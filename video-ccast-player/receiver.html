@@ -38,12 +38,13 @@
 				window.mediaElement = document.getElementById('media');
 				window.mediaManager = new cast.receiver.MediaManager(window.mediaElement);
 				window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
-				window.castReceiverManager.start();
 		
-				var customMessageBus = castReceiverManager.getCastMessageBus('urn:x-cast:org.gcastsamples.castnotifications');
+				var customMessageBus = window.castReceiverManager.getCastMessageBus('urn:x-cast:org.gcastsamples.castnotifications');
 				customMessageBus.onMessage = function(event) {
 					document.getElementById('adv-content').innerHTML = event.data;
 				}
+
+				window.castReceiverManager.start();
 			}
 		</script>
 	</body>
