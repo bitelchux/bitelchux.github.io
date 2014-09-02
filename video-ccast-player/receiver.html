@@ -24,11 +24,12 @@
 </head>
 	<body>
 		<div id="mediaContainer">
+		<!-- to test: https://d2k4ls0ga9ks2.cloudfront.net/VID_20140727_225510282.mp4 -->
 			<div id="videoContainer">
 				<video id="media"/>
 			</div>
 			<div class="banner">
-				<p>This is an Overlay</p>
+				<p id="adv-content">This is an Overlay</p>
 			</div>
 		</div>
 		
@@ -38,6 +39,11 @@
 				window.mediaManager = new cast.receiver.MediaManager(window.mediaElement);
 				window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
 				window.castReceiverManager.start();
+		
+				var customMessageBus = castReceiverManager.getCastMessageBus('urn:x-cast:org.gcastsamples.castnotifications');
+				customMessageBus.onMessage = function(event) {
+					document.getElementById('adv-content').innerHTML = event.data;
+				}
 			}
 		</script>
 	</body>
