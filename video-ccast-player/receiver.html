@@ -2,6 +2,8 @@
 <html>
 	<head>
 		<title>HTML5 Video Test</title>
+		<script src="//www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js"></script>
+
 		<style>
 		video {
 			width: 50%;
@@ -23,14 +25,20 @@
 	<body>
 		<div id="mediaContainer">
 			<div id="videoContainer">
-				<video
-					src="https://d2k4ls0ga9ks2.cloudfront.net/VID_20140727_225510282.mp4"
-	  				type="video/mp4"
-	  				controls autoplay/>
+				<video id="media"/>
 			</div>
 			<div class="banner">
 				<p>This is an Overlay</p>
 			</div>
 		</div>
+		
+		<script>
+			window.onload = function() {
+				window.mediaElement = document.getElementById('media');
+				window.mediaManager = new cast.receiver.MediaManager(window.mediaElement);
+				window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
+				window.castReceiverManager.start();
+			}
+		</script>
 	</body>
 </html>
