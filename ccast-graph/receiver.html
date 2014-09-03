@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>HTML5 Video Test</title>
+			<link rel="stylesheet" type="text/css" href="examples.css">
+
+			<script src="jquery.min.js"></script>
+			<script src="excanvas.min.js"></script>
+			<script src="jquery.flot.min.js"></script>
+
+			<script src="//www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js"></script>
+	</head>
+
+	<body>
+		<div id="plot_inputs">
+			<label for="range_begin">Initial Value</label>
+			<input id="range_begin" type="input" value="-10"/>
+
+			<label for="range_end">Final Value</label>
+			<input id="range_end" type="input" value="+10"/>
+
+			<label for="range_increment">Increment</label>
+			<input id="range_increment" type="input" value="0.5"/>
+
+			<label for="funct">Function of x</label>
+			<textarea id="funct" rows="4" cols="50">return Math.sin(x);</textarea>
+
+			<button id="btn_plot" type="button">Plot!</button>
+		</div>
+		<div id="content">
+			<div class="demo-container">
+				<div id="placeholder" class="demo-placeholder"></div>
+			</div>
+		</div>
+	</body>
+	
+	<script>
+		function plot(data) {
+			var func = 'var _func = function(x) { ' + data.funct + '};'; 
+
+			$.globalEval(func);
+
+			var points = [];
+			for (var x = data.begin; x <= data.end; x+=data.increment) {
+				points.push([x, _func(x)]);
+			}
+
+			$.plot("#placeholder", [ points ]);
+		};
+
+		function startBrowserMode() {
+			$( "#btn_plot" ).on( "click", function( event ) {
+				var data = {};
+				data.funct = $('#funct').val();
+				data.begin = parseFloat($('#range_begin').val());
+				data.end = parseFloat($('#range_end').val());
+				data.increment = parseFloat($('#range_increment').val());
+				plot(data);
+			});
+		};
+
+ 		function startChromeCastMode() {
+			window.onload = function() {
+				window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
+		
+				var customMessageBus = window.castReceiverManager.getCastMessageBus('urn:x-cast:org.gcastsamples.plot');
+				customMessageBus.onMessage = function(event) {
+					var json = $.parseJSON(event.data);
+					plot(json);
+				}
+
+				window.castReceiverManager.start();
+			}
+		};
+		
+		if (navigator.userAgent.indexOf('CrKey') >= 0) {
+			$('#plot_inputs').hide();
+			startChromeCastMode();
+		} else {
+			$('#plot_inputs').show();
+			startBrowserMode();
+		}
+	</script>
+</html>
