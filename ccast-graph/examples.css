@@ -84,7 +84,7 @@ input[type=checkbox] {
 	-webkit-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
 }
 
-@media tv and (min-width: 700px) and (orientation: landscape) {
+@media tv {
 	.demo-container {
 		width: 1050px;
 		height: 550px;
