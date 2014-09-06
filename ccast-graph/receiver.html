@@ -75,6 +75,7 @@
 		
 		if (navigator.userAgent.indexOf('CrKey') >= 0) {
 			$('#plot_inputs').hide();
+			$( '#page_navigation1' ).addClass( 'demo-container-for-tv' );
 			startChromeCastMode();
 		} else {
 			$('#plot_inputs').show();
