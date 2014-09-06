@@ -38,7 +38,7 @@
 		function plot(data) {
 			var func = 'var _func = function(x) { ' + data.funct + '};'; 
 
-			$.globalEval(func);
+			$.globalEval(func); // Be aware of injections!!
 
 			var points = [];
 			for (var x = data.begin; x <= data.end; x+=data.increment) {
@@ -75,7 +75,7 @@
 		
 		if (navigator.userAgent.indexOf('CrKey') >= 0) {
 			$('#plot_inputs').hide();
-			$( '#page_navigation1' ).addClass( 'demo-container-for-tv' );
+		    $('.demo-container').addClass('demo-container-for-tv');
 			startChromeCastMode();
 		} else {
 			$('#plot_inputs').show();
