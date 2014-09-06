@@ -63,7 +63,7 @@
 			window.onload = function() {
 				window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
 		
-				var customMessageBus = window.castReceiverManager.getCastMessageBus('urn:x-cast:org.gcastsamples.plot');
+				var customMessageBus = window.castReceiverManager.getCastMessageBus('urn:x-cast:org.gcastsamples.plotandcast');
 				customMessageBus.onMessage = function(event) {
 					var json = $.parseJSON(event.data);
 					plot(json);
