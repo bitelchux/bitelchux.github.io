@@ -75,34 +75,60 @@
 					showBanner('#notification_banner');
 			}
 
-			var fakeAds =  ['Discount now on Play Store!!',
+			var advertising = {
+				contents : ['Discount now on Play Store!!',
 							'Free Mac Pro for who sleeps one month in Apple Store Line!',
 							'Cheap Flights from Campinas to Rio de Janeiro!!',
 							'Wanna code HTML5 for food?',
-							'Learn JavaScript with us now!! Free courses available!!'];
-			var index = 0;
+							'Learn JavaScript with us now!! Free courses available!!'],
+
+				start : function() {
+					var index = 0;
+					advertising.interval = setInterval(function getAds() {
+						showAd(advertising.contents[index]);
+						if (index == advertising.contents.length) {
+							index = 0;
+						} else {
+							index++;
+						}
+					}, 5000);
+				},
+
+				stop : function() {
+					if (advertising.interval) {
+						clearInterval(advertising.interval);
+					}
+				}
+			};
 
 			window.onload = function() {
 				window.mediaElement = document.getElementById('media');
+
 				window.mediaManager = new cast.receiver.MediaManager(window.mediaElement);
+				window.mediaManager.onPlay = (function() {
+				    var origOnPlay = mediaManager.onPlay;
+				    return function(event) {
+				    	advertising.start();
+				        origOnPlay(event);
+				    }
+				}());
+
 				window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
 
-				var customMessageBus = window.castReceiverManager.getCastMessageBus(
-									'urn:x-cast:org.gcastsamples.castnotifications');
+				window.castReceiverManager.onSenderDisconnected = function(event) {
+					if (window.castReceiverManager.getSenders().length == 0 &&
+						event.reason == cast.receiver.system.DisconnectReason.REQUESTED_BY_SENDER) {
+						advertising.stop();
+						window.close();
+					}
+				};
+
+				var customMessageBus = window.castReceiverManager.getCastMessageBus('urn:x-cast:org.gcastsamples.castnotifications');
 				customMessageBus.onMessage = function(event) {
 					showNotification(event.data);
 				}
 
-				window.castReceiverManager.start();
-				
-				setInterval(function getAds() {
-					showAd(fakeAds[index]);
-					if (index == fakeAds.length) {
-						index = 0;
-					} else {
-						index++;
-					}
-				}, 5000);
+				window.castReceiverManager.start();				
 			}
 		</script>
 	</body>
