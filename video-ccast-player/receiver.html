@@ -104,14 +104,6 @@
 				window.mediaElement = document.getElementById('media');
 
 				window.mediaManager = new cast.receiver.MediaManager(window.mediaElement);
-				
-				window.mediaManager['origOnPlay'] = mediaManager.onPlay;
-				window.mediaManager.onPlay = function (event) {
-				    console.info('play!!');
-				    advertising.start();
-					window.mediaManager['origOnPlay'](event);
-				};
-
 				window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
 
 				window.castReceiverManager.onSenderDisconnected = function(event) {
@@ -127,7 +119,10 @@
 					showNotification(event.data);
 				}
 
-				window.castReceiverManager.start();				
+				window.castReceiverManager.start();
+
+				// the best is to start advertising with video playing...
+				advertising.start();
 			}
 		</script>
 	</body>
