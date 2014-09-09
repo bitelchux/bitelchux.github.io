@@ -102,10 +102,13 @@
 
 			window.onload = function() {
 				window.mediaElement = document.getElementById('media');
+				window.mediaElement.addEventListener('playing', function(event) {
+					console.info('Started!');
+					advertising.start();
+				});
 
 				window.mediaManager = new cast.receiver.MediaManager(window.mediaElement);
 				window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
-
 				window.castReceiverManager.onSenderDisconnected = function(event) {
 					if (window.castReceiverManager.getSenders().length == 0 &&
 						event.reason == cast.receiver.system.DisconnectReason.REQUESTED_BY_SENDER) {
@@ -114,15 +117,13 @@
 					}
 				};
 
-				var customMessageBus = window.castReceiverManager.getCastMessageBus('urn:x-cast:org.gcastsamples.castnotifications');
+				var customMessageBus = window.castReceiverManager.getCastMessageBus(
+							'urn:x-cast:org.gcastsamples.castnotifications');
 				customMessageBus.onMessage = function(event) {
 					showNotification(event.data);
 				}
 
 				window.castReceiverManager.start();
-
-				// the best is to start advertising with video playing...
-				advertising.start();
 			}
 		</script>
 	</body>
