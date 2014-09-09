@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>HTML5 Video Test</title>
+		<title>HTML5 Charts for Web and Chromecast</title>
 			<link href="receiver.css" rel="stylesheet">
 		    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
     
@@ -14,27 +14,30 @@
 
 	<body>
 		<form id="plot_inputs" role="form" class="panel panel-default">
+		   <div class="panel-heading">
+				<h3 class="panel-title">Fill all fields below and plot your Graph:</h3>
+		   </div>
 			<div class="panel-body">
-			<div class="form-group">
-				<label for="range_begin">Initial Value</label>
-				<input id="range_begin" type="input" value="-10" class="form-control" required/>
-			</div>
+				<div class="form-group input-group-lg">
+					<label for="range_begin">Initial Value</label>
+					<input id="range_begin" type="input" value="-10" class="form-control" required/>
+				</div>
 
-			<div class="form-group">
-				<label for="range_end">Final Value</label>
-				<input id="range_end" type="input" value="+10" class="form-control"  required/>
-			</div>
+				<div class="form-group input-group-lg">
+					<label for="range_end">Final Value</label>
+					<input id="range_end" type="input" value="+10" class="form-control"  required/>
+				</div>
 
-			<div class="form-group">
-				<label for="range_increment">Increment</label>
-				<input id="range_increment" type="input" value="0.5" class="form-control" required/>
-			</div>
+				<div class="form-group input-group-lg">
+					<label for="range_increment">Increment</label>
+					<input id="range_increment" type="input" value="0.5" class="form-control" required/>
+				</div>
 
-			<div class="form-group">
-				<label for="funct">Function of x</label>
-				<textarea id="funct" rows="4" cols="50"  class="form-control" required>return Math.sin(x);</textarea>
-			</div>
-			<button id="btn_plot" type="button" class="btn btn-default">Plot!</button>
+				<div class="form-group input-group-lg">
+					<label for="funct">Function of x</label>
+					<textarea id="funct" rows="4" cols="50"  class="form-control" required>return Math.sin(x);</textarea>
+				</div>
+				<button id="btn_plot" type="button" class="btn btn-default">Plot!</button>
 			</div>
 		</form>
 		<div id="content">
