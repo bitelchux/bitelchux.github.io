@@ -104,14 +104,13 @@
 				window.mediaElement = document.getElementById('media');
 
 				window.mediaManager = new cast.receiver.MediaManager(window.mediaElement);
-				window.mediaManager.onPlay = (function() {
-				    var origOnPlay = mediaManager.onPlay;
-				    return function(event) {
-				    	console.info('play!!');
-				    	advertising.start();
-				        origOnPlay(event);
-				    }
-				}());
+				
+				window.mediaManager['origOnPlay'] = mediaManager.onPlay;
+				window.mediaManager.onPlay = function (event) {
+				    console.info('play!!');
+				    advertising.start();
+					window.mediaManager['origOnPlay'](event);
+				};
 
 				window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
 
