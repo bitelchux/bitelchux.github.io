@@ -72,7 +72,7 @@
 
 console.log = function(message) {
     console.olog(message);
-    $('#dbug').append('<p>' + message + '</p>');
+    $('#dbug').append('<br/>' + message);
 };
 console.error = console.debug = console.info =  console.log
 		function plot(data) {
@@ -101,17 +101,21 @@ $( "#dbug" ).html($("#dbug").html()+"1."+func);
 
  		function startChromeCastMode() {
 			window.onload = function() {
+				$('#dbug').append('<br/>a');
 				window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
-		
+		$('#dbug').append('<br/>b');
 				var customMessageBus = window.castReceiverManager.getCastMessageBus('urn:x-cast:org.gcastsamples.plotandcast');
+				
+				$('#dbug').append('<br/>'+customMessageBus);
 				customMessageBus.onMessage = function(event) {
-					$( "#dbug" ).html($("#dbug").html()+"0."+event.data);
+						$('#dbug').append('<br/>'+event.data);
+					
 					var json = $.parseJSON(event.data);
 					plot(json);
 				}
 
 				window.castReceiverManager.start();
-				$( "#dbug" ).html($("#dbug").html()+"3.");
+				$('#dbug').append('<br/>c');
 			}
 		};
 		
