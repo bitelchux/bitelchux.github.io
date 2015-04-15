@@ -24,7 +24,7 @@
 		
 	</div>
 	<h1>xxxx</h1>
-	<iframe src="http://juegosjuegosgratis.mobi/juego/indiara-and-the-gold-skull/" width="800" height="600"></iframe>
+	<iframe src="http://juegosjuegosgratis.mobi/juego/indiara-and-the-gold-skull/" style="position:absolute;top:0px;left:0px" width="800" height="600"></iframe>
 	
 	
 		<form id="plot_inputs" role="form" class="panel panel-default">
@@ -98,7 +98,9 @@ $( "#dbug" ).html($("#dbug").html()+"1."+func);
 				plot(data);
 			});
 		};
-
+function simulateClick(x, y) {
+    jQuery(document.elementFromPoint(x, y)).click();
+}
  		function startChromeCastMode() {
 			window.onload = function() {
 			
@@ -108,8 +110,7 @@ $( "#dbug" ).html($("#dbug").html()+"1."+func);
 				
 			
 				customMessageBus.onMessage = function(event) {
-					$('#dbug').append('<br/>z');
-						$('#dbug').append('<br/>'+event.data);
+					 simulateClick(350, 350)
 					
 					var json = $.parseJSON(event.data);
 					plot(json);
