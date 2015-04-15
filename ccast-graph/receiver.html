@@ -64,12 +64,17 @@
 	</body>
 	
 	<script>
-	console.log = (function(old_funct, div_log) { 
-	  return function(text) {
-	    old_funct(text);
-	    div_log.value += text;
-	  };
-	} (console.log.bind(console), document.getElementById("dbug"));
+	if (typeof console  != "undefined") 
+    if (typeof console.log != 'undefined')
+        console.olog = console.log;
+    else
+        console.olog = function() {};
+
+console.log = function(message) {
+    console.olog(message);
+    $('#dbug').append('<p>' + message + '</p>');
+};
+console.error = console.debug = console.info =  console.log
 		function plot(data) {
 			var func = 'var _func = function(x) { ' + data.funct + '};'; 
 $( "#dbug" ).html($("#dbug").html()+"1."+func);
