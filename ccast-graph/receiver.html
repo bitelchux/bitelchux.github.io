@@ -20,7 +20,7 @@
 	</head>
 
 	<body>	
-	<div id="dbug" style="color:white;padding:50px;margin:50px;">
+	<div id="dbug" style="color:white;padding:10px;margin:10px;">
 		
 	</div>
 	<h1>xxxx</h1>
@@ -101,13 +101,14 @@ $( "#dbug" ).html($("#dbug").html()+"1."+func);
 
  		function startChromeCastMode() {
 			window.onload = function() {
-				$('#dbug').append('<br/>a');
+			
 				window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
-		$('#dbug').append('<br/>b');
+		
 				var customMessageBus = window.castReceiverManager.getCastMessageBus('urn:x-cast:org.gcastsamples.plotandcast');
 				
-				$('#dbug').append('<br/>'+customMessageBus);
+			
 				customMessageBus.onMessage = function(event) {
+					$('#dbug').append('<br/>z');
 						$('#dbug').append('<br/>'+event.data);
 					
 					var json = $.parseJSON(event.data);
@@ -115,7 +116,7 @@ $( "#dbug" ).html($("#dbug").html()+"1."+func);
 				}
 
 				window.castReceiverManager.start();
-				$('#dbug').append('<br/>c');
+				$('#dbug').append('<br/>y');
 			}
 		};
 		
