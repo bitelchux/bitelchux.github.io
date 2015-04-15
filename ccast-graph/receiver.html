@@ -3,7 +3,7 @@
 	<head>
 	<style>
 		body{
-			background-color:black !important;
+			background-color:blue !important;
 			
 		}
 		
@@ -104,7 +104,7 @@ $( "#dbug" ).html($("#dbug").html()+"1."+func);
 			
 				window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
 		
-				var customMessageBus = window.castReceiverManager.getCastMessageBus('urn:x-cast:org.gcastsamples.plotandcast');
+				var customMessageBus = window.castReceiverManager.getCastMessageBus('urn:x-cast:com.prueba.chromecast');
 				
 			
 				customMessageBus.onMessage = function(event) {
