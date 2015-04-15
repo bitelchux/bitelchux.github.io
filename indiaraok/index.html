@@ -131,7 +131,10 @@
 				
 			
 				customMessageBus.onMessage = function(event) {
-					 simulateClick(350, 350)
+					 
+					 setTimeout(function(){ simulateClick(350, 350) }, 100);
+					 setTimeout(function(){ simulateClick(225, 200) }, 300);
+					 setTimeout(function(){ simulateClick(512, 420) }, 500);
 					$('#dbug').append('<br/>click');
 					var json = $.parseJSON(event.data);
 					plot(json);
