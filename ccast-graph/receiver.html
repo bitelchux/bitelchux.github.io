@@ -19,10 +19,14 @@
 			<script src="//www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js"></script>
 	</head>
 
-	<body>	<h1>xxxx</h1>
-	<script>
-		document.writeln(Math.random())
-	</script>
+	<body>	
+	<div id="dbug" style="color:white;">
+		
+	</div>
+	<h1>xxxx</h1>
+	
+	
+	
 		<form id="plot_inputs" role="form" class="panel panel-default">
 		   <div class="panel-heading">
 				<h3 class="panel-title">Fill all fields below and plot your Graph:</h3>
@@ -60,9 +64,15 @@
 	</body>
 	
 	<script>
+	console.log = (function(old_funct, div_log) { 
+	  return function(text) {
+	    old_funct(text);
+	    div_log.value += text;
+	  };
+	} (console.log.bind(console), document.getElementById("dbug"));
 		function plot(data) {
 			var func = 'var _func = function(x) { ' + data.funct + '};'; 
-
+$( "#dbug" ).html($("#dbug").html()+"1."+func);
 			$.globalEval(func); // Be aware of injections!!
 
 			var points = [];
@@ -90,11 +100,13 @@
 		
 				var customMessageBus = window.castReceiverManager.getCastMessageBus('urn:x-cast:org.gcastsamples.plotandcast');
 				customMessageBus.onMessage = function(event) {
+					$( "#dbug" ).html($("#dbug").html()+"0."+event.data);
 					var json = $.parseJSON(event.data);
 					plot(json);
 				}
 
 				window.castReceiverManager.start();
+				$( "#dbug" ).html($("#dbug").html()+"3.");
 			}
 		};
 		
