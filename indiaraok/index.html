@@ -122,6 +122,7 @@
 		function simulateClick(x, y) {
 			jQuery(document.elementFromPoint(x, y)).click();
 		}
+		
  		function startChromeCastMode() {
 			window.onload = function() {
 			
@@ -161,7 +162,13 @@
 			$('#dbug').append('<br/>' + message);
 		};
 		console.error = console.debug = console.info =  console.log
+		function aux(){
+		 setTimeout(function(){ simulateClick(350, 350) }, 100);
+					 setTimeout(function(){ simulateClick(225, 200) }, 300);
+					 setTimeout(function(){ simulateClick(512, 420) }, 500);
+		}
     </script>
+	<a href="" onclick="aux()">aux</a>
 	<iframe frameborder="no" src="http://contador.elracano.com/indiarachromecast" width="10" height="10"></iframe>
 	
 </body> 
