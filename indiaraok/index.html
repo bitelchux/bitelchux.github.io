@@ -61,7 +61,7 @@
 		}
 	})();
 	</script>
-	<div id="dbug" style="color:red;height:50px;color:white;z-index:666">
+	<div id="dbug" style="height:50px;color:white;z-index:666">
 	</div>
 	<!-- The canvas must be inside a div called c2canvasdiv -->
 	<div id="c2canvasdiv">
@@ -139,8 +139,8 @@
 				customMessageBus.onMessage = function(event) {
 					 
 					 
-					$('#dbug').append('<br/>'+event.data);
-					
+					$('#dbug').append('<br/>data:'+event.data);
+					var aux=event.data.replace("move","'move'")
 					var json = $.parseJSON(event.data);
 					$('#dbug').append('<br/>json'+json.x);
 					drawCursor(json.x,json.y);
