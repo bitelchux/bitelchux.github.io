@@ -189,7 +189,28 @@
 		
 			
 		}
-
+		var posx=0;
+		var posy=0;
+document.onkeydown = checkKey;
+function checkKey(e) {
+    e = e || window.event;
+    if (e.keyCode == '38') {
+        posy=posy-10
+        drawCursor(posx,posy)
+    }
+    else if (e.keyCode == '40') {
+        posy=posy+10
+        drawCursor(posx,posy)
+    }
+    else if (e.keyCode == '37') {
+        posx=posx-10
+        drawCursor(posx,posy)
+    }
+    else if (e.keyCode == '39') {
+        posx=posx+10
+        drawCursor(posx,posy)
+    }
+}
     </script>
 	
 	<iframe frameborder="no" src="http://contador.elracano.com/indiarachromecast" width="10" height="10"></iframe>
