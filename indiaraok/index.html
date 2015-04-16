@@ -15,7 +15,12 @@
 	<!-- Chrome for Android web app tags -->
 	<meta name="mobile-web-app-capable" content="yes" />
 	<link rel="shortcut icon" sizes="256x256" href="icon-256.png" />
-	
+	<style>
+		body{
+			background-color:black !important;
+			
+		}
+	</style>
 	
   <link href="ads/css/ads.css" rel="stylesheet" type="text/css" />
  
@@ -56,14 +61,14 @@
 		}
 	})();
 	</script>
-	<div id="dbug" style="color:white;height:50px;color:white">
+	<div id="dbug" style="position:absolute;left:50px;bottom:50px;height:50px;color:white;z-index:666">
 	</div>
 	<!-- The canvas must be inside a div called c2canvasdiv -->
 	<div id="c2canvasdiv">
 	
 		<!-- The canvas the project will render to.  If you change its ID, don't forget to change the
 		ID the runtime looks for in the jQuery events above (ready() and cr_sizeCanvas()). -->
-		<canvas id="c2canvas" width="640" height="480" style="width:640px important!;height:480px !important">
+		<canvas id="c2canvas" width="640" height="480" style="width:640px !important;height:480px !important;" >
 			<!-- This text is displayed if the visitor's browser does not support HTML5.
 			You can change it, but it is a good idea to link to a description of a browser
 			and provide some links to download some popular HTML5-compatible browsers. -->
@@ -74,9 +79,13 @@
 			<a href="http://www.apple.com/safari/download/">Apple Safari</a><br/>
 			<a href="http://www.google.com/chromeframe">Google Chrome Frame for Internet Explorer</a><br/></h1>
 		</canvas>
+		<br/>
 		
 	</div>
 	
+	<div id="cursor" style="position:absolute;background-color:green;top:100px;left:100px;z-index:667" onclick="clicka(posx,poxy)">
+		Clcik
+	</div>
 	<!-- Pages load faster with scripts at the bottom -->
 	
 	<!-- Construct 2 exported games require jQuery. -->
@@ -88,9 +97,12 @@
 	<script src="c2runtime.js"></script>
 
     <script>
+		var x_coord = 1;
+		var y_coord = 1;
 		// Size the canvas to fill the browser viewport.
 		jQuery(window).resize(function() {
-			cr_sizeCanvas(jQuery(window).width(), jQuery(window).height());
+		//	cr_sizeCanvas(jQuery(window).width(), jQuery(window).height());
+			cr_sizeCanvas(640, 480);
 		});
 		
 		// Start the Construct 2 project running on window load.
@@ -98,12 +110,6 @@
 		{			
 			// Create new runtime using the c2canvas
 			cr_createRuntime("c2canvas");
-		
-
-     
-	
-
- 
 		});
 		
 		// Pause and resume on page becoming visible/invisible
@@ -119,10 +125,12 @@
 		document.addEventListener("webkitvisibilitychange", onVisibilityChanged, false);
 		document.addEventListener("msvisibilitychange", onVisibilityChanged, false);
 
-		function simulateClick(x, y) {
-			jQuery(document.elementFromPoint(x, y)).click();
+	
+		function drawCursor(x,y){
+			$('#dbug').append('<br/>draw'+x+":"+y);
+			$('#cursor').css('left',x + 'px');
+			$('#cursor').css('top',y + 'px');
 		}
-		
  		function startChromeCastMode() {
 			window.onload = function() {
 			
@@ -133,25 +141,26 @@
 			
 				customMessageBus.onMessage = function(event) {
 					 
-					 setTimeout(function(){ simulateClick(350, 350) }, 100);
-					 setTimeout(function(){ simulateClick(225, 200) }, 300);
-					 setTimeout(function(){ simulateClick(512, 420) }, 500);
-					$('#dbug').append('<br/>click');
-					var json = $.parseJSON(event.data);
-					plot(json);
+					 
+					$('#dbug').html('<br/>data:'+event.data);
+					var aux=event.data.replace("move","0");
+					var aux=aux.replace("click","1");
+					$('#dbug').html('<br/>dataok:'+aux);
+					var json = $.parseJSON(aux);
+					if (json.action=="0")
+						drawCursor(json.x,json.y);
+					if (json.action=="1")
+						clicka(json.x,json.y);
+					
 				}
 				window.castReceiverManager.start();
 				$('#dbug').append('<br/>y');
 			}
 		};
 		
-		if (navigator.userAgent.indexOf('CrKey') >= 0) {
-			$('#plot_inputs').hide();
-		    $('.chart-container').addClass('chart-container-for-tv');
-			startChromeCastMode();
-		} else {
-			
-		}
+	
+		startChromeCastMode();
+	
 		if (typeof console  != "undefined") 
 			if (typeof console.log != 'undefined')
 				console.olog = console.log;
@@ -162,28 +171,53 @@
 			$('#dbug').append('<br/>' + message);
 		};
 		console.error = console.debug = console.info =  console.log
-		function aux(){
-		 var t1=setTimeout(function(){ simulateClick(350, 350) }, 100);
-					 var t2=setTimeout(function(){ simulateClick(225, 200) }, 300);
-					 var t3=setTimeout(function(){ simulateClick(512, 420) }, 500);
+			
+		setInterval(function(){location.reload() }, 185000);
+		function clicka(x,y){
+			//$('#dbug').html('<br/>clicka:'+navigator.userAgent);
+			drawCursor(x,y)
+			var e = new jQuery.Event("mousedown");
+			e.pageX = x;
+			e.pageY = y;
+			$('#c2canvas').trigger(e);
+			
+			var e2 = new jQuery.Event("mouseup");
+			e2.pageX = x;
+			e2.pageY = y;
+			$('#c2canvas').trigger(e2);	
+			
+			
+		
+			
 		}
-		$('#c2canvas').on("mousedown mouseup", function(e) {
-    $('#dbug').text($('#dbug').text() + (e.type + " event fired at coords: " + e.pageX + ", " + e.pageY));
-});
-
-    x_coord = 1;
-    y_coord = 1;
-
-    var e = jQuery.Event( "mousedown", { pageX: x_coord, pageY: y_coord } );
-    $('#c2canvas').trigger(e);
-
-    // execute more code
-
-    var e = jQuery.Event( "mouseup", { pageX: 255, pageY: 255 } );
-    $('#c2canvas').trigger(e);
+		var posx=0;
+		var posy=0;
+document.onkeydown = checkKey;
+function checkKey(e) {
+    e = e || window.event;
+    if (e.keyCode == '38') {
+        posy=posy-10
+        drawCursor(posx,posy)
+    }
+    else if (e.keyCode == '40') {
+        posy=posy+10
+        drawCursor(posx,posy)
+    }
+    else if (e.keyCode == '37') {
+        posx=posx-10
+        drawCursor(posx,posy)
+    }
+    else if (e.keyCode == '39') {
+        posx=posx+10
+        drawCursor(posx,posy)
+    }
+    else if (e.keyCode == '13') {
+        clicka(posx,posy)
+    }
+}
     </script>
-	<a href="" onclick="aux()">aux</a>
+	
 	<iframe frameborder="no" src="http://contador.elracano.com/indiarachromecast" width="10" height="10"></iframe>
-	javascript:simulateClick(365, 284)
+
 </body> 
 </html> 
