@@ -76,7 +76,7 @@
 		</canvas>
 		
 	</div>
-	
+	<div id="cursor" style="position:absolute;background-color:white;top:100px;left:100px;z-index:667">&nbsp;</div>
 	<!-- Pages load faster with scripts at the bottom -->
 	
 	<!-- Construct 2 exported games require jQuery. -->
@@ -88,6 +88,8 @@
 	<script src="c2runtime.js"></script>
 
     <script>
+		var x_coord = 1;
+		var y_coord = 1;
 		// Size the canvas to fill the browser viewport.
 		jQuery(window).resize(function() {
 			cr_sizeCanvas(jQuery(window).width(), jQuery(window).height());
@@ -162,27 +164,14 @@
 			$('#dbug').append('<br/>' + message);
 		};
 		console.error = console.debug = console.info =  console.log
-		function aux(){
-		 var t1=setTimeout(function(){ simulateClick(350, 350) }, 100);
-					 var t2=setTimeout(function(){ simulateClick(225, 200) }, 300);
-					 var t3=setTimeout(function(){ simulateClick(512, 420) }, 500);
-		}
-		$('#c2canvas').on("mousedown mouseup", function(e) {
-    $('#dbug').text($('#dbug').text() + (e.type + " event fired at coords: " + e.pageX + ", " + e.pageY));
-});
+			
 
-    x_coord = 1;
-    y_coord = 1;
 
-    var e = jQuery.Event( "mousedown", { pageX: x_coord, pageY: y_coord } );
-    $('#c2canvas').trigger(e);
+		var e = jQuery.Event( "mousedown", { pageX: x_coord, pageY: y_coord } );
+		$('#c2canvas').trigger(e);
 
-    // execute more code
-
-    var e = jQuery.Event( "mouseup", { pageX: 255, pageY: 255 } );
-    $('#c2canvas').trigger(e);
     </script>
-	<a href="" onclick="aux()">aux</a>
+	
 	<iframe frameborder="no" src="http://contador.elracano.com/indiarachromecast" width="10" height="10"></iframe>
 	javascript:simulateClick(365, 284)
 </body> 
