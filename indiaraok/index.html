@@ -123,7 +123,10 @@
 		function simulateClick(x, y) {
 			jQuery(document.elementFromPoint(x, y)).click();
 		}
-		
+		function drawCursor(x,y){
+			$('#cursor').css('left',x + 'px');
+			$('#cursor').css('top',y + 'px');
+		}
  		function startChromeCastMode() {
 			window.onload = function() {
 			
@@ -137,6 +140,7 @@
 					 
 					$('#dbug').append('<br/>'+event.data);
 					var json = $.parseJSON(event.data);
+					drawCursor(json.x,json.y);
 					
 				}
 				window.castReceiverManager.start();
