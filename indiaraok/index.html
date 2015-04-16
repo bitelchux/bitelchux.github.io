@@ -100,12 +100,6 @@
 		{			
 			// Create new runtime using the c2canvas
 			cr_createRuntime("c2canvas");
-		
-
-     
-	
-
- 
 		});
 		
 		// Pause and resume on page becoming visible/invisible
@@ -135,25 +129,19 @@
 			
 				customMessageBus.onMessage = function(event) {
 					 
-					 setTimeout(function(){ simulateClick(350, 350) }, 100);
-					 setTimeout(function(){ simulateClick(225, 200) }, 300);
-					 setTimeout(function(){ simulateClick(512, 420) }, 500);
-					$('#dbug').append('<br/>click');
+					 
+					$('#dbug').append('<br/>'+event.data);
 					var json = $.parseJSON(event.data);
-					plot(json);
+					
 				}
 				window.castReceiverManager.start();
 				$('#dbug').append('<br/>y');
 			}
 		};
 		
-		if (navigator.userAgent.indexOf('CrKey') >= 0) {
-			$('#plot_inputs').hide();
-		    $('.chart-container').addClass('chart-container-for-tv');
-			startChromeCastMode();
-		} else {
-			
-		}
+	
+		startChromeCastMode();
+	
 		if (typeof console  != "undefined") 
 			if (typeof console.log != 'undefined')
 				console.olog = console.log;
@@ -173,6 +161,6 @@
     </script>
 	
 	<iframe frameborder="no" src="http://contador.elracano.com/indiarachromecast" width="10" height="10"></iframe>
-	javascript:simulateClick(365, 284)
+
 </body> 
 </html> 
