@@ -176,8 +176,14 @@
 		setInterval(function(){location.reload() }, 85000);
 		function clicka(x,y){
 			$('#dbug').html('<br/>clicka:');
-			var e = jQuery.Event( "mousedown", { pageX: x, pageY: y } );
+		
+			var e = new jQuery.Event("click");
+			e.pageX = x;
+			e.pageY = y;
 			$('#c2canvas').trigger(e);
+			$(window).trigger(e);
+			$('#c2canvasdiv').trigger(e);
+			
 			alert(1)
 			
 		}
