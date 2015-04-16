@@ -61,14 +61,14 @@
 		}
 	})();
 	</script>
-	<div id="dbug" style="height:50px;color:white;z-index:666">
+	<div id="dbug" style="position:absolute;left:50px;bottom:50px;height:50px;color:white;z-index:666">
 	</div>
 	<!-- The canvas must be inside a div called c2canvasdiv -->
 	<div id="c2canvasdiv">
 	
 		<!-- The canvas the project will render to.  If you change its ID, don't forget to change the
 		ID the runtime looks for in the jQuery events above (ready() and cr_sizeCanvas()). -->
-		<canvas id="c2canvas" width="640" height="480" style="top:0px !important;left:0px !important;width:640px important!;height:480px !important">
+		<canvas id="c2canvas" width="640" height="480" style="position:absolute;top:0px !important;left:0px !important;width:640px important!;height:480px !important">
 			<!-- This text is displayed if the visitor's browser does not support HTML5.
 			You can change it, but it is a good idea to link to a description of a browser
 			and provide some links to download some popular HTML5-compatible browsers. -->
