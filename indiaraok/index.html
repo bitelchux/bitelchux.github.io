@@ -141,10 +141,12 @@
 					 
 					$('#dbug').html('<br/>data:'+event.data);
 					var aux=event.data.replace("move","0");
-				
+					var aux=aux.replace("click","1");
 					var json = $.parseJSON(aux);
-				
-					drawCursor(json.x,json.y);
+					if (json.action=="0")
+						drawCursor(json.x,json.y);
+					if (json.action=="1")
+						clicka(json.x,json.y);
 					
 				}
 				window.castReceiverManager.start();
@@ -167,9 +169,10 @@
 		console.error = console.debug = console.info =  console.log
 			
 		setInterval(function(){location.reload() }, 85000);
-
-		var e = jQuery.Event( "mousedown", { pageX: x_coord, pageY: y_coord } );
-		$('#c2canvas').trigger(e);
+		function clicka(x,y){
+			var e = jQuery.Event( "mousedown", { pageX: x, pageY: y } );
+			$('#c2canvas').trigger(e);
+		}
 
     </script>
 	
