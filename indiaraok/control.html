@@ -1,26 +1,29 @@
 <html>
 <head>
+<meta name="language" content="us" />
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />  
 	<script src="jquery-2.0.0.min.js"></script>
 
-	<style>
-		.flota{
-			float:left;
-			witdh:50%;						
-		}
-		.botonaccion{
-			vertical-align:middle;
-			text-align:center;
-			background-color:red;
-			color:white;
-			font-weight:strong;
-		}
-	</style>
-	<script>
+
+    <style>
+        .flota{
+        float:left;
+        witdh:50%;
+        }
+        .botonaccion{
+        vertical-align:middle;
+        text-align:center;
+        background-color:red;
+        color:white;
+        font-weight:strong;
+        }
+    </style>
+    <script>
 		var posx=0;
 		var posy=0;
 		var oldx=0;
 		var oldy=0;
-
 		var upressed=false;
 		var dpressed=false;
 		var lpressed=false;
@@ -28,10 +31,10 @@
 		function raton(){
 			var incx=0;
 			var incy=0;
-			if (upressed) incy=1;
-			if (dpressed) incy=-1;
-			if (rpressed) incx=1;
-			if (lpressed) incx=-1;
+			if (upressed) incy=10;
+			if (dpressed) incy=-10;
+			if (rpressed) incx=10;
+			if (lpressed) incx=-10;
 			posx=posx+incx;
 			posy=posy+incy;
 			if (oldx!=posx || oldy!=posy){
@@ -59,7 +62,6 @@
 				e.preventDefault();
 				dpressed=false
 			});
-
 			$('#btnl').bind('touchstart', function(e) {
 				e.preventDefault();				
 				lpressed=true
@@ -68,7 +70,6 @@
 				e.preventDefault();
 				lpressed=false
 			});
-
 			$('#btnr').bind('touchstart', function(e) {
 				e.preventDefault();				
 				rpressed=true
@@ -84,31 +85,31 @@
 </head>
 <body>
 new!!
-	<div class="flota">
-		<table border=1 style="float:none">
-			<tr>
-				<td colspan="2" align="center">
-					<img src="" alt="arriba" id="btnu" />
-				</td>
-			</tr>
-			<tr>
-				<td align=left>
-					<img src="" alt="izquierda"  id="btnl" />
-				</td>
-				<td align=right>
-					<img src="" alt="derecha"  id="btnr" />
-				</td>
-			</tr>
-			<tr>
-				<td colspan=2 align=center>
-					<img src="" alt="abajo"  id="btnd" />
-				</td>
-			</tr>
-		</table>
-	</div>
-	<div class="flota botonaccion" onclick="clica()">
-		ACTION
-	</div>
+<div class="flota">
+    <table border=1 style="float:none">
+        <tr>
+            <td colspan="2" align="center">
+                <img src="" alt="arriba" id="btnu" />
+            </td>
+        </tr>
+        <tr>
+            <td align=left>
+                <img src="" alt="izquierda"  id="btnl" />
+            </td>
+            <td align=right>
+                <img src="" alt="derecha"  id="btnr" />
+            </td>
+        </tr>
+        <tr>
+            <td colspan=2 align=center>
+                <img src="" alt="abajo"  id="btnd" />
+            </td>
+        </tr>
+    </table>
+</div>
+<div class="flota botonaccion" onclick="Android.cliz(posx,posy)">
+    ACTION
+</div>
 </body>
 
 </html>
