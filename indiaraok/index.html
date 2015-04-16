@@ -175,9 +175,14 @@
 		function clicka(x,y){
 			$('#dbug').html('<br/>clicka:');
 			drawCursor(x,y)
-			var e = new jQuery.Event("click");
+			var e = new jQuery.Event("mousedown");
 			e.pageX = x;
 			e.pageY = y;
+			$('#c2canvas').trigger(e);
+			
+			var e2 = new jQuery.Event("mouseup");
+			e2.pageX = x;
+			e2.pageY = y;
 			$('#c2canvas').trigger(e);
 			
 			
