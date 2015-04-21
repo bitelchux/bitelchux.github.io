@@ -4,7 +4,7 @@
 		var theSenderID=0;
 		var customMessageBus=null;
 		function drawCursor(x,y){
-			$('#dbug').append('<br/>draw'+x+":"+y);
+			//$('#dbug').append('<br/>draw'+x+":"+y);
 			$('#cursor').css('left',x + 'px');
 			$('#cursor').css('top',y + 'px');
 		}
@@ -19,7 +19,7 @@
 				customMessageBus.onMessage = function(event) {
 					 
 					 theSenderID = event.senderId;
-					$('#dbug').html('<br/>dataok:'+event.data);
+					//$('#dbug').html('<br/>dataok:'+event.data);
 					//var aux=event.data.replace("move","0");
 					//var aux=aux.replace("click","1");
 				//	$('#dbug').html('<br/>dataok:'+aux);
@@ -40,7 +40,7 @@
 					
 				}
 				window.castReceiverManager.start();
-				$('#dbug').append('<br/>y');
+				//$('#dbug').append('<br/>y');
 			}
 		};
 		
@@ -54,7 +54,7 @@
 				console.olog = function() {};
 		console.log = function(message) {
 			console.olog(message);
-			$('#dbug').append('<br/>' + message);
+			//$('#dbug').append('<br/>' + message);
 		};
 		console.error = console.debug = console.info =  console.log
 			
@@ -91,9 +91,9 @@
 			clearTimeout(timerClickOn);
 		}
 		function send(id,msg){
-			$('#dbug').html('<br/>message sent to sender init');
+			//$('#dbug').html('<br/>message sent to sender init');
 			customMessageBus.send(id,msg);
-			$('#dbug').html('<br/>message sent to sender ok');
+			//$('#dbug').html('<br/>message sent to sender ok');
 		}
 		document.onkeydown = checkKey;
 		function checkKey(e) {
