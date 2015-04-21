@@ -152,7 +152,7 @@
 					$('#dbug').html('<br/>data:'+event.data);
 					//var aux=event.data.replace("move","0");
 					//var aux=aux.replace("click","1");
-					$('#dbug').html('<br/>dataok:'+aux);
+				//	$('#dbug').html('<br/>dataok:'+aux);
 					var json = $.parseJSON(aux);
 					if (json.action=="move")
 						drawCursor(json.x,json.y);
