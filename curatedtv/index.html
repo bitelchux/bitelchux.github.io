@@ -1,0 +1,755 @@
+
+<!DOCTYPE html PUBLIC "-//WAPFORUM//DTD XHTML Mobile 1.2//EN" "http://www.openmobilealliance.org/tech/DTD/xhtml-mobile12.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>MY Tv listings</title>
+<meta name="title" content="MY Tv listings" />
+<meta name="language" content="" />
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />  
+<script src="http://code.jquery.com/jquery.min.js" type="text/javascript"></script> 
+
+
+<link href='http://fonts.googleapis.com/css?family=Ubuntu:300' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="slider.css" />
+<script src="slider.js" type="text/javascript"></script>
+<script src="lazyload.js" type="text/javascript"></script>
+<script src="../vex.js" type="text/javascript"></script> 
+
+<script>vex.defaultOptions.className = 'vex-theme-default';</script>
+
+<link rel="stylesheet" href="http://github.hubspot.com/vex/css/vex.css" />
+
+<link rel="stylesheet" href="http://github.hubspot.com/vex/css/vex-theme-default.css" />
+<script>
+
+function alertDialog(msg){
+    vex.dialog.buttons.YES.text = 'Ok',
+  
+    vex.dialog.alert({    
+      message: msg,
+  /*
+      callback: function(value) {
+        if(value){
+            document.location.href='https://www.facebook.com/dialog/oauth/?client_id=229317550587161&redirect_uri=http://diagnosticodesintomas.com/&state=YOUR_STATE_VALUE&scope=email';
+                   
+        }
+      }      
+      */
+    });
+}
+function show(i){
+var txt= $("#ficha" + i).html().replace("oculto","nop")
+
+	alertx(txt);
+}
+                function alertx(txt) {
+                	
+					alertDialog(txt);
+				
+                }
+                
+                
+ $(document).ready(function(){
+        //refreshcurrenthour()
+           var elem = document.querySelector('#action');
+           var s1= new Powerange(elem, { min: -10, max: 10, start: 0,hideRange: true });      
+           elem = document.querySelector('#adventure');
+           var s2 = new Powerange(elem, { min: -10, max: 10, start: 0,hideRange: true });
+           elem = document.querySelector('#comedy');
+           var s3 = new Powerange(elem, { min: -10, max: 10, start: 0,hideRange: true });
+           elem = document.querySelector('#drama');
+           var s4 = new Powerange(elem, { min: -10, max: 10, start: 0,hideRange: true });
+           elem = document.querySelector('#fantasy');
+           var s5 = new Powerange(elem, { min: -10, max: 10, start: 0,hideRange: true });
+           elem = document.querySelector('#horror');
+           var s6 = new Powerange(elem, { min: -10, max: 10, start: 0,hideRange: true });
+           elem = document.querySelector('#mystery');
+           var s7 = new Powerange(elem, { min: -10, max: 10, start: 0,hideRange: true });
+           elem = document.querySelector('#romance');
+           var s8 = new Powerange(elem, { min: -10, max: 10, start: 0,hideRange: true });
+           elem = document.querySelector('#sci-fi');
+           var s9 = new Powerange(elem, { min: -10, max: 10, start: 0,hideRange: true });
+		   elem = document.querySelector('#game-show');
+           var s10 = new Powerange(elem, { min: -10, max: 10, start: 0,hideRange: true });
+		   elem = document.querySelector('#talk-show');
+           var s10 = new Powerange(elem, { min: -10, max: 10, start: 0,hideRange: true });
+		   elem = document.querySelector('#sports');
+           var s10 = new Powerange(elem, { min: -10, max: 10, start: 0,hideRange: true });
+		   
+        $('.cli').click(function(e) {
+			var txt=$(this).html()
+            txt= txt.replace(/(<([^>]+)>)/ig,"")
+            txt= txt.replace("&nbsp;","")                   
+			//alertx(txt);
+		})
+      $('.liwatch').click(function(e) {
+    		var txt=$(this).html();
+            var obj=$(this);
+            $.get( "setcookie.php?cual=" + txt, function( data ) {
+                obj.removeClass();                
+                obj.addClass("liwatch");
+                obj.addClass( data );
+            });
+
+
+		})  
+	
+        $(function() {
+			$('.choose_state').change(function (){ showRefresh(true) });
+			$('.range-slider').change(function (){ showRefresh(true) });
+			
+            $("img.lazy").lazyload({
+                 effect : "fadeIn"
+            });
+			showFilters(true);
+	
+
+			setInterval(function(){
+				$(".blinker").animate({'opacity':'0.1'},300)
+				$(".blinker").animate({'opacity':'1'},300)
+				$(".blinker").animate({'opacity':'0.1'},300)
+				$(".blinker").animate({'opacity':'1'},300)
+			},5500); 
+            
+        });
+		myresize();
+})
+	function tomorrow(obj){
+		//document.location.href='/index2.php?'+$(obj).val()+'=1'
+	}
+	var minWpc=596;
+	function showRefresh(show){
+		if (show){
+			$("#btnApplyFilters").fadeIn("slow");
+
+		}else{
+			$("#btnApplyFilters").hide();
+		}
+	}
+	function showFilters(show){
+		var w = $(document).width(); // New width
+    //    alert(w)
+//		if (w>=minWpcTablet) return;
+		if (show){
+			$(".filtros").fadeIn("slow");
+			$("#dataOver").fadeIn("slow");
+			$("#btnShowFilters").fadeOut("slow");
+			$(document).scrollTop()
+		
+		}else{
+			$(".filtros").fadeOut("slow");
+			$("#dataOver").fadeOut("slow");
+			$("#btnApplyFilters").hide();
+			$("#btnShowFilters").fadeIn("slow");
+		
+		}
+	}
+    var minWpcTablet=854;
+	function myresize() {
+		$(document).scrollTop()
+		return 0;
+		var w = $(document).width(); // New width
+       // alert("myresize" + w)
+		if (w <= minWpcTablet) {
+			//$(".filtros").width($(document).width()-50)
+		//	alert(1)
+			//$("#data").width($(document).width()-50)
+			
+		} else {
+			//$(".filtros").width(300)
+          //  alert(2)
+			//$("#data").width($(document).width()-$(".filtros").width()-120)
+            
+		}
+		//movil una columna
+	}
+	$(window).resize(function () {
+        
+		myresize();
+	});
+
+function applyfilter(){
+    var salida="getdata.php?f=1"
+
+    $( ".range-slider" ).each(function() {
+      salida=salida + "&" + this.id + "=" + parseInt($(this).val());
+    });
+	//salida=salida+"&onlymovies=" + $("#onlymovies").val()
+	salida=salida+"&offset=" + $("#offset").val()
+	//salida=salida+"&genre=" + $("#genre").val()
+	salida=salida+"&hour=" + $("#hour").val()
+	salida=salida+"&hmasuno=" + $("#hmasuno").val()
+    //alert(salida);
+	$( "#data" ).html( "<p align='center'><h1>Loading...</h1></p>" );
+    $.get( salida, function( data ) {
+        $( "#data" ).html( data );
+		//myresize();
+		showRefresh(false)
+		showFilters(false)
+		$(document).scrollTop()
+        $("img.lazy").lazyload({
+                 effect : "fadeIn"
+         });        
+    });
+ 
+
+}
+function slug(Text)
+{
+    return Text
+        .toLowerCase()
+        .replace(/ /g,'-')
+        .replace(/[^\w-]+/g,'')
+        ;
+}
+
+</script>  
+    <script type="text/javascript">
+
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-30469433-7']);
+    _gaq.push(['_trackPageview']);
+
+    (function () {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+
+</script>
+<style>
+
+* {
+font-family: 'Ubuntu', sans-serif;
+border: 0;
+font-size:small;
+color:black;
+
+}
+body {
+margin: 0px;
+padding: 0px;
+overflow-x: hidden;
+overflow-y: scroll;
+}
+
+.fondoazul h2{
+color:white;
+}
+.fondoazul p{
+text-align:left;
+color:white;
+}
+.fondoazul a{
+width:300px;
+font-size:1.2em;
+font-weight:bold;
+}
+.item{
+border-bottom:1px solid silver;
+
+}
+.destacado{
+background-color:#4678c6;
+color:white;
+
+}
+.destacado strong{
+
+color:white;
+}
+table{
+border-spacing: 0;
+border-collapse: collapse;
+}
+.c{
+width:px !important;
+font-size:small;
+font-weight:bold;
+text-align:center;
+overflow:hidden;
+}
+.p{
+border:1px solid silver;
+}
+
+
+.qina{
+cursor: pointer;
+margin: 0px;
+padding: 0px;
+height: 40px;
+
+overflow: hidden;
+text-overflow: ellipsis;
+white-space: nowrap;
+background-color:#E3E1E2 !important;
+
+border-bottom:1px solid black;
+}
+.qin{
+cursor: pointer;
+margin: 0px;
+padding: 0px;
+height: 40px;
+
+overflow: hidden;
+text-overflow: ellipsis;
+white-space: nowrap;
+
+border-bottom:1px solid black;
+}
+
+
+h1,h2,h3,h4,h5{
+display:inline;
+font-size:small;
+}
+.q0{
+height: 39px;
+text-align: center;
+font-weight:bold;
+vertical-align: middle;
+width:px;
+
+}
+.reglahora,.conrelleno {
+color: white;
+font-size: normal;
+background-color: #2D6BB4;
+}
+.reglahoraalt, .conrellenoalt {
+color: white;
+font-size: normal;
+background-color: #3D82D4;
+}
+.reglahora,.reglahoraalt{
+height: 20px;
+width:px;
+}
+.fondoazul{
+background-color:#4c7ed1;
+width:100%;
+}
+
+.q0 select{
+	width:100%;
+	height:20px;
+}
+.header ul{
+list-style-type:none;
+padding:2px;
+margin:0px;
+}
+.header ul li{
+display:inline;
+}
+button, .boton, input, submit {
+cursor:pointer;
+display: inline-block;
+vertical-align: top;
+color: #2087fc;
+text-align: center;
+background-color: white;
+border-radius: 4px;
+font-weight: bold;
+box-shadow: inset 0 0 0 1px #2087fc;
+-webkit-appearance: none;
+height: 30px;
+line-height: 30px;
+padding: 0 20px;
+border-bottom: 2px solid #c8c8c8;
+}
+.header a{
+text-decoration:none;
+}
+.header h1{
+margin:0px;
+padding:0px;
+}
+.pelis td{
+overflow:hidden;
+font-size:small !important;
+}
+.lishora{
+width:40px;
+}
+.liscanal{
+max-width:100px;
+font-weight:bold;
+}
+.pelis a{
+text-decoration:none;
+font-size:small !important;
+color:black;
+}
+#watchlist ul li { 
+display: inline; 
+margin:2px;
+padding:5px;
+}
+.liactivo{
+    background-color:#00aa00;
+    border:1px solid green;
+}
+.liinactivo{
+    background-color:#aa0000;
+    border:1px solid red;
+}
+.poster{
+	float:left;
+}
+.conte{
+position:relative
+}
+.peli{
+	float:left;
+	width:98px;
+    max-width:98px;
+	max-height:190px;
+	margin:2px;
+	padding:2px;
+	height:190px;
+    box-shadow: 0 1px 2px rgba(34, 25, 25, 0.4);
+    background: -webkit-linear-gradient(45deg, #ffffff, #f9f9f9);
+
+	overflow: hidden;
+	margin-bottom:10px;
+}
+.peli td{
+	text-overflow:ellipsis;
+    vertical-align:top;
+    width:99%;
+    
+}
+.h h2{
+overflow: hidden;
+color:white;
+text-overflow: ellipsis;
+
+}
+.peli .h{
+	background-color:#4678c6;
+	color:white;
+	text-align:center;
+	max-height:30px;
+	overflow:hidden;
+    vertical-align:top;
+    position:absolute;
+    top:0px;
+    width:100%;
+    opacity:0.65
+}
+.peli .c{
+	background-color:#4678c6;
+	color:white;
+}
+.peli .h{
+}
+#data{
+min-width:300px;
+}
+select.choose_state{
+margin: 1px;
+padding: 1px;
+box-shadow: 0 1px 2px rgba(34, 25, 25, 0.4);
+}
+
+select.choose_state {
+    border: 2px solid #4c7ed1;
+   background-color:white;
+    -webkit-border-radius: 0px;
+    outline: none;
+ 
+    font-size: 1em;
+  
+    display: inline-block; /*Important*/
+}
+.filtros{
+	position:absolute;
+	top:50px;
+	left:0px;
+	box-shadow: 0 1px 2px rgba(34, 25, 25, 0.4);
+	min-width:300px;
+	max-width:620px;
+	width:90%;
+	margin:4px;
+	padding:4px;
+	z-index:3;
+	background-color:white;
+}
+.header {
+	background: #4c7ed1;
+	background: #4c7ed1 -webkit-gradient(linear,0 0,0 100%,from(#5587e2),to(#4678c6));
+	background: -moz-linear-gradient(top,#5587e2,#4678c6);
+	height: 40px;
+	padding: 0;
+	margin-bottom: 5px;
+	border-bottom: 1px solid #c8c8c8;
+	box-shadow: 0 1px 1px rgba(0,0,0,0.04);
+	top:0px;
+	left:0px;
+	position:fixed;
+	width:100%;
+	z-index:4;
+}
+#dataOver{
+	width:100%;
+	position:fixed;
+	top:0px;
+	left:0px;
+	height:100%;
+	z-index:2;
+	background-color:black;
+	opacity:0.5;
+}
+
+#refreshdiv{
+	position:fixed;
+	top:0px;
+	left:0px;
+	width:100%;
+	height:90px;
+	display:none;
+	z-index:5;
+}
+#refreshdiv #inner{
+	display: table;
+	text-align:center;
+	color:white;
+	margin: 0 auto;
+	background-color:#4c7ed1;
+	width:310px;
+	height:90px;
+}
+#data{
+	z-index:1
+	float:left;
+	margin:10px;
+	padding:10px;
+	display:inline-block;
+}
+.lazy{
+width:98px;
+max-height:134px;
+}
+option{
+text-transform:capitalize;
+}
+
+	
+		#inner p{
+			color:white;
+			font-weight:bold;
+		}
+		.grande{
+			font-size:x-large;
+		}
+.poster{
+	width:92px;
+	height:129px;
+}
+.descrip{
+display:none;   
+}
+
+
+#data{
+    width:90%;
+}
+.flota{
+	float:left;
+	width:300px;
+    padding: 2px;
+}
+.oculto{
+display:none;
+}
+.nota_0{
+background-color:#F53105;
+}
+.nota_1{
+background-color:#F55733;
+}
+.nota_2{
+background-color:#F78A72;
+}
+.nota_3{
+background-color:#F5B5A6;
+}
+.nota_4{
+background-color:#F7D5CD;
+}
+.nota_5{
+background-color:#ffffff;
+}
+.nota_6{
+background-color:#D7F5D0;
+}
+.nota_7{
+background-color:#C1F7B5;
+}
+.nota_8{
+background-color:#78FA5A;
+}
+.nota_9{
+background-color:#55FA2F;
+}
+.nota_10{
+background-color:#34F707;
+}
+</style>
+
+
+</head>
+<body>
+	<div class="header">
+		<ul  style="text-align:center">
+
+
+        		<li><a class="boton" href="http://tvgrid.info/">&lt;Back</a></li>
+        		<li><div class="boton blinker" id="btnApplyFilters" onclick="applyfilter()">Apply Filters</div></li>
+		<li><div class="boton blinker" id="btnShowFilters" onclick="showFilters(true)" style="display:none">Show Filters</div></li>
+		</ul>
+	</div>
+	<br/><br/><br/><br/>
+
+<div class="filtros" id="filtrosdiv">
+  
+    <div  class="fondoazul">
+    <BR/>
+    <h2>PERSONALIZE RESULTS</h2>
+    <BR/><BR/>
+    </div>
+    Results will be showed according your selection in the below options
+    <br/>
+
+	<div class="flota">
+        <br/><br/>
+		<table width="90%">
+			<tr>
+				<td align="left">
+					<strong style="color:red">I hate</strong>
+				</td>
+				<td align="center">
+					<strong style="color:orange">Indiferent</strong>
+				</td>
+				<td align="right">
+					<strong style="color:green">I love it</strong>
+				</td>
+			</tr>
+			
+		</table>	
+		<h3>Action</h3>
+		<input type="text" id="action" class="range-slider"/>
+		<br/>
+		<h3>Adventure</h3>
+		<input type="text" id="adventure" class="range-slider"/>
+		<br/>
+		<h3>Comedy</h3>
+		<input type="text" id="comedy" class="range-slider"/>
+		<br/>
+		<h3>Drama</h3>
+		<input type="text" id="drama" class="range-slider"/>
+		<br/>
+		<h3>Fantasy</h3>
+		<input type="text" id="fantasy" class="range-slider"/>
+		<br/>
+		<h3>Horror</h3>
+		<input type="text" id="horror" class="range-slider"/>
+<br/>
+	</div>
+    
+	<div class="flota">
+        <br/><br/>
+		<table width="90%">
+			<tr>
+				<td align="left">
+					<strong style="color:red">I hate</strong>
+				</td>
+				<td align="center">
+					<strong style="color:orange">Indiferent</strong>
+				</td>
+				<td align="right">
+					<strong style="color:green">I love it</strong>
+				</td>
+			</tr>
+			
+		</table>	
+		<h3>Romance</h3>
+		<input type="text" id="romance" class="range-slider"/>
+		<br/>
+		<h3>Sci Fi</h3>
+		<input type="text" id="sci-fi" class="range-slider"/>
+		<br/>
+		<h3>Game Show</h3>
+		<input type="text" id="game-show" class="range-slider"/>
+		<br/>
+		<h3>Talk Show</h3>
+		<input type="text" id="talk-show" class="range-slider"/>
+		<br/>
+		<h3>Sports</h3>
+		<input type="text" id="sports" class="range-slider"/>
+		<br/>
+		<h3>Mystery</h3>
+		<input type="text" id="mystery" class="range-slider"/>
+		<br/>		
+	</div>
+	 <div style="clear:both"></div>	 <div class="boton azul" onclick="applyfilter()">Apply</div><div class="boton azul" onclick="showFilters(false);" >Cancel</div>
+    <br/>
+    <br/>
+    <br/>
+
+</div>
+	<div style="text-align:center;padding:3px;margin:5px">
+		<h4 class='grande'>From
+
+		<select name="hour" id="hour" class="choose_state" onchange="applyfilter()"  size="1">
+		<option value=0 >0:00</option><option value=1 >1:00</option><option value=2 >2:00</option><option value=3 >3:00</option><option value=4 >4:00</option><option value=5 >5:00</option><option value=6 >6:00</option><option value=7 >7:00</option><option value=8 >8:00</option><option value=9 >9:00</option><option value=10 >10:00</option><option value=11 >11:00</option><option value=12 selected>12:00</option><option value=13 >13:00</option><option value=14 >14:00</option><option value=15 >15:00</option><option value=16 >16:00</option><option value=17 >17:00</option><option value=18 >18:00</option><option value=19 >19:00</option><option value=20 >20:00</option><option value=21 >21:00</option><option value=22 >22:00</option>		</select> to 
+		<select name="hmasuno" id="hmasuno" class="choose_state" onchange="applyfilter()"  size="1">
+		<option value=11 >11:00</option><option value=12 >12:00</option><option value=13 >13:00</option><option value=14 >14:00</option><option value=15 >15:00</option><option value=16 >16:00</option><option value=17 >17:00</option><option value=18 >18:00</option><option value=19 >19:00</option><option value=20 >20:00</option><option value=21 >21:00</option><option value=22 >22:00</option><option value=23 selected>23:00</option>		</select>
+		
+		
+		<select name="offset" id="offset" class="choose_state" onchange="applyfilter()"  size="1">
+			<option value="">Eastern Time-Now 12:35</option>
+			<option value="1">Central time-Now 11:35</option>
+			<option value="2">Mountain time-Now 10:35</option>
+			<option value="3">Pacific time-Now 09:35</option>
+			<option value="4">Alaska time-Now 08:35</option>
+		</select>
+		</h4>
+		<br/>
+		<!--
+		<h3>Show only</h3>
+		<select name="genre" id="genre" class="choose_state"  size="1">
+		<option value="">All Genres</option>
+		<option value="action">action</option> 
+		<option value="adventure">adventure</option>    <option value="comedy">comedy</option>    <option value="drama">drama</option>    <option value="fantasy">fantasy</option>   
+		<option value="romance">romance</option>    <option value="horror">horror</option>    <option value="sci-fi">sci-fi</option>    <option value="sport">sport</option>    
+		<option value="game-show">game-show</option> <option value="talk-show">talk-show</option> <option value="sports">sports</option> 
+		<option value="mystery">mystery</option>
+		</select> 
+
+		<br/>
+		<h3>Show</h3>
+		<select name="onlymovies" id="onlymovies" class="choose_state"  size="1">
+		<option value="">Movies and programs</option>
+		<option value="1">Only movies</option>
+
+		</select>
+		-->
+		
+		<p style='font-size:medium'>Results sorted by your personalized preferences (firsts items are best for you than the last one)</p>
+	</div>
+	
+	<div id="dataOver">&nbsp;</div>
+    <div id="data">
+
+    <table class='peli' onclick='show(0)'><tr><td><div class='conte'><div class='h'><h2> LONESOME DOVE -  RETURN</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/96639.jpg'/></div></div></td></tr><tr><td class='t'>21:35 to 23:10</td></tr><tr><td><table><tr><td class='c'>ENCORE</td><td class='nota_10'>10</td></tr></table></td></tr></table><div id='ficha0' class='oculto'><h3> LONESOME DOVE -  RETURN</h3><br/>Epic story about two former Texas rangers who decide to move cattle from the south to Montana. Augustus McCrae and Woodrow Call run into many problems on the way, and the journey doesnt ... » <br/><b>Genres</b> Adventure Drama Western<br/><b>Your personalized rating: 10</b></div><table class='peli' onclick='show(1)'><tr><td><div class='conte'><div class='h'><h2> LONESOME DOVE -  THE PLAINS</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/96639.jpg'/></div></div></td></tr><tr><td class='t'>20:00 to 21:35</td></tr><tr><td><table><tr><td class='c'>ENCORE</td><td class='nota_10'>10</td></tr></table></td></tr></table><div id='ficha1' class='oculto'><h3> LONESOME DOVE -  THE PLAINS</h3><br/>Epic story about two former Texas rangers who decide to move cattle from the south to Montana. Augustus McCrae and Woodrow Call run into many problems on the way, and the journey doesnt ... » <br/><b>Genres</b> Adventure Drama Western<br/><b>Your personalized rating: 10</b></div><table class='peli' onclick='show(2)'><tr><td><div class='conte'><div class='h'><h2> THE SECRET IN THEIR EYES</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/1305806.jpg'/></div></div></td></tr><tr><td class='t'>21:00 to 23:10</td></tr><tr><td><table><tr><td class='c'>INDIE</td><td class='nota_7'>7</td></tr></table></td></tr></table><div id='ficha2' class='oculto'><h3> THE SECRET IN THEIR EYES</h3><br/>A retired legal counselor writes a novel hoping to find closure for one of his past unresolved homicide cases and for his unreciprocated love with his superior - both of which still haunt him decades later. <br/><b>Genres</b> Drama Mystery Thriller<br/><b>Your personalized rating: 7</b></div><table class='peli' onclick='show(3)'><tr><td><div class='conte'><div class='h'><h2> THE SECRET IN THEIR EYES</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/1305806.jpg'/></div></div></td></tr><tr><td class='t'>13:35 to 15:50</td></tr><tr><td><table><tr><td class='c'>INDIE</td><td class='nota_7'>7</td></tr></table></td></tr></table><div id='ficha3' class='oculto'><h3> THE SECRET IN THEIR EYES</h3><br/>A retired legal counselor writes a novel hoping to find closure for one of his past unresolved homicide cases and for his unreciprocated love with his superior - both of which still haunt him decades later. <br/><b>Genres</b> Drama Mystery Thriller<br/><b>Your personalized rating: 7</b></div><table class='peli' onclick='show(4)'><tr><td><div class='conte'><div class='h'><h2> SEINFELD -  THE APARTMENT</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/98904.jpg'/></div></div></td></tr><tr><td class='t'>19:30 to 20:00</td></tr><tr><td><table><tr><td class='c'>TBS</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha4' class='oculto'><h3> SEINFELD -  THE APARTMENT</h3><br/>The continuing misadventures of neurotic New York stand-up comedian Jerry Seinfeld and his equally neurotic New York friends. <br/><b>Genres</b> Comedy<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(5)'><tr><td><div class='conte'><div class='h'><h2> GAME OF THRONES -  THE HOUSE OF BLACK AND WHITE</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/944947.jpg'/></div></div></td></tr><tr><td class='t'>21:00 to 22:00</td></tr><tr><td><table><tr><td class='c'>HBO</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha5' class='oculto'><h3> GAME OF THRONES -  THE HOUSE OF BLACK AND WHITE</h3><br/>Several noble families fight for control of the mythical land of Westeros. <br/><b>Genres</b> Adventure Drama Fantasy<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(6)'><tr><td><div class='conte'><div class='h'><h2> SEINFELD -  THE PHONE MESSAGE</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/98904.jpg'/></div></div></td></tr><tr><td class='t'>19:00 to 19:30</td></tr><tr><td><table><tr><td class='c'>TBS</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha6' class='oculto'><h3> SEINFELD -  THE PHONE MESSAGE</h3><br/>The continuing misadventures of neurotic New York stand-up comedian Jerry Seinfeld and his equally neurotic New York friends. <br/><b>Genres</b> Comedy<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(7)'><tr><td><div class='conte'><div class='h'><h2> FRIENDS -  THE ONE WITH THE MEMORIAL SERVICE</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/108778.jpg'/></div></div></td></tr><tr><td class='t'>16:30 to 17:00</td></tr><tr><td><table><tr><td class='c'>TBS</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha7' class='oculto'><h3> FRIENDS -  THE ONE WITH THE MEMORIAL SERVICE</h3><br/>When Monicas high school friend (Rachel) re-enters her life, she sets off on a series of humorous and entertaining events involving Monicas brother (Ross), her ex-roommate (Phoebe), and her next door neighbors (Chandler & Joey) <br/><b>Genres</b> Comedy Romance<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(8)'><tr><td><div class='conte'><div class='h'><h2> FRIENDS -  THE ONE WITH THE BOOB JOB</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/108778.jpg'/></div></div></td></tr><tr><td class='t'>16:00 to 16:30</td></tr><tr><td><table><tr><td class='c'>TBS</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha8' class='oculto'><h3> FRIENDS -  THE ONE WITH THE BOOB JOB</h3><br/>When Monicas high school friend (Rachel) re-enters her life, she sets off on a series of humorous and entertaining events involving Monicas brother (Ross), her ex-roommate (Phoebe), and her next door neighbors (Chandler & Joey) <br/><b>Genres</b> Comedy Romance<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(9)'><tr><td><div class='conte'><div class='h'><h2> SEINFELD -  THE JACKET</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/98904.jpg'/></div></div></td></tr><tr><td class='t'>18:00 to 18:30</td></tr><tr><td><table><tr><td class='c'>TBS</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha9' class='oculto'><h3> SEINFELD -  THE JACKET</h3><br/>The continuing misadventures of neurotic New York stand-up comedian Jerry Seinfeld and his equally neurotic New York friends. <br/><b>Genres</b> Comedy<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(10)'><tr><td><div class='conte'><div class='h'><h2> FRIENDS -  THE ONE WITH THE LOTTERY</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/108778.jpg'/></div></div></td></tr><tr><td class='t'>17:00 to 17:30</td></tr><tr><td><table><tr><td class='c'>TBS</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha10' class='oculto'><h3> FRIENDS -  THE ONE WITH THE LOTTERY</h3><br/>When Monicas high school friend (Rachel) re-enters her life, she sets off on a series of humorous and entertaining events involving Monicas brother (Ross), her ex-roommate (Phoebe), and her next door neighbors (Chandler & Joey) <br/><b>Genres</b> Comedy Romance<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(11)'><tr><td><div class='conte'><div class='h'><h2> FRIENDS -  THE ONE WITH RACHELS DREAM</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/108778.jpg'/></div></div></td></tr><tr><td class='t'>17:30 to 18:00</td></tr><tr><td><table><tr><td class='c'>TBS</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha11' class='oculto'><h3> FRIENDS -  THE ONE WITH RACHELS DREAM</h3><br/>When Monicas high school friend (Rachel) re-enters her life, she sets off on a series of humorous and entertaining events involving Monicas brother (Ross), her ex-roommate (Phoebe), and her next door neighbors (Chandler & Joey) <br/><b>Genres</b> Comedy Romance<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(12)'><tr><td><div class='conte'><div class='h'><h2> SEINFELD -  THE CHINESE RESTAURANT</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/98904.jpg'/></div></div></td></tr><tr><td class='t'>18:30 to 19:00</td></tr><tr><td><table><tr><td class='c'>TBS</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha12' class='oculto'><h3> SEINFELD -  THE CHINESE RESTAURANT</h3><br/>The continuing misadventures of neurotic New York stand-up comedian Jerry Seinfeld and his equally neurotic New York friends. <br/><b>Genres</b> Comedy<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(13)'><tr><td><div class='conte'><div class='h'><h2> SPONGEBOB SQUAREPANTS -  BLACKENED SPONGE MERMAID MAN VS. SPONGE</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/206512.jpg'/></div></div></td></tr><tr><td class='t'>17:30 to 18:00</td></tr><tr><td><table><tr><td class='c'>NIK</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha13' class='oculto'><h3> SPONGEBOB SQUAREPANTS -  BLACKENED SPONGE MERMAID MAN VS. SPONGE</h3><br/>The misadventures of a fast-food restaurant working sponge who lives under the sea. <br/><b>Genres</b> Animation Comedy Family<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(14)'><tr><td><div class='conte'><div class='h'><h2> NHL HOCKEY -  VANCOUVER CANUCKS AT CALGARY FLAMES</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/772213.jpg'/></div></div></td></tr><tr><td class='t'>22:00 to 01:00</td></tr><tr><td><table><tr><td class='c'>USA</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha14' class='oculto'><h3> NHL HOCKEY -  VANCOUVER CANUCKS AT CALGARY FLAMES</h3><br/>NBC Sports presents live game coverage from the National Hockey League. Bill Clement and Ray Ferraro will provide extensive coverage from the NBC Sports studio. <br/><b>Genres</b> Sport<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(15)'><tr><td><div class='conte'><div class='h'><h2> SPONGEBOB SQUAREPANTS -  THE GRAVEYARD SHIFT KRUSTY LOVE</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/206512.jpg'/></div></div></td></tr><tr><td class='t'>17:00 to 17:30</td></tr><tr><td><table><tr><td class='c'>NIK</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha15' class='oculto'><h3> SPONGEBOB SQUAREPANTS -  THE GRAVEYARD SHIFT KRUSTY LOVE</h3><br/>The misadventures of a fast-food restaurant working sponge who lives under the sea. <br/><b>Genres</b> Animation Comedy Family<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(16)'><tr><td><div class='conte'><div class='h'><h2> NHL HOCKEY -  WASHINGTON CAPITALS AT NEW YORK ISLANDERS</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/772213.jpg'/></div></div></td></tr><tr><td class='t'>19:30 to 22:00</td></tr><tr><td><table><tr><td class='c'>USA</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha16' class='oculto'><h3> NHL HOCKEY -  WASHINGTON CAPITALS AT NEW YORK ISLANDERS</h3><br/>NBC Sports presents live game coverage from the National Hockey League. Bill Clement and Ray Ferraro will provide extensive coverage from the NBC Sports studio. <br/><b>Genres</b> Sport<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(17)'><tr><td><div class='conte'><div class='h'><h2> BOY MEETS WORLD -  JANITOR DAD</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/105958.jpg'/></div></div></td></tr><tr><td class='t'>18:00 to 18:30</td></tr><tr><td><table><tr><td class='c'>ABCF</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha17' class='oculto'><h3> BOY MEETS WORLD -  JANITOR DAD</h3><br/>Adolescent Cory Matthews grows up, and faces problems with friends, family, and school. <br/><b>Genres</b> Comedy Drama Family<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(18)'><tr><td><div class='conte'><div class='h'><h2> BOY MEETS WORLD -  FISHING FOR VIRNA</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/105958.jpg'/></div></div></td></tr><tr><td class='t'>17:00 to 17:30</td></tr><tr><td><table><tr><td class='c'>ABCF</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha18' class='oculto'><h3> BOY MEETS WORLD -  FISHING FOR VIRNA</h3><br/>Adolescent Cory Matthews grows up, and faces problems with friends, family, and school. <br/><b>Genres</b> Comedy Drama Family<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(19)'><tr><td><div class='conte'><div class='h'><h2> BOY MEETS WORLD -  SHALLOW BOY</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/105958.jpg'/></div></div></td></tr><tr><td class='t'>17:30 to 18:00</td></tr><tr><td><table><tr><td class='c'>ABCF</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha19' class='oculto'><h3> BOY MEETS WORLD -  SHALLOW BOY</h3><br/>Adolescent Cory Matthews grows up, and faces problems with friends, family, and school. <br/><b>Genres</b> Comedy Drama Family<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(20)'><tr><td><div class='conte'><div class='h'><h2> SPONGEBOB SQUAREPANTS -  NEW STUDENT STARFISH CLAMS</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/206512.jpg'/></div></div></td></tr><tr><td class='t'>14:30 to 15:00</td></tr><tr><td><table><tr><td class='c'>NIK</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha20' class='oculto'><h3> SPONGEBOB SQUAREPANTS -  NEW STUDENT STARFISH CLAMS</h3><br/>The misadventures of a fast-food restaurant working sponge who lives under the sea. <br/><b>Genres</b> Animation Comedy Family<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(21)'><tr><td><div class='conte'><div class='h'><h2> SPONGEBOB SQUAREPANTS -  BORN AGAIN KRABS I HAD AN ACCIDENT</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/206512.jpg'/></div></div></td></tr><tr><td class='t'>15:00 to 15:30</td></tr><tr><td><table><tr><td class='c'>NIK</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha21' class='oculto'><h3> SPONGEBOB SQUAREPANTS -  BORN AGAIN KRABS I HAD AN ACCIDENT</h3><br/>The misadventures of a fast-food restaurant working sponge who lives under the sea. <br/><b>Genres</b> Animation Comedy Family<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(22)'><tr><td><div class='conte'><div class='h'><h2> SPONGEBOB SQUAREPANTS -  YOURS, MINE AND MINE KRACKED KRABS</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/206512.jpg'/></div></div></td></tr><tr><td class='t'>15:30 to 16:00</td></tr><tr><td><table><tr><td class='c'>NIK</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha22' class='oculto'><h3> SPONGEBOB SQUAREPANTS -  YOURS, MINE AND MINE KRACKED KRABS</h3><br/>The misadventures of a fast-food restaurant working sponge who lives under the sea. <br/><b>Genres</b> Animation Comedy Family<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(23)'><tr><td><div class='conte'><div class='h'><h2> RIVER MONSTERS -  EUROPEAN MANEATER</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/1476750.jpg'/></div></div></td></tr><tr><td class='t'>17:00 to 18:00</td></tr><tr><td><table><tr><td class='c'>APL</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha23' class='oculto'><h3> RIVER MONSTERS -  EUROPEAN MANEATER</h3><br/>Jeremy Wade searches the world for legendary and flesh-eating freshwater fish. <br/><b>Genres</b> Documentary<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(24)'><tr><td><div class='conte'><div class='h'><h2> DEADLIEST CATCH -  GREATEST GAME EVER FISHED</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/446809.jpg'/></div></div></td></tr><tr><td class='t'>13:00 to 14:00</td></tr><tr><td><table><tr><td class='c'>DSC</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha24' class='oculto'><h3> DEADLIEST CATCH -  GREATEST GAME EVER FISHED</h3><br/>A documentary series chronicling the real-life high-sea adventures of the Alaskan crab fishermen. This is the most deadly profession in the world. <br/><b>Genres</b> Documentary Adventure Reality-TV<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(25)'><tr><td><div class='conte'><div class='h'><h2> DEADLIEST CATCH -  BREAKING MANDY</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/446809.jpg'/></div></div></td></tr><tr><td class='t'>14:00 to 15:00</td></tr><tr><td><table><tr><td class='c'>DSC</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha25' class='oculto'><h3> DEADLIEST CATCH -  BREAKING MANDY</h3><br/>A documentary series chronicling the real-life high-sea adventures of the Alaskan crab fishermen. This is the most deadly profession in the world. <br/><b>Genres</b> Documentary Adventure Reality-TV<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(26)'><tr><td><div class='conte'><div class='h'><h2> DEADLIEST CATCH -  SABOTAGE</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/446809.jpg'/></div></div></td></tr><tr><td class='t'>15:00 to 16:00</td></tr><tr><td><table><tr><td class='c'>DSC</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha26' class='oculto'><h3> DEADLIEST CATCH -  SABOTAGE</h3><br/>A documentary series chronicling the real-life high-sea adventures of the Alaskan crab fishermen. This is the most deadly profession in the world. <br/><b>Genres</b> Documentary Adventure Reality-TV<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(27)'><tr><td><div class='conte'><div class='h'><h2> DEADLIEST CATCH -  YOULL KNOW MY NAME IS THE LORD... PART I</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/446809.jpg'/></div></div></td></tr><tr><td class='t'>16:00 to 17:00</td></tr><tr><td><table><tr><td class='c'>DSC</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha27' class='oculto'><h3> DEADLIEST CATCH -  YOULL KNOW MY NAME IS THE LORD... PART I</h3><br/>A documentary series chronicling the real-life high-sea adventures of the Alaskan crab fishermen. This is the most deadly profession in the world. <br/><b>Genres</b> Documentary Adventure Reality-TV<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(28)'><tr><td><div class='conte'><div class='h'><h2> DEADLIEST CATCH -  WOMEN DRIVERS</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/446809.jpg'/></div></div></td></tr><tr><td class='t'>12:00 to 13:00</td></tr><tr><td><table><tr><td class='c'>DSC</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha28' class='oculto'><h3> DEADLIEST CATCH -  WOMEN DRIVERS</h3><br/>A documentary series chronicling the real-life high-sea adventures of the Alaskan crab fishermen. This is the most deadly profession in the world. <br/><b>Genres</b> Documentary Adventure Reality-TV<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(29)'><tr><td><div class='conte'><div class='h'><h2> RIVER MONSTERS -  DEATH RAY</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/1476750.jpg'/></div></div></td></tr><tr><td class='t'>18:00 to 19:00</td></tr><tr><td><table><tr><td class='c'>APL</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha29' class='oculto'><h3> RIVER MONSTERS -  DEATH RAY</h3><br/>Jeremy Wade searches the world for legendary and flesh-eating freshwater fish. <br/><b>Genres</b> Documentary<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(30)'><tr><td><div class='conte'><div class='h'><h2> CRIMINAL MINDS -  DORADO FALLS</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/452046.jpg'/></div></div></td></tr><tr><td class='t'>15:00 to 16:00</td></tr><tr><td><table><tr><td class='c'>AETV</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha30' class='oculto'><h3> CRIMINAL MINDS -  DORADO FALLS</h3><br/>The cases of the BAU an elite group of profilers that analyze the nations most dangerous criminal minds in an effort to anticipate their next moves before they strike again. <br/><b>Genres</b> Crime Drama Mystery<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(31)'><tr><td><div class='conte'><div class='h'><h2> RIVER MONSTERS -  CONGO KILLER</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/1476750.jpg'/></div></div></td></tr><tr><td class='t'>16:00 to 17:00</td></tr><tr><td><table><tr><td class='c'>APL</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha31' class='oculto'><h3> RIVER MONSTERS -  CONGO KILLER</h3><br/>Jeremy Wade searches the world for legendary and flesh-eating freshwater fish. <br/><b>Genres</b> Documentary<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(32)'><tr><td><div class='conte'><div class='h'><h2> LAW & ORDER</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/203259.jpg'/></div></div></td></tr><tr><td class='t'>18:30 to 19:30</td></tr><tr><td><table><tr><td class='c'>USA</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha32' class='oculto'><h3> LAW & ORDER</h3><br/>This show introduces the Special Victims Unit, a new elite squad of NYPD detectives who investigate sexually related crimes. <br/><b>Genres</b> Crime Drama Mystery<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(33)'><tr><td><div class='conte'><div class='h'><h2> CRIMINAL MINDS -  PROOF</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/452046.jpg'/></div></div></td></tr><tr><td class='t'>14:00 to 15:00</td></tr><tr><td><table><tr><td class='c'>AETV</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha33' class='oculto'><h3> CRIMINAL MINDS -  PROOF</h3><br/>The cases of the BAU an elite group of profilers that analyze the nations most dangerous criminal minds in an effort to anticipate their next moves before they strike again. <br/><b>Genres</b> Crime Drama Mystery<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(34)'><tr><td><div class='conte'><div class='h'><h2> LAW & ORDER</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/203259.jpg'/></div></div></td></tr><tr><td class='t'>13:30 to 14:30</td></tr><tr><td><table><tr><td class='c'>USA</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha34' class='oculto'><h3> LAW & ORDER</h3><br/>This show introduces the Special Victims Unit, a new elite squad of NYPD detectives who investigate sexually related crimes. <br/><b>Genres</b> Crime Drama Mystery<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(35)'><tr><td><div class='conte'><div class='h'><h2> THE FRESH PRINCE OF BEL-AIR -  KNOWLEDGE IS POWER</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/98800.jpg'/></div></div></td></tr><tr><td class='t'>17:24 to 18:00</td></tr><tr><td><table><tr><td class='c'>BET</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha35' class='oculto'><h3> THE FRESH PRINCE OF BEL-AIR -  KNOWLEDGE IS POWER</h3><br/>The Banks family, a respectable Californian family, take in a relative - Will Smith, a street-smart teenager from Philadelphia. The idea is to make him respectable, responsible and mature, but Will has got other plans... <br/><b>Genres</b> Comedy<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(36)'><tr><td><div class='conte'><div class='h'><h2> THE FRESH PRINCE OF BEL-AIR -  JUST SAY YO</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/98800.jpg'/></div></div></td></tr><tr><td class='t'>12:10 to 12:45</td></tr><tr><td><table><tr><td class='c'>MTV</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha36' class='oculto'><h3> THE FRESH PRINCE OF BEL-AIR -  JUST SAY YO</h3><br/>The Banks family, a respectable Californian family, take in a relative - Will Smith, a street-smart teenager from Philadelphia. The idea is to make him respectable, responsible and mature, but Will has got other plans... <br/><b>Genres</b> Comedy<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(37)'><tr><td><div class='conte'><div class='h'><h2> THE FRESH PRINCE OF BEL-AIR -  HOMEBOY, SWEET HOMEBOY</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/98800.jpg'/></div></div></td></tr><tr><td class='t'>21:30 to 22:00</td></tr><tr><td><table><tr><td class='c'>NIK</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha37' class='oculto'><h3> THE FRESH PRINCE OF BEL-AIR -  HOMEBOY, SWEET HOMEBOY</h3><br/>The Banks family, a respectable Californian family, take in a relative - Will Smith, a street-smart teenager from Philadelphia. The idea is to make him respectable, responsible and mature, but Will has got other plans... <br/><b>Genres</b> Comedy<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(38)'><tr><td><div class='conte'><div class='h'><h2> THE FRESH PRINCE OF BEL-AIR -  MISTAKEN IDENTITY</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/98800.jpg'/></div></div></td></tr><tr><td class='t'>22:30 to 23:00</td></tr><tr><td><table><tr><td class='c'>NIK</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha38' class='oculto'><h3> THE FRESH PRINCE OF BEL-AIR -  MISTAKEN IDENTITY</h3><br/>The Banks family, a respectable Californian family, take in a relative - Will Smith, a street-smart teenager from Philadelphia. The idea is to make him respectable, responsible and mature, but Will has got other plans... <br/><b>Genres</b> Comedy<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(39)'><tr><td><div class='conte'><div class='h'><h2> THE FRESH PRINCE OF BEL-AIR -  TALKING TURKEY</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/98800.jpg'/></div></div></td></tr><tr><td class='t'>16:48 to 17:24</td></tr><tr><td><table><tr><td class='c'>BET</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha39' class='oculto'><h3> THE FRESH PRINCE OF BEL-AIR -  TALKING TURKEY</h3><br/>The Banks family, a respectable Californian family, take in a relative - Will Smith, a street-smart teenager from Philadelphia. The idea is to make him respectable, responsible and mature, but Will has got other plans... <br/><b>Genres</b> Comedy<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(40)'><tr><td><div class='conte'><div class='h'><h2> THE FRESH PRINCE OF BEL-AIR -  COURTING DISASTER</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/98800.jpg'/></div></div></td></tr><tr><td class='t'>16:12 to 16:48</td></tr><tr><td><table><tr><td class='c'>BET</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha40' class='oculto'><h3> THE FRESH PRINCE OF BEL-AIR -  COURTING DISASTER</h3><br/>The Banks family, a respectable Californian family, take in a relative - Will Smith, a street-smart teenager from Philadelphia. The idea is to make him respectable, responsible and mature, but Will has got other plans... <br/><b>Genres</b> Comedy<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(41)'><tr><td><div class='conte'><div class='h'><h2> AROUND THE HORN</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/377139.jpg'/></div></div></td></tr><tr><td class='t'>17:00 to 17:30</td></tr><tr><td><table><tr><td class='c'>ESPN</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha41' class='oculto'><h3> AROUND THE HORN</h3><br/>Tony Reali hosts a fun, irreverent half hour of discussion and debate on sports-related topics. Reali chooses the topics and gives each of the panelists, sports writers from major ... » <br/><b>Genres</b> Sport Talk-Show<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(42)'><tr><td><div class='conte'><div class='h'><h2> IZOMBIE -  VIRTUAL REALITY BITES</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/3501584.jpg'/></div></div></td></tr><tr><td class='t'>21:00 to 22:00</td></tr><tr><td><table><tr><td class='c'>CW</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha42' class='oculto'><h3> IZOMBIE -  VIRTUAL REALITY BITES</h3><br/>A medical resident finds that being a zombie has its perks, which she uses to assist the police. <br/><b>Genres</b> Comedy Crime Drama<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(43)'><tr><td><div class='conte'><div class='h'><h2> GILMORE GIRLS -  FIGHT FACE</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/238784.jpg'/></div></div></td></tr><tr><td class='t'>12:00 to 13:00</td></tr><tr><td><table><tr><td class='c'>ABCF</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha43' class='oculto'><h3> GILMORE GIRLS -  FIGHT FACE</h3><br/>A drama centering around the relationship between a thirtysomething single mother and her teen daughter living in Stars Hollow, Connecticut. <br/><b>Genres</b> Comedy Drama<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(44)'><tr><td><div class='conte'><div class='h'><h2> GUNSMOKE -  A TOWN IN CHAINS</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/47736.jpg'/></div></div></td></tr><tr><td class='t'>14:00 to 15:00</td></tr><tr><td><table><tr><td class='c'>TVLAND</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha44' class='oculto'><h3> GUNSMOKE -  A TOWN IN CHAINS</h3><br/>Marshal Matt Dillon keeps the peace in the rough and tumble Dodge City. <br/><b>Genres</b> Western<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(45)'><tr><td><div class='conte'><div class='h'><h2> NCIS -  CHECK</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/364845.jpg'/></div></div></td></tr><tr><td class='t'>20:00 to 21:00</td></tr><tr><td><table><tr><td class='c'>CBS</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha45' class='oculto'><h3> NCIS -  CHECK</h3><br/>The cases of the Naval Criminal Investigative Service. <br/><b>Genres</b> Action Comedy Crime<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(46)'><tr><td><div class='conte'><div class='h'><h2> DEADLIEST CATCH -  YOULL KNOW MY NAME IS THE LORD... PART II</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/446809.jpg'/></div></div></td></tr><tr><td class='t'>17:00 to 18:00</td></tr><tr><td><table><tr><td class='c'>DSC</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha46' class='oculto'><h3> DEADLIEST CATCH -  YOULL KNOW MY NAME IS THE LORD... PART II</h3><br/>A documentary series chronicling the real-life high-sea adventures of the Alaskan crab fishermen. This is the most deadly profession in the world. <br/><b>Genres</b> Documentary Adventure Reality-TV<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(47)'><tr><td><div class='conte'><div class='h'><h2> LAW & ORDER</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/203259.jpg'/></div></div></td></tr><tr><td class='t'>14:30 to 15:30</td></tr><tr><td><table><tr><td class='c'>USA</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha47' class='oculto'><h3> LAW & ORDER</h3><br/>This show introduces the Special Victims Unit, a new elite squad of NYPD detectives who investigate sexually related crimes. <br/><b>Genres</b> Crime Drama Mystery<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(48)'><tr><td><div class='conte'><div class='h'><h2> LAW & ORDER</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/203259.jpg'/></div></div></td></tr><tr><td class='t'>15:30 to 16:30</td></tr><tr><td><table><tr><td class='c'>USA</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha48' class='oculto'><h3> LAW & ORDER</h3><br/>This show introduces the Special Victims Unit, a new elite squad of NYPD detectives who investigate sexually related crimes. <br/><b>Genres</b> Crime Drama Mystery<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(49)'><tr><td><div class='conte'><div class='h'><h2> LAW & ORDER</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/203259.jpg'/></div></div></td></tr><tr><td class='t'>16:30 to 17:30</td></tr><tr><td><table><tr><td class='c'>USA</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha49' class='oculto'><h3> LAW & ORDER</h3><br/>This show introduces the Special Victims Unit, a new elite squad of NYPD detectives who investigate sexually related crimes. <br/><b>Genres</b> Crime Drama Mystery<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(50)'><tr><td><div class='conte'><div class='h'><h2> LAW & ORDER</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/203259.jpg'/></div></div></td></tr><tr><td class='t'>12:30 to 13:30</td></tr><tr><td><table><tr><td class='c'>USA</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha50' class='oculto'><h3> LAW & ORDER</h3><br/>This show introduces the Special Victims Unit, a new elite squad of NYPD detectives who investigate sexually related crimes. <br/><b>Genres</b> Crime Drama Mystery<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(51)'><tr><td><div class='conte'><div class='h'><h2> BONES -  THE MAGGOTS IN THE MEATHEAD</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/460627.jpg'/></div></div></td></tr><tr><td class='t'>16:00 to 17:00</td></tr><tr><td><table><tr><td class='c'>TNT</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha51' class='oculto'><h3> BONES -  THE MAGGOTS IN THE MEATHEAD</h3><br/>A forensic anthropologist and a cocky FBI agent build a team to investigate death causes. And quite often, there isnt more to examine than rotten flesh or mere bones. <br/><b>Genres</b> Comedy Crime Drama<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(52)'><tr><td><div class='conte'><div class='h'><h2> BONES -  THE BEGINNING IN THE END</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/460627.jpg'/></div></div></td></tr><tr><td class='t'>13:00 to 14:00</td></tr><tr><td><table><tr><td class='c'>TNT</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha52' class='oculto'><h3> BONES -  THE BEGINNING IN THE END</h3><br/>A forensic anthropologist and a cocky FBI agent build a team to investigate death causes. And quite often, there isnt more to examine than rotten flesh or mere bones. <br/><b>Genres</b> Comedy Crime Drama<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(53)'><tr><td><div class='conte'><div class='h'><h2> BONES -  THE MASTODON IN THE ROOM</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/460627.jpg'/></div></div></td></tr><tr><td class='t'>14:00 to 15:00</td></tr><tr><td><table><tr><td class='c'>TNT</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha53' class='oculto'><h3> BONES -  THE MASTODON IN THE ROOM</h3><br/>A forensic anthropologist and a cocky FBI agent build a team to investigate death causes. And quite often, there isnt more to examine than rotten flesh or mere bones. <br/><b>Genres</b> Comedy Crime Drama<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(54)'><tr><td><div class='conte'><div class='h'><h2> BONES -  THE COUPLE IN THE CAVE</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/460627.jpg'/></div></div></td></tr><tr><td class='t'>15:00 to 16:00</td></tr><tr><td><table><tr><td class='c'>TNT</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha54' class='oculto'><h3> BONES -  THE COUPLE IN THE CAVE</h3><br/>A forensic anthropologist and a cocky FBI agent build a team to investigate death causes. And quite often, there isnt more to examine than rotten flesh or mere bones. <br/><b>Genres</b> Comedy Crime Drama<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(55)'><tr><td><div class='conte'><div class='h'><h2> LAW & ORDER</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/203259.jpg'/></div></div></td></tr><tr><td class='t'>17:30 to 18:30</td></tr><tr><td><table><tr><td class='c'>USA</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha55' class='oculto'><h3> LAW & ORDER</h3><br/>This show introduces the Special Victims Unit, a new elite squad of NYPD detectives who investigate sexually related crimes. <br/><b>Genres</b> Crime Drama Mystery<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(56)'><tr><td><div class='conte'><div class='h'><h2> CASTLE -  FOOD TO DIE FOR</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/1219024.jpg'/></div></div></td></tr><tr><td class='t'>17:00 to 18:00</td></tr><tr><td><table><tr><td class='c'>TNT</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha56' class='oculto'><h3> CASTLE -  FOOD TO DIE FOR</h3><br/>After a serial killer imitates the plots of his novels, successful mystery novelist Richard "Rick" Castle gets permission from the Mayor of New York City to tag along with an NYPD homicide investigation team for research purposes. <br/><b>Genres</b> Comedy Crime Drama<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(57)'><tr><td><div class='conte'><div class='h'><h2> FUTURAMA -  THE PRISONER OF BENDA</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/149460.jpg'/></div></div></td></tr><tr><td class='t'>17:24 to 17:54</td></tr><tr><td><table><tr><td class='c'>COMEDY</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha57' class='oculto'><h3> FUTURAMA -  THE PRISONER OF BENDA</h3><br/>Fry, a pizza guy is accidentally frozen in 1999 and thawed out New Years Eve 2999. <br/><b>Genres</b> Animation Comedy Sci-Fi<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(58)'><tr><td><div class='conte'><div class='h'><h2> THE DAILY SHOW WITH JON STEWART -  GAYLE LEMMON</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/115147.jpg'/></div></div></td></tr><tr><td class='t'>18:26 to 18:57</td></tr><tr><td><table><tr><td class='c'>COMEDY</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha58' class='oculto'><h3> THE DAILY SHOW WITH JON STEWART -  GAYLE LEMMON</h3><br/>Americas top fake news show. <br/><b>Genres</b> Comedy News Talk-Show<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(59)'><tr><td><div class='conte'><div class='h'><h2> DOCTOR WHO -  INTO THE DALEK</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/436992.jpg'/></div></div></td></tr><tr><td class='t'>12:00 to 13:00</td></tr><tr><td><table><tr><td class='c'>BBCA</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha59' class='oculto'><h3> DOCTOR WHO -  INTO THE DALEK</h3><br/>The further adventures of the time traveling alien adventurer and his companions. <br/><b>Genres</b> Adventure Drama Family<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(60)'><tr><td><div class='conte'><div class='h'><h2> DOCTOR WHO -  ROBOT OF SHERWOOD</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/436992.jpg'/></div></div></td></tr><tr><td class='t'>13:00 to 14:00</td></tr><tr><td><table><tr><td class='c'>BBCA</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha60' class='oculto'><h3> DOCTOR WHO -  ROBOT OF SHERWOOD</h3><br/>The further adventures of the time traveling alien adventurer and his companions. <br/><b>Genres</b> Adventure Drama Family<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(61)'><tr><td><div class='conte'><div class='h'><h2> FUTURAMA -  A CLOCKWORK ORIGIN</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/149460.jpg'/></div></div></td></tr><tr><td class='t'>16:54 to 17:24</td></tr><tr><td><table><tr><td class='c'>COMEDY</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha61' class='oculto'><h3> FUTURAMA -  A CLOCKWORK ORIGIN</h3><br/>Fry, a pizza guy is accidentally frozen in 1999 and thawed out New Years Eve 2999. <br/><b>Genres</b> Animation Comedy Sci-Fi<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(62)'><tr><td><div class='conte'><div class='h'><h2> FUTURAMA -  THAT DARN KATZ!</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/149460.jpg'/></div></div></td></tr><tr><td class='t'>16:24 to 16:54</td></tr><tr><td><table><tr><td class='c'>COMEDY</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha62' class='oculto'><h3> FUTURAMA -  THAT DARN KATZ!</h3><br/>Fry, a pizza guy is accidentally frozen in 1999 and thawed out New Years Eve 2999. <br/><b>Genres</b> Animation Comedy Sci-Fi<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(63)'><tr><td><div class='conte'><div class='h'><h2> HOW I MET YOUR MOTHER -  NATURAL HISTORY</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/460649.jpg'/></div></div></td></tr><tr><td class='t'>12:00 to 12:30</td></tr><tr><td><table><tr><td class='c'>LIFE</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha63' class='oculto'><h3> HOW I MET YOUR MOTHER -  NATURAL HISTORY</h3><br/>Ted searches for the woman of his dreams in New York City with the help of his four best friends. <br/><b>Genres</b> Comedy Drama Romance<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(64)'><tr><td><div class='conte'><div class='h'><h2> SUPERNATURAL -  THE PURGE</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/460681.jpg'/></div></div></td></tr><tr><td class='t'>12:00 to 13:00</td></tr><tr><td><table><tr><td class='c'>TNT</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha64' class='oculto'><h3> SUPERNATURAL -  THE PURGE</h3><br/>Two brothers follow their fathers footsteps as "hunters" fighting evil supernatural beings of many kinds including monsters, demons, and gods that roam the earth. <br/><b>Genres</b> Drama Fantasy Horror<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(65)'><tr><td><div class='conte'><div class='h'><h2> FUTURAMA -  THE LATE PHILIP J. FRY</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/149460.jpg'/></div></div></td></tr><tr><td class='t'>15:54 to 16:24</td></tr><tr><td><table><tr><td class='c'>COMEDY</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha65' class='oculto'><h3> FUTURAMA -  THE LATE PHILIP J. FRY</h3><br/>Fry, a pizza guy is accidentally frozen in 1999 and thawed out New Years Eve 2999. <br/><b>Genres</b> Animation Comedy Sci-Fi<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(66)'><tr><td><div class='conte'><div class='h'><h2> HOUSE -  BAGGAGE</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/412142.jpg'/></div></div></td></tr><tr><td class='t'>12:00 to 13:00</td></tr><tr><td><table><tr><td class='c'>UHD</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha66' class='oculto'><h3> HOUSE -  BAGGAGE</h3><br/>An antisocial maverick doctor who specializes in diagnostic medicine does whatever it takes to solve puzzling cases that come his way using his crack team of doctors and his wits. <br/><b>Genres</b> Drama Mystery<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(67)'><tr><td><div class='conte'><div class='h'><h2> HOUSE -  HELP ME</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/412142.jpg'/></div></div></td></tr><tr><td class='t'>13:00 to 14:00</td></tr><tr><td><table><tr><td class='c'>UHD</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha67' class='oculto'><h3> HOUSE -  HELP ME</h3><br/>An antisocial maverick doctor who specializes in diagnostic medicine does whatever it takes to solve puzzling cases that come his way using his crack team of doctors and his wits. <br/><b>Genres</b> Drama Mystery<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(68)'><tr><td><div class='conte'><div class='h'><h2> HOUSE -  OPEN AND SHUT</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/412142.jpg'/></div></div></td></tr><tr><td class='t'>19:00 to 20:00</td></tr><tr><td><table><tr><td class='c'>UHD</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha68' class='oculto'><h3> HOUSE -  OPEN AND SHUT</h3><br/>An antisocial maverick doctor who specializes in diagnostic medicine does whatever it takes to solve puzzling cases that come his way using his crack team of doctors and his wits. <br/><b>Genres</b> Drama Mystery<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(69)'><tr><td><div class='conte'><div class='h'><h2> HOUSE -  THE CHOICE</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/412142.jpg'/></div></div></td></tr><tr><td class='t'>20:00 to 21:00</td></tr><tr><td><table><tr><td class='c'>UHD</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha69' class='oculto'><h3> HOUSE -  THE CHOICE</h3><br/>An antisocial maverick doctor who specializes in diagnostic medicine does whatever it takes to solve puzzling cases that come his way using his crack team of doctors and his wits. <br/><b>Genres</b> Drama Mystery<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(70)'><tr><td><div class='conte'><div class='h'><h2> HOUSE -  BAGGAGE</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/412142.jpg'/></div></div></td></tr><tr><td class='t'>21:00 to 22:00</td></tr><tr><td><table><tr><td class='c'>UHD</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha70' class='oculto'><h3> HOUSE -  BAGGAGE</h3><br/>An antisocial maverick doctor who specializes in diagnostic medicine does whatever it takes to solve puzzling cases that come his way using his crack team of doctors and his wits. <br/><b>Genres</b> Drama Mystery<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(71)'><tr><td><div class='conte'><div class='h'><h2> HOUSE -  HELP ME</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/412142.jpg'/></div></div></td></tr><tr><td class='t'>22:00 to 23:00</td></tr><tr><td><table><tr><td class='c'>UHD</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha71' class='oculto'><h3> HOUSE -  HELP ME</h3><br/>An antisocial maverick doctor who specializes in diagnostic medicine does whatever it takes to solve puzzling cases that come his way using his crack team of doctors and his wits. <br/><b>Genres</b> Drama Mystery<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(72)'><tr><td><div class='conte'><div class='h'><h2> HOUSE -  KNIGHT FALL</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/412142.jpg'/></div></div></td></tr><tr><td class='t'>18:00 to 19:00</td></tr><tr><td><table><tr><td class='c'>UHD</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha72' class='oculto'><h3> HOUSE -  KNIGHT FALL</h3><br/>An antisocial maverick doctor who specializes in diagnostic medicine does whatever it takes to solve puzzling cases that come his way using his crack team of doctors and his wits. <br/><b>Genres</b> Drama Mystery<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(73)'><tr><td><div class='conte'><div class='h'><h2> HOUSE -  LOCKDOWN</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/412142.jpg'/></div></div></td></tr><tr><td class='t'>17:00 to 18:00</td></tr><tr><td><table><tr><td class='c'>UHD</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha73' class='oculto'><h3> HOUSE -  LOCKDOWN</h3><br/>An antisocial maverick doctor who specializes in diagnostic medicine does whatever it takes to solve puzzling cases that come his way using his crack team of doctors and his wits. <br/><b>Genres</b> Drama Mystery<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(74)'><tr><td><div class='conte'><div class='h'><h2> HOUSE -  SELFISH</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/412142.jpg'/></div></div></td></tr><tr><td class='t'>14:00 to 15:00</td></tr><tr><td><table><tr><td class='c'>UHD</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha74' class='oculto'><h3> HOUSE -  SELFISH</h3><br/>An antisocial maverick doctor who specializes in diagnostic medicine does whatever it takes to solve puzzling cases that come his way using his crack team of doctors and his wits. <br/><b>Genres</b> Drama Mystery<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(75)'><tr><td><div class='conte'><div class='h'><h2> HOUSE -  UNWRITTEN</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/412142.jpg'/></div></div></td></tr><tr><td class='t'>15:00 to 16:00</td></tr><tr><td><table><tr><td class='c'>UHD</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha75' class='oculto'><h3> HOUSE -  UNWRITTEN</h3><br/>An antisocial maverick doctor who specializes in diagnostic medicine does whatever it takes to solve puzzling cases that come his way using his crack team of doctors and his wits. <br/><b>Genres</b> Drama Mystery<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(76)'><tr><td><div class='conte'><div class='h'><h2> HOUSE -  MASSAGE THERAPY</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/412142.jpg'/></div></div></td></tr><tr><td class='t'>16:00 to 17:00</td></tr><tr><td><table><tr><td class='c'>UHD</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha76' class='oculto'><h3> HOUSE -  MASSAGE THERAPY</h3><br/>An antisocial maverick doctor who specializes in diagnostic medicine does whatever it takes to solve puzzling cases that come his way using his crack team of doctors and his wits. <br/><b>Genres</b> Drama Mystery<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(77)'><tr><td><div class='conte'><div class='h'><h2> HOW I MET YOUR MOTHER -  SPOILER ALERT</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/460649.jpg'/></div></div></td></tr><tr><td class='t'>15:30 to 16:00</td></tr><tr><td><table><tr><td class='c'>FX</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha77' class='oculto'><h3> HOW I MET YOUR MOTHER -  SPOILER ALERT</h3><br/>Ted searches for the woman of his dreams in New York City with the help of his four best friends. <br/><b>Genres</b> Comedy Drama Romance<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(78)'><tr><td><div class='conte'><div class='h'><h2> HOW I MET YOUR MOTHER -  DOWISETREPLA</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/460649.jpg'/></div></div></td></tr><tr><td class='t'>15:00 to 15:30</td></tr><tr><td><table><tr><td class='c'>FX</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha78' class='oculto'><h3> HOW I MET YOUR MOTHER -  DOWISETREPLA</h3><br/>Ted searches for the woman of his dreams in New York City with the help of his four best friends. <br/><b>Genres</b> Comedy Drama Romance<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(79)'><tr><td><div class='conte'><div class='h'><h2> FRONTLINE -  AMERICAN TERRORIST</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/133302.jpg'/></div></div></td></tr><tr><td class='t'>22:00 to 23:30</td></tr><tr><td><table><tr><td class='c'>PBS</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha79' class='oculto'><h3> FRONTLINE -  AMERICAN TERRORIST</h3><br/>Investigative journalist documentaries. <br/><b>Genres</b> Documentary<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(80)'><tr><td><div class='conte'><div class='h'><h2> FAMILY GUY -  BRIAN GOES BACK TO COLLEGE</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/182576.jpg'/></div></div></td></tr><tr><td class='t'>14:00 to 14:30</td></tr><tr><td><table><tr><td class='c'>TBS</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha80' class='oculto'><h3> FAMILY GUY -  BRIAN GOES BACK TO COLLEGE</h3><br/>In a wacky Rhode Island town, a dysfunctional family strive to cope with everyday life as they are thrown from one crazy scenario to another. <br/><b>Genres</b> Animation Comedy<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(81)'><tr><td><div class='conte'><div class='h'><h2> SPORTSCENTER</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/136668.jpg'/></div></div></td></tr><tr><td class='t'>12:00 to 13:00</td></tr><tr><td><table><tr><td class='c'>ESPN</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha81' class='oculto'><h3> SPORTSCENTER</h3><br/>Daily sports news, results, and features. <br/><b>Genres</b> News Sport<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(82)'><tr><td><div class='conte'><div class='h'><h2> CASTLE -  OVERKILL</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/1219024.jpg'/></div></div></td></tr><tr><td class='t'>18:00 to 19:00</td></tr><tr><td><table><tr><td class='c'>TNT</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha82' class='oculto'><h3> CASTLE -  OVERKILL</h3><br/>After a serial killer imitates the plots of his novels, successful mystery novelist Richard "Rick" Castle gets permission from the Mayor of New York City to tag along with an NYPD homicide investigation team for research purposes. <br/><b>Genres</b> Comedy Crime Drama<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(83)'><tr><td><div class='conte'><div class='h'><h2> AMERICAN EXPERIENCE -  MY LAI</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/94416.jpg'/></div></div></td></tr><tr><td class='t'>21:00 to 22:00</td></tr><tr><td><table><tr><td class='c'>PBS</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha83' class='oculto'><h3> AMERICAN EXPERIENCE -  MY LAI</h3><br/>A series showcasing documentaries on American history. <br/><b>Genres</b> Documentary History<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(84)'><tr><td><div class='conte'><div class='h'><h2> DEADLIEST CATCH -  A BROTHERHOOD TESTED, PART II</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/446809.jpg'/></div></div></td></tr><tr><td class='t'>19:00 to 20:00</td></tr><tr><td><table><tr><td class='c'>DSC</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha84' class='oculto'><h3> DEADLIEST CATCH -  A BROTHERHOOD TESTED, PART II</h3><br/>A documentary series chronicling the real-life high-sea adventures of the Alaskan crab fishermen. This is the most deadly profession in the world. <br/><b>Genres</b> Documentary Adventure Reality-TV<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(85)'><tr><td><div class='conte'><div class='h'><h2> DEADLIEST CATCH -  PRODIGAL SON</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/446809.jpg'/></div></div></td></tr><tr><td class='t'>21:00 to 22:02</td></tr><tr><td><table><tr><td class='c'>DSC</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha85' class='oculto'><h3> DEADLIEST CATCH -  PRODIGAL SON</h3><br/>A documentary series chronicling the real-life high-sea adventures of the Alaskan crab fishermen. This is the most deadly profession in the world. <br/><b>Genres</b> Documentary Adventure Reality-TV<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(86)'><tr><td><div class='conte'><div class='h'><h2> FRESH OFF THE BOAT -  SO CHINEEZ</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/3551096.jpg'/></div></div></td></tr><tr><td class='t'>20:00 to 20:30</td></tr><tr><td><table><tr><td class='c'>ABC</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha86' class='oculto'><h3> FRESH OFF THE BOAT -  SO CHINEEZ</h3><br/>A Taiwanese family makes their way in America during the 1990s. <br/><b>Genres</b> Comedy<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(87)'><tr><td><div class='conte'><div class='h'><h2> DEADLIEST CATCH -  A BROTHERHOOD TESTED, PART I</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/446809.jpg'/></div></div></td></tr><tr><td class='t'>18:00 to 19:00</td></tr><tr><td><table><tr><td class='c'>DSC</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha87' class='oculto'><h3> DEADLIEST CATCH -  A BROTHERHOOD TESTED, PART I</h3><br/>A documentary series chronicling the real-life high-sea adventures of the Alaskan crab fishermen. This is the most deadly profession in the world. <br/><b>Genres</b> Documentary Adventure Reality-TV<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(88)'><tr><td><div class='conte'><div class='h'><h2> SPORTSCENTER</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/136668.jpg'/></div></div></td></tr><tr><td class='t'>13:00 to 14:00</td></tr><tr><td><table><tr><td class='c'>ESPN</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha88' class='oculto'><h3> SPORTSCENTER</h3><br/>Daily sports news, results, and features. <br/><b>Genres</b> News Sport<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(89)'><tr><td><div class='conte'><div class='h'><h2> THE BIG BANG THEORY -  THE COHABITATION FORMULATION</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/898266.jpg'/></div></div></td></tr><tr><td class='t'>21:00 to 21:30</td></tr><tr><td><table><tr><td class='c'>TBS</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha89' class='oculto'><h3> THE BIG BANG THEORY -  THE COHABITATION FORMULATION</h3><br/>A woman who moves into an apartment across the hall from two brilliant but socially awkward physicists shows them how little they know about life outside of the laboratory. <br/><b>Genres</b> Comedy<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(90)'><tr><td><div class='conte'><div class='h'><h2> THE BIG BANG THEORY -  THE TOAST DERIVATION</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/898266.jpg'/></div></div></td></tr><tr><td class='t'>21:30 to 22:00</td></tr><tr><td><table><tr><td class='c'>TBS</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha90' class='oculto'><h3> THE BIG BANG THEORY -  THE TOAST DERIVATION</h3><br/>A woman who moves into an apartment across the hall from two brilliant but socially awkward physicists shows them how little they know about life outside of the laboratory. <br/><b>Genres</b> Comedy<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(91)'><tr><td><div class='conte'><div class='h'><h2> THE BIG BANG THEORY -  THE PRESTIDIGITATION APPROXIMATION</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/898266.jpg'/></div></div></td></tr><tr><td class='t'>22:30 to 23:00</td></tr><tr><td><table><tr><td class='c'>TBS</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha91' class='oculto'><h3> THE BIG BANG THEORY -  THE PRESTIDIGITATION APPROXIMATION</h3><br/>A woman who moves into an apartment across the hall from two brilliant but socially awkward physicists shows them how little they know about life outside of the laboratory. <br/><b>Genres</b> Comedy<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(92)'><tr><td><div class='conte'><div class='h'><h2> SPORTSCENTER</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/136668.jpg'/></div></div></td></tr><tr><td class='t'>18:00 to 19:00</td></tr><tr><td><table><tr><td class='c'>ESPN</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha92' class='oculto'><h3> SPORTSCENTER</h3><br/>Daily sports news, results, and features. <br/><b>Genres</b> News Sport<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(93)'><tr><td><div class='conte'><div class='h'><h2> HOW I MET YOUR MOTHER -  IM NOT THAT GUY</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/460649.jpg'/></div></div></td></tr><tr><td class='t'>14:30 to 15:00</td></tr><tr><td><table><tr><td class='c'>FX</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha93' class='oculto'><h3> HOW I MET YOUR MOTHER -  IM NOT THAT GUY</h3><br/>Ted searches for the woman of his dreams in New York City with the help of his four best friends. <br/><b>Genres</b> Comedy Drama Romance<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(94)'><tr><td><div class='conte'><div class='h'><h2> HOW I MET YOUR MOTHER -  GLITTER</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/1763612.jpg'/></div></div></td></tr><tr><td class='t'>12:30 to 13:00</td></tr><tr><td><table><tr><td class='c'>LIFE</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha94' class='oculto'><h3> HOW I MET YOUR MOTHER -  GLITTER</h3><br/>While Barney finds a new video from Robins Canadian teen star past, Lily fears that a baby could come between her friendship with Robin. Meanwhile, Teds obnoxious old friend, "Punchy," comes from Cleveland for a visit. <br/><b>Genres</b> Comedy Drama Romance<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(95)'><tr><td><div class='conte'><div class='h'><h2> THE BIG BANG THEORY -  THE THESPIAN CATALYST</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/898266.jpg'/></div></div></td></tr><tr><td class='t'>20:00 to 20:30</td></tr><tr><td><table><tr><td class='c'>TBS</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha95' class='oculto'><h3> THE BIG BANG THEORY -  THE THESPIAN CATALYST</h3><br/>A woman who moves into an apartment across the hall from two brilliant but socially awkward physicists shows them how little they know about life outside of the laboratory. <br/><b>Genres</b> Comedy<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(96)'><tr><td><div class='conte'><div class='h'><h2> THE BIG BANG THEORY -  THE BENEFACTOR FACTOR</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/898266.jpg'/></div></div></td></tr><tr><td class='t'>20:30 to 21:00</td></tr><tr><td><table><tr><td class='c'>TBS</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha96' class='oculto'><h3> THE BIG BANG THEORY -  THE BENEFACTOR FACTOR</h3><br/>A woman who moves into an apartment across the hall from two brilliant but socially awkward physicists shows them how little they know about life outside of the laboratory. <br/><b>Genres</b> Comedy<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(97)'><tr><td><div class='conte'><div class='h'><h2> HOW I MET YOUR MOTHER -  HOW I MET EVERYONE ELSE</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/460649.jpg'/></div></div></td></tr><tr><td class='t'>14:00 to 14:30</td></tr><tr><td><table><tr><td class='c'>FX</td><td class='nota_2'>2</td></tr></table></td></tr></table><div id='ficha97' class='oculto'><h3> HOW I MET YOUR MOTHER -  HOW I MET EVERYONE ELSE</h3><br/>Ted searches for the woman of his dreams in New York City with the help of his four best friends. <br/><b>Genres</b> Comedy Drama Romance<br/><b>Your personalized rating: 2</b></div><table class='peli' onclick='show(98)'><tr><td><div class='conte'><div class='h'><h2> SUPER WHY! -  THE ANT AND THE GRASSHOPPER</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/1115770.jpg'/></div></div></td></tr><tr><td class='t'>15:30 to 16:00</td></tr><tr><td><table><tr><td class='c'>PBS</td><td class='nota_0'>0</td></tr></table></td></tr></table><div id='ficha98' class='oculto'><h3> SUPER WHY! -  THE ANT AND THE GRASSHOPPER</h3><br/>Littlest Pig is on a picnic and he is starving! Problem is, he didnt plan ahead and pack a snack! The Super Readers fly into the story of Ant and Grasshopper where the jovial grasshopper ... » <br/><b>Genres</b> Animation Family<br/><b>Your personalized rating: 0</b></div><table class='peli' onclick='show(99)'><tr><td><div class='conte'><div class='h'><h2> THE FLASH -  WHO IS HARRISON WELLS?</h2></div><div class='poster'><img class='lazy' data-original='http://tvgrid.info/imgs/3107288.jpg'/></div></div></td></tr><tr><td class='t'>20:00 to 21:00</td></tr><tr><td><table><tr><td class='c'>CW</td><td class='nota_0'>0</td></tr></table></td></tr></table><div id='ficha99' class='oculto'><h3> THE FLASH -  WHO IS HARRISON WELLS?</h3><br/>The adventures of scientist Barry Allen who is a superhero with incredible speed. <br/><b>Genres</b> Action Adventure Drama<br/><b>Your personalized rating: 0</b></div>
+    </div>
+	<iframe frameborder="no" src="http://contador.elracano.com/tv-curated" width="10" height="10"></iframe>
+		<script type="text/javascript">(function(){var ticker=document.createElement('script');ticker.type='text/javascript';ticker.async=true;ticker.src='//twitcker.com/ticker/tvtodaynews.js?speed=1&links=true&appearance=marquee&container=footer';(document.getElementsByTagName('head')[0]||document.getElementsByTagName('body')[0]).appendChild(ticker);})();</script>
+</body>
+</html>
+

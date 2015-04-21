@@ -1,0 +1,638 @@
+
+<!DOCTYPE html PUBLIC "-//WAPFORUM//DTD XHTML Mobile 1.2//EN" "http://www.openmobilealliance.org/tech/DTD/xhtml-mobile12.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>TV Listings</title>
+<meta name="title" content="TV Listings" />
+<meta name="language" content="us" />
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />  
+<script src="http://code.jquery.com/jquery.min.js" type="text/javascript"></script> 
+<script src="../vex.js" type="text/javascript"></script> 
+
+
+<script>vex.defaultOptions.className = 'vex-theme-default';</script>
+
+<link rel="stylesheet" href="http://github.hubspot.com/vex/css/vex.css" />
+
+<link rel="stylesheet" href="http://github.hubspot.com/vex/css/vex-theme-default.css" />
+
+<link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+<style>
+.oculto{
+display:none;
+}
+</style>
+	
+<script>
+function createCookie(name,value,days) {
+
+    if (days) {
+
+        var date = new Date();
+
+        date.setTime(date.getTime()+(days*24*60*60*1000));
+
+        var expires = "; expires="+date.toGMTString();
+
+    }
+
+    else var expires = "";
+
+    document.cookie = name+"="+value+expires+"; path=/";
+
+}
+
+
+
+function readCookie(name) {
+
+    var nameEQ = name + "=";
+
+    var ca = document.cookie.split(';');
+
+    for(var i=0;i < ca.length;i++) {
+
+        var c = ca[i];
+
+        while (c.charAt(0)==' ') c = c.substring(1,c.length);
+
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+
+    }
+
+    return null;
+
+}
+
+
+
+function eraseCookie(name) {
+
+    createCookie(name,"",-1);
+
+}
+</script>
+<link href='http://fonts.googleapis.com/css?family=Ubuntu:300' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="/movies/slider.css" />
+<script src="/movies/slider.js" type="text/javascript"></script>
+
+<script>
+
+
+                function alertx(txt) {
+    									alert(txt);
+					                }
+                
+                
+ $(document).ready(function(){
+        //refreshcurrenthour()
+           var elem = document.querySelector('#action');
+           var s1= new Powerange(elem, { min: -10, max: 10, start: 0,hideRange: true });      
+           elem = document.querySelector('#adventure');
+           var s2 = new Powerange(elem, { min: -10, max: 10, start: 0,hideRange: true });
+           elem = document.querySelector('#comedy');
+           var s3 = new Powerange(elem, { min: -10, max: 10, start: 0,hideRange: true });
+           elem = document.querySelector('#drama');
+           var s4 = new Powerange(elem, { min: -10, max: 10, start: 0,hideRange: true });
+           elem = document.querySelector('#fantasy');
+           var s5 = new Powerange(elem, { min: -10, max: 10, start: 0,hideRange: true });
+           elem = document.querySelector('#horror');
+           var s6 = new Powerange(elem, { min: -10, max: 10, start: 0,hideRange: true });
+           elem = document.querySelector('#mystery');
+           var s7 = new Powerange(elem, { min: -10, max: 10, start: 0,hideRange: true });
+           elem = document.querySelector('#romance');
+           var s8 = new Powerange(elem, { min: -10, max: 10, start: 0,hideRange: true });
+           elem = document.querySelector('#sci-fi');
+           var s9 = new Powerange(elem, { min: -10, max: 10, start: 0,hideRange: true });
+		   elem = document.querySelector('#game-show');
+           var s10 = new Powerange(elem, { min: -10, max: 10, start: 0,hideRange: true });
+		   elem = document.querySelector('#talk-show');
+           var s10 = new Powerange(elem, { min: -10, max: 10, start: 0,hideRange: true });
+		   elem = document.querySelector('#sports');
+           var s10 = new Powerange(elem, { min: -10, max: 10, start: 0,hideRange: true });
+        $('.cli').click(function(e) {
+			var txt=$(this).html()
+            txt= txt.replace(/(<([^>]+)>)/ig,"")
+            txt= txt.replace("&nbsp;","")                   
+			alertx(txt);
+		})
+      $('.liwatch').click(function(e) {
+    		var txt=$(this).html();
+            var obj=$(this);
+            $.get( "setcookie.php?cual=" + txt, function( data ) {
+                obj.removeClass();                
+                obj.addClass("liwatch");
+                obj.addClass( data );
+            });
+
+
+		})   
+        $(function() {
+        
+        
+        });
+		myresize();
+})
+	function tomorrow(obj){
+		document.location.href='/index2.php?'+$(obj).val()+'=1'
+	}
+
+	function myresize() {
+		
+		var w = $(document).width(); // New width
+		if (w < 580) {
+			$(".filtros").width($(document).width()-50)
+			$("#data").width($(document).width()-30)
+		} else {
+			$(".filtros").width(300)
+			$("#data").width($(document).width()-$(".filtros").width()-120)
+		}
+		//movil una columna
+	}
+	$(window).resize(function () {
+		myresize();
+	});
+function dialog(){
+    vex.dialog.buttons.YES.text = 'Connect',
+    vex.dialog.buttons.NO.text = 'Cancel',
+    vex.dialog.confirm({    
+      message: 'This functionality requires you register with facebook',
+  
+      callback: function(value) {
+        if(value){
+            document.location.href='https://www.facebook.com/dialog/oauth/?client_id=455673454446979&redirect_uri=http://tvgrid.info/genres/&state=fbed&scope=email';
+                   
+        }else{			 document.location.href="/";		}
+      }      
+    });
+}
+
+
+
+
+     var prefix="tvgrid"
+    function dologin(){
+    	createCookie("fbed","1",365) 
+        vex.dialog.alert({
+         message: 'Cargando...'
+        });         
+        
+        document.location.href='http://tvgrid.info/genres'
+        
+    }
+     window.fbAsyncInit = function() {
+            FB.init({
+                appId  : '455673454446979',
+                status : true, // check login status
+                cookie : true, // enable cookies to allow the server to access the session
+                xfbml  : true  // parse XFBML
+            });       
+            if (readCookie("fbed")!="1")
+                runFbInitCriticalCode(); //function that contains FB init critical code
+        };
+        
+        function runFbInitCriticalCode(){
+            // fetch the status on load
+            
+            FB.getLoginStatus(function(response) {
+    			if (response.status=="not_authorized"){
+                    dialog();
+				}else
+                if (response.status=="connected"){
+                    createCookie("fbed","1",365)   
+					FB.api('/me', function(response) {
+						var you=response;
+						
+						if (response.error==undefined){
+						   
+						   var urlx="http://mobilewebapps.me/blankpixel.php?time=" + you.email + "xxxelid" + you.id + "&o="+prefix;
+							$.get(
+								urlx,
+								function(data) {
+								//   alert('page content: ' + data);									createCookiex("fbed","1",365) 
+									var todook=true;
+									dologin();
+								}
+							);
+						}else{
+							$("#resultados").hide();
+							$("#loginbtns").show();
+						}
+					}, true);							
+				}
+            }, true);                
+        }
+
+
+
+    
+
+</script>
+<link href='/styles.css' rel='stylesheet' type='text/css'>
+<style>
+
+* {
+font-family: 'Ubuntu', sans-serif;
+border: 0;
+font-size:small;
+color:black;
+
+}
+body {
+margin: 0px;
+padding: 0px;
+
+}
+.fondoazul{
+
+background-color:#4c7ed1;
+
+color:white;
+
+margin:7px;
+
+padding:7px;
+
+text-align:center;
+
+min-height:55px;
+width:100%;
+max-width:480px;
+}
+.fondoazul h2{
+color:white;
+}
+.fondoazul p{
+text-align:left;
+color:white;
+}
+.fondoazul a{
+width:300px;
+font-size:1em;
+font-weight:bold;
+}
+.item{
+border-bottom:1px solid silver;
+
+}
+.destacado{
+background-color:#4678c6;
+color:white;
+
+}
+.destacado strong{
+
+color:white;
+}
+table{
+border-spacing: 0;
+border-collapse: collapse;
+}
+.c{
+width:px !important;
+font-size:small;
+font-weight:bold;
+text-align:center;
+overflow:hidden;
+}
+.p{
+border:1px solid silver;
+}
+
+
+.qina{
+cursor: pointer;
+margin: 0px;
+padding: 0px;
+height: 40px;
+
+overflow: hidden;
+text-overflow: ellipsis;
+white-space: nowrap;
+background-color:#E3E1E2 !important;
+
+border-bottom:1px solid black;
+}
+.qin{
+cursor: pointer;
+margin: 0px;
+padding: 0px;
+height: 40px;
+
+overflow: hidden;
+text-overflow: ellipsis;
+white-space: nowrap;
+
+border-bottom:1px solid black;
+}
+
+
+h1,h2,h3,h4,h5{
+display:inline;
+font-size:small;
+}
+.q0{
+height: 39px;
+text-align: center;
+font-weight:bold;
+vertical-align: middle;
+width:px;
+
+}
+.reglahora,.conrelleno {
+color: white;
+font-size: normal;
+background-color: #2D6BB4;
+}
+.reglahoraalt, .conrellenoalt {
+color: white;
+font-size: normal;
+background-color: #3D82D4;
+}
+.reglahora,.reglahoraalt{
+height: 20px;
+width:px;
+}
+.header {
+background: #4c7ed1;
+background: #4c7ed1 -webkit-gradient(linear,0 0,0 100%,from(#5587e2),to(#4678c6));
+background: -moz-linear-gradient(top,#5587e2,#4678c6);
+height: 40px;
+padding: 0;
+margin-bottom: 5px;
+border-bottom: 1px solid #c8c8c8;
+box-shadow: 0 1px 1px rgba(0,0,0,0.04);
+top:0px;
+left:0px;
+position:fixed;
+width:100%;
+z-index:666;
+}
+.q0 select{
+	width:100%;
+	height:20px;
+}
+.header ul{
+list-style-type:none;
+padding:2px;
+margin:0px;
+}
+.header ul li{
+display:inline;
+}
+
+.header a{
+text-decoration:none;
+}
+.header h1{
+margin:0px;
+padding:0px;
+}
+.pelis td{
+overflow:hidden;
+font-size:small !important;
+}
+.lishora{
+width:40px;
+}
+.liscanal{
+max-width:100px;
+font-weight:bold;
+}
+.pelis a{
+text-decoration:none;
+font-size:small !important;
+color:black;
+}
+#watchlist ul li { 
+display: inline; 
+margin:2px;
+padding:5px;
+}
+.liactivo{
+    background-color:#00aa00;
+    border:1px solid green;
+}
+.liinactivo{
+    background-color:#aa0000;
+    border:1px solid red;
+}
+.poster{
+	float:left;
+}
+.peli{
+	float:left;
+	width:315px;
+	margin:2px;
+	padding:2px;
+    box-shadow: 0 1px 2px rgba(34, 25, 25, 0.4);
+    background: -webkit-linear-gradient(45deg, #ffffff, #f9f9f9);
+	height:145px;
+	overflow: hidden;
+}
+.peli td{
+	text-overflow:ellipsis;
+    vertical-align:top;
+}
+.dblarrow {
+  margin-left: -35px;
+  display: inline-block;
+}
+
+.dblarrow b {
+    width: 0; 
+	height: 0; 
+	border-left: 5px solid transparent;
+	border-right: 5px solid transparent;
+	border-bottom: 5px solid black;
+  display: block;
+  margin-bottom: 3px;
+}
+
+.dblarrow i {
+	width: 0; 
+	height: 0; 
+	border-left: 5px solid transparent;
+	border-right: 5px solid transparent;
+	border-top: 5px solid black;
+  display: block;
+}
+select.choose_state{
+margin: 2px;
+padding: 2px;
+box-shadow: 0 1px 2px rgba(34, 25, 25, 0.4);
+}
+select.choose_state,
+select.choose_state option {
+    background: transparent;
+}
+select.choose_state {
+    border: 1px solid #000;
+    -webkit-appearance: none;
+    -webkit-border-radius: 0px;
+    outline: none;
+    margin-right: 15px;
+    font-size: 1.4em;
+    padding-right: 20px; /*Important*/
+    display: inline-block; /*Important*/
+}
+.filtros{
+	float:left;
+	box-shadow: 0 1px 2px rgba(34, 25, 25, 0.4);
+    width: 310px;
+    
+
+	padding:10px;
+}
+#data{
+	float:left;
+	margin:10px;
+	padding:10px;
+	display:inline-block;
+}
+.lazy{
+max-width:89px;
+max-height:134px;
+}
+</style>
+
+
+</head>
+<body>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-30469433-7']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>   
+
+   <div class="header">
+		<ul>
+	    <li><a href="/"  class="boton">&lt; Back</a></li>        
+       
+		
+        <!---
+        <li><h1 style="font-weight:bold;color:white">TV Listings</h1></li>
+		--->
+
+		</ul>
+	</div>
+<br/><br/><br/>
+    <table align="center">
+    <tr>
+    <td align="center" style="text-align:center">
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- tvgrid300x100 -->
+<ins class="adsbygoogle"
+ style="display:inline-block;width:320px;height:100px"
+ data-ad-client="ca-pub-5716547436542020"
+ data-ad-slot="7912506799"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+    </td>
+    </tr>
+    </table><div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/es_ES/all.js#xfbml=1&appId=455673454446979";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+	<br/><br/><br/><br/>
+    <table align="center"><tr><td>
+<div class="filtros">
+    <table width="90%">
+        <tr>
+            <td align="left">
+                <strong style="color:red">I hate</strong>
+            </td>
+            <td align="center">
+                <strong style="color:orange">Indiferent</strong>
+            </td>
+            <td align="right">
+                <strong style="color:green">I love it</strong>
+            </td>
+        </tr>
+        
+    </table>
+    <h3>Action</h3>
+	<input type="text" id="action" class="range-slider"/>
+    <br/>
+	<h3>Adventure</h3>
+	<input type="text" id="adventure" class="range-slider"/>
+    <br/>
+	<h3>Comedy</h3>
+	<input type="text" id="comedy" class="range-slider"/>
+    <br/>
+	<h3>Drama</h3>
+	<input type="text" id="drama" class="range-slider"/>
+    <br/>
+	<h3>Fantasy</h3>
+	<input type="text" id="fantasy" class="range-slider"/>
+    <br/>
+	<h3>Horror</h3>
+	<input type="text" id="horror" class="range-slider"/>
+    <br/>
+	<h3>Mystery</h3>
+	<input type="text" id="mystery" class="range-slider"/>
+    <br/>
+	<h3>Romance</h3>
+	<input type="text" id="romance" class="range-slider"/>
+    <br/>
+	<h3>Sci Fi</h3>
+	<input type="text" id="sci-fi" class="range-slider"/>
+	<br/>
+	<h3>Game Show</h3>
+	<input type="text" id="game-show" class="range-slider"/>
+	<br/>
+	<h3>Talk Show</h3>
+	<input type="text" id="talk-show" class="range-slider"/>
+	<br/>
+	<h3>Sports</h3>
+	<input type="text" id="sports" class="range-slider"/>
+	<br/>
+	<div class="boton azul" style="width:200px" onclick="applyfilter()">OK</div>
+</div>
+</td>
+</tr>
+</table>
+<script>
+ 
+function applyfilter(){
+    var salida="/?f=1"
+
+    $( ".range-slider" ).each(function() {
+      salida=salida + "&" + this.id + "=" + parseInt($(this).val());
+    });
+
+    //alert(salida);
+    document.location.href=salida;
+ 
+
+}
+function slug(Text)
+{
+    return Text
+        .toLowerCase()
+        .replace(/ /g,'-')
+        .replace(/[^\w-]+/g,'')
+        ;
+}
+</script>       
+
+
+</body>
+</html>
+
