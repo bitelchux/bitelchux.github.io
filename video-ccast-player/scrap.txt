@@ -1,4 +1,0 @@
-<video
-	src="https://d2k4ls0ga9ks2.cloudfront.net/VID_20140727_225510282.mp4"
-			type="video/mp4"
-			controls autoplay/>
