@@ -34,8 +34,8 @@
 					}
 					if (json.action=="clickoff"){
 						clickOff(json.x,json.y);
-						send(theSenderID,"clickof");
-						$('#dbug').html('<br/>message sent to sender');
+						
+						
 					}
 					
 				}
@@ -91,7 +91,9 @@
 			clearTimeout(timerClickOn);
 		}
 		function send(id,msg){
+			$('#dbug').html('<br/>message sent to sender init');
 			customMessageBus.send(id,msg);
+			$('#dbug').html('<br/>message sent to sender ok');
 		}
 		document.onkeydown = checkKey;
 		function checkKey(e) {
