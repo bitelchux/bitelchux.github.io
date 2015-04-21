@@ -4,7 +4,7 @@
 		var theSenderID=0;
 		var customMessageBus=null;
 		function drawCursor(x,y){
-			//$('#dbug').append('<br/>draw'+x+":"+y);
+			$('#dbug').append('<br/>draw'+x+":"+y);
 			$('#cursor').css('left',x + 'px');
 			$('#cursor').css('top',y + 'px');
 		}
