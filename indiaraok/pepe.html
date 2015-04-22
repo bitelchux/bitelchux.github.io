@@ -158,11 +158,11 @@ table{
 		  
 		}
 		if (modo==undefined){
-			document.location.getElementById("step1").style.display="block";
-			document.location.getElementById("step2").style.display="none";
+			document.getElementById("step1").style.display="block";
+			document.getElementById("step2").style.display="none";
 		}else{
-			document.location.getElementById("step2").style.display="block";
-			document.location.getElementById("step1").style.display="none";
+			document.getElementById("step2").style.display="block";
+			document.getElementById("step1").style.display="none";
 		}
 	</script>
 
@@ -173,10 +173,10 @@ table{
 			</tr>
 			<tr>
 				<td width="50%" onclick="Android.openChromecastVersion()">
-					<img src="chromecast.jpg"/>
+					<img src="chromecast.jpg" style="width:100%" />
 				</td>
 				<td width="50%" onclick="document.location.href='../indiaramobile/index.html'">
-					<img src="phone.jpg"/>
+					<img src="phone.jpg" style="width:100%" />
 				</td>				
 			</tr>
 			
