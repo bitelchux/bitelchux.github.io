@@ -143,28 +143,7 @@ table{
  
 <body> 
 	<script src="//code.jquery.com/jquery.min.js"></script>
-	<script>
-		var modo = getQueryVariable("modo");
 
-		function getQueryVariable(variable) {
-		  var query = window.location.search.substring(1);
-		  var vars = query.split("&");
-		  for (var i=0;i<vars.length;i++) {
-		    var pair = vars[i].split("=");
-		    if (pair[0] == variable) {
-		      return pair[1];
-		    }
-		  } 
-		  
-		}
-		if (modo==undefined){
-			document.getElementById("step1").style.display="block";
-			document.getElementById("step2").style.display="none";
-		}else{
-			document.getElementById("step2").style.display="block";
-			document.getElementById("step1").style.display="none";
-		}
-	</script>
 
 	<div id="step1">
 		<table align="center">
@@ -189,5 +168,27 @@ table{
 		If your chormecast is connected and online and icon does not appear <span onclick="Android.exit()" style="color:red">click here in order to close</span> the game, and restart the game again
 		
 	</div>	
+	<script>
+		var modo = getQueryVariable("modo");
+
+		function getQueryVariable(variable) {
+		  var query = window.location.search.substring(1);
+		  var vars = query.split("&");
+		  for (var i=0;i<vars.length;i++) {
+		    var pair = vars[i].split("=");
+		    if (pair[0] == variable) {
+		      return pair[1];
+		    }
+		  } 
+		  
+		}
+		if (modo==undefined){
+			document.getElementById("step1").style.display="block";
+			document.getElementById("step2").style.display="none";
+		}else{
+			document.getElementById("step2").style.display="block";
+			document.getElementById("step1").style.display="none";
+		}
+	</script>
 </body> 
 </html> 
