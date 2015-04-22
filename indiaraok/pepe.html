@@ -15,7 +15,113 @@
 	<meta name="mobile-web-app-capable" content="yes" />
 	<link rel="shortcut icon" sizes="256x256" href="icon-256.png" />
 	
+<style>
+
+	@font-face {
+		font-family: 'Roboto';
+		font-style: normal;
+		font-weight: 400;
+		src: local('Roboto Regular'), local('Roboto-Regular'), url("roboto.woff") format('woff');
+	}
+	*{
+	font-family: 'Roboto', sans-serif;
+	color: #555;
+	border: 0;
+
+	text-transform: capitalize;
+	}
+
+
+	input{
+		position: relative;
+		padding: 10px;
+		font-weight: 400;
+		text-align: center;
+		white-space: nowrap;
+		vertical-align: middle;
+		background-color: #fff;
+		color: #1092d3;
+		border-radius: 4px;
+		border: 1px solid #1092d3;
+		-webkit-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
+		-o-user-select: none;
+		user-select: none;
+	}
 	
+	input[type=submit],input[type=button]{
+		cursor: pointer;
+		background-color: #1092d3;
+		color: white;
+	}
+	input[type=text]{		
+		background-color: white;
+		color: #1092d3;
+	}
+	select{
+		padding: 10px;
+		position: relative;
+		border: 1px solid #1092d3;
+		-webkit-border-radius: 4px;
+		background-color: white;
+		-moz-border-radius: 4px;
+		border-radius: 4px;
+		margin: 0em;
+		font: normal normal normal 13.3333330154419px/normal Arial;
+		text-rendering: auto;
+		color: initial;
+		letter-spacing: normal;
+		word-spacing: normal;
+		text-transform: none;
+		text-indent: 0px;
+		text-shadow: none;
+		display: inline-block;
+		text-align: start;
+	}
+	.error{
+		border:1px solid red !important;
+		background-color:#F5E7E7 !important;
+		color:red !important;
+	}
+	.disableado{
+		background-color:silver !important;
+		color:gray !important;
+		border:1px solid gray !important;
+	}
+	.centered {
+		width: 305px;      
+		position: absolute;
+		top:0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+
+		margin: auto;
+	}
+	.oculto{
+		display:none;
+	}
+	.quesito{
+		max-width:400px;
+		
+	}
+	.flota{
+		float:left;
+	}
+	.conborde{
+		border:1px solid #1092d3;
+	}	
+	.sinborde{
+		border:0px;
+	}
+	.azul{
+		color:#0094FF;
+	}
+	.azulbg{
+		background-color:#0094FF;
+	}
+</style>	
   	
 
 </head> 
