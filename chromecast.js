@@ -75,7 +75,7 @@
 		}
 		var timerClickOn=null;
 		function clickOn(x,y){
-			//$('#dbug').html('<br/>clicka:'+navigator.userAgent);
+			$('#dbug').html('<br/>clicka:'+navigator.userAgent);
 			
 			var e = new jQuery.Event("mousedown");
 			e.pageX = x;
@@ -84,7 +84,7 @@
 			timerClickOn=setTimeout(function(){ clickOff(x,y) }, 2000);
 		}
 		function clickOff(x,y){
-			//$('#dbug').html('<br/>clicka:'+navigator.userAgent);
+			$('#dbug').html('<br/>clicka:'+navigator.userAgent);
 			var e2 = new jQuery.Event("mouseup");
 			e2.pageX = x;
 			e2.pageY = y;
