@@ -13,7 +13,7 @@
 			
 				window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
 		
-				customMessageBus = window.castReceiverManager.getCastMessageBus('urn:x-cast:com.prueba.chromecast');
+				customMessageBus = window.castReceiverManager.getCastMessageBus('urn:x-cast:'+packageID);
 				
 			
 				customMessageBus.onMessage = function(event) {
