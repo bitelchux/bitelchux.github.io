@@ -22,7 +22,28 @@
  
 <body> 
 	<script src="jquery-2.0.0.min.js"></script>
+	<script>
+		var modo = getQueryVariable("modo");
 
+		function getQueryVariable(variable) {
+		  var query = window.location.search.substring(1);
+		  var vars = query.split("&");
+		  for (var i=0;i<vars.length;i++) {
+		    var pair = vars[i].split("=");
+		    if (pair[0] == variable) {
+		      return pair[1];
+		    }
+		  } 
+		  alert('Query Variable ' + variable + ' not found');
+		}
+		if (modo==""){
+			$("#step1").show();
+			$("#step2").hide();
+		}else{
+			$("#step2").show();
+			$("#step1").hide();
+		}
+	</script>
 
 	<div id="step1">
 		<table>
@@ -40,5 +61,11 @@
 			
 		</table>
 	</div>
+	<div id="step2">
+		Ensure your chromecast is connected, the icon <img src="chromeicon.png"/> will appear in your mobile upper right corner<br/>
+		After connect to your chromecast pressing that icon,this text will hide and a control pad will appear in your mobile, use arrows keys if you want to move the "cursor" (in menu sections) and tap the big red button if you want to select and action in menu sections or if you want to jump in game sections<br/>
+		If your chormecast is connected and online and icon does not appear <div onclick="Android.exit()">click here in order to close</div> the game, and restart the game again
+		
+	</div>	
 </body> 
 </html> 
