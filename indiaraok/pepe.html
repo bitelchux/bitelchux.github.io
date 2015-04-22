@@ -158,11 +158,11 @@ table{
 		  
 		}
 		if (modo==undefined){
-			$("#step1").show();
-			$("#step2").hide();
+			document.location.getElementById("step1").style.display="block";
+			document.location.getElementById("step2").style.display="none";
 		}else{
-			$("#step2").show();
-			$("#step1").hide();
+			document.location.getElementById("step2").style.display="block";
+			document.location.getElementById("step1").style.display="none";
 		}
 	</script>
 
