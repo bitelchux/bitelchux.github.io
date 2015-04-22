@@ -4,7 +4,7 @@
 		var theSenderID=0;
 		var customMessageBus=null;
 		function drawCursor(x,y){
-			$('#dbug').append('<br/>draw'+x+":"+y);
+			$('#dbug').html('<br/>draw'+x+":"+y);
 			$('#cursor').css('left',x + 'px');
 			$('#cursor').css('top',y + 'px');
 		}
@@ -75,7 +75,7 @@
 		}
 		var timerClickOn=null;
 		function clickOn(x,y){
-			$('#dbug').html('<br/>clicka:'+navigator.userAgent);
+			$('#dbug').html('<br/>clickon');
 			
 			var e = new jQuery.Event("mousedown");
 			e.pageX = x;
@@ -84,7 +84,7 @@
 			timerClickOn=setTimeout(function(){ clickOff(x,y) }, 2000);
 		}
 		function clickOff(x,y){
-			$('#dbug').html('<br/>clicka:'+navigator.userAgent);
+			$('#dbug').html('<br/>clickoff');
 			var e2 = new jQuery.Event("mouseup");
 			e2.pageX = x;
 			e2.pageY = y;
