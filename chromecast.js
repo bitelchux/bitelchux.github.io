@@ -4,7 +4,7 @@
 		var theSenderID=0;
 		var customMessageBus=null;
 		function drawCursor(x,y){
-			$('#dbug').html('<br/>draw'+x+":"+y);
+			//$('#dbug').html('<br/>draw'+x+":"+y);
 			$('#cursor').css('left',x + 'px');
 			$('#cursor').css('top',y + 'px');
 		}
@@ -46,7 +46,7 @@
 		
 	
 		startChromeCastMode();
-	
+	/*
 		if (typeof console  != "undefined") 
 			if (typeof console.log != 'undefined')
 				console.olog = console.log;
@@ -54,10 +54,10 @@
 				console.olog = function() {};
 		console.log = function(message) {
 			console.olog(message);
-			$('#dbug').append('<br/>' + message);
+			//$('#dbug').append('<br/>' + message);
 		};
 		console.error = console.debug = console.info =  console.log
-		
+		*/
 	
 	//	setInterval(function(){location.reload() }, 60000);
 		function clicka(x,y){
@@ -75,7 +75,7 @@
 		}
 		var timerClickOn=null;
 		function clickOn(x,y){
-			$('#dbug').html('<br/>clickon');
+			//$('#dbug').html('<br/>clickon');
 			
 			var e = new jQuery.Event("mousedown");
 			e.pageX = x;
