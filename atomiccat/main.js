@@ -299,9 +299,11 @@ function addScore(_, inv) {
     invs.remove(inv);
     score += 1;
     scoreText.setText(score);
-	SPAWN_RATE=SPAWN_RATE+0.1
+	SPAWN_RATE=Math.min(SPAWN_RATE+0.01,2)
 	OPENING=Math.max(155,OPENING-0.2);
 	SPEED=Math.min(220,SPEED+0.2);
+	console.log("Speed" + SPEED +"|opening"+ OPENING+ "|spawn"+SPAWN_RATE);
+
     scoreSnd.play();
 }
 
