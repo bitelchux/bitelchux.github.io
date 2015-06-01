@@ -1,5 +1,5 @@
 var DEBUG = false;
-var SPEED = 180;
+var SPEED = 150;
 var GRAVITY = 18;
 var FLAP = 420;
 var SPAWN_RATE = 1 / 1.5;
@@ -255,8 +255,7 @@ function o() {
 
 function spawnFinger(fingerY, flipped) {
 	
-	OPENING=Math.max(155,OPENING-0.2);
-	SPEED=Math.min(220,SPEED+0.2);
+
     var finger = fingers.create(
         game.width,
         fingerY + (flipped ? -o() : o()) / 2,
@@ -292,7 +291,7 @@ function spawnFingers() {
     inv.body.velocity.x = -SPEED;
 
     fingersTimer.start();
-	SPAWN_RATE=SPAWN_RATE+0.1
+	
     fingersTimer.add(1 / SPAWN_RATE);
 }
 
@@ -300,6 +299,9 @@ function addScore(_, inv) {
     invs.remove(inv);
     score += 1;
     scoreText.setText(score);
+	SPAWN_RATE=SPAWN_RATE+0.1
+	OPENING=Math.max(155,OPENING-0.2);
+	SPEED=Math.min(220,SPEED+0.2);
     scoreSnd.play();
 }
 
@@ -360,10 +362,13 @@ function update() {
         } else {
             // Check game over
             if (cobraMode < 1) {
-                game.physics.overlap(birdie, fingers, setGameOver);
-                if (!gameOver && birdie.body.bottom >= game.world.bounds.bottom) {
-                    setGameOver();
-                }
+				//OJO
+				if (1==9){
+					game.physics.overlap(birdie, fingers, setGameOver);
+					if (!gameOver && birdie.body.bottom >= game.world.bounds.bottom) {
+						setGameOver();
+					}
+				}
             }
             // Add score
             game.physics.overlap(birdie, invs, addScore);
