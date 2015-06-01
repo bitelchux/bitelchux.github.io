@@ -90,7 +90,7 @@ function create() {
     game.stage.scale.setScreenSize(true);
     // Draw bg
     bg = game.add.graphics(0, 0);
-    bg.beginFill(0xDDEEFF, 1);
+    bg.beginFill(0x000000, 1);
     bg.drawRect(0, 0, game.world.width, game.world.height);
     bg.endFill();
     // Credits 'yo
@@ -115,13 +115,13 @@ function create() {
     birdie = game.add.sprite(0, 0, 'birdie');
     birdie.anchor.setTo(0.5, 0.5);
     birdie.animations.add('fly', [0, 1, 2, 3], 10, true);
-    birdie.animations.add('cobra', [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19], 60, false);
+   // birdie.animations.add('cobra', [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19], 60, false);
     birdie.inputEnabled = true;
     birdie.body.collideWorldBounds = true;
     birdie.body.gravity.y = GRAVITY;
     // Add fence
-    fence = game.add.tileSprite(0, game.world.height - 32, game.world.width, 32, 'fence');
-    fence.tileScale.setTo(2, 2);
+	fence = game.add.tileSprite(0, 0, game.world.width, game.world.height, 'fence');
+   // fence.tileScale.setTo(2, 2);
     // Add score text
     scoreText = game.add.text(
         game.world.width / 2,
@@ -390,11 +390,13 @@ function update() {
         }
     });
     // Scroll fence
+
     if (!gameOver) {
         fence.tilePosition.x -= game.time.physicsElapsed * SPEED / 2;
     }
     // Decrease cobra mode
-    cobraMode -= game.time.physicsElapsed * SPEED * 5;
+   // cobraMode -= game.time.physicsElapsed * SPEED * 5;
+   cobraMode =-1;
 }
 
 function render() {
@@ -414,11 +416,13 @@ function onKeyDown(e) { }
 var pressTime = 0;
 function onKeyUp(e) {
     if (Phaser.Keyboard.SPACEBAR == e.keyCode) {
+		/*
         if (game.time.now - pressTime < 200) {
             cobraMode = 1000;
         } else {
-            flap();
-        }
+		*/
+        flap();
+        
         pressTime = game.time.now;
     }
 }
