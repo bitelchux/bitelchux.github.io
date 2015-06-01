@@ -173,10 +173,12 @@ function create() {
     game.input.onDown.add(flap);
     game.input.keyboard.addCallbacks(game, onKeyDown, onKeyUp);
     // Start clouds timer
+	/*
     cloudsTimer = new Phaser.Timer(game);
     cloudsTimer.onEvent.add(spawnCloud);
     cloudsTimer.start();
     cloudsTimer.add(Math.random());
+	*/
     // RESET!
     reset();
 }
@@ -234,7 +236,7 @@ function spawnCloud() {
         Math.floor(4 * Math.random())
     );
     var cloudScale = 2 + 2 * Math.random();
-    cloud.alpha = 2 / cloudScale;
+   // cloud.alpha = 2 / cloudScale;
     cloud.scale.setTo(cloudScale, cloudScale);
     cloud.body.allowGravity = false;
     cloud.body.velocity.x = -SPEED / cloudScale;
