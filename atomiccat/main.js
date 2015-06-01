@@ -8,20 +8,20 @@ var OPENING = 144;
 function init(parent) {
 
 var slides = [
-    "Hi, I'm Steve",
-    "I'm a web developer\nat Insync",
-    "I am not a game developer",
-    "This is my \"first\" game",
-    "I learned programming\nto develop games",
-    "Back then I was learning\nJavascript with Sphere",
-    "It was an RPG game IDE\nthat used JS for scripting",
-    "Kefka's Revenge was\nmade with Sphere",
-    "But then websites\nbecame a thing",
-    "Got bored one afternoon",
-    "\"I think I can write\na clone of that\"",
-    "Phaser\nhttp://phaser.io",
-    "Show you how I made it",
-    "Add something to it"
+    "Impact!!",
+    "",
+    "",
+    "",
+    "I",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    ""
 ];
 
 var state = {
@@ -189,8 +189,8 @@ function reset() {
     gameOver = false;
     score = 0;
     credits.renderable = true;
-    scoreText.setText("DON'T\nTOUCH\nMY\nBIRDIE");
-    instText.setText("TOUCH TO FLAP\nBIRDIE WINGS");
+    scoreText.setText("DON'T\nTOUCH\nASTEROIDS");
+    instText.setText("TOUCH ANYWHERE TO IMPULSE\nATOMIC CAT");
     gameOverText.renderable = false;
     birdie.body.allowGravity = false;
     birdie.angle = 0;
@@ -223,7 +223,9 @@ function flap() {
     if (!gameOver) {
         birdie.body.velocity.y = -FLAP;
         flapSnd.play();
-    }
+    }else{
+		reset();
+	}
 }
 
 function spawnCloud() {
@@ -298,7 +300,7 @@ function addScore(_, inv) {
 
 function setGameOver() {
     gameOver = true;
-    instText.setText("TOUCH BIRDIE\nTO TRY AGAIN");
+    instText.setText("TOUCH CAT\nTO TRY AGAIN");
     instText.renderable = true;
     var hiscore = window.localStorage.getItem('hiscore');
     hiscore = hiscore ? hiscore : score;
