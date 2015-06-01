@@ -383,6 +383,7 @@ function update() {
         2 + 0.1 * Math.cos(game.time.now / 100),
         2 + 0.1 * Math.sin(game.time.now / 100)
     );
+	/*
     // Update clouds timer
     cloudsTimer.update();
     // Remove offscreen clouds
@@ -391,6 +392,7 @@ function update() {
             cloud.kill();
         }
     });
+	*/
     // Scroll fence
 
     if (!gameOver) {
@@ -398,6 +400,7 @@ function update() {
     }
     // Decrease cobra mode
    // cobraMode -= game.time.physicsElapsed * SPEED * 5;
+   
    cobraMode =-1;
 }
 
