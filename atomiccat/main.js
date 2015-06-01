@@ -44,7 +44,7 @@ var game = new Phaser.Game(
 function preload() {
     var assets = {
         spritesheet: {
-            birdie: ['assets/birdie.png', 48, 24],
+            birdie: ['assets/birdie.png', 48, 48],
             clouds: ['assets/clouds.png', 128, 64]
         },
         image: {
@@ -300,7 +300,7 @@ function addScore(_, inv) {
 
 function setGameOver() {
     gameOver = true;
-    instText.setText("TOUCH CAT\nTO TRY AGAIN");
+    instText.setText("TOUCH ANYWHERE\nTO TRY AGAIN");
     instText.renderable = true;
     var hiscore = window.localStorage.getItem('hiscore');
     hiscore = hiscore ? hiscore : score;
