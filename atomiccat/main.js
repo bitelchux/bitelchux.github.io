@@ -104,6 +104,8 @@ function create() {
             align: 'center'
         }
     );
+	  // Add fence
+	fence = game.add.tileSprite(0, 0, game.world.width, game.world.height, 'fence');
     credits.anchor.x = 0.5;
     // Add clouds group
     clouds = game.add.group();
@@ -119,8 +121,7 @@ function create() {
     birdie.inputEnabled = true;
     birdie.body.collideWorldBounds = true;
     birdie.body.gravity.y = GRAVITY;
-    // Add fence
-	fence = game.add.tileSprite(0, 0, game.world.width, game.world.height, 'fence');
+  
    // fence.tileScale.setTo(2, 2);
     // Add score text
     scoreText = game.add.text(
