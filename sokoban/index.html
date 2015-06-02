@@ -395,6 +395,7 @@ function KeyCatchChange()
 }
 
 setInterval("Timer()",1000);
+var packageID="com.botijo.sokoban";
 </script>
 <script>
 var posx=0;
@@ -402,7 +403,7 @@ var posx=0;
 		var theSenderID=0;
 		var customMessageBus=null;
 		function drawCursor(x,y){
-			//$('#dbug').html('<br/>draw'+x+":"+y);
+			$('#dbug').html('<br/>draw'+x+":"+y);
 			$('#cursor').css('left',x + 'px');
 			$('#cursor').css('top',y + 'px');
 		}
@@ -438,7 +439,7 @@ var posx=0;
 					
 				}
 				window.castReceiverManager.start();
-				//$('#dbug').append('<br/>y');
+				$('#dbug').append('<br/>y');
 			}
 		};
 		
@@ -474,20 +475,12 @@ var posx=0;
 		var timerClickOn=null;
 		function clickOn(x,y){
 			$('#dbug').html('<br/>clickon');
-			
-			var e = new jQuery.Event("mousedown");
-			e.pageX = x;
-			e.pageY = y;
-			$('#c2canvas').trigger(e);
-			timerClickOn=setTimeout(function(){ clickOff(x,y) }, 2000);
+			Move(x,y)
+		
 		}
 		function clickOff(x,y){
 			$('#dbug').html('<br/>clickoff');
-			var e2 = new jQuery.Event("mouseup");
-			e2.pageX = x;
-			e2.pageY = y;
-			$('#c2canvas').trigger(e2);	
-			clearTimeout(timerClickOn);
+		
 		}
 		function send(id,msg){
 			//$('#dbug').html('<br/>message sent to sender init');
