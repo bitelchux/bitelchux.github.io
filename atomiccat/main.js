@@ -12,7 +12,7 @@ var slides = [
     "",
     "",
     "",
-    "I",
+    "",
     "",
     "",
     "",
@@ -365,7 +365,7 @@ function update() {
             // Check game over
             if (cobraMode < 1) {
 				//OJO
-				if (1==9){
+				if (1==1){
 					game.physics.overlap(birdie, fingers, setGameOver);
 					if (!gameOver && birdie.body.bottom >= game.world.bounds.bottom) {
 						setGameOver();
