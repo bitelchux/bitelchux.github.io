@@ -261,7 +261,7 @@ function gameOver(){
 	$("#game").hide('slow')
 	$("#gameOver").show('slow')
 	createCookie("level","0");
-	setTimeout(setMode("MENU"),5000);
+	setTimeout(function(){setMode("MENU")},5000);
 	
 }
 function nextStage(){
