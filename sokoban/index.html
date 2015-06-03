@@ -37,6 +37,10 @@ box-shadow: inset 0px 1px 0px #3e9cbf, 0px 5px 0px 0px #205c73, 0px 10px 5px #99
 border-radius: 10px;
 text-transform:uppercase;
 }
+.selected{
+	background-color:blue;
+	font-size:1em;
+}
 </style>
 <title>Sokoban</title>
 <script src="http://www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js"></script>
@@ -101,6 +105,7 @@ function setMode(cual){
 		$("#menu").hide();
 		$("#game").show();		
 	}
+	MODE=cual;
 }
 
 function Timer()
@@ -371,8 +376,8 @@ $(document).ready(function(){
 <BODY bgcolor=#808080 text=#0080FF onResize="javascript:Resize()" leftmargin=0 topmargin=0>
 	<div id="dbug" style="color:yellow;">debug</div>
 <div id="menu">
-	<input type="button" class="boton" value="start"/><br/>
-	<input type="button" class="boton" value="Continue"/><br/>
+	<input id="btnstart" type="button" class="boton" value="start"/><br/>
+	<input id="btncontinue" type="button" class="boton" value="Continue"/><br/>
 </div>	
 <form name="OptionsForm">
 <DIV id="game" ALIGN=center>
