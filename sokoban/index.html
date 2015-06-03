@@ -47,6 +47,11 @@ font-size:2em;
 position:absolute;background-color:red;width:100px;
 height:100px;
 }
+.fullscreen{
+text-align:center;
+background-color:white;
+height:100%;
+}
 </style>
 <title>Sokoban</title>
 <script src="http://www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js"></script>
@@ -250,6 +255,24 @@ function readCookie(name) {
 function eraseCookie(name) {
     createCookie(name,"",-1);
 }
+function gameOver(){
+	$("#game").hide('slow')
+	$("#gameOver").show('slow')
+	createCookie("level","0");
+	setTimeout(setMode("MENU"),5000);
+	
+}
+function nextStage(){
+	$("#game").hide('slow')
+	$("#levelcomplete").show('slow')
+	createCookie("level","0");
+	setTimeout({
+		ChangeLevel(1);
+		$("#levelcomplete").hide('slow');
+		$("#game").show('slow');
+		},1000);
+	
+}
 function Move(ddX, ddY)
 { 
 $("#dbug").html("dentro de move:"+ddX+":"+ddY+"MODE:"+MODE);
@@ -312,7 +335,13 @@ if (MODE=="GAME"){
 	  }
 	  window.document.OptionsForm.Moves.value=NumStr(MoveCount);
 	  isOver=true;
-	  if (IsOver) window.document.images[0].src = Pic[Series][4].src;
+	  if (IsOver) {
+		window.document.images[0].src = Pic[Series][4].src;
+		if (Level<=90)
+			nextStage();
+		else	
+			gameOver()
+	  }
   }
 }
 
@@ -425,7 +454,15 @@ $(document).ready(function(){
 		document.writeln(Math.random())
 		
 	</script>
-<div id="menu" style="text-align:center;background-color:white;height:100%">
+	<div id="gameover" style="display:none" class="fullscreen">
+		<h1>You finish the game (90 levels!!!)</h1>
+		<h1>Congratulations!!!</h1>
+		
+	</div>
+	<div id="levelcomplete" style="display:none" class="fullscreen">
+		<h1>STAGE CLEAR!!!</h1>
+	</div>
+<div id="menu" class="fullscreen">
 	<input id="btnstart" type="button" class="boton" value="start" onclick="setMode('GAME');Init(0)"/><br/>
 	<input id="btncontinue" type="button" class="boton" value="Continue" onclick="setMode('GAME');Continue()"/><br/>
 	level
