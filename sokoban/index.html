@@ -110,8 +110,7 @@ function Continue(){
 	if (isNaN(l))
 		Init(0);
 	else{
-		Level=parseInt(l);
-		Init(parseInt(l));
+		changeLevel(parseInt(l));
 		
 	}
 		
@@ -474,7 +473,7 @@ $(document).ready(function(){
 	if (isNaN(readCookie("level")))
 		createCookie("level","0",365)
 
-	document.write(readCookie("level"));
+	document.write(parseInt(readCookie("level"))+1);
 	</script>
 </div>	
 <form name="OptionsForm">
