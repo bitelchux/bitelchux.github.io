@@ -312,12 +312,12 @@ $(document).ready(function(){
 </script>
 </head>
 <BODY bgcolor=#808080 text=#0080FF onResize="javascript:Resize()" leftmargin=0 topmargin=0>
-	<div id="dbug" style="color:yellow">debug</div>
+	<div id="dbug" style="color:yellow;">debug</div>
 <form name="OptionsForm">
 <DIV ALIGN=center>
 <table border=0 cellpadding=0 cellspacing=0 width=100% height=100%><tr><td id="bg" bgcolor=#cccccc background="cosmosbg.gif" align=center>
 <table noborder cellpadding=10 cellspacing=0 width=100%>
-<tr><td align=left>
+<tr style="display:none"><td align=left>
   <table noborder cellpadding=1 cellspacing=1>
     <tr><td align=left>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<B>Series:</B></td></tr>
     <tr><td align=left><input type=radio name="Series" checked onClick="javascript:SetSeries(0)"><B>XSokoban</B></td></tr>
@@ -439,7 +439,7 @@ var posx=0;
 					
 				}
 				window.castReceiverManager.start();
-				$('#dbug').append('<br/>y');
+				$('#dbug').html('<br/>y');
 			}
 		};
 		
@@ -453,12 +453,12 @@ var posx=0;
 				console.olog = function() {};
 		console.log = function(message) {
 			console.olog(message);
-			$('#dbug').append('<br/>' + message);
+			$('#dbug').html('<br/>' + message);
 		};
 		console.error = console.debug = console.info =  console.log
 		
 	
-		setInterval(function(){location.reload() }, 30000);
+		//setInterval(function(){location.reload() }, 30000);
 		function clicka(x,y){
 			$('#dbug').html('<br/>clicka:'+navigator.userAgent);
 			drawCursor(x,y)
