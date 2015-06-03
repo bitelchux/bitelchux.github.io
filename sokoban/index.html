@@ -41,13 +41,9 @@ font-size:2em;
 .selected{
 	background-color:blue;
 	font-size:2em;
+	text-decoration:underlined;
 }
-.selected::after { 
-    content: " <- ";
-    background-color: yellow;
-    color: red;
-    font-weight: bold;
-}
+
 </style>
 <title>Sokoban</title>
 <script src="http://www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js"></script>
@@ -435,7 +431,9 @@ $(document).ready(function(){
 </div>	
 <form name="OptionsForm">
 <DIV id="game" ALIGN=center>
-
+<div class="game_controls" id="divUp" style="position:absolute;background-color:red;width:50;margin:auto;top:0px;>
+	ddd
+</div>
 <table border=0 cellpadding=0 cellspacing=0 width=100% height=100%><tr><td id="bg" bgcolor=#cccccc background="cosmosbg.gif" align=center>
 <table noborder cellpadding=10 cellspacing=0 width=100%>
 <tr><td align=left>
