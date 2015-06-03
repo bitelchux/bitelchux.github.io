@@ -252,6 +252,7 @@ function eraseCookie(name) {
 }
 function Move(ddX, ddY)
 { 
+$("dbug").html("dentro de move:"ddX+":"+ddY);
 if (MODE=="MENU"){
 	if ($("#btncontinue").hasClass( "selected" )){
 		$("#btncontinue").removeClass( "selected" )
