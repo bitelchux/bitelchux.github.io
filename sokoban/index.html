@@ -46,7 +46,7 @@ text-transform:uppercase;
 <script src="http://www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js"></script>
 <script for=document event="onkeydown()" language="JScript">
 if (window.event) KeyDown(window.event.keyCode);
-alert(1);
+
 </script>
 <script language="JavaScript" src="jquery.js" type="text/javascript"></script>
 <script language="JavaScript" src="sokoban.js" type="text/javascript"></script>
@@ -206,6 +206,9 @@ function Init(ll)
   Now = new Date();
   StartTime = Now.getTime() / 1000;
   IsOver=false;
+  var l=$.cookie("level");
+  if (!isNaN(l))
+		$.cookie("level",Math.max(parseInt(l),ll)
 }
 
 function OverTest()
@@ -393,6 +396,12 @@ $(document).ready(function(){
 <div id="menu">
 	<input id="btnstart" type="button" class="boton" value="start" onclick="Init(0)"/><br/>
 	<input id="btncontinue" type="button" class="boton" value="Continue" onclick="Continue()"/><br/>
+	level
+	<script>
+	if (isNaN($.cookie("level")))
+		$.cookie("level","0")
+	document.write($.cookie("level"));
+	</script>
 </div>	
 <form name="OptionsForm">
 <DIV id="game" ALIGN=center>
