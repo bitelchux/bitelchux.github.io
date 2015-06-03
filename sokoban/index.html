@@ -500,8 +500,9 @@ var posx=0;
 				customMessageBus.onMessage = function(event) {
 					 
 					 theSenderID = event.senderId;
+					 alert(event.data)
 					$('#dbug').html('<br/>dataok:'+event.data);
-					alert(event.data)
+					
 					//var aux=event.data.replace("move","0");
 					//var aux=aux.replace("click","1");
 				//	$('#dbug').html('<br/>dataok:'+aux);
