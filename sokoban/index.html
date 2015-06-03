@@ -66,11 +66,14 @@ if (window.event) KeyDown(window.event.keyCode);
 <script language="JavaScript">
 var scrn=xscrn, n_scrn=n_xscrn;
 var i, j, I_Sel, J_Sel, XPos, YPos, StartTime, EndTime, TimeString="00:00:00", IsOver, XMax=20, YMax=17, Series=0;
-var Level=1, MoveCount, MaxMoveCount, MaxMove=4949;
+var Level=1
+/*
+MoveCount, MaxMoveCount, MaxMove=4949;
+*/
 var IsNetscape = false;  
 if(navigator.appName == "Netscape") IsNetscape = true;
 
-History=new Array(MaxMove);
+//History=new Array(MaxMove);
 
 Fld = new Array(XMax);
 for (i=0; i < XMax; i++)
@@ -212,8 +215,8 @@ function Init(ll)
     if (cc=="!") { jj++; ii=0; }
     else ii++;
   }
-  MoveCount=0;
-  MaxMoveCount=0;
+ // MoveCount=0;
+ // MaxMoveCount=0;
   RefreshScreen();
   window.document.images[0].src = Pic[Series][5].src;
   Now = new Date();
@@ -301,6 +304,7 @@ if (MODE=="GAME"){
 		  PosX+=ddX;
 		  PosY+=ddY;
 		  nn=-(ddX+1)-3*(ddY+1);
+		  /*
 		  if (History[MoveCount]!=nn)
 		  { History[MoveCount]=nn;
 			MaxMoveCount=MoveCount+1;
@@ -308,10 +312,13 @@ if (MODE=="GAME"){
 		  MoveCount++;
 		  if (MaxMoveCount<MoveCount)
 			MaxMoveCount=MoveCount;
-		  IsOver=OverTest();
-		  if (MoveCount==MaxMove)
+			  if (MoveCount==MaxMove)
 		  { alert("Sorry, no more moves. Please try again !");
 		  }
+			*/
+		 
+	
+		   IsOver=OverTest();
 		}
 	  }
 	  else
@@ -323,6 +330,7 @@ if (MODE=="GAME"){
 		  PosX+=ddX;
 		  PosY+=ddY;
 		  nn=(ddX+1)+3*(ddY+1);
+		  /*
 		  if (History[MoveCount]!=nn)
 		  { History[MoveCount]=nn;
 			MaxMoveCount=MoveCount+1;
@@ -333,9 +341,10 @@ if (MODE=="GAME"){
 		  if (MoveCount==MaxMove)
 		  { alert("Sorry, no more moves. Please try again !");
 		  }
+		  */
 		}
 	  }
-	  window.document.OptionsForm.Moves.value=NumStr(MoveCount);
+	  //window.document.OptionsForm.Moves.value=NumStr(MoveCount);
 	  //OJO
 	  IsOver=true;
 	  if (IsOver) {
@@ -348,10 +357,11 @@ if (MODE=="GAME"){
   }
 }
 
+/*
 function MoveBack(mm)
 { var ii, nn, ddX, ddY;
   for (ii=0; ii<mm; ii++)
-  { if (MoveCount==0) return;
+  { //if (MoveCount==0) return;
     IsOver=false;
     window.document.images[0].src = Pic[Series][5].src;
     MoveCount--;
@@ -390,7 +400,8 @@ function MoveBack(mm)
 function MoveForward(mm)
 { var ii, nn, ddX, ddY;
   for (ii=0; ii<mm; ii++)
-  { if (MoveCount>=MaxMoveCount) return;
+  { 
+  //if (MoveCount>=MaxMoveCount) return;
     nn=History[MoveCount];
     if (nn<0) nn*=-1;
     ddX=nn%3;
@@ -400,7 +411,7 @@ function MoveForward(mm)
     Move(ddX, ddY);
   }
 }
-
+*/
 function RefreshPic(ii, jj)
 { window.document.images[ii+jj*XMax+1].src = Pic[Series][Fld[ii][jj]].src;
 }
@@ -412,7 +423,7 @@ function RefreshScreen()
       window.document.images[ii+jj*XMax+1].src = Pic[Series][Fld[ii][jj]].src;
   }
   window.document.OptionsForm.Level.value=NumStr(Level);
-  window.document.OptionsForm.Moves.value=NumStr(MoveCount);
+  //window.document.OptionsForm.Moves.value=NumStr(MoveCount);
 }
 
 function Help()
