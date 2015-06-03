@@ -418,14 +418,14 @@ $(document).ready(function(){
 </script>
 </head>
 <BODY bgcolor=#808080 text=#0080FF onResize="javascript:Resize()" leftmargin=0 topmargin=0>
-	<div id="dbug" style="color:yellow;position:absolute;top:0px;left:0px;">debug</div>
+	<div id="dbug" style="color:yellow;position:absolute;top:100px;left:0px;">debug</div>
 	<script>
 		document.writeln(Math.random())
 		
 	</script>
-<div id="menu" style="text-align:center">
-	<input id="btnstart" type="button" class="boton" value="start" onclick="$('#menu').hide();$('#game').show();Init(0)"/><br/>
-	<input id="btncontinue" type="button" class="boton" value="Continue" onclick="$('#menu').hide();$('#game').show();Continue()"/><br/>
+<div id="menu" style="text-align:center;background-color:white;">
+	<input id="btnstart" type="button" class="boton" value="start" onclick="$('#menu').hide();$('#game').show('slow');Init(0)"/><br/>
+	<input id="btncontinue" type="button" class="boton" value="Continue" onclick="$('#menu').hide();$('#game').show('slow');Continue()"/><br/>
 	level
 	<script>
 	if (isNaN(readCookie("level")))
