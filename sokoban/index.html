@@ -386,6 +386,10 @@ $(document).ready(function(){
 </head>
 <BODY bgcolor=#808080 text=#0080FF onResize="javascript:Resize()" leftmargin=0 topmargin=0>
 	<div id="dbug" style="color:yellow;">debug</div>
+	<script>
+		document.writeln(Math.random())
+		
+	</script>
 <div id="menu">
 	<input id="btnstart" type="button" class="boton" value="start" onclick="Init(0)"/><br/>
 	<input id="btncontinue" type="button" class="boton" value="Continue" onclick="Continue()"/><br/>
@@ -496,7 +500,8 @@ var posx=0;
 				customMessageBus.onMessage = function(event) {
 					 
 					 theSenderID = event.senderId;
-					//$('#dbug').html('<br/>dataok:'+event.data);
+					$('#dbug').html('<br/>dataok:'+event.data);
+					alert(event.data)
 					//var aux=event.data.replace("move","0");
 					//var aux=aux.replace("click","1");
 				//	$('#dbug').html('<br/>dataok:'+aux);
