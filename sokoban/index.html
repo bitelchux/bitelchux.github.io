@@ -424,8 +424,8 @@ $(document).ready(function(){
 		
 	</script>
 <div id="menu" style="text-align:center">
-	<input id="btnstart" type="button" class="boton" value="start" onclick="Init(0)"/><br/>
-	<input id="btncontinue" type="button" class="boton" value="Continue" onclick="Continue()"/><br/>
+	<input id="btnstart" type="button" class="boton" value="start" onclick="$('#menu').hide();$('#game').show();Init(0)"/><br/>
+	<input id="btncontinue" type="button" class="boton" value="Continue" onclick="$('#menu').hide();$('#game').show();Continue()"/><br/>
 	level
 	<script>
 	if (isNaN(readCookie("level")))
@@ -434,7 +434,7 @@ $(document).ready(function(){
 	</script>
 </div>	
 <form name="OptionsForm">
-<DIV id="game" ALIGN=center>
+<DIV id="game" ALIGN=center style="display:none">
 <div class="game_controls" id="divUp" style="left:50%;top:0px;">
 	ddd
 </div>
@@ -569,7 +569,7 @@ var posx=0;
 						clickOn(json.x,json.y);
 					}
 					if (json.action=="clickoff"){
-						clickOff(json.x,json.y);											
+						clicka(json.x,json.y);											
 					}
 					
 				}
