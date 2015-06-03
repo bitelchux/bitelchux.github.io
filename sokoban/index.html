@@ -110,8 +110,8 @@ function Continue(){
 	if (isNaN(l))
 		Init(0);
 	else{
-		Init(l);
-		Level=l;
+		Init(parseInt(l));
+		Level=parseInt(l);
 	}
 		
 }
@@ -340,7 +340,7 @@ if (MODE=="GAME"){
 	  IsOver=true;
 	  if (IsOver) {
 		window.document.images[0].src = Pic[Series][4].src;
-		if (Level<=90)
+		if (Level<=89)
 			nextStage();
 		else	
 			gameOver()
