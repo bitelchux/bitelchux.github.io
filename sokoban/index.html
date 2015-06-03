@@ -261,8 +261,10 @@ function eraseCookie(name) {
     createCookie(name,"",-1);
 }
 function gameOver(){
-	$("#game").hide('slow')
-	$("#gameOver").show('slow')
+	$("#game").hide('slow');
+	$("#menu").hide('slow');
+	$("#levelcomplete").hide('slow')
+	$("#gameOver").show('slow');
 	createCookie("level","0");
 	setTimeout(function(){setMode("MENU")},5000);
 	
