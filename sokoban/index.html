@@ -36,10 +36,17 @@ box-shadow: inset 0px 1px 0px #3e9cbf, 0px 5px 0px 0px #205c73, 0px 10px 5px #99
 -webkit-border-radius: 10px;
 border-radius: 10px;
 text-transform:uppercase;
+font-size:2em;
 }
 .selected{
 	background-color:blue;
-	font-size:1em;
+	font-size:2em;
+}
+.selected::after { 
+    content: " <- ";
+    background-color: yellow;
+    color: red;
+    font-weight: bold;
 }
 </style>
 <title>Sokoban</title>
@@ -95,7 +102,7 @@ function SetSeries(nn)
 }
 
 function Continue(){
-	var l=$.cookie("level");
+	var l=readCookie("level");
 	if (isNaN(l))
 		Init(0);
 	else
@@ -206,9 +213,9 @@ function Init(ll)
   Now = new Date();
   StartTime = Now.getTime() / 1000;
   IsOver=false;
-  var l=$.cookie("level");
+  var l=readCookie("level")
   if (!isNaN(l))
-		$.cookie("level",Math.max(parseInt(l),ll))
+		createCookie("level",Math.max(parseInt(l),ll),365)
 }
 
 function OverTest()
@@ -220,7 +227,30 @@ function OverTest()
   }
   return(true);
 }
+function createCookie(name,value,days) {
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime()+(days*24*60*60*1000));
+        var expires = "; expires="+date.toGMTString();
+    }
+    else var expires = "";
+    document.cookie = name+"="+value+expires+"; path=/";
+}
 
+function readCookie(name) {
+    var nameEQ = name + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0;i < ca.length;i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1,c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+    }
+    return null;
+}
+
+function eraseCookie(name) {
+    createCookie(name,"",-1);
+}
 function Move(ddX, ddY)
 { 
 if (MODE=="MENU"){
@@ -398,9 +428,9 @@ $(document).ready(function(){
 	<input id="btncontinue" type="button" class="boton" value="Continue" onclick="Continue()"/><br/>
 	level
 	<script>
-	if (isNaN($.cookie("level")))
-		$.cookie("level","0")
-	document.write($.cookie("level"));
+	if (isNaN(readCookie("level")))
+		createCookie("level","0",365)
+	document.write(readCookie("level"));
 	</script>
 </div>	
 <form name="OptionsForm">
