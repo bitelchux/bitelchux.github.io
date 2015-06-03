@@ -252,7 +252,7 @@ function eraseCookie(name) {
 }
 function Move(ddX, ddY)
 { 
-$("#dbug").html("dentro de move:"+ddX+":"+ddY);
+$("#dbug").html("dentro de move:"+ddX+":"+ddY+"MODE:"+MODE);
 if (MODE=="MENU"){
 	if ($("#btncontinue").hasClass( "selected" )){
 		$("#btncontinue").removeClass( "selected" )
@@ -411,6 +411,7 @@ function redim(){
 	h=$(document).height();
 	Init(0);
 }
+
 $(document).ready(function(){
 	redim()
 
@@ -418,14 +419,14 @@ $(document).ready(function(){
 </script>
 </head>
 <BODY bgcolor=#808080 text=#0080FF onResize="javascript:Resize()" leftmargin=0 topmargin=0>
-	<div id="dbug" style="color:yellow;position:absolute;top:100px;left:0px;">debug</div>
+	<div id="dbug" style="color:blue;position:absolute;top:100px;left:0px;">debug</div>
 	<script>
 		document.writeln(Math.random())
 		
 	</script>
 <div id="menu" style="text-align:center;background-color:white;">
-	<input id="btnstart" type="button" class="boton" value="start" onclick="$('#menu').hide();$('#game').show('slow');Init(0)"/><br/>
-	<input id="btncontinue" type="button" class="boton" value="Continue" onclick="$('#menu').hide();$('#game').show('slow');Continue()"/><br/>
+	<input id="btnstart" type="button" class="boton" value="start" onclick="setMode('GAME');Init(0)"/><br/>
+	<input id="btncontinue" type="button" class="boton" value="Continue" onclick="setMode('GAME');Continue()"/><br/>
 	level
 	<script>
 	if (isNaN(readCookie("level")))
@@ -597,11 +598,11 @@ var posx=0;
 		function clicka(x,y){
 			$('#dbug').html('<br/>clicka:'+navigator.userAgent);
 			if (MODE=="MENU"){
+				setMode('GAME');
 				if ($("#btnstart").hasClass("selected")){
 				
 					Init(0);
-					$("#menu").hide();
-					$("#game").show();
+					
 				}
 				if ($("#btncontinue").hasClass("selected"))
 					Continue();					
