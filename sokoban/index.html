@@ -109,8 +109,10 @@ function Continue(){
 	var l=readCookie("level");
 	if (isNaN(l))
 		Init(0);
-	else
+	else{
 		Init(l);
+		Level=l;
+	}
 		
 }
 
