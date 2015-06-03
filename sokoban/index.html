@@ -535,7 +535,7 @@ var posx=0;
 				console.olog = function() {};
 		console.log = function(message) {
 			console.olog(message);
-			$('#dbug').html('<br/>' + message);
+			$('#dbug').html('<br/>console:' + message);
 		};
 		console.error = console.debug = console.info =  console.log
 		
