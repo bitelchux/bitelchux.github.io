@@ -264,7 +264,7 @@ function gameOver(){
 	$("#game").hide('slow');
 	$("#menu").hide('slow');
 	$("#levelcomplete").hide('slow')
-	$("#gameOver").show('slow');
+	$("#gameover").show('slow');
 	createCookie("level","0");
 	setTimeout(function(){setMode("MENU")},5000);
 	
@@ -348,7 +348,7 @@ if (MODE=="GAME"){
 	  }
 	  //window.document.OptionsForm.Moves.value=NumStr(MoveCount);
 	  //OJO
-	  IsOver=true;
+	  //IsOver=true;
 	  if (IsOver) {
 		window.document.images[0].src = Pic[Series][4].src;
 		if (Level<=89)
