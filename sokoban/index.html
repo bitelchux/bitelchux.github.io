@@ -266,7 +266,7 @@ function nextStage(){
 	$("#game").hide('slow')
 	$("#levelcomplete").show('slow')
 	createCookie("level","0");
-	setTimeout({
+	setTimeout(function(){
 		ChangeLevel(1);
 		$("#levelcomplete").hide('slow');
 		$("#game").show('slow');
