@@ -252,7 +252,7 @@ function eraseCookie(name) {
 }
 function Move(ddX, ddY)
 { 
-$("dbug").html("dentro de move:"ddX+":"+ddY);
+$("dbug").html("dentro de move:"+ddX+":"+ddY);
 if (MODE=="MENU"){
 	if ($("#btncontinue").hasClass( "selected" )){
 		$("#btncontinue").removeClass( "selected" )
@@ -452,7 +452,7 @@ $(document).ready(function(){
 </div>
 <table border=0 cellpadding=0 cellspacing=0 width=100% height=100%><tr><td id="bg" bgcolor=#cccccc background="cosmosbg.gif" align=center>
 <table noborder cellpadding=10 cellspacing=0 width=100%>
-<tr><td align=left>
+<tr style="display:none"><td align=left>
   <table noborder cellpadding=1 cellspacing=1>
     <tr><td align=left>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<B>Series:</B></td></tr>
     <tr><td align=left><input type=radio name="Series" checked onClick="javascript:SetSeries(0)"><B>XSokoban</B></td></tr>
@@ -597,8 +597,12 @@ var posx=0;
 		function clicka(x,y){
 			$('#dbug').html('<br/>clicka:'+navigator.userAgent);
 			if (MODE=="MENU"){
-				if ($("#btnstart").hasClass("selected"))
+				if ($("#btnstart").hasClass("selected")){
+				
 					Init(0);
+					$("#menu").hide();
+					$("#game").show();
+				}
 				if ($("#btncontinue").hasClass("selected"))
 					Continue();					
 			}else{
