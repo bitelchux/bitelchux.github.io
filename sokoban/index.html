@@ -210,7 +210,7 @@ function OverTest()
 
 function Move(ddX, ddY)
 { 
-if (MODE=="menu"){
+if (MODE=="MENU"){
 	if ($("#btncontinue").hasClass( "selected" )){
 		$("#btncontinue").removeClass( "selected" )
 		$("#btnstart").addClass( "selected" )
@@ -218,7 +218,8 @@ if (MODE=="menu"){
 		$("#btnstart").removeClass( "selected" )
 		$("#btncontinue").addClass( "selected" )	
 	}
-}else{
+}
+if (MODE=="GAME"){
 	   var nn;
 	  if (IsOver) return;
 	  if (Fld[PosX+ddX][PosY+ddY]>2)
