@@ -93,6 +93,16 @@ function SetSeries(nn)
     else document.getElementById("bg").style.backgroundImage="url('sokoban0.gif')";
   }
 }
+
+function Continue(){
+	var l=$.cookie("level");
+	if (isNaN(l))
+		Init(0);
+	else
+		Init(l);
+		
+}
+
 var MODE="";
 setMode("MENU");
 
@@ -377,8 +387,8 @@ $(document).ready(function(){
 <BODY bgcolor=#808080 text=#0080FF onResize="javascript:Resize()" leftmargin=0 topmargin=0>
 	<div id="dbug" style="color:yellow;">debug</div>
 <div id="menu">
-	<input id="btnstart" type="button" class="boton" value="start"/><br/>
-	<input id="btncontinue" type="button" class="boton" value="Continue"/><br/>
+	<input id="btnstart" type="button" class="boton" value="start" onclick="Init(0)"/><br/>
+	<input id="btncontinue" type="button" class="boton" value="Continue" onclick="Continue()"/><br/>
 </div>	
 <form name="OptionsForm">
 <DIV id="game" ALIGN=center>
@@ -500,9 +510,7 @@ var posx=0;
 						clickOn(json.x,json.y);
 					}
 					if (json.action=="clickoff"){
-						clickOff(json.x,json.y);
-						
-						
+						clickOff(json.x,json.y);											
 					}
 					
 				}
@@ -529,16 +537,15 @@ var posx=0;
 		//setInterval(function(){location.reload() }, 30000);
 		function clicka(x,y){
 			$('#dbug').html('<br/>clicka:'+navigator.userAgent);
-			drawCursor(x,y)
-			var e = new jQuery.Event("mousedown");
-			e.pageX = x;
-			e.pageY = y;
-			$('#c2canvas').trigger(e);
-			
-			var e2 = new jQuery.Event("mouseup");
-			e2.pageX = x;
-			e2.pageY = y;
-			$('#c2canvas').trigger(e2);	
+			if (MODE=="MENU"){
+				if ($("#btnstart").hasClass("selected"))
+					Init(0);
+				if ($("#btncontinue").hasClass("selected"))
+					Continue();					
+			}else{
+				//RESET
+				ChangeLevel(0)
+			}
 		}
 		var timerClickOn=null;
 		function clickOn(x,y){
