@@ -194,11 +194,7 @@ function ChangeLevel(dd)
 function Init(ll)
 { var cc, ii, jj, kk;
 
-	var imgw=parseInt(w/XMax);
-	var imgh=parseInt(h/YMax+2);
-	var tilewh=Math.min(imgw,imgh);
-	$("img").width(tilewh);
-	$("img").height(tilewh);
+	
   for (ii=0; ii < XMax; ii++)
   { for (jj=0; jj < YMax; jj++)
       Fld[ii][jj]=0;
@@ -217,6 +213,13 @@ function Init(ll)
   }
  // MoveCount=0;
  // MaxMoveCount=0;
+ //OJO redim sprites
+	var imgw=parseInt(w/kk);
+	var imgh=parseInt(h/jj);
+	var tilewh=Math.min(imgw,imgh);
+	$("img").width(tilewh);
+	$("img").height(tilewh);
+
   RefreshScreen();
   window.document.images[0].src = Pic[Series][5].src;
   Now = new Date();
