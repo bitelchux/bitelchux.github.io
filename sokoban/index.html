@@ -199,7 +199,7 @@ function Init(ll)
   { for (jj=0; jj < YMax; jj++)
       Fld[ii][jj]=0;
   }
-  ii=0; jj=0;
+  ii=0; jj=0;mm=0;
   for (kk=0; kk<scrn[ll].length; kk++)
   { cc=scrn[ll].charAt(kk);
     if (cc==".") Fld[ii][jj]=1;
@@ -208,13 +208,13 @@ function Init(ll)
     if (cc=="*") Fld[ii][jj]=4;
     if (cc=="@") { Fld[ii][jj]=5; PosX=ii; PosY=jj; }
     if ((cc!=" ")&&(cc!="!")&&(Fld[ii][jj]==0)) alert(cc);
-    if (cc=="!") { jj++; ii=0; }
+    if (cc=="!") { jj++;if (ii>mm) mm=ii; ii=0; }
     else ii++;
   }
  // MoveCount=0;
  // MaxMoveCount=0;
  //OJO redim sprites
-	var imgw=parseInt(w/ii);
+	var imgw=parseInt(w/mm);
 	var imgh=parseInt(h/jj);
 	var tilewh=Math.min(imgw,imgh);
 	$("img").width(tilewh);
