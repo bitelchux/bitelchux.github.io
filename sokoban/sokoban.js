@@ -12,7 +12,7 @@ xscrn[n_xscrn++]=
 "#  ###!"+
 "####!"+
 "";
-/*
+
 xscrn[n_xscrn++]=
 
 
@@ -539,7 +539,7 @@ xscrn[n_xscrn++]=
 
 xscrn[n_xscrn++]=
 
-"'Duh!'!"+
+
 
 "#####!"+
 "#@$.#!"+
@@ -1314,7 +1314,7 @@ xscrn[n_xscrn++]=
 
 xscrn[n_xscrn++]=
 
-"'Lockdown'!"+
+
 
 "  #####!"+
 "  #   #!"+
@@ -1993,7 +1993,7 @@ xscrn[n_xscrn++]=
 
 xscrn[n_xscrn++]=
 
-"'reduction of (Mas Sasquatch 8)'!"+
+
 
 "       #####!"+
 "########   #!"+
@@ -2009,7 +2009,7 @@ xscrn[n_xscrn++]=
 
 xscrn[n_xscrn++]=
 
-"'from (Original 18)'!"+
+
 
 "###########!"+
 "#  .  #   #!"+
@@ -2022,7 +2022,7 @@ xscrn[n_xscrn++]=
 
 xscrn[n_xscrn++]=
 
-"'from (Boxxle 43)'!"+
+
 
 " ####!"+
 "##  ###!"+
@@ -2040,7 +2040,7 @@ xscrn[n_xscrn++]=
 
 xscrn[n_xscrn++]=
 
-"'from (Original 47)'!"+
+
 
 "     ####!"+
 " #####  #!"+
@@ -2054,7 +2054,7 @@ xscrn[n_xscrn++]=
 
 xscrn[n_xscrn++]=
 
-"'from (Original 47)'!"+
+
 
 "   ####!"+
 "   #  #!"+
@@ -2070,7 +2070,7 @@ xscrn[n_xscrn++]=
 
 xscrn[n_xscrn++]=
 
-"'reduced (Mas Sasquatch 23)'!"+
+
 
 "###### ####!"+
 "#     #    #!"+
@@ -2085,7 +2085,7 @@ xscrn[n_xscrn++]=
 
 xscrn[n_xscrn++]=
 
-"'reduction of (Revenge 306)'!"+
+
 
 "#############!"+
 "#.# @#  #   #!"+
@@ -2101,7 +2101,7 @@ xscrn[n_xscrn++]=
 
 xscrn[n_xscrn++]=
 
-"'Take the long way home.'!"+
+
 
 " ############################!"+
 " #                          #!"+
@@ -2124,7 +2124,7 @@ xscrn[n_xscrn++]=
 
 xscrn[n_xscrn++]=
 
-"'The Dungeon'!"+
+
 
 "    ######               ####!"+
 "#####*#  #################  ##!"+
@@ -2143,4 +2143,3 @@ xscrn[n_xscrn++]=
 "# #             # $        #*#!"+
 "#   #########  ### @#####  #*#!"+
 "#####       #### ####   ######!";
-*/
