@@ -605,7 +605,11 @@ var posx=0;
 			window.onload = function() {
 			
 				window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
-		
+				window.castReceiverManager.onSenderDisconnected = function(event) {
+				  if(window.castReceiverManager.getSenders().length == 0) {
+					  window.close();
+				  }
+				}
 				customMessageBus = window.castReceiverManager.getCastMessageBus('urn:x-cast:'+packageID);
 				
 			
@@ -615,6 +619,20 @@ var posx=0;
 					 alert(event.data)
 					$('#dbug').html('<br/>dataokx:'+event.data);
 					
+					if (event.data.indexOf("RESET")){
+						ChangeLevel(0);
+						return 0;
+					}
+					if (event.data.indexOf("MENU")){
+						
+						document.location.href=document.location.href
+						return 0;
+						
+					}
+					if (event.data.indexOf("QUIT")){
+						window.close();
+						return 0;
+					}
 					//var aux=event.data.replace("move","0");
 					//var aux=aux.replace("click","1");
 				//	$('#dbug').html('<br/>dataok:'+aux);
@@ -654,7 +672,7 @@ var posx=0;
 		console.error = console.debug = console.info =  console.log
 		
 		//OJO
-		//setInterval(function(){location.reload() }, 30000);
+		setInterval(function(){location.reload() }, 45000);
 		function clicka(x,y){
 			$('#dbug').html('<br/>clicka:'+navigator.userAgent);
 			if (MODE=="MENU"){
