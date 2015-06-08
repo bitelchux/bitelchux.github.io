@@ -21,7 +21,7 @@
 }
 body{
 background-color:white;
-
+overflow:hidden;
 }
 .boton {
 min-width:220px;
@@ -220,7 +220,7 @@ function Init(ll)
  // MoveCount=0;
  // MaxMoveCount=0;
  //OJO redim sprites
-	var imgw=parseInt(w/mm);
+	var imgw=parseInt(w/mm+3);
 	var imgh=parseInt(h/jj+3);
 	var tilewh=Math.min(imgw,imgh);
 	$("img").width(tilewh);
