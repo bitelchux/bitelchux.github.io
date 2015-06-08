@@ -18,6 +18,10 @@
 
 	
 }
+body{
+background-color:white;
+
+}
 .boton {
 min-width:220px;
 background: #3e9cbf;
@@ -469,7 +473,7 @@ $(document).ready(function(){
 </script>
 </head>
 <BODY bgcolor=#808080 text=#0080FF onResize="javascript:Resize()" leftmargin=0 topmargin=0>
-	<div id="dbug" style="disply:none;color:blue;position:absolute;top:100px;left:0px;">debug</div>
+	<div id="dbug" style="display:none;color:blue;position:absolute;top:100px;left:0px;"></div>
 	<script>
 		document.writeln(Math.random())
 		
@@ -485,7 +489,7 @@ $(document).ready(function(){
 <div id="menu" class="fullscreen">
 	<input id="btnstart" type="button" class="boton" value="start" onclick="setMode('GAME');Init(0)"/><br/>
 	<input id="btncontinue" type="button" class="boton" value="Continue" onclick="setMode('GAME');Continue()"/><br/>
-	level
+	
 	<script>
 	if (isNaN(readCookie("level"))){
 		createCookie("level","0",365);
