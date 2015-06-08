@@ -355,7 +355,7 @@ if (MODE=="GAME"){
 	  IsOver=true;
 	  if (IsOver) {
 		window.document.images[0].src = Pic[Series][4].src;
-		if (Level<=153)
+		if (Level<=152)
 			nextStage();
 		else	
 			gameOver()
@@ -487,9 +487,11 @@ $(document).ready(function(){
 	<input id="btncontinue" type="button" class="boton" value="Continue" onclick="setMode('GAME');Continue()"/><br/>
 	level
 	<script>
-	if (isNaN(readCookie("level")))
+	if (isNaN(readCookie("level"))){
 		createCookie("level","0",365)
-
+		//OJO
+		createCookie("level","150",365)
+	}
 	document.write(parseInt(readCookie("level"))+1);
 	</script>
 </div>	
