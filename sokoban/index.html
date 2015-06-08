@@ -125,12 +125,12 @@ setMode("MENU");
 
 function setMode(cual){
 	if (cual=="MENU"){
-		$("#menu").show();
-		$("#game").hide();
+		$("#menu").fadeIn();
+		$("#game").fadeOut();
 	}
 	if (cual=="GAME"){
-		$("#menu").hide();
-		$("#game").show();		
+		$("#menu").fadeOut();
+		$("#game").fadeIn();		
 	}
 	MODE=cual;
 }
@@ -265,22 +265,22 @@ function eraseCookie(name) {
     createCookie(name,"",-1);
 }
 function gameOver(){
-	$("#game").hide('slow');
-	$("#menu").hide('slow');
-	$("#levelcomplete").hide('slow')
-	$("#gameover").show('slow');
+	$("#game").fadeOut('slow');
+	$("#menu").fadeOut('slow');
+	$("#levelcomplete").fadeOut('slow')
+	$("#gameover").fadeIn('slow');
 	createCookie("level","0");
 	setTimeout(function(){setMode("MENU")},5000);
 	
 }
 function nextStage(){
-	$("#game").hide('slow')
-	$("#levelcomplete").show('slow')
+	$("#game").fadeOut('slow')
+	$("#levelcomplete").fadeIn('slow')
 	createCookie("level","0");
 	setTimeout(function(){
 		ChangeLevel(1);
-		$("#levelcomplete").hide('slow');
-		$("#game").show('slow');
+		$("#levelcomplete").fadeOut('slow');
+		$("#game").fadeIn('slow');
 		},1000);
 	
 }
