@@ -352,10 +352,10 @@ if (MODE=="GAME"){
 	  }
 	  //window.document.OptionsForm.Moves.value=NumStr(MoveCount);
 	  //OJO
-	  //IsOver=true;
+	  IsOver=true;
 	  if (IsOver) {
 		window.document.images[0].src = Pic[Series][4].src;
-		if (Level<=89)
+		if (Level<=153)
 			nextStage();
 		else	
 			gameOver()
@@ -475,7 +475,7 @@ $(document).ready(function(){
 		
 	</script>
 	<div id="gameover" style="display:none" class="fullscreen">
-		<h1>You finish the game (90 levels!!!)</h1>
+		<h1>You finish the game (154 levels!!!)</h1>
 		<h1>Congratulations!!!</h1>
 		
 	</div>
@@ -512,7 +512,7 @@ $(document).ready(function(){
 </div>
 <table border=0 cellpadding=0 cellspacing=0 width=100% height=100%><tr><td id="bg" bgcolor=#cccccc background="cosmosbg.gif" align=center>
 <table noborder cellpadding=10 cellspacing=0 width=100%>
-<tr style="display:none"><td align=left>
+<tr style="display:table"><td align=left>
   <table noborder cellpadding=1 cellspacing=1>
     <tr><td align=left>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<B>Series:</B></td></tr>
     <tr><td align=left><input type=radio name="Series" checked onClick="javascript:SetSeries(0)"><B>XSokoban</B></td></tr>
@@ -598,7 +598,7 @@ var posx=0;
 		var theSenderID=0;
 		var customMessageBus=null;
 		function drawCursor(x,y){
-			$('#dbug').html('<br/>draw'+x+":"+y);
+			//$('#dbug').html('<br/>draw'+x+":"+y);
 			$('#cursor').css('left',x + 'px');
 			$('#cursor').css('top',y + 'px');
 		}
@@ -621,22 +621,22 @@ var posx=0;
 					
 					
 					if (event.data.indexOf("RESET")>=0){
-						$('#dbug').html('<br/>dataokxreset:'+event.data);
+						//$('#dbug').html('<br/>dataokxreset:'+event.data);
 						ChangeLevel(0);
 						return 0;
 					}
 					if (event.data.indexOf("MENU")>=0){
-						$('#dbug').html('<br/>dataokxMENU:'+event.data);
+						//$('#dbug').html('<br/>dataokxMENU:'+event.data);
 						document.location.href=document.location.href
 						return 0;
 						
 					}
 					if (event.data.indexOf("QUIT")>=0){
-						$('#dbug').html('<br/>dataokxQUIT:'+event.data);
+						//$('#dbug').html('<br/>dataokxQUIT:'+event.data);
 						window.close();
 						return 0;
 					}
-					$('#dbug').html('<br/>dataokx:'+event.data);
+					//$('#dbug').html('<br/>dataokx:'+event.data);
 					//var aux=event.data.replace("move","0");
 					//var aux=aux.replace("click","1");
 				//	$('#dbug').html('<br/>dataok:'+aux);
@@ -657,13 +657,13 @@ var posx=0;
 					
 				}
 				window.castReceiverManager.start();
-				$('#dbug').html('<br/>y');
+				//$('#dbug').html('<br/>y');
 			}
 		};
 		
 	
 		startChromeCastMode();
-	
+	/*
 		if (typeof console  != "undefined") 
 			if (typeof console.log != 'undefined')
 				console.olog = console.log;
@@ -674,9 +674,9 @@ var posx=0;
 			$('#dbug').html('<br/>console:' + message);
 		};
 		console.error = console.debug = console.info =  console.log
-		
+		*/
 		//OJO
-		setInterval(function(){location.reload() }, 45000);
+		//setInterval(function(){location.reload() }, 45000);
 		function clicka(x,y){
 			$('#dbug').html('<br/>clicka:'+navigator.userAgent);
 			if (MODE=="MENU"){
