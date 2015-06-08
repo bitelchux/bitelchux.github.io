@@ -286,7 +286,7 @@ function nextStage(){
 }
 function Move(ddX, ddY)
 { 
-$("#dbug").html("dentro de move:"+ddX+":"+ddY+"MODE:"+MODE);
+//$("#dbug").html("dentro de move:"+ddX+":"+ddY+"MODE:"+MODE);
 if (MODE=="MENU"){
 	if ($("#btncontinue").hasClass( "selected" )){
 		$("#btncontinue").removeClass( "selected" )
@@ -469,7 +469,7 @@ $(document).ready(function(){
 </script>
 </head>
 <BODY bgcolor=#808080 text=#0080FF onResize="javascript:Resize()" leftmargin=0 topmargin=0>
-	<div id="dbug" style="color:blue;position:absolute;top:100px;left:0px;">debug</div>
+	<div id="dbug" style="disply:none;color:blue;position:absolute;top:100px;left:0px;">debug</div>
 	<script>
 		document.writeln(Math.random())
 		
@@ -685,7 +685,7 @@ var posx=0;
 		//OJO
 		//setInterval(function(){location.reload() }, 45000);
 		function clicka(x,y){
-			$('#dbug').html('<br/>clicka:'+navigator.userAgent);
+			//$('#dbug').html('<br/>clicka:'+navigator.userAgent);
 			if (MODE=="MENU"){
 				setMode('GAME');
 				if ($("#btnstart").hasClass("selected")){
@@ -702,12 +702,12 @@ var posx=0;
 		}
 		var timerClickOn=null;
 		function clickOn(x,y){
-			$('#dbug').html('<br/>clickon');
+			//$('#dbug').html('<br/>clickon');
 			Move(x,y)
 		
 		}
 		function clickOff(x,y){
-			$('#dbug').html('<br/>clickoff');
+			//$('#dbug').html('<br/>clickoff');
 		
 		}
 		function send(id,msg){
