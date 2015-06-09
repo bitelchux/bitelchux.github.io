@@ -528,7 +528,7 @@ $(document).ready(function(){
 		createCookie("level","0",365);
 		
 	}else{
-		document.write("Current saved level:"+parseInt(readCookie("level"))+1);
+		document.write("Current saved level:"+parseInt(parseInt(readCookie("level"))+1));
 	}
 	
 	</script>
@@ -557,7 +557,7 @@ $(document).ready(function(){
 </div>
 <table border=0 cellpadding=0 cellspacing=0 width=100% height=100%><tr><td id="bg" bgcolor=#cccccc background="cosmosbg.gif" align=center>
 <table noborder cellpadding=10 cellspacing=0 width=100%>
-<tr style="display:hidden"><td align=left>
+<tr style="display:none"><td align=left>
   <table noborder cellpadding=1 cellspacing=1>
     <tr><td align=left>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<B>Series:</B></td></tr>
     <tr><td align=left><input type=radio name="Series" checked onClick="javascript:SetSeries(0)"><B>XSokoban</B></td></tr>
