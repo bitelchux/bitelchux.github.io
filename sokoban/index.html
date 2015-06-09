@@ -283,7 +283,8 @@ function gameOver(){
 }
 function nextStage(){
 	$("#game").fadeOut('slow')
-	$("#levelcomplete").fadeIn('slow')
+	$("#levelcomplete").fadeIn('slow');
+	sfxAplausos.play();
 	createCookie("level","0");
 	setTimeout(function(){
 		ChangeLevel(1);
@@ -293,9 +294,12 @@ function nextStage(){
 	
 }
 function Move(ddX, ddY)
-{ 
+{
+
+
 //$("#dbug").html("dentro de move:"+ddX+":"+ddY+"MODE:"+MODE);
 if (MODE=="MENU"){
+	sfxMove.play();
 	if ($("#btncontinue").hasClass( "selected" )){
 		$("#btncontinue").removeClass( "selected" )
 		$("#btnstart").addClass( "selected" )
@@ -315,6 +319,7 @@ if (MODE=="GAME"){
 		  RefreshPic(PosX, PosY);
 		  RefreshPic(PosX+ddX, PosY+ddY);
 		  RefreshPic(PosX+2*ddX, PosY+2*ddY);
+		  
 		  PosX+=ddX;
 		  PosY+=ddY;
 		  nn=-(ddX+1)-3*(ddY+1);
@@ -427,7 +432,17 @@ function MoveForward(mm)
 }
 */
 function RefreshPic(ii, jj)
-{ window.document.images[ii+jj*XMax+1].src = Pic[Series][Fld[ii][jj]].src;
+{ 
+if (window.document.images[ii+jj*XMax+1].src != Pic[Series][Fld[ii][jj]].src){
+	if (Pic[Series][Fld[ii][jj]].src.indexOf("sokoban3")>0){
+		sfxBox.play();
+	}else 	if (Pic[Series][Fld[ii][jj]].src.indexOf("sokoban4")>0){
+		sfxPlace.play();
+	}else{
+		sfxMove.play();
+	}
+}
+window.document.images[ii+jj*XMax+1].src = Pic[Series][Fld[ii][jj]].src;
 }
 
 function RefreshScreen()
@@ -469,9 +484,24 @@ function redim(){
 	h=$(document).height();
 	Init(0);
 }
-
+var sfxMove,sfxBox,sfxPlace,sfxAplausos
+function initSfx(){
+	sfxMove= new Howl({
+		urls: ['pip.mp3']
+	})
+	sfxBox= new Howl({
+		urls: ['push.mp3']
+	})
+	sfxPlace= new Howl({
+		urls: ['clunk.mp3']
+	})
+	sfxAplausos= new Howl({
+		urls: ['aplausos.mp3']
+	})
+}
 $(document).ready(function(){
-	redim()
+	redim();
+	initSfx()
 
 })
 </script>
@@ -485,7 +515,9 @@ $(document).ready(function(){
 		
 	</div>
 	<div id="levelcomplete" style="display:none" class="fullscreen">
-		<h1>STAGE CLEAR!!!</h1>
+		<br/><br/><br/>
+		<script>document.writeln("<h1>LEVEL " + parseInt(parseInt(Level)+1) + " CLEAR!!!</h1>")</script>
+		
 	</div>
 <div id="menu" class="fullscreen">
 	<input id="btnstart" type="button" class="boton" value="start" onclick="setMode('GAME');Init(0)"/><br/>
@@ -525,7 +557,7 @@ $(document).ready(function(){
 </div>
 <table border=0 cellpadding=0 cellspacing=0 width=100% height=100%><tr><td id="bg" bgcolor=#cccccc background="cosmosbg.gif" align=center>
 <table noborder cellpadding=10 cellspacing=0 width=100%>
-<tr style="display:none"><td align=left>
+<tr style="display:hidden"><td align=left>
   <table noborder cellpadding=1 cellspacing=1>
     <tr><td align=left>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<B>Series:</B></td></tr>
     <tr><td align=left><input type=radio name="Series" checked onClick="javascript:SetSeries(0)"><B>XSokoban</B></td></tr>
