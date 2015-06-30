@@ -79,9 +79,6 @@ function getP(name) {
 
 $(document).ready(function(){
 
-	var img=document.getElementById("imagen") 
-
-    img.src=getP("img");
 
     if ($(window).width()>$(window).height()){
 
@@ -98,8 +95,6 @@ $(document).ready(function(){
     
 
 
-
-	$("#teaser").html(decodeURIComponent(getP("txt")));
 
 })
 
@@ -143,9 +138,16 @@ $(document).ready(function(){
 			customMessageBus.onMessage = function(event) {
 				 
 				 theSenderID = event.senderId;
-				 $('#dbug').html('<br/>connected'+ theSenderID+'recived:'+event.data);
-				
-				
+				$('#dbug').html('<br/>connected'+ theSenderID+'recived:'+event.data);
+				var json = $.parseJSON(event.data);
+			
+				if (json.action=="VIEW"){
+					var img=document.getElementById("imagen") 
+					img.src=json.p2;
+					$("#teaser").html(json.p1);
+					
+				}
+				/*
 				if (event.data.indexOf("RESET")>=0){
 					//$('#dbug').html('<br/>dataokxreset:'+event.data);
 					ChangeLevel(0);
@@ -166,21 +168,16 @@ $(document).ready(function(){
 				//var aux=event.data.replace("move","0");
 				//var aux=aux.replace("click","1");
 			//	$('#dbug').html('<br/>dataok:'+aux);
-				var json = $.parseJSON(event.data);
-				if (json.action=="move")
-					Move(json.x,json.y);
-				if (json.action=="click"){
-					clicka(json.x,json.y);
-				}
+				
 				/*
 				if (json.action=="clickon"){
 					clickOn(json.x,json.y);
 				}
-				*/
+				
 				if (json.action=="clickoff"){
 					clicka(json.x,json.y);											
 				}
-				
+				*/
 			}
 			window.castReceiverManager.start();
 			//$('#dbug').html('<br/>y');
