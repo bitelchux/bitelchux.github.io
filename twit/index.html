@@ -147,8 +147,8 @@ console.error = console.debug = console.info =  console.log
 			$('#dbug').html($('#dbug').html()+"<br/>"+json.action+"<br/>"+json.p1+"<br/>"+json.p2);
 				if (json.action=="VIEW"){
 					var img=document.getElementById("imagen") 
-					img.src=json.p2;
-					$("#teaser").html(json.p1);
+						img.src=json.p1;
+					$("#teaser").html(decodeURIComponent(json.p2));
 					    if ($(window).width()>$(window).height()){
 							img.height=$(window).height()-40       
 						}else{
