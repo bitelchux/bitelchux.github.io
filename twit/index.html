@@ -119,6 +119,8 @@ $(document).ready(function(){
 
 </div>
 <script>
+	setInterval(function(){ document.location.href="https://bitelchux.github.io/twit/?r="+Math.random() }, 30000);
+	$("#dbug").html(Math.random());
 	var packageID="botijo.twitter.chromecast";
 	var posx=0;
 	var posy=0;
@@ -255,8 +257,7 @@ $(document).ready(function(){
 			clicka(posx,posy)
 		}
 	}
-	setInterval(function(){ document.location.href=document.location.href }, 30000);
-	$("#dbug").html(Math.random());
+
 </script>
 
 </body>
