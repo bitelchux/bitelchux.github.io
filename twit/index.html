@@ -80,17 +80,7 @@ function getP(name) {
 $(document).ready(function(){
 
 
-    if ($(window).width()>$(window).height()){
 
-        img.height=$(window).height()-40       
-
-    }else{
-
-        img.width=$(window).width()-40   
-
-        
-
-    }
 
     
 
@@ -145,7 +135,11 @@ $(document).ready(function(){
 					var img=document.getElementById("imagen") 
 					img.src=json.p2;
 					$("#teaser").html(json.p1);
-					
+					    if ($(window).width()>$(window).height()){
+							img.height=$(window).height()-40       
+						}else{
+							img.width=$(window).width()-40   
+						}	
 				}
 				/*
 				if (event.data.indexOf("RESET")>=0){
