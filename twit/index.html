@@ -96,7 +96,7 @@ $(document).ready(function(){
 <body>
 <script src="http://www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js"></script>
 <div id="dbug" style="position:absolute;top:100px;left:0px;background-color:blue">asdadasdasd</div>
-<div id="debugDiv" style="position:absolute;top:250px;left:0px;background-color:green"></div>
+<div id="debugDiv" style="position:absolute;top:250px;left:0px;background-color:green">Console</div>
 
 <img id="imagen"/>
 
@@ -106,6 +106,18 @@ $(document).ready(function(){
 
 </div>
 <script>
+if (typeof console  != "undefined") 
+    if (typeof console.log != 'undefined')
+        console.olog = console.log;
+    else
+        console.olog = function() {};
+
+console.log = function(message) {
+    console.olog(message);
+    $('#debugDiv').append('<p>' + message + '</p>');
+};
+console.error = console.debug = console.info =  console.log
+
 	setInterval(function(){ document.location.href="https://bitelchux.github.io/twit/?r="+Math.random() }, 30000);
 	$("#dbug").html(Math.random());
 	var packageID="botijo.twitter.chromecast";
@@ -252,17 +264,7 @@ $(document).ready(function(){
 	}
 
 
-if (typeof console  != "undefined") 
-    if (typeof console.log != 'undefined')
-        console.olog = console.log;
-    else
-        console.olog = function() {};
 
-console.log = function(message) {
-    console.olog(message);
-    $('#debugDiv').append('<p>' + message + '</p>');
-};
-console.error = console.debug = console.info =  console.log
 </script>
 
 </body>
