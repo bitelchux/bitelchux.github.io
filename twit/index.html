@@ -95,12 +95,12 @@ $(document).ready(function(){
 
 <body>
 <script src="http://www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js"></script>
-<div id="dbug" style="position:absolute;top:100px;left:0px;background-color:blue">asdadasdasd</div>
-<div id="debugDiv" style="position:absolute;top:250px;left:0px;background-color:green">Console</div>
+<div id="dbug" style="display:none;position:absolute;top:100px;left:0px;background-color:blue">asdadasdasd</div>
+<div id="debugDiv" style="display:none;position:absolute;top:250px;left:0px;background-color:green">Console</div>
 
 <img id="imagen"/>
 
-<div id="teaser">
+<div id="teaser" style="position:absolute;bottom:150px;left:0px;background-color:black;color:white">
 
 
 
@@ -146,8 +146,17 @@ console.error = console.debug = console.info =  console.log
 				var json = $.parseJSON(event.data);
 			$('#dbug').html($('#dbug').html()+"<br/>"+json.action+"<br/>"+json.p1+"<br/>"+json.p2);
 				if (json.action=="VIEW"){
+					
 					var img=document.getElementById("imagen") 
+					$("#imagen").fadeOut("slow", function() {
+
 						img.src=json.p1;
+						img.onload = function () {
+						        $("#imagen").fadeIn();       
+						 };
+						
+					    // Animation complete.
+  					});
 					$("#teaser").html(decodeURIComponent(json.p2));
 					    if ($(window).width()>$(window).height()){
 							img.height=$(window).height()-40       
