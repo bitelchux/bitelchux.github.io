@@ -12,7 +12,7 @@
 
 <style>
 html{
-	background-color:red;
+	background-color:orange;
 	
 }
 body{
@@ -140,7 +140,7 @@ $(document).ready(function(){
 				 theSenderID = event.senderId;
 				$('#dbug').html('<br/>connected'+ theSenderID+'recived:'+event.data);
 				var json = $.parseJSON(event.data);
-			
+			$('#dbug').html($('#dbug').html()+"<br/>"+json.action+"<br/>"+json.p1+"<br/>"+json.p2);
 				if (json.action=="VIEW"){
 					var img=document.getElementById("imagen") 
 					img.src=json.p2;
