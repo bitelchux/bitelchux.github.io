@@ -40,7 +40,7 @@ font-size:big;
 #teaser{
 
     background-color:black;
-font-size:1.5em;
+font-size:2.5em;
 	color:white;
 
 	position:absolute;
@@ -50,6 +50,8 @@ font-size:1.5em;
 	left:0px;
 
 	width:100%;
+	margin:10px;
+	padding:10px;
 
 }	
 
@@ -98,10 +100,10 @@ $(document).ready(function(){
 <div id="dbug" style="display:none;position:absolute;top:100px;left:0px;background-color:blue">asdadasdasd</div>
 <div id="debugDiv" style="display:none;position:absolute;top:250px;left:0px;background-color:green">Console</div>
 
-<img id="imagen"/>
+<img id="imagen" src="t1024.png"/>
 
 <div id="teaser" style="position:absolute;bottom:150px;left:0px;background-color:black;color:white">
-
+Tweet news Caster, tweet from your phone
 
 
 </div>
@@ -159,7 +161,7 @@ console.error = console.debug = console.info =  console.log
   					});
 					$("#teaser").html(decodeURIComponent(json.p2));
 					    if ($(window).width()>$(window).height()){
-							img.height=$(window).height()-40       
+							img.height=$(window).height()-180       
 						}else{
 							img.width=$(window).width()-40   
 						}	
