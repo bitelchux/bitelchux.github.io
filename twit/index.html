@@ -160,7 +160,9 @@ console.error = console.debug = console.info =  console.log
 						
 					    // Animation complete.
   					});
-					$("#teaser").html(decodeURIComponent(json.p2));
+					var txt=decodeURIComponent(json.p2);
+					txt = txt.replace(/^(\[url=)?(https?:\/\/)?(www\.|\S+?\.)(\S+?\.)?\S+$\s*/mg, '');
+					$("#teaser").html(txt);
 					    if ($(window).width()>$(window).height()){
 							img.height=$(window).height()-180       
 						}else{
