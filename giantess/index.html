@@ -72,7 +72,7 @@ function checkNetConnection(){
  jQuery.ajaxSetup({async:false});
  re="";
  r=Math.round(Math.random() * 10000);
- $.get("https://dl.dropboxusercontent.com/u/6932226/busto.png",{subins:r},function(d){
+ $.get("http://bitelchux.github.io/giantess/busto.png",{subins:r},function(d){
   re=true;
  }).error(function(){
   re=false;
@@ -81,7 +81,7 @@ function checkNetConnection(){
 }
 $(document).ready(function(){
 	if (checkNetConnection()){
-		document.location.href="https://dl.dropboxusercontent.com/u/6932226/giantessgame.html?apk=1"
+		document.location.href="http://bitelchux.github.io/giantess/giantessgame.html?apk=1"
 	}else{
 		$("#loading").fadeOut("slow");
 		$("#error").fadeIn("slow");
