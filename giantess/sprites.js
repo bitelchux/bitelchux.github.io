@@ -18,7 +18,7 @@ function Library(){
 	}
 	this.AddSfx = function(alias,src){
 		var fx = new Howl({
-			urls: [src],
+			urls: ["http://bitelchux.github.io/giantess/" + src],
 			onplay: function() {
 				this.playing=true;
 			},		
