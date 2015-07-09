@@ -50,7 +50,7 @@ function Sprite () {
 			
 			
 			var im=new Image();
-			im.src=srcs[i];
+			im.src="http://bitelchux.github.io/giantess/"  + srcs[i];
 			this.numRepes=numRepes;
 			this.contMax=contMax;
 			this.w=w;
@@ -64,7 +64,7 @@ function Sprite () {
 			
 			
 			var im=new Image();
-			im.src=src+i+".png";
+			im.src="http://bitelchux.github.io/giantess/" + src+i+".png";
 			this.numRepes=numRepes;
 			this.contMax=contMax;
 			this.w=w;
