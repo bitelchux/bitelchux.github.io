@@ -75,7 +75,8 @@ function BaseEnemy () {
 				var r=randi(1,4)
 				if (!library.sfx["e"+r].playing) library.sfx["e"+r].play();
 			}else{
-			//	if (!library.sfx["pop"].playing) library.sfx["pop"].play();
+				var r=randi(1,2)
+				if (!library.sfx["espachu"+r].playing) library.sfx["espachu"+r].play();
 			}
 	
 			if (this.energia<=0){

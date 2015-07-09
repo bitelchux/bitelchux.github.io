@@ -53,6 +53,7 @@ function tictac(){
 	
 }
 function start(){
+	library.sfx["boton"].play();
 	$("#menu").fadeOut("slow");
 	$("#main").fadeIn("slow");
 	Game.menu=false;
@@ -60,9 +61,11 @@ function start(){
 	weaver = window.setTimeout(nextWave, 1000);
 }
 function restart(){
+	library.sfx["boton"].play();
 	location.reload();
 }
 function exit(){
+	library.sfx["boton"].play();
 Cocoon.App.exit()
 }
 function showGameOver(){	

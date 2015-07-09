@@ -116,7 +116,9 @@ function initSprites(){
 	fx1 = library.AddSfx("e3","explo3.mp3");
 	fx1 = library.AddSfx("e4","explo4.mp3");
 	
-	fx1 = library.AddSfx("pop","button.mp3");
+	fx1 = library.AddSfx("espachu1","splat1.mp3");
+	fx1 = library.AddSfx("espachu2","splat2.mp3");
+	fx1 = library.AddSfx("boton","button.mp3");
 
 }
 
