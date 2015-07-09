@@ -98,7 +98,7 @@ var animBarraVida=-666;
 function drawUI(){
 	t.ctx.fillStyle = 'orangered';
 	t.ctx.textBaseline = 'top';
-	t.ctx.fillText  ('Crushed:'+Game.crushed, 0, 30*t.scalefactor);
+	t.ctx.fillText  ('Crushed:'+Game.crushed, 0, t.c.height/10*t.scalefactor);
 	
 	
 	var alto=parseInt(t.c.height/15);
