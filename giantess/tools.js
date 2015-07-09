@@ -98,6 +98,7 @@ var animBarraVida=-666;
 function drawUI(){
 	t.ctx.fillStyle = 'orangered';
 	t.ctx.textBaseline = 'top';
+	t.ctx.fillStyle = "#ffffff";
 	t.ctx.fillText  ('Crushed:'+Game.crushed, 0, t.c.height/10*t.scalefactor);
 	
 	
@@ -354,11 +355,12 @@ function Tools () {
 	this.paintLaser = function(x,y){
 		this.ctx.fillStyle = "#ff0000";
 		this.ctx.fillRect(x,y,5,5);
+		this.ctx.lineWidth = 15*this.scalefactor;
 		this.ctx.beginPath();
 		this.ctx.moveTo(this.c.width/2, this.c.height);
 		this.ctx.lineTo(x, y);
 		this.ctx.stroke();
-		this.paintSprite(x,y,30,30,impacto.Get());
+		this.paintSprite(x,y,80,80,impacto.Get());
 	}	
 	this.paintSprite = function(x,y,w,h,img){
 		this.ctx.drawImage(img, x,y, w*this.scalefactor, h*this.scalefactor);
