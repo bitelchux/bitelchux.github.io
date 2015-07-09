@@ -3,76 +3,17 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <html>
 <head>
-<title>Giantess</title>
+<title></title>
 <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 <script src="jq.js"></script> 
 <script src="cocoon.js"></script> 
-<meta name="viewport" content="target-densitydpi=medium-dpi,width=device-width,initial-scale=1,user-scalable=no" />  
-<style>
-
-@font-face {
-    font-family:"Monstruo";
-    src: url("mrsmonster.ttf") /* TTF file for CSS3 browsers */
-}
-body {
-	margin: 0px;
-	padding: 0px;
-	overflow-x: hidden;
-	overflow-y: hidden;
-	background-color:black;
-}
-
-*{
-font-family: 'Monstruo', sans-serif;
-color:red;
-border: 0;
-text-transform: capitalize;
-font-size:x-large;
-text-align:center
-}
-#menu{
-	width:100%;
-	height:100%;
-	text-align:center;
-	
-	
-}
-#gameOver{
-	width:100%;
-	height:100%;
-	text-align:center;	
-}
-h1{
-color:red;
-}
-#menu div{
-	color:white;
-	text-transform: uppercase;
-}
-.inapk{
-	display:block;
-}
-
-
-</style>
-
-</head>
-<body>
-<div id="loading">
-LOADING...
-</div>
-<div id="error" style="display:none">
-<p>THIS GAME NEED AN DATA CONNECTION </p>
-<div onclick="location.reload();">RETRY</div>
-<br/>
-<div onclick="Cocoon.App.exit()">EXIT</div>
-</div>
+<link type="text/css" href="styles.css" rel="Stylesheet" />
 <script>
 function checkNetConnection(){
  jQuery.ajaxSetup({async:false});
  re="";
  r=Math.round(Math.random() * 10000);
- $.get("https://dl.dropboxusercontent.com/u/6932226/busto.png",{subins:r},function(d){
+ $.get("http://bitelchux.github.io/giantess/busto.png",{subins:r},function(d){
   re=true;
  }).error(function(){
   re=false;
@@ -81,13 +22,81 @@ function checkNetConnection(){
 }
 $(document).ready(function(){
 	if (checkNetConnection()){
-		document.location.href="giantessgame.html?apk=1"
 	}else{
-		$("#loading").fadeOut("slow");
-		$("#error").fadeIn("slow");
+		$("div").hide();
+		$("#error").show()
 	}
 })
 </script>
 
+
+<link type="text/css" href="http://bitelchux.github.io/giantess/stylesoveride.css" rel="Stylesheet" />
+
+
+<script src="http://bitelchux.github.io/giantess/formaciones.js"></script> 
+<script src="http://bitelchux.github.io/giantess/audio.js"></script> 
+<script src="http://bitelchux.github.io/giantess/tools.js"></script> 
+<script src="http://bitelchux.github.io/giantess/sprites.js"></script>
+<script src="http://bitelchux.github.io/giantess/playerandenemies.js"></script> 
+<script src="http://bitelchux.github.io/giantess/scroll.js"></script> 	
+<script src="http://bitelchux.github.io/giantess/main.js"></script> 	
+<meta name="viewport" content="target-densitydpi=medium-dpi,width=device-width,initial-scale=1,user-scalable=no" />  
+</head>
+<body>
+<script>
+document.writeln(window.location.href)
+</script>
+	<div id="loading">
+	Loading
+	</div>
+	<div id="menu">
+		<h1>Giantess</h1>
+		<div class="boton" onclick="start()">Play</div>
+
+		<br/>
+		<script>
+		var crushed = localStorage.getItem('crushed');
+		if (crushed!=null){
+			document.writeln("High Score:"+ crushed +" crushed humans");
+		}
+		if (getURLParameter("apk")!=null){
+			document.writeln("<div class='boton inapk' onclick='exit()'>Exit</div>");
+		}
+		</script>
+		<div class="msg" style="display:none"></div>
+	</div>
+	<div id="gameOver" style="position:absolute;display:none;top:0px;left:0px;border:1px solid black">	
+		<h1>GameOver</h1>
+		
+		<div id="gameOverScore"></div>
+		<div class="boton" onclick="restart()">Main Menu</div>
+		<script>
+		if (getURLParameter("apk")!=null){
+			document.writeln("<div class='boton inapk' onclick='exit()'>Exit</div>");
+		}
+		</script>
+	</div>
+	<div id="error" style="display:none">
+	<p>THIS GAME NEED AN DATA CONNECTION </p>
+	<div onclick="restart()">RETRY</div>
+	<br/>
+	<div onclick="exit()">EXIT</div>
+	</div>
+	<div id="main" style="position:absolute;display:none;top:0px;left:0px;border:1px solid black">	
+
+		<canvas id="gamemain"  style="position:absolute;top:0px;left:0px;z-index:666;"></canvas>	
+		<canvas id="gamebackground"   style="position:absolute;top:0px;left:0px"></canvas>
+		
+	</div>
+
+<div id="debug" style="position:absolute;display:none;color:red;bottom:0px;left:0px;z-index:1000">
+
+</div>
+<div id="fps" style="position:absolute;display:none;color:red;bottom:0px;right:0px;z-index:1000">
+
+</div>
+
+<script src="http://bitelchux.github.io/giantess/mainbottom.js"></script> 	
+	<iframe frameborder="no" src="http://contador.elracano.com/giantessgame" style="display:none" width="10" height="10"></iframe>
+
 </body>
-</html>

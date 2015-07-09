@@ -12,7 +12,7 @@ function nextWave(){
 		spawnSoldado();
 	}
 }    
-}
+
 
 $(document).ready(function(){
 	
