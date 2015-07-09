@@ -99,7 +99,7 @@ function drawUI(){
 	t.ctx.fillStyle = 'orangered';
 	t.ctx.textBaseline = 'top';
 	t.ctx.fillStyle = "#ffffff";
-	ctx.font="1em Monstruo";
+	t.ctx.font="1em Monstruo";
 	t.ctx.fillText  ('Crushed:'+Game.crushed, 0, t.c.height/10*t.scalefactor);
 	
 	
