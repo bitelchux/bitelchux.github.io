@@ -1,4 +1,4 @@
-var waves=24;
+var waves=1;
 var timeinseconds=0;
 var fpsOut = document.getElementById('fps');
 var weaver;

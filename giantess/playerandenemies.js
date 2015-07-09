@@ -281,7 +281,7 @@ function Enemy1 () {
 //copter
 function Enemy2 () {
 	this.comun=new BaseEnemy();
-	this.comun.speed=1; //max vel 4
+	this.comun.speed=2; //max vel 4
 	this.reset=function(){
 		this.comun.damage=10;
 		this.comun.tipoMov=3;
@@ -336,10 +336,10 @@ function Enemy3 () {
 //copterAPAche
 function Enemy3 () {
 	this.comun=new BaseEnemy();
-	this.comun.speed=2; //max vel 4
+	this.comun.speed=3; //max vel 4
 	this.reset=function(){
 		this.comun.damage=10;
-		this.comun.tipoMov=1;	
+		this.comun.tipoMov=3;	
 		
 		//this.comun.fromx=aleatorio(0,t.c.width);
 		//this.comun.fromy=0;		
@@ -417,7 +417,7 @@ function Bomb () {
 		this.comun.damage=10;
 		this.comun.tipoMov=1;	
 		
-		this.comun.fromx=0
+		this.comun.fromx=-50
 		this.comun.fromy=aleatorio(0,t.c.height-t.c.height/3);	
 		this.comun.x=this.comun.fromx;
 		this.comun.y=this.comun.fromy;

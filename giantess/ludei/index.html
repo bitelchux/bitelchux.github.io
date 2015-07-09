@@ -43,9 +43,7 @@ $(document).ready(function(){
 <meta name="viewport" content="target-densitydpi=medium-dpi,width=device-width,initial-scale=1,user-scalable=no" />  
 </head>
 <body>
-<script>
-document.writeln(window.location.href)
-</script>
+
 	<div id="loading">
 	Loading
 	</div>
@@ -59,10 +57,9 @@ document.writeln(window.location.href)
 		if (crushed!=null){
 			document.writeln("High Score:"+ crushed +" crushed humans");
 		}
-		if (getURLParameter("apk")!=null){
-			document.writeln("<div class='boton inapk' onclick='exit()'>Exit</div>");
-		}
+
 		</script>
+		<div class='boton inapk' onclick='exit()'>Exit</div>
 		<div class="msg" style="display:none"></div>
 	</div>
 	<div id="gameOver" style="position:absolute;display:none;top:0px;left:0px;border:1px solid black">	

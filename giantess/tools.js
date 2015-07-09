@@ -354,6 +354,15 @@ function Tools () {
 		this.ctx.fillRect(x,y,20,20);
 	}
 	this.paintLaser = function(x,y){
+		this.ctx.lineWidth = 22*this.scalefactor;
+		
+		this.ctx.beginPath();
+		this.ctx.moveTo(this.c.width/2, this.c.height);
+		this.ctx.strokeStyle = '#ffffff';
+		this.ctx.lineTo(x, y);
+		this.ctx.stroke();
+		
+		
 		this.ctx.lineWidth = 15*this.scalefactor;
 		
 		this.ctx.beginPath();
