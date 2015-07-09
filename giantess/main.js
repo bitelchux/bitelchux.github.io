@@ -57,7 +57,7 @@ function start(){
 	$("#main").fadeIn("slow");
 	Game.menu=false;
 	Game.playing=true;
-	weaver = window.setInterval(nextWave, 1000);
+	weaver = window.setTimeout(nextWave, 1000);
 }
 function restart(){
 	location.reload();

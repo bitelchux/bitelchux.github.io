@@ -10,6 +10,7 @@ function nextWave(){
 		spawnFormacion(timeinseconds,waves++);	
 	  if (timeinseconds%2==0)
 		spawnSoldado();
+	  weaver = window.setTimeout(nextWave, 1000);
 	}
 }    
 
