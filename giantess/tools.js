@@ -355,12 +355,13 @@ function Tools () {
 	}
 	this.paintLaser = function(x,y){
 		this.ctx.lineWidth = 15*this.scalefactor;
-		this.ctx.fillStyle = "#ff0000";
+		
 		this.ctx.beginPath();
 		this.ctx.moveTo(this.c.width/2, this.c.height);
+		this.ctx.strokeStyle = '#ff0000';
 		this.ctx.lineTo(x, y);
 		this.ctx.stroke();
-		this.paintSprite(x-40,y-40,80,80,impacto.Get());
+		//this.paintSprite(x-40,y-40,80,80,impacto.Get());
 	}	
 	this.paintSprite = function(x,y,w,h,img){
 		this.ctx.drawImage(img, x,y, w*this.scalefactor, h*this.scalefactor);

@@ -281,7 +281,7 @@ function Enemy1 () {
 //copter
 function Enemy2 () {
 	this.comun=new BaseEnemy();
-	this.comun.speed=4; //max vel 4
+	this.comun.speed=1; //max vel 4
 	this.reset=function(){
 		this.comun.damage=10;
 		this.comun.tipoMov=3;
@@ -377,7 +377,7 @@ function Enemy3 () {
 
 function Enemy4 () {
 	this.comun=new BaseEnemy();
-	this.comun.speed=2; //max vel 4
+	this.comun.speed=4; //max vel 4
 	this.reset=function(){
 		this.comun.damage=10;
 		this.comun.tipoMov=1;	
@@ -417,22 +417,22 @@ function Bomb () {
 		this.comun.damage=10;
 		this.comun.tipoMov=1;	
 		
-		this.comun.fromx=aleatorio(0,t.c.width);
-		this.comun.fromy=0;		
+		this.comun.fromx=0
+		this.comun.fromy=aleatorio(0,t.c.height-t.c.height/3);	
 		this.comun.x=this.comun.fromx;
 		this.comun.y=this.comun.fromy;
 		
-		this.comun.tox=this.comun.fromx;
-		this.comun.toy=t.c.height;
+		this.comun.tox=t.c.width;
+		this.comun.toy=this.comun.fromy;
 		this.comun.w=100;
 		this.comun.h=100;		
 		
 		this.comun.speed=2; //max vel 4
 		this.comun.stepMaxcont=parseInt(t.c.height/this.comun.speed)
-		this.comun.incx=0;
-		this.comun.incy=(this.comun.toy)/(t.c.height/this.comun.speed)
+		this.comun.incy=0;
+		this.comun.incx=(this.comun.tox)/(t.c.width/this.comun.speed)
 		//fx2.play();
-		this.comun.incy=this.comun.incy*t.scalefactor;
+		this.comun.incx=this.comun.incx*t.scalefactor;
 		
 		
 
