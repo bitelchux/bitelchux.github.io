@@ -5,10 +5,34 @@
 <head>
 <title></title>
 <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-<link type="text/css" href="http://bitelchux.github.io/giantess/jqui.css" rel="Stylesheet" /> 
-<link type="text/css" href="http://bitelchux.github.io/giantess/styles.css" rel="Stylesheet" />
-<script src="http://bitelchux.github.io/giantess/jq.js"></script> 
-<script src="http://bitelchux.github.io/giantess/cocoon.js"></script> 
+<script src="jq.js"></script> 
+<script src="cocoon.js"></script> 
+<link type="text/css" href="styles.css" rel="Stylesheet" />
+<script>
+function checkNetConnection(){
+ jQuery.ajaxSetup({async:false});
+ re="";
+ r=Math.round(Math.random() * 10000);
+ $.get("http://bitelchux.github.io/giantess/busto.png",{subins:r},function(d){
+  re=true;
+ }).error(function(){
+  re=false;
+ });
+ return re;
+}
+$(document).ready(function(){
+	if (checkNetConnection()){
+	}else{
+		$("div").hide();
+		$("#error").show()
+	}
+})
+</script>
+
+
+<link type="text/css" href="http://bitelchux.github.io/giantess/stylesoveride.css" rel="Stylesheet" />
+
+
 <script src="http://bitelchux.github.io/giantess/formaciones.js"></script> 
 <script src="http://bitelchux.github.io/giantess/audio.js"></script> 
 <script src="http://bitelchux.github.io/giantess/tools.js"></script> 
@@ -19,6 +43,9 @@
 <meta name="viewport" content="target-densitydpi=medium-dpi,width=device-width,initial-scale=1,user-scalable=no" />  
 </head>
 <body>
+<script>
+document.writeln(window.location.href)
+</script>
 	<div id="loading">
 	Loading
 	</div>
@@ -49,6 +76,12 @@
 		}
 		</script>
 	</div>
+	<div id="error" style="display:none">
+	<p>THIS GAME NEED AN DATA CONNECTION </p>
+	<div onclick="restart()">RETRY</div>
+	<br/>
+	<div onclick="exit()">EXIT</div>
+	</div>
 	<div id="main" style="position:absolute;display:none;top:0px;left:0px;border:1px solid black">	
 
 		<canvas id="gamemain"  style="position:absolute;top:0px;left:0px;z-index:666;"></canvas>	
@@ -56,12 +89,13 @@
 		
 	</div>
 
-<div id="debug" style="position:absolute;color:red;bottom:0px;left:0px;z-index:1000">
+<div id="debug" style="position:absolute;display:none;color:red;bottom:0px;left:0px;z-index:1000">
 
 </div>
-<div id="fps" style="position:absolute;color:red;bottom:0px;right:0px;z-index:1000">
+<div id="fps" style="position:absolute;display:none;color:red;bottom:0px;right:0px;z-index:1000">
 
 </div>
+
 <script src="http://bitelchux.github.io/giantess/mainbottom.js"></script> 	
 	<iframe frameborder="no" src="http://contador.elracano.com/giantessgame" style="display:none" width="10" height="10"></iframe>
 

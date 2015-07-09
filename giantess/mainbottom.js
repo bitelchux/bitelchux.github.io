@@ -12,54 +12,38 @@ function nextWave(){
 		spawnSoldado();
 	}
 }    
+}
+
 $(document).ready(function(){
-	$("#loading").hide();
-	$("#main").hide();
-	initScroll();
-	t=new Tools();
 	
-	document.body.onmousedown = function() { 
-		t.mouseDown = 1;
-	}
-	document.body.onmouseup = function() {
-		t.mouseDown = 0;
-	}
-	
-	
-	
-	if ('ontouchstart' in document.documentElement) {	
-		document.getElementById("gamemain").addEventListener("touchstart", tap,false);
-		document.getElementById("gamemain").addEventListener("touchend", untap,false);
-	  //document.getElementById("gamemain").addEventListener("touchmove", tap,false);	
-	}else{
-		document.getElementById("gamemain").addEventListener("mousedown", tap,false);		
-		document.getElementById("gamemain").addEventListener("mouseup", untap,false);	
-		//document.getElementById("gamemain").addEventListener("mousemove", tap,false);		
-	}
-	redim();
-	initSprites();
-	p=new Player();
-	e=new Array();	
-	tictac();	
-	
-/*
-	window.addEventListener('touchmove', function(e) {	
-		e.preventDefault();
-		console.log("tm");
-	}, false);
-	window.addEventListener('touchend', function(e) {
+		$("#loading").hide();
+		$("#main").hide();
+		initScroll();
+		t=new Tools();
 		
-		e.preventDefault();
-		console.log("te");
-	}, false);
-	window.addEventListener('mousemove', function(e) {
-		e.preventDefault();
-		console.log("mm");
-	}, false);
-	window.addEventListener('mousedown', function(e) {
-		e.preventDefault();
-		console.log("md");
-	}, false);
-	*/
+		document.body.onmousedown = function() { 
+			t.mouseDown = 1;
+		}
+		document.body.onmouseup = function() {
+			t.mouseDown = 0;
+		}
+		
+		
+		
+		if ('ontouchstart' in document.documentElement) {	
+			document.getElementById("gamemain").addEventListener("touchstart", tap,false);
+			document.getElementById("gamemain").addEventListener("touchend", untap,false);
+		  //document.getElementById("gamemain").addEventListener("touchmove", tap,false);	
+		}else{
+			document.getElementById("gamemain").addEventListener("mousedown", tap,false);		
+			document.getElementById("gamemain").addEventListener("mouseup", untap,false);	
+			//document.getElementById("gamemain").addEventListener("mousemove", tap,false);		
+		}
+		redim();
+		initSprites();
+		p=new Player();
+		e=new Array();	
+		tictac();	
+	
 
 });
