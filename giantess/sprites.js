@@ -7,7 +7,7 @@ function Library(){
 	this.sfxCont=0;
 	this.AddImage = function(alias,src){						
 			var im=new Image();
-			im.src=src;			
+			im.src="http://bitelchux.github.io/giantess/" + src;			
 			this.init=true;
 			this.images[src]=im;
 			this.imagesCont++;
