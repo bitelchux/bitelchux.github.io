@@ -75,7 +75,7 @@ function BaseEnemy () {
 				var r=randi(1,4)
 				if (!library.sfx["e"+r].playing) library.sfx["e"+r].play();
 			}else{
-				if (!library.sfx["pop"].playing) library.sfx["pop"].play();
+			//	if (!library.sfx["pop"].playing) library.sfx["pop"].play();
 			}
 	
 			if (this.energia<=0){
@@ -246,7 +246,7 @@ function Enemy1 () {
 	this.reset=function(){
 		this.comun.damage=10;
 		this.comun.tipoMov=1;	
-		if (!library.sfx["pop"].playing) library.sfx["pop"].play();
+		//if (!library.sfx["pop"].playing) library.sfx["pop"].play();
 		//this.comun.fromx=aleatorio(0,t.c.width);
 		//this.comun.fromy=0;		
 		this.comun.x=this.comun.fromx;

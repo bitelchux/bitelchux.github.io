@@ -29,7 +29,7 @@ function Library(){
 				this.playing=false;
 
 			}
-		}).play();	
+		});
 		this.sfxCont++;		
 		this.sfx[alias]=fx;		
 		return fx;
