@@ -16,7 +16,11 @@ font-family: 'Monstruo', sans-serif;
 color:red;
 border: 0;
 text-transform: capitalize;
-font-size:1.6em;
+text-align:center;
+font-size:1.2em;
+}
+p{
+font-size:1em;
 }
 #menu{
 	width:100%;
