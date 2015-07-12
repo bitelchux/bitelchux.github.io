@@ -13,11 +13,11 @@ function Library(){
 			this.images[alias]=im;
 			this.imagesCont++;
 		
-			$("#loading").html("<h3>Loading...</h3>"+this.imagesCont+" load "+src+"<br/>")
+			//$("#loading").html("<h3>Loading...</h3>"+this.imagesCont+" load "+src+"<br/>")
 			
 			im.onload = function () {
 				library.imagesCont--;
-				$("#loading").html("<h3>Loading...</h3>"+library.imagesCont+src+" loaded!!!<br/>")
+				//$("#loading").html("<h3>Loading...</h3>"+library.imagesCont+src+" loaded!!!<br/>")
 				checkIfResourcesLoaded();
 			}						
 			return im;
@@ -25,7 +25,7 @@ function Library(){
 	this.AddSfx = function(alias,src){
 			this.imagesCont++;
 			
-			$("#loading").html("<h3>Loading...</h3>"+this.imagesCont+" load "+src+"<br/>")
+			//$("#loading").html("<h3>Loading...</h3>"+this.imagesCont+" load "+src+"<br/>")
 		var fx = new Howl({
 			urls: ["http://bitelchux.github.io/giantess/" + src],
 			onplay: function() {
@@ -37,7 +37,8 @@ function Library(){
 			onload: function() {
 				this.playing=false;
 				library.imagesCont--;
-				$("#loading").html("<h3>Loading...</h3>"+library.imagesCont+src+" loaded!!!<br/>")
+				
+				//$("#loading").html("<h3>Loading...</h3>"+library.imagesCont+src+" loaded!!!<br/>")
 				checkIfResourcesLoaded();
 			}
 		});
