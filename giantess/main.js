@@ -27,21 +27,23 @@ function tictac(){
 			var enemy=e[idx];
 			enemy.comun.tictac();
 			if (p.disparando){
-				//t.paintRect(enemy.comun.x,enemy.comun.y,enemy.comun.w*t.scalefactor,enemy.comun.h*t.scalefactor,"#00ff00")
+				
 				if (enemy.comun.x<t.cursorX && t.cursorX<enemy.comun.x+enemy.comun.w*t.scalefactor){
 					if (enemy.comun.y<t.cursorY && t.cursorY<enemy.comun.y+enemy.comun.h*t.scalefactor){					
 						enemy.comun.impactar(100);
 					}
 				}
 			}
-			if (enemy.comun.y>t.c.height-bodyimg.height*t.scalefactor+bodyy){					
+			//t.paintRect(0,t.c.height-bodyimg.height*t.scalefactor-bodyy,t.c.width,bodyimg.height*t.scalefactor,"#00ff00")
+			if (enemy.comun.y>t.c.height-bodyimg.height/2*t.scalefactor-bodyy){					
 					enemy.comun.tetazo();					
 			}
+			//t.paintRect(p2x,t.c.height-p2img.height*t.scalefactor-p2y,p2img.width*t.scalefactor,p2img.height*t.scalefactor,"#00ff00")
 			if( enemy.comun.tipoEne=="Soldier"){					
 				var crushed=false;
-				if ((enemy.comun.y>t.c.height-p2img.height*t.scalefactor/1.8+p2y && enemy.comun.x<p2img.width*t.scalefactor && enemy.comun.x>p2x))
+				if ((enemy.comun.y>t.c.height-p2img.height*t.scalefactor/1.8-p2y && enemy.comun.x<p2img.width*t.scalefactor && enemy.comun.x>p2x))
 					crushed=true;
-				if ((enemy.comun.y>t.c.height-p1img.height*t.scalefactor/1.8+p1y && enemy.comun.x<p1img.width*t.scalefactor && enemy.comun.x>p1x))
+				if ((enemy.comun.y>t.c.height-p1img.height*t.scalefactor/1.8-p1y && enemy.comun.x<p1img.width*t.scalefactor && enemy.comun.x>p1x))
 					crushed=true;
 				if (crushed)
 					enemy.comun.tetazo();					
