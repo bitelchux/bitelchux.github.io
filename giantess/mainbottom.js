@@ -1,4 +1,4 @@
-var waves=1;
+var waves=22;
 var timeinseconds=0;
 var fpsOut = document.getElementById('fps');
 var weaver;
@@ -16,8 +16,12 @@ function nextWave(){
 
 
 $(document).ready(function(){
-	
-		
+		var txt="<h3>INSTRUCTIONS<h3>";
+		txt=txt+"1.SHOOT THE TANKS,COPTERS AND JETS<BR/>"
+		txt=txt+"2.RECOVER ENERGY CRUSHING SOLDIERS<BR/>"
+		txt=txt+"3.DONT SHOOT THE SKULLS!!!<BR/>"
+		$(".msg").html(txt)
+		$(".msg").show();
 		initScroll();
 		t=new Tools();
 		

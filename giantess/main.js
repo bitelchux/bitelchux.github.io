@@ -81,7 +81,7 @@ function showGameOver(){
 	var crushed = Game.crushed
 	localStorage.setItem('crushed',crushed);
 	if (crushed!=null){
-		$("#gameOverScore").html("<p>Score:"+ crushed +" crushed humans!!!</p>");
+		$("#gameOverScore").html("<p>Score:"+ crushed +" crushed soldiers!!!</p>");
 	}
 	$("#gameOver").fadeIn("slow");
   });

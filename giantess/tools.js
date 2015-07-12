@@ -330,14 +330,15 @@ function spawnFormacion(seconds,wave){
 			var noloop=0;
 			while (noloop++<5 && !okcoord){
 				okcoord=true;
-				fromx=randi(10,(t.c.width-100*t.scalefactor));
+				fromx=randi(10,(t.c.width-200*t.scalefactor));
 				fromy=0-randi(100*t.scalefactor,5*100*t.scalefactor);
 				if (auxEnes.length>0){
 					for (ai=0;ai<auxEnes.length;ai++){
-						if (fromx>auxEnes[ai].comun.x && fromx<auxEnes[ai].comun.x+auxEnes[ai].comun.width)
-							okcoord=false;
-						if (fromy>auxEnes[ai].comun.y && fromx<auxEnes[ai].comun.y+auxEnes[ai].comun.height)
-							okcoord=false;			
+						if (fromx>auxEnes[ai].comun.x-30 && fromx<auxEnes[ai].comun.x+auxEnes[ai].comun.width+30){
+							if (fromy>auxEnes[ai].comun.y-30 && fromx<auxEnes[ai].comun.y+auxEnes[ai].comun.height+30)
+								okcoord=false;	
+							
+						}		
 					}
 				}
 			}

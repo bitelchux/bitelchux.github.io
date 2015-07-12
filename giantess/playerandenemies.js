@@ -84,6 +84,13 @@ function BaseEnemy () {
 			}else{
 				this.status=this.INMUNE;
 			}
+			if (this.tipoEne=="Bomb"){
+				if(!this.teteado){
+					this.teteado=true;
+					Game.vida=Game.vida-this.damage;
+				}
+				
+			}
 		}			
 	}	
 	this.tetazo=function(){		
@@ -403,13 +410,12 @@ function Enemy4 () {
 		
 		
 		this.comun.stepMaxcont=parseInt(t.c.height/this.comun.speed)
-		this.comun.incx=Math.abs((this.comun.tox-this.comun.fromx)/20)
+		this.comun.incx=(this.comun.tox-this.comun.fromx)/(t.c.height-this.comun.fromy/this.comun.speed)
 		this.comun.incy=(this.comun.toy)/(t.c.height/this.comun.speed)
 		
 	//	this.comun.incx=this.comun.incx*t.scalefactor;
 		this.comun.incy=this.comun.incy*t.scalefactor;
-		//fx2.play();
-		this.comun.incy=this.comun.incy*t.scalefactor;
+		
 		
 		
 
