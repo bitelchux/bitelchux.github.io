@@ -113,8 +113,10 @@ function drawUI(){
 	t.ctx.fillStyle = "#000000";
 	t.ctx.fillRect(margen,margen,t.c.width-2*margen,alto-margen);		
 	t.ctx.fillStyle = "#ff0000";
-	if (animBarraVida>=vida)
+	if (animBarraVida>vida)
 		animBarraVida--;
+	if (animBarraVida<vida)
+		animBarraVida++;
 	t.ctx.fillRect(margen,margen,animBarraVida,alto-margen);	
 	
 }
@@ -140,13 +142,13 @@ function spawn(tipo,x,y,incspeed){
 		var enemy
 		if (tipo=="Soldier")
 			enemy=new Enemy0();
-		if (tipo=="Tank")
+		if (tipo=="Enemy1")
 			enemy=new Enemy1();
-		if (tipo=="Tank2")
+		if (tipo=="Enemy2")
 			enemy=new Enemy2();
-		if (tipo=="Tank3")
+		if (tipo=="Enemy3")
 			enemy=new Enemy3();
-		if (tipo=="Tank4")
+		if (tipo=="Enemy4")
 			enemy=new Enemy4();		
 		if (tipo=="Bomb"){
 			enemy=new Bomb();
@@ -313,6 +315,7 @@ function spawnFormacion(seconds,wave){
 		bombs[k]=randi(0,parseInt(numEnemies));
 		
 	}
+	var auxEnes=new Array();
 	for (var j=0;j<numEnemies;j++){
 		if (bombs.indexOf(j)>=0){
 			
@@ -323,25 +326,42 @@ function spawnFormacion(seconds,wave){
 		if (tipo!=""){
 			var fromx=0;
 			var fromy=0;
-			fromx=randi(10,(t.c.width-100*t.scalefactor));
-			fromy=0-randi(100*t.scalefactor,5*100*t.scalefactor);
-		
+			var okcoord=false;
+			var noloop=0;
+			while (noloop++<5 && !okcoord){
+				okcoord=true;
+				fromx=randi(10,(t.c.width-100*t.scalefactor));
+				fromy=0-randi(100*t.scalefactor,5*100*t.scalefactor);
+				if (auxEnes.length>0){
+					for (ai=0;ai<auxEnes.length;ai++){
+						if (fromx>auxEnes[ai].comun.x && fromx<auxEnes[ai].comun.x+auxEnes[ai].comun.width)
+							okcoord=false;
+						if (fromy>auxEnes[ai].comun.y && fromx<auxEnes[ai].comun.y+auxEnes[ai].comun.height)
+							okcoord=false;			
+					}
+				}
+			}
 			var mid=null;
 			var incspeed=randi(0,parseInt(wave/5));
 			if (tipo=="x1"){
-				mid=spawn("Tank",fromx,fromy,incspeed);
+				mid=spawn("Enemy1",fromx,fromy,incspeed);
+				auxEnes.push(e[mid])
 			}
 			if (tipo=="x2"){
-				mid=spawn("Tank2",fromx,fromy,incspeed);
+				mid=spawn("Enemy2",fromx,fromy,incspeed);
+				auxEnes.push(e[mid])
 			}
 			if (tipo=="x3"){
-				mid=spawn("Tank3",fromx,fromy,incspeed);
+				mid=spawn("Enemy3",fromx,fromy,incspeed);
+				auxEnes.push(e[mid])
 			}
 			if (tipo=="x4"){
-				mid=spawn("Tank4",fromx,fromy,incspeed);
+				mid=spawn("Enemy4",fromx,fromy,incspeed);
+				auxEnes.push(e[mid])
 			}
 			if (tipo.indexOf("o")>=0){
 				mid=spawn("Bomb",fromx,fromy,incspeed);
+				
 			}			
 			
 			

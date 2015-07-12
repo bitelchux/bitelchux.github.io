@@ -99,8 +99,10 @@
 				p2incy=p2incy+0.1;
 			}	
 		}
-		t.paintSpriteFromBottom(t.c.width/3-p2img.width*t.scalefactor,p2y,p2img.width,p2img.height,p2img);
-		t.paintSpriteFromBottom(t.c.width-t.c.width/3,p1y,p1img.width,p1img.height,p1img);
+		p2x=t.c.width/3-p2img.width*t.scalefactor;
+		p1x=t.c.width-t.c.width/3;
+		t.paintSpriteFromBottom(p2x,p2y,p2img.width,p2img.height,p2img);
+		t.paintSpriteFromBottom(p1x,p1y,p1img.width,p1img.height,p1img);
 		t.paintSpriteFromBottom(bodyx,bodyy,bodyimg.width,bodyimg.height,bodyimg);		
 	}
     //img.crossOrigin="anonymous";

@@ -39,11 +39,12 @@ function tictac(){
 					enemy.comun.tetazo();					
 			}
 			//t.paintRect(p2x,t.c.height-p2img.height*t.scalefactor-p2y,p2img.width*t.scalefactor,p2img.height*t.scalefactor,"#00ff00")
-			if( enemy.comun.tipoEne=="Soldier"){					
+			if( enemy.comun.tipoEne=="Soldier" || enemy.comun.tipoEne=="Enemy1"){	
+				//t.paintRect(enemy.comun.x,enemy.comun.y,5,5,"#00ffff")			
 				var crushed=false;
-				if ((enemy.comun.y>t.c.height-p2img.height*t.scalefactor/1.8-p2y && enemy.comun.x<p2img.width*t.scalefactor && enemy.comun.x>p2x))
+				if ((enemy.comun.y>t.c.height-p2img.height*t.scalefactor-p2y && enemy.comun.x<p2img.width*t.scalefactor && enemy.comun.x>p2x))
 					crushed=true;
-				if ((enemy.comun.y>t.c.height-p1img.height*t.scalefactor/1.8-p1y && enemy.comun.x<p1img.width*t.scalefactor && enemy.comun.x>p1x))
+				if ((enemy.comun.y>t.c.height-p1img.height*t.scalefactor-p1y && enemy.comun.x<p1img.width*t.scalefactor && enemy.comun.x>p1x))
 					crushed=true;
 				if (crushed)
 					enemy.comun.tetazo();					
