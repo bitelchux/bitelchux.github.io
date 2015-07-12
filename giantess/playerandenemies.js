@@ -56,8 +56,8 @@ function BaseEnemy () {
 	this.incy=0;
 	//this.w=100;
 	//this.h=100;
-	this.centrox=0;
-	this.centroy=0;
+	this.centerx=0;
+	this.centery=0;
 	this.energia=100;	
 	this.cont=0;
 	this.speed=1;
@@ -124,14 +124,16 @@ function BaseEnemy () {
 				this.status=this.ANDANDO;
 			}
 		}
-		if (this.status==this.MURIENDO){			
+		if (this.status==this.MURIENDO || this.status==this.MURIENDO2 ){	
+			this.speed=0;
 			this.contstatus[this.MURIENDO]=this.contstatus[this.MURIENDO]-1;
 			if (this.contstatus[this.MURIENDO]<=0){
 				this.status=this.MUERTO;				
 			}
 			
 		}
-		if (this.status==this.MUERTO){			
+		if (this.status==this.MUERTO){	
+			this.speed=0;		
 			this.contstatus[this.MUERTO]=this.contstatus[this.MUERTO]-1;
 			if (this.contstatus[this.MUERTO]<=0){
 				delete e[this.arrayPosition];
@@ -161,24 +163,24 @@ function BaseEnemy () {
 			
 		}
 		*/
-
+		var img=null;
 		if (this.inmune<=0 || this.inmune%10==0){
 	
-			var img=this.sprites["andando"].Get();
+			img=this.sprites["andando"].Get();
 			t.paintSprite(this.x,this.y,img.w,img.h,img);
 		}
 		else if (this.status==this.ANDANDO){
-			var img=this.sprites[this.ANDANDO].Get();
+			img=this.sprites[this.ANDANDO].Get();
 			t.paintSprite(this.x,this.y,img.w,img.h,img);
 		}
 		else if (this.status==this.MURIENDO2){
-			var img=this.sprites["muriendo2"].Get();
+			img=this.sprites["muriendo2"].Get();
 			t.paintSprite(this.x,this.y,img.w,img.h,img);
 		}else if (this.disparando){
-			var img=this.sprites["disparando"].Get();
+			img=this.sprites["disparando"].Get();
 			t.paintSprite(this.x,this.y,img.w,img.h,img);
 		}else if (this.status==this.MURIENDO){
-			var img=this.sprites[this.MURIENDO].Get();
+			img=this.sprites[this.MURIENDO].Get();
 			
 			t.paintSprite(this.x,this.y,img.w,img.h,img);
 			if (this.tipoEne!="Soldier"){
@@ -186,9 +188,11 @@ function BaseEnemy () {
 				t.paintSprite(this.x-20,this.y+20,img.w,img.h,img);
 			}
 		}else if (this.status==this.MUERTO){
-			var img=this.sprites[this.MUERTO].Get();
+			img=this.sprites[this.MUERTO].Get();
 			t.paintSprite(this.x,this.y,img.w,img.h,img);
 		}
+		this.centerx=this.x+img.w*t.scalefactor/2;
+		this.centery=this.y+img.h*t.scalefactor/2;
 		//if (this.x>t.maxw) {dbug("limit x");this.reset()}
 		if (this.y>t.c.height) {
 			
@@ -198,6 +202,7 @@ function BaseEnemy () {
 			*/
 			delete e[this.arrayPosition];
 		}
+		
 	}	
 	
 	
@@ -218,8 +223,8 @@ function Enemy0 () {
 		
 		this.comun.tox=this.comun.fromx;
 		this.comun.toy=t.c.height;
-		this.comun.w=100;
-		this.comun.h=100;		
+		this.comun.w=50;
+		this.comun.h=50;		
 		
 		
 		this.comun.stepMaxcont=parseInt(t.c.height/this.comun.speed)
@@ -232,12 +237,12 @@ function Enemy0 () {
 		
 
 		//this.comun.sprites[this.comun.ANDANDO].Add("soldadodispara_1.png|soldadodispara_2.png|soldadodispara_3.png",-1,10,100,100);
-		this.comun.sprites[this.comun.ANDANDO].Add("soldado1.png|soldado2.png",-1,10,this.comun.w*2,this.comun.h*2);
+		this.comun.sprites[this.comun.ANDANDO].Add("soldado1.png|soldado2.png",-1,10,this.comun.w,this.comun.h);
 		//this.comun.sprites[this.comun.ANDANDO].Add("e1.png",-1,10,50,50);
-		this.comun.sprites[this.comun.MURIENDO].AddSeq("soldadom",1,6,1,10,this.comun.w*2,this.comun.h*2);
-		this.comun.sprites[this.comun.MURIENDO2].Add("soldadomx.png",1,10,this.comun.w*2,this.comun.h*2);
+		this.comun.sprites[this.comun.MURIENDO].AddSeq("soldadom",1,6,1,10,this.comun.w,this.comun.h);
+		this.comun.sprites[this.comun.MURIENDO2].Add("soldadomx.png",1,10,this.comun.w,this.comun.h);
 		//this.comun.sprites[this.comun.MURIENDO].Add("soldadomuriendo_1.png|soldadomuriendo_2.png",-1,10,50,50);
-		this.comun.sprites[this.comun.MUERTO].Add("soldadomuerto.png",0,10,this.comun.w*2,this.comun.h*2);
+		this.comun.sprites[this.comun.MUERTO].Add("soldadomuerto.png",0,10,this.comun.w,this.comun.h);
 	}
 
 }
@@ -246,7 +251,7 @@ function Enemy1 () {
 	this.comun=new BaseEnemy();
 	this.comun.speed=1; //max vel 4
 	this.reset=function(){
-		this.comun.damage=10;
+		this.comun.damage=5;
 		this.comun.tipoMov=1;	
 		//if (!library.sfx["pop"].playing) library.sfx["pop"].play();
 		//this.comun.fromx=aleatorio(0,t.c.width);
@@ -283,23 +288,24 @@ function Enemy2 () {
 	this.comun=new BaseEnemy();
 	this.comun.speed=2; //max vel 4
 	this.reset=function(){
-		this.comun.damage=10;
-		this.comun.tipoMov=3;
+		this.comun.damage=6;
+		this.comun.tipoMov=1;
 		
 		//this.comun.fromx=aleatorio(0,t.c.width);
 		//this.comun.fromy=0;	
 		this.comun.w=100;
-		this.comun.h=100;		
+		this.comun.h=100;	
+		this.comun.fromx=aleatorio(0,t.c.width);		
 		this.comun.x=this.comun.fromx;
 		this.comun.y=this.comun.fromy;
 		this.comun.tox=aleatorio(0,t.c.width);
 		this.comun.toy=t.c.height;
 		
 		this.comun.stepMaxcont=parseInt(t.c.height/this.comun.speed)
-		this.comun.incx=(this.comun.tox-this.comun.fromx)/(t.c.height/this.comun.speed)
+		this.comun.incx=(this.comun.tox-this.comun.fromx)/(t.c.width/this.comun.speed)
 		this.comun.incy=(this.comun.toy)/(t.c.height/this.comun.speed)
 		
-		this.comun.incx=this.comun.incx*t.scalefactor;
+	//	this.comun.incx=this.comun.incx*t.scalefactor;
 		this.comun.incy=this.comun.incy*t.scalefactor;
 		//fx3.play();
 		
@@ -338,7 +344,7 @@ function Enemy3 () {
 	this.comun=new BaseEnemy();
 	this.comun.speed=3; //max vel 4
 	this.reset=function(){
-		this.comun.damage=10;
+		this.comun.damage=7;
 		this.comun.tipoMov=3;	
 		
 		//this.comun.fromx=aleatorio(0,t.c.width);
@@ -379,23 +385,27 @@ function Enemy4 () {
 	this.comun=new BaseEnemy();
 	this.comun.speed=4; //max vel 4
 	this.reset=function(){
-		this.comun.damage=10;
+		this.comun.damage=8;
 		this.comun.tipoMov=1;	
 		
 		//this.comun.fromx=aleatorio(0,t.c.width);
 		//this.comun.fromy=0;		
+		this.comun.fromx=aleatorio(0,t.c.width);	
 		this.comun.x=this.comun.fromx;
 		this.comun.y=this.comun.fromy;
 		
-		this.comun.tox=this.comun.fromx;
+		this.comun.tox=aleatorio(0,t.c.width);	
 		this.comun.toy=t.c.height;
 		this.comun.w=100;
 		this.comun.h=100;		
 		
 		
 		this.comun.stepMaxcont=parseInt(t.c.height/this.comun.speed)
-		this.comun.incx=0;
+		this.comun.incx=(this.comun.tox-this.comun.fromx)/(t.c.width/this.comun.speed)
 		this.comun.incy=(this.comun.toy)/(t.c.height/this.comun.speed)
+		
+	//	this.comun.incx=this.comun.incx*t.scalefactor;
+		this.comun.incy=this.comun.incy*t.scalefactor;
 		//fx2.play();
 		this.comun.incy=this.comun.incy*t.scalefactor;
 		
@@ -414,7 +424,7 @@ function Enemy4 () {
 function Bomb () {
 	this.comun=new BaseEnemy();
 	this.reset=function(){
-		this.comun.damage=10;
+		this.comun.damage=15;
 		this.comun.tipoMov=1;	
 		
 		this.comun.fromx=-50

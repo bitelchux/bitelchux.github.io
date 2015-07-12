@@ -17,8 +17,7 @@ function nextWave(){
 
 $(document).ready(function(){
 	
-		$("#loading").hide();
-		$("#main").hide();
+		
 		initScroll();
 		t=new Tools();
 		

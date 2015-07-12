@@ -100,7 +100,7 @@ function drawUI(){
 	t.ctx.textBaseline = 'top';
 	t.ctx.fillStyle = "#ffffff";
 	t.ctx.font="0.5em Monstruo";
-	t.ctx.fillText  ('Crushed:'+Game.crushed, 0, t.c.height/10*t.scalefactor);
+	t.ctx.fillText  ('Crushed:'+Game.crushed, 0, t.c.height/7*t.scalefactor);
 	
 	
 	var alto=parseInt(t.c.height/15);
@@ -205,6 +205,7 @@ function spawnSoldado(){
 	mid=spawn("Soldier",fromx,fromy,incspeed);
 	
 }
+/*
 function spawnFormacion(seconds,wave){
 	
 	var wnumEnemies=Math.min(20,parseInt(wave/3)+2)
@@ -243,7 +244,7 @@ function spawnFormacion(seconds,wave){
 	for (var i=0;i<rows.length;i++){
 		var cols=rows[i].split(";");
 		var numEnemies=cols.length;
-		var separacionx=parseInt(t.c.width/numEnemies);	
+		var separacionx=parseInt((t.c.width-100*t.scalefactor)/numEnemies);	
 		for (var j=0;j<numEnemies;j++){
 
 		//	var r=randi(0,separacionx/10)
@@ -258,18 +259,21 @@ function spawnFormacion(seconds,wave){
 			if (tipo!=""){
 				var fromx=0;
 				var fromy=0;
+				
 				if (wnumRows!=1){
-					if (wave>=10){
-						fromx=randi(0,t.c.width);
-					}
+					
+						fromx=randi(0,t.c.width-100*t.scalefactor);
+					
 				}
 				else{
 					if (wave>=20 && randomizePos){
-						fromx=0-i*(t.c.width/randi(5,15));
+						fromx=0-i*((t.c.width-100*t.scalefactor)/randi(5,15));
 					}else{
 						fromx=0+separacionx/2 + separacionx*j;
 					}
 				}
+				
+				
 				if (wave>=20 && randomizePos){
 					fromy=0-i*(t.c.height/randi(5,15));
 				}else{
@@ -300,6 +304,51 @@ function spawnFormacion(seconds,wave){
 	}
 	
 }
+*/
+function spawnFormacion(seconds,wave){
+	
+	var numEnemies=Math.min(20,parseInt(wave/3)+2)
+	var bombs=new Array(randi(0,Math.min(numEnemies/5,parseInt(wave/5))));
+	for (var k=0;k<bombs.length;k++){
+		bombs[k]=randi(0,parseInt(numEnemies));
+		
+	}
+	for (var j=0;j<numEnemies;j++){
+		if (bombs.indexOf(j)>=0){
+			
+			tipo="o";
+		}else{
+			tipo="x"+randi(1,parseInt(wave/4));
+		}
+		if (tipo!=""){
+			var fromx=0;
+			var fromy=0;
+			fromx=randi(10,(t.c.width-100*t.scalefactor));
+			fromy=0-randi(100*t.scalefactor,5*100*t.scalefactor);
+		
+			var mid=null;
+			var incspeed=randi(0,parseInt(wave/5));
+			if (tipo=="x1"){
+				mid=spawn("Tank",fromx,fromy,incspeed);
+			}
+			if (tipo=="x2"){
+				mid=spawn("Tank2",fromx,fromy,incspeed);
+			}
+			if (tipo=="x3"){
+				mid=spawn("Tank3",fromx,fromy,incspeed);
+			}
+			if (tipo=="x4"){
+				mid=spawn("Tank4",fromx,fromy,incspeed);
+			}
+			if (tipo.indexOf("o")>=0){
+				mid=spawn("Bomb",fromx,fromy,incspeed);
+			}			
+			
+			
+		}
+	}	
+}
+	
 
 function initLevel(){
 	//rellenar arrays
@@ -348,7 +397,10 @@ function Tools () {
 		//this.c.width = this.c.width;
 		this.ctx.clearRect(0, 0, this.c.width, this.c.height);
 	}
-
+	this.paintRect = function(x,y,w,h,color){
+		this.ctx.fillStyle = color;
+		this.ctx.fillRect(x,y,w,h);
+	}
 	this.paintDot = function(x,y,color){
 		this.ctx.fillStyle = color;
 		this.ctx.fillRect(x,y,20,20);

@@ -1,4 +1,5 @@
 function Library(){
+	
 	this.images=new Array();
 	
 	this.imagesCont=0;
@@ -9,14 +10,22 @@ function Library(){
 			var im=new Image();
 			im.src="http://bitelchux.github.io/giantess/" + src;			
 			this.init=true;
-			this.images[src]=im;
+			this.images[alias]=im;
 			this.imagesCont++;
+		
+			$("#loading").html("<h3>Loading...</h3>"+this.imagesCont+" load "+src+"<br/>")
+			
 			im.onload = function () {
-				this.imagesCont--;
+				library.imagesCont--;
+				$("#loading").html("<h3>Loading...</h3>"+library.imagesCont+src+" loaded!!!<br/>")
+				checkIfResourcesLoaded();
 			}						
 			return im;
 	}
 	this.AddSfx = function(alias,src){
+			this.imagesCont++;
+			
+			$("#loading").html("<h3>Loading...</h3>"+this.imagesCont+" load "+src+"<br/>")
 		var fx = new Howl({
 			urls: ["http://bitelchux.github.io/giantess/" + src],
 			onplay: function() {
@@ -27,7 +36,9 @@ function Library(){
 			},
 			onload: function() {
 				this.playing=false;
-
+				library.imagesCont--;
+				$("#loading").html("<h3>Loading...</h3>"+library.imagesCont+src+" loaded!!!<br/>")
+				checkIfResourcesLoaded();
 			}
 		});
 		this.sfxCont++;		
@@ -49,8 +60,12 @@ function Sprite () {
 		for (var i=0;i< srcs.length;i++){
 			
 			
-			var im=new Image();
-			im.src="http://bitelchux.github.io/giantess/"  + srcs[i];
+			var im=null;
+			if (library.images[srcs[i]]==undefined){
+				im=library.AddImage(srcs[i],srcs[i]);
+			}else{
+				im=library.images[srcs[i]];
+			}
 			this.numRepes=numRepes;
 			this.contMax=contMax;
 			this.w=w;
@@ -61,10 +76,12 @@ function Sprite () {
 	this.AddSeq = function(src,from,to,numRepes,contMax,w,h){
 		
 		for (var i=from;i< to;i++){
-			
-			
-			var im=new Image();
-			im.src="http://bitelchux.github.io/giantess/" + src+i+".png";
+			var im=null;
+			if (library.images[src+i]==undefined){
+				im=library.AddImage(src+i,src+i+".png");
+			}else{
+				im=library.images[src+i];
+			}
 			this.numRepes=numRepes;
 			this.contMax=contMax;
 			this.w=w;
@@ -119,6 +136,23 @@ function initSprites(){
 	fx1 = library.AddSfx("espachu1","splat1.mp3");
 	fx1 = library.AddSfx("espachu2","splat2.mp3");
 	fx1 = library.AddSfx("boton","button.mp3");
+	
+	fx1=library.AddImage("p2","pie2.png");
+	fx1=library.AddImage("p1","pie1.png");
+	fx1=library.AddImage("body","busto.png");
+	fx1=new Enemy0();
+	fx1.reset();
+	fx1=new Enemy1();
+	fx1.reset();
+	fx1=new Enemy2();
+	fx1.reset();
+	fx1=new Enemy3();
+	fx1.reset();
+	fx1=new Enemy4();
+	fx1.reset();
+	fx1=new Bomb();
+	fx1.reset();
+	
 
 }
 

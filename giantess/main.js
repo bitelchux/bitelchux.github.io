@@ -3,14 +3,17 @@ var ZIGZAG=3;
 var INMOVIL=0;
 var MOVIL=1;
 function tictac(){
-	window.requestAnimationFrame(tictac);
 	
+	window.requestAnimationFrame(tictac);
+
 	  // Clear the canvas
 	if (Game.playing){
 		if (Game.vida<=0){
+			
 			Game.playing=false;
 			Game.gameOver=true;
 			showGameOver();
+			
 		}
 		t.clearCanvas();	
 		scroll(); //fondo
@@ -24,13 +27,14 @@ function tictac(){
 			var enemy=e[idx];
 			enemy.comun.tictac();
 			if (p.disparando){
+				//t.paintRect(enemy.comun.x,enemy.comun.y,enemy.comun.w*t.scalefactor,enemy.comun.h*t.scalefactor,"#00ff00")
 				if (enemy.comun.x<t.cursorX && t.cursorX<enemy.comun.x+enemy.comun.w*t.scalefactor){
 					if (enemy.comun.y<t.cursorY && t.cursorY<enemy.comun.y+enemy.comun.h*t.scalefactor){					
 						enemy.comun.impactar(100);
 					}
 				}
 			}
-			if (enemy.comun.y>t.c.height-bodyimg.height/2*t.scalefactor+bodyy){					
+			if (enemy.comun.y>t.c.height-bodyimg.height*t.scalefactor+bodyy){					
 					enemy.comun.tetazo();					
 			}
 			if( enemy.comun.tipoEne=="Soldier"){					
@@ -54,8 +58,8 @@ function tictac(){
 }
 function start(){
 	library.sfx["boton"].play();
-	$("#menu").fadeOut("slow");
-	$("#main").fadeIn("slow");
+	$("#menu").hide();
+	$("#main").show();
 	Game.menu=false;
 	Game.playing=true;
 	weaver = window.setTimeout(nextWave, 1000);
@@ -86,6 +90,17 @@ function redim(){
 	 t.h=h;
 	 t.redim();
 	 
+}
+function checkIfResourcesLoaded(){
+	if (library.imagesCont==0){
+		$("#loading").hide();
+		$("#menu").show();
+	}else{
+		$("#loading").show();
+		$("#menu").hide();
+		
+	}
+	
 }
 $(window).on('resize', function(){
 	redim()
