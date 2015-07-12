@@ -35,7 +35,7 @@ function tictac(){
 				}
 			}
 			//t.paintRect(0,t.c.height-bodyimg.height*t.scalefactor-bodyy,t.c.width,bodyimg.height*t.scalefactor,"#00ff00")
-			if (enemy.comun.x>=0 && enemy.comun.w*t.scalefactor<=t.c.width && enemy.comun.centery>t.c.height-bodyimg.height*t.scalefactor-bodyy){					
+			if (enemy.comun.x>=0 && enemy.comun.centerx<=t.c.width && enemy.comun.centery>t.c.height-bodyimg.height*t.scalefactor-bodyy){					
 					enemy.comun.tetazo();					
 			}
 			//t.paintRect(p2x,t.c.height-p2img.height*t.scalefactor-p2y,p2img.width*t.scalefactor,p2img.height*t.scalefactor,"#00ff00")

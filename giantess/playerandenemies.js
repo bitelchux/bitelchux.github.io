@@ -89,15 +89,17 @@ function BaseEnemy () {
 	this.tetazo=function(){		
 		if(!this.teteado){
 			if (this.tipoEne=="Soldier"){
-				Game.vida=Game.vida+this.damage;
+				Game.vida=Math.min(100,Game.vida+this.damage);
 				Game.crushed++;
 				this.status=this.MURIENDO2;
 				var r=randi(1,2)
 				if (!library.sfx["espachu"+r].playing) library.sfx["espachu"+r].play();
 				
 			}else{
-				Game.vida=Game.vida-this.damage;
-				this.impactar(100);
+				if (this.status==this.ANDANDO){
+					Game.vida=Game.vida-this.damage;
+					this.impactar(100);
+				}
 			}
 			
 			this.teteado=true;
@@ -302,7 +304,7 @@ function Enemy2 () {
 		this.comun.toy=t.c.height;
 		
 		this.comun.stepMaxcont=parseInt(t.c.height/this.comun.speed)
-		this.comun.incx=(this.comun.tox-this.comun.fromx)/(t.c.width/this.comun.speed)
+		this.comun.incx=(this.comun.tox-this.comun.fromx)/(t.c.height-this.comun.fromy/this.comun.speed)
 		this.comun.incy=(this.comun.toy)/(t.c.height/this.comun.speed)
 		
 	//	this.comun.incx=this.comun.incx*t.scalefactor;
@@ -342,7 +344,7 @@ function Enemy3 () {
 //copterAPAche
 function Enemy3 () {
 	this.comun=new BaseEnemy();
-	this.comun.speed=3; //max vel 4
+	this.comun.speed=1; //max vel 4
 	this.reset=function(){
 		this.comun.damage=7;
 		this.comun.tipoMov=3;	
@@ -401,7 +403,7 @@ function Enemy4 () {
 		
 		
 		this.comun.stepMaxcont=parseInt(t.c.height/this.comun.speed)
-		this.comun.incx=(this.comun.tox-this.comun.fromx)/(t.c.width/this.comun.speed)
+		this.comun.incx=Math.abs((this.comun.tox-this.comun.fromx)/20)
 		this.comun.incy=(this.comun.toy)/(t.c.height/this.comun.speed)
 		
 	//	this.comun.incx=this.comun.incx*t.scalefactor;
