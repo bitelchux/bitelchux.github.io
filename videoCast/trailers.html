@@ -100,6 +100,8 @@ $(document).ready(function(){
 					//var txt=decodeURIComponent(json.p2);
 					//txt = txt.replace(/^(\[url=)?(https?:\/\/)?(www\.|\S+?\.)(\S+?\.)?\S+$\s*/mg, '');
 					playYT(json.p2,json.p1,false);
+					send(theSenderID,"videostarted")
+					broadcast("videostarted")
 				}
 			}
 			window.castReceiverManager.start();
