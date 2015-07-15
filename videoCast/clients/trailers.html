@@ -13,10 +13,14 @@
 #youmax-header{
 	display:none;
 }
+li:focus { 
+    background-color: yellow;
+}
 </style>
 </head>
 <body>
-<div id="debugDiv">wwww</div>
+
+<div id="debugDiv" onclick="forceCast();nextVideo()">wwww</div>
 <div id="youmax" class=".youmax"></div>
 
 <script type="text/javascript">
@@ -52,10 +56,12 @@ maxContainerWidth:1080
 });
 var interval=null;
 var lastId="";
+var lastRow=null;
 function parchearClick(){
 	$( "#tiles li" ).click(function() {
-	
+		
 		if (lastId!=this.id){
+			  lastRow=this;
 			  if (typeof Android !== 'undefined') {
 				Android.cmd("VIEW",this.id, "video")
 			  }
@@ -64,9 +70,15 @@ function parchearClick(){
 			  $(".mfp-bg").hide();
 			  $(".mfp-wrap").hide();
 			  event.stopPropagation();
-			  
+			  setTimeout(function(){ lastId="" }, 1000)
 		  }
 		});
+}
+function nextVideo(){
+	if (lastRow!=null)
+		lastRow=lastRow.nextSibling;
+	if (lastRow!=null)
+		$(lastRow).click();
 }
 function forceCast(){
 	if (interval==null){

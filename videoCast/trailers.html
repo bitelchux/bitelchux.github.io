@@ -100,8 +100,8 @@ $(document).ready(function(){
 					//var txt=decodeURIComponent(json.p2);
 					//txt = txt.replace(/^(\[url=)?(https?:\/\/)?(www\.|\S+?\.)(\S+?\.)?\S+$\s*/mg, '');
 					playYT(json.p2,json.p1,false);
-					send(theSenderID,"videostarted")
-					broadcast("videostarted")
+					send(theSenderID,"connected")
+					
 				}
 			}
 			window.castReceiverManager.start();
@@ -173,8 +173,7 @@ $(document).ready(function(){
          //alert("fin");
         }
         if (event.data == YT.PlayerState.ENDED) {
-         //alert("fin");
-		 //send(theSenderID,"videofinished")
+			send(theSenderID,"videoend")
         }
 		
       }
