@@ -67,7 +67,7 @@ function parchearClick(){
 	
 	if (lastId!=this.id){
 		  if (typeof Android !== 'undefined') {
-			Android.cmd("VIEW",this.id, encodeURIComponent(txt))
+			Android.cmd("VIEW",this.id, "video")
 		  }
 		  alert( "Handler for .click() called." + this.id);
 		  lastId=this.id
@@ -89,7 +89,7 @@ $( document ).ready(function() {
 </script>
 
 <div id="youmax" class=".youmax"></div>
-
+<!--
 <div>
 $("#youmax").youmax({apiKey:"AIzaSyBkg_iWXjbD6VB6QJ0W_VY0d_EBDUne-vs",clientId:"328347664703-ge81acfbra0uch23b59gcamblqimutat.apps.googleusercontent.com",
 channel:"https://www.youtube.com/user/dota2",
@@ -97,5 +97,6 @@ playList:["https://www.youtube.com/playlist?list=PL6295232EFE2E2D9A"],
 searchTab:[{name:"MySearch",restrictToChannels:"https://www.youtube.com/user/dota2",relatedTo:"https://www.youtube.com/watch?v=DeumyOzKqgI",searchQuery:"dota2",searchOrder:"rating"}],
 selectedTab:"u",displayVideo:"popup",alwaysUseDropdown:true,autoPlayVideo:false,displayFirstVideoOnLoad:true,skin:"clean",searchBoxScope:"channel",linkNewPages:false,autoLoadComments:true,featuredVideo:"",alignPopupToTop:true,videoProtocol:"http:",commentOrder:"time",playlistSearchFile:"",userWebsite:"",videoMode:"wide",shareLink:"youtube",widgetMode:false,maxResults:18,innerOffset:25,outerOffset:35,minItemWidth:250,maxItemWidth:400,maxContainerWidth:1080});
 </div>
+-->
 </body>
 </html>
