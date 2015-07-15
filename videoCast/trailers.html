@@ -171,7 +171,8 @@ $(document).ready(function(){
          //alert("fin");
         }
         if (event.data == YT.PlayerState.ENDED) {
-         alert("fin");
+         //alert("fin");
+		 send(theSenderID,"videofinished")
         }
 		
       }
