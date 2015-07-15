@@ -59,7 +59,7 @@ function parchearClick(){
 			  if (typeof Android !== 'undefined') {
 				Android.cmd("VIEW",this.id, "video")
 			  }
-			  alert( Android + "Handler for .click() called." + this.id);
+			  //alert( Android + "Handler for .click() called." + this.id);
 			  lastId=this.id
 			  $(".mfp-bg").hide();
 			  $(".mfp-wrap").hide();
@@ -69,9 +69,11 @@ function parchearClick(){
 		});
 }
 function forceCast(){
-	alert("force cast")
-	parchearClick()
-	interval=setInterval(function(){ parchearClick() }, 1000);
+	if (interval==null){
+		//alert("force cast")
+		parchearClick()
+		interval=setInterval(function(){ parchearClick() }, 1000);
+	}
 }
 $( document ).ready(function() {
 	if (typeof console  != "undefined") 
