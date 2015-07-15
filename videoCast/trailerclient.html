@@ -1,0 +1,74 @@
+
+<html>
+<head>
+<!-- Include jQuery if not present already -->
+<script src="http://mobilewebapps.me/galleries/mega/jquery/jquery-1.9.1.min.js"></script>
+
+<!-- Include Youmax -->
+<script src="http://mobilewebapps.me/galleries/mega/js/jquery.youmax.min.js"></script>
+
+<!-- Include Youmax Styles -->
+<link rel="stylesheet" href="http://mobilewebapps.me/galleries/mega/css/youmax_grey.min.css"/>
+</head>
+<body>
+<div id="youmax" class=".youmax"></div>
+
+<script type="text/javascript">
+$("#youmax").youmax({apiKey:"AIzaSyBkg_iWXjbD6VB6QJ0W_VY0d_EBDUne-vs",clientId:"328347664703-ge81acfbra0uch23b59gcamblqimutat.apps.googleusercontent.com",
+channel:"https://www.youtube.com/user/giantessgigantes",
+playList:[],
+searchTab:[{name:"Home",restrictToChannels:"",relatedTo:"",searchQuery:"cats",searchOrder:"date"}],
+selectedTab:"s1",
+displayVideo:"popup",
+alwaysUseDropdown:true,
+autoPlayVideo:true,
+displayFirstVideoOnLoad:false,
+skin:"clean",
+searchBoxScope:"global",
+linkNewPages:false,
+autoLoadComments:true,
+featuredVideo:"",
+alignPopupToTop:true,
+videoProtocol:"http:",
+commentOrder:"time",
+playlistSearchFile:"",
+userWebsite:"",
+videoMode:"wide",
+shareLink:"youtube",
+widgetMode:false,
+maxResults:18,
+innerOffset:25,
+outerOffset:35,
+minItemWidth:250,
+maxItemWidth:400,
+maxContainerWidth:1080
+});
+var interval=null;
+function parchearClick(){
+	$( "#tiles li" ).click(function() {
+	  
+	  alert( "Handler for .click() called." );
+	  $(".mfp-bg").hide();
+	  $(".mfp-wrap").hide();
+	  event.stopPropagation();
+	});
+}
+$( document ).ready(function() {
+	alert("ready");
+	interval=setInterval(function(){ parchearClick() }, 1000);
+
+	
+});
+</script>
+
+<div id="youmax" class=".youmax"></div>
+
+<div>
+$("#youmax").youmax({apiKey:"AIzaSyBkg_iWXjbD6VB6QJ0W_VY0d_EBDUne-vs",clientId:"328347664703-ge81acfbra0uch23b59gcamblqimutat.apps.googleusercontent.com",
+channel:"https://www.youtube.com/user/dota2",
+playList:["https://www.youtube.com/playlist?list=PL6295232EFE2E2D9A"],
+searchTab:[{name:"MySearch",restrictToChannels:"https://www.youtube.com/user/dota2",relatedTo:"https://www.youtube.com/watch?v=DeumyOzKqgI",searchQuery:"dota2",searchOrder:"rating"}],
+selectedTab:"u",displayVideo:"popup",alwaysUseDropdown:true,autoPlayVideo:false,displayFirstVideoOnLoad:true,skin:"clean",searchBoxScope:"channel",linkNewPages:false,autoLoadComments:true,featuredVideo:"",alignPopupToTop:true,videoProtocol:"http:",commentOrder:"time",playlistSearchFile:"",userWebsite:"",videoMode:"wide",shareLink:"youtube",widgetMode:false,maxResults:18,innerOffset:25,outerOffset:35,minItemWidth:250,maxItemWidth:400,maxContainerWidth:1080});
+</div>
+</body>
+</html>
