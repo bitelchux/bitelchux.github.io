@@ -16,21 +16,11 @@
 </style>
 </head>
 <body>
-<div id="debugDiv">yyy</div>
+<div id="debugDiv">wwww</div>
 <div id="youmax" class=".youmax"></div>
 
 <script type="text/javascript">
-	if (typeof console  != "undefined") 
-		if (typeof console.log != 'undefined')
-			console.olog = console.log;
-		else
-			console.olog = function() {};
 
-	console.log = function(message) {
-		console.olog(message);
-		$('#debugDiv').append('<p>' + message + '</p>');
-	};
-	console.error = console.debug = console.info =  console.log
 $("#youmax").youmax({apiKey:"AIzaSyBkg_iWXjbD6VB6QJ0W_VY0d_EBDUne-vs",clientId:"328347664703-ge81acfbra0uch23b59gcamblqimutat.apps.googleusercontent.com",
 channel:"https://www.youtube.com/user/giantessgigantes",
 playList:[],
@@ -84,7 +74,17 @@ function forceCast(){
 	interval=setInterval(function(){ parchearClick() }, 1000);
 }
 $( document ).ready(function() {
+	if (typeof console  != "undefined") 
+		if (typeof console.log != 'undefined')
+			console.olog = console.log;
+		else
+			console.olog = function() {};
 
+	console.log = function(message) {
+		console.olog(message);
+		$('#debugDiv').append('<p>' + message + '</p>');
+	};
+	console.error = console.debug = console.info =  console.log
 });
 </script>
 
