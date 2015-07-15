@@ -9,6 +9,11 @@
 
 <!-- Include Youmax Styles -->
 <link rel="stylesheet" href="http://mobilewebapps.me/galleries/mega/css/youmax_grey.min.css"/>
+<style>
+#youmax-header{
+	display:none;
+}
+</style>
 </head>
 <body>
 <div id="youmax" class=".youmax"></div>
@@ -44,20 +49,30 @@ maxItemWidth:400,
 maxContainerWidth:1080
 });
 var interval=null;
+var lastId="";
 function parchearClick(){
 	$( "#tiles li" ).click(function() {
-	  
-	  alert( "Handler for .click() called." );
-	  $(".mfp-bg").hide();
-	  $(".mfp-wrap").hide();
-	  event.stopPropagation();
+	
+	if (lastId!=this.id){
+		  if (typeof Android !== 'undefined') {
+			Android.cmd("VIEW",this.id, encodeURIComponent(txt))
+		  }
+		  alert( "Handler for .click() called." + this.id);
+		  lastId=this.id
+		  $(".mfp-bg").hide();
+		  $(".mfp-wrap").hide();
+		  event.stopPropagation();
+		  
+	  }
 	});
 }
-$( document ).ready(function() {
-	alert("ready");
+function forceCast(){
+	alert("force cast")
+	parchearClick()
 	interval=setInterval(function(){ parchearClick() }, 1000);
+}
+$( document ).ready(function() {
 
-	
 });
 </script>
 
