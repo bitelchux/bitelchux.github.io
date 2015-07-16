@@ -22,7 +22,10 @@ li:focus {
 #youmax-tabs span:nth-child(2){
    display:none;
 }
-
+.selected { 
+    background-color: silver !important;
+	
+}
 #youmax-tabs{
 display:block;
 }
@@ -91,8 +94,14 @@ function parchearClick(){
 function nextVideo(){
 	if (lastRow!=null)
 		lastRow=lastRow.nextSibling;
-	if (lastRow!=null)
-		$(lastRow).click();
+	if (lastRow!=null){
+			$(lastRow).click();
+			$("li").removeClass("selected")
+			$(lastRow).addClass("selected")
+			$('html,body').animate({scrollTop: $(lastRow).offset().top});
+			
+			
+	}
 }
 function forceCast(){
 	if (interval==null){
