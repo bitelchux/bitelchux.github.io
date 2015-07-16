@@ -92,10 +92,12 @@ function nextVideo(){
 	if (lastRow!=null)
 		lastRow=lastRow.nextSibling;
 	if (lastRow!=null){
-			$(lastRow).click();
+		
 			$("li").removeClass("selected")
 			$(lastRow).addClass("selected")
-			$('html,body').animate({scrollTop: $(lastRow).offset().top});
+			$('html,body').animate({scrollTop: $(lastRow).offset().top},2000, function() {
+				$(lastRow).click();
+			});
 			
 			
 	}
