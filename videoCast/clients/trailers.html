@@ -1,6 +1,11 @@
-
-<html>
+<!DOCTYPE html PUBLIC "-//WAPFORUM//DTD XHTML Mobile 1.2//EN" "http://www.openmobilealliance.org/tech/DTD/xhtml-mobile12.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+<title>TRailers chromecast</title>
+<meta name="title" content="TV Listings" />
+<meta name="language" content="us" />
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />  
 <!-- Include jQuery if not present already -->
 <script src="http://mobilewebapps.me/galleries/mega/jquery/jquery-1.9.1.min.js"></script>
 
@@ -13,8 +18,15 @@
 #youmax-header{
 	display:none;
 }
-li:focus { 
-    background-color: yellow;
+.selected { 
+    background-color: silver !important;
+	
+}
+#youmax-tabs{
+display:none;
+}
+body{
+margin:0px;    
 }
 </style>
 </head>
@@ -27,8 +39,8 @@ li:focus {
 
 $("#youmax").youmax({apiKey:"AIzaSyBkg_iWXjbD6VB6QJ0W_VY0d_EBDUne-vs",clientId:"328347664703-ge81acfbra0uch23b59gcamblqimutat.apps.googleusercontent.com",
 channel:"https://www.youtube.com/user/giantessgigantes",
-playList:[],
-searchTab:[{name:"Home",restrictToChannels:"",relatedTo:"",searchQuery:"cats",searchOrder:"date"}],
+playList:["https://www.youtube.com/playlist?list=PLoI2X2t2pTL_Zsun0XHCfCGvu3sor1Yhw"],
+searchTab:[],
 selectedTab:"s1",
 displayVideo:"popup",
 alwaysUseDropdown:true,
@@ -71,14 +83,22 @@ function parchearClick(){
 			  $(".mfp-wrap").hide();
 			  event.stopPropagation();
 			  setTimeout(function(){ lastId="" }, 1000)
+			  $("li").removeClass("selected")
+			  $(this).addClass("selected")
 		  }
 		});
 }
 function nextVideo(){
 	if (lastRow!=null)
 		lastRow=lastRow.nextSibling;
-	if (lastRow!=null)
-		$(lastRow).click();
+	if (lastRow!=null){
+			$(lastRow).click();
+			$("li").removeClass("selected")
+			$(lastRow).addClass("selected")
+			$('html,body').animate({scrollTop: $(lastRow).offset().top});
+			
+			
+	}
 }
 function forceCast(){
 	if (interval==null){
