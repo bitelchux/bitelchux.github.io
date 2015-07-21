@@ -1,6 +1,11 @@
-
-<html>
+<!DOCTYPE html PUBLIC "-//WAPFORUM//DTD XHTML Mobile 1.2//EN" "http://www.openmobilealliance.org/tech/DTD/xhtml-mobile12.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+<title>TRailers chromecast</title>
+<meta name="title" content="TV Listings" />
+<meta name="language" content="us" />
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />  
 <!-- Include jQuery if not present already -->
 <script src="http://mobilewebapps.me/galleries/mega/jquery/jquery-1.9.1.min.js"></script>
 
@@ -13,21 +18,15 @@
 #youmax-header{
 	display:none;
 }
-li:focus { 
-    background-color: yellow;
-}
-#youmax-tabs span:nth-child(1){
-   display:none;
-}
-#youmax-tabs span:nth-child(2){
-   display:none;
-}
 .selected { 
     background-color: silver !important;
 	
 }
 #youmax-tabs{
-display:block;
+display:none;
+}
+#youmax-select-box{
+display:none !important;
 }
 body{
 margin:0px;    
@@ -36,14 +35,14 @@ margin:0px;
 </head>
 <body>
 
-<div id="debugDiv" style="display:none" onclick="forceCast();nextVideo()"></div>
+<div id="debugDiv" style="display:none;" onclick="forceCast();nextVideo()"></div>
 <div id="youmax" class=".youmax"></div>
 
 <script type="text/javascript">
 
 $("#youmax").youmax({apiKey:"AIzaSyBkg_iWXjbD6VB6QJ0W_VY0d_EBDUne-vs",clientId:"328347664703-ge81acfbra0uch23b59gcamblqimutat.apps.googleusercontent.com",
 channel:"https://www.youtube.com/user/giantessgigantes",
-playList:["https://www.youtube.com/playlist?list=PLoI2X2t2pTL9v0AC8sX21_FYndHMtlCuW","https://www.youtube.com/playlist?list=PLoI2X2t2pTL8KtyMMQc2VRcMfjzQdZhfS"],
+playList:["https://www.youtube.com/playlist?list=PLoI2X2t2pTL9Gs-8SkqWN9zbbbb1T2vdG"],
 searchTab:[],
 selectedTab:"p1",
 displayVideo:"popup",
@@ -61,7 +60,6 @@ commentOrder:"time",
 playlistSearchFile:"",
 userWebsite:"",
 videoMode:"wide",
-alwaysUseDropdown:false,
 shareLink:"youtube",
 widgetMode:false,
 maxResults:18,
@@ -89,7 +87,7 @@ function parchearClick(){
 			  event.stopPropagation();
 			  setTimeout(function(){ lastId="" }, 1000)
 			  $("li").removeClass("selected")
-			  $(this).addClass("selected")			  
+			  $(this).addClass("selected")
 		  }
 		});
 }
@@ -97,7 +95,7 @@ function nextVideo(){
 	if (lastRow!=null)
 		lastRow=lastRow.nextSibling;
 	if (lastRow!=null){
-			
+		
 			$("li").removeClass("selected")
 			$(lastRow).addClass("selected")
 			$('html,body').animate({scrollTop: $(lastRow).offset().top},2000, function() {
@@ -130,7 +128,7 @@ $( document ).ready(function() {
 </script>
 
 <div id="youmax" class=".youmax"></div>
-<iframe frameborder="no" src="http://contador.elracano.com/video-androidgameplays" width="10" height="10"></iframe>
+<iframe frameborder="no" src="http://contador.elracano.com/video-trailers" width="10" height="10"></iframe>
 <!--
 <div>
 $("#youmax").youmax({apiKey:"AIzaSyBkg_iWXjbD6VB6QJ0W_VY0d_EBDUne-vs",clientId:"328347664703-ge81acfbra0uch23b59gcamblqimutat.apps.googleusercontent.com",
