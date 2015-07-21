@@ -88,6 +88,8 @@ function parchearClick(){
 			  $(".mfp-wrap").hide();
 			  event.stopPropagation();
 			  setTimeout(function(){ lastId="" }, 1000)
+			  $("li").removeClass("selected")
+			  $(this).addClass("selected")			  
 		  }
 		});
 }

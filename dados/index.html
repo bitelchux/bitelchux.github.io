@@ -1,0 +1,174 @@
+
+<!DOCTYPE HTML>
+
+<!--
+Little HTML5/coffeescript dice app
+By Bart Nagel <bart@tremby.net>
+MIT licence
+
+Dice rolling sound effect by Mike Koenig, "Attribution 3.0" licence, found at 
+and edited down from 
+http://soundbible.com/182-Shake-And-Roll-Dice.html
+-->
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<meta name="author" content="Bart Nagel &lt;bart@tremby.net&gt;">
+		<title>Dice</title>
+		<script>
+			var GLOBALSIDES=20;
+			var GLOBALWITHZERO=false;
+			var GLOBALUSER="user";
+		</script>
+		<script src="libs.js" type="application/javascript"></script>
+		<script src="dice.js" type="application/javascript"></script>
+<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" href="style.css" type="text/css" charset="utf-8">
+		<link rel="stylesheet" href="style2.css" type="text/css" charset="utf-8">
+		<style>
+			* {
+			font-family:'Roboto',Verdana;
+			color:silver;
+			font-size:big;
+			}
+		</style>
+	</head>
+	<body>
+		<script src="http://www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js"></script>
+		<div id="dbug" style="display:none;position:absolute;top:100px;left:0px;background-color:blue">asdadasdasd</div>
+		<div id="debugDiv" style="display:none;position:absolute;top:250px;left:0px;background-color:green">Console</div>
+		<section id="dice">
+			<button id="configuration-toggle" style="display:none">Toggle configuration</button>
+			<ul>
+				<li>
+					<div class="image">
+						<div class="aspect"></div>
+						<div class="content">
+							<div class="sides">d6</div>
+							<div class="value"><span class="default-size">click to roll</span></div>
+							<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 4 4">
+								<circle class="dot-1-1" cx="1" cy="1" r="0.45"/>
+								<circle class="dot-1-2" cx="1" cy="2" r="0.45"/>
+								<circle class="dot-1-3" cx="1" cy="3" r="0.45"/>
+								<circle class="dot-2-1" cx="2" cy="1" r="0.45"/>
+								<circle class="dot-2-2" cx="2" cy="2" r="0.45"/>
+								<circle class="dot-2-3" cx="2" cy="3" r="0.45"/>
+								<circle class="dot-3-1" cx="3" cy="1" r="0.45"/>
+								<circle class="dot-3-2" cx="3" cy="2" r="0.45"/>
+								<circle class="dot-3-3" cx="3" cy="3" r="0.45"/>
+							</svg>
+						</div>
+					</div>
+					<div class="label"></div>
+					<div class="hold"  style="display:none">
+						<label>
+							<input class="hold" type="checkbox">
+							Hold
+						</label>
+					</div>
+					<ul class="configuration">
+						<li>
+							<label>
+								Number of sides
+								<input class="sides" type="number" min="2" step="1" value="6">
+							</label>
+						</li>
+						<li>
+							<label>
+								Base-zero
+								<input class="base-zero" type="checkbox">
+							</label>
+						</li>
+						<li>
+							<label>
+								Colour
+								<input class="colour" type="color" value="#cc0000">
+							</label>
+						</li>
+						<li>
+							<label>
+								Die label
+								<input class="label" type="text">
+							</label>
+						</li>
+						<li>
+							<button class="remove">Remove</button>
+						</li>
+						<li>
+							<button class="duplicate">Duplicate</button>
+						</li>
+					</ul>
+				</li>
+			</ul>
+			<div id="total"></div>
+		</section>
+		<section id="history">
+			<ol>
+			</ol>
+		</section>
+		<div id="sound"></div>		
+		<script>
+			if (typeof console  != "undefined") {
+				if (typeof console.log != 'undefined')
+					console.olog = console.log;
+				else
+					console.olog = function() {};
+			}
+			console.log = function(message) {
+				console.olog(message);
+				$('#debugDiv').html('<p>' + message + '</p>');
+			};
+			console.error = console.debug = console.info =  console.log	
+			$("#dbug").html(Math.random());
+			var packageID="chromecast.dice.roller";
+			var posx=0;
+			var posy=0;
+			var theSenderID=0;
+			var customMessageBus=null;	
+			function startChromeCastMode() {
+				window.onload = function() {		
+					window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
+					window.castReceiverManager.onSenderDisconnected = function(event) {
+					  $('#dbug').html('<br/>disconnect'+ event.data);
+					  if(window.castReceiverManager.getSenders().length == 0) {
+						  window.close();
+					  }
+					}
+					customMessageBus = window.castReceiverManager.getCastMessageBus('urn:x-cast:'+packageID);
+					customMessageBus.onMessage = function(event) {				 
+						theSenderID = event.senderId;
+						$('#dbug').html('<br/>connected'+ theSenderID+'recived:'+event.data);
+						var json = $.parseJSON(event.data);
+						$('#dbug').html($('#dbug').html()+"<br/>"+json.action+"<br/>"+json.p1+"<br/>"+json.p2);
+						if (json.action=="VIEW"){										
+							//var txt=decodeURIComponent(json.p2);
+							//txt = txt.replace(/^(\[url=)?(https?:\/\/)?(www\.|\S+?\.)(\S+?\.)?\S+$\s*/mg, '');
+							GLOBALUSER=json.p1;
+							GLOBALSIDES=json.p2;
+							if (json.p3=="true")							
+								GLOBALWITHZERO=true;
+							else	
+								GLOBALWITHZERO=false;
+							$('#dice').click();
+							send(theSenderID,"connected")
+							
+						}
+					}
+					window.castReceiverManager.start();
+					//$('#dbug').html('<br/>y');
+				}
+			};
+			startChromeCastMode();
+			function send(id,msg){
+				//$('#dbug').html('<br/>message sent to sender init');
+				customMessageBus.send(id,msg);
+				//$('#dbug').html('<br/>message sent to sender ok');
+			}
+		</script>
+		<div onclick="$('#dice').click()">uausausa</div>
+		http://tremby.net/dice/
+	</body>
+</html>
+
