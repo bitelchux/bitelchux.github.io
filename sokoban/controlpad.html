@@ -76,7 +76,9 @@
 		function menu(){
 			Android.cmd2("MENU");
 		}
-
+		function clicka(){
+			Android.cmd("click",0,0);
+		}
 		function reset(){
 			Android.cmd2("RESET");
 		}
@@ -154,6 +156,7 @@
 			<div style="display: table-cell;vertical-align: middle;text-align:center;"><img src="bd.png"/></div>
 		</div>	
 		<div style="position:absolute;display: table;right:0px;bottom:0px;height:50px;">
+			<span class="boton" onclick="clicka()">Click</span>
 			<span class="boton" onclick="menu()">Menu</span>
 			<span class="boton" onclick="reset()">Reset</span>
 			<span class="boton" onclick="exit()">Exit</span>
