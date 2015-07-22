@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+
+    <!-- Allow fullscreen mode on iOS devices. (These are Apple specific meta tags.) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui" />
+
+
+    <meta name="HandheldFriendly" content="true" />
+    <script src="jq.js"></script>
+
+    <style>
+        @font-face {
+        font-family: 'mifu';
+        src: url('roboto.woff')  format('truetype');/* Safari, Android, iOS */
+        }
+        body{
+            background:url("bg.gif");
+        }
+        *{
+        font-family: 'mifu', Fallback, sans-serif;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        color:black;
+		-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;
+
+
+        }
+        .flota{
+        float:left;
+        witdh:50%;
+        }
+        .botonaccion{
+        vertical-align:middle;
+        text-align:center;
+        background-color:red;
+
+        font-weight:strong;
+        }
+		.boton{
+			border:1px solid black;
+			background-color:silver;
+			padding: 12px;
+			
+		}
+    </style>
+    <script>
+		var posx=0;
+		var posy=0;
+		var oldx=0;
+		var oldy=0;
+		var upressed=false;
+		var dpressed=false;
+		var lpressed=false;
+		var rpressed=false;
+		function raton(){
+			var x=0;
+			var y=0;
+			if (upressed) y=1;
+			if (dpressed) y=-1;
+			if (rpressed) x=1;
+			if (lpressed) x=-1;
+			if (x!=0 || y!=0)
+			{
+				Android.sendXY(x,y);
+				//console.log("current:" + key)
+			}
+			
+		}
+		function forceCast(){
+			$("#step1").hide();
+			$("#step2").show();
+		}
+		function menu(){
+			Android.cmd2("MENU");
+		}
+
+		function reset(){
+			Android.cmd2("RESET");
+		}
+		$(document).ready(function() {
+			var eventypein="";
+			var eventypeout="";
+			var ua = navigator.userAgent.toLowerCase();
+			var isAndroid = ua.indexOf("android") > -1; //&& ua.indexOf("mobile");
+			if(isAndroid) {
+				eventypein="touchstart";
+				eventypeout="touchend";
+			}else{
+				eventypein="mousedown";
+				eventypeout="mouseup";
+			}
+			
+			$('#btnu').bind(eventypein, function(e) {
+				e.preventDefault();				
+				upressed=true
+			});
+			$('#btnu').bind(eventypeout, function(e) {
+				e.preventDefault();
+				upressed=false
+			});
+			
+			$('#btnd').bind(eventypein, function(e) {
+				e.preventDefault();				
+				dpressed=true
+			});
+			$('#btnd').bind(eventypeout, function(e) {
+				e.preventDefault();
+				dpressed=false
+			});
+			$('#btnl').bind(eventypein, function(e) {
+				e.preventDefault();				
+				lpressed=true
+			});
+			$('#btnl').bind(eventypeout, function(e) {
+				e.preventDefault();
+				lpressed=false
+			});
+			$('#btnr').bind(eventypein, function(e) {
+				e.preventDefault();				
+				rpressed=true
+			});
+			$('#btnr').bind(eventypeout, function(e) {
+				e.preventDefault();
+				rpressed=false
+			});	
+			setInterval(function(){ raton()}, 100);			
+		});
+	</script>
+
+</head>
+<body>
+<div id="step1" style="text-align:justify;margin: auto;max-width:600px;display:block">
+    Looking for cast devices on your network...<br/>
+    Connect by clicking the cast icon <img src="chromeicon.png"/> above when it appears<br/>
+    If your Chromecast is connected and online and icon does not appear <span onclick="Android.exit()" style="color:red">click here in order to close</span> the game, and restart the game again
+
+</div>
+
+<div  id="step2" class="flota"  style="text-align:justify;margin: auto;color:white;max-width:600px;display:none">
+   
+		<div style="position:absolute;display: table;left:0px;height:40%;top:30%;width:50px;background-color:silver;" id="btnl" >
+			<div style="display: table-cell;vertical-align: middle;text-align:center;"><img src="bl.png"/></div>
+		</div>
+		<div style="position:absolute;display: table;right:0px;height:40%;top:30%;width:50px;background-color:silver;" id="btnr" >
+			<div style="display: table-cell;vertical-align: middle;text-align:center;"><img src="br.png"/></div>
+		</div>
+		<div style="position:absolute;display: table;left:30%;width:30%;top:0px;height:50px;background-color:silver;" id="btnu" >
+			<div style="display: table-cell;vertical-align: middle;text-align:center;"><img src="bu.png"/></div>
+		</div>
+		<div style="position:absolute;display: table;left:30%;width:30%;bottom:0px;height:50px;background-color:silver;" id="btnd" >
+			<div style="display: table-cell;vertical-align: middle;text-align:center;"><img src="bd.png"/></div>
+		</div>	
+		<div style="position:absolute;display: table;right:0px;bottom:0px;height:50px;">
+			<span class="boton" onclick="menu()">Menu</span>
+			<span class="boton" onclick="reset()">Reset</span>
+			<span class="boton" onclick="exit()">Exit</span>
+		</div>			
+   
+</div>
+
+
+</body>
+
+</html>
