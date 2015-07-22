@@ -70,6 +70,7 @@
 			function initX(){
 					$('#screen canvas').on("mousedown mouseup", function(e) {
 					console.log(e.type + " event fired at coords: " + e.pageX + ", " + e.pageY);
+					alert(e.type + " event fired at coords: " + e.pageX + ", " + e.pageY);
 					});
 
 					x_coord = 1;
@@ -85,7 +86,8 @@
 					var e = jQuery.Event( "mouseup", { pageX: x_coord, pageY: y_coord } );
 					$('#canvas_element').trigger(e);
 			}
+			setTimeout(function(){ initX();alert(1) }, 8000);
 		</script>
 	</body>
-	<a href="#" onclick="initX()">asdasd</a>
+	
 </html>
