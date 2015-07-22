@@ -100,38 +100,46 @@
 			
 			$('#btnu').bind(eventypein, function(e) {
 				e.preventDefault();				
-				upressed=true
+				upressed=true;
+				raton();
 			});
 			$('#btnu').bind(eventypeout, function(e) {
 				e.preventDefault();
-				upressed=false
+				upressed=false;
+				raton()
 			});
 			
 			$('#btnd').bind(eventypein, function(e) {
 				e.preventDefault();				
-				dpressed=true
+				dpressed=true;
+				raton()
 			});
 			$('#btnd').bind(eventypeout, function(e) {
 				e.preventDefault();
-				dpressed=false
+				dpressed=false;
+				raton()
 			});
 			$('#btnl').bind(eventypein, function(e) {
 				e.preventDefault();				
-				lpressed=true
+				lpressed=true;
+				raton();
 			});
 			$('#btnl').bind(eventypeout, function(e) {
 				e.preventDefault();
-				lpressed=false
+				lpressed=false;
+				raton();
 			});
 			$('#btnr').bind(eventypein, function(e) {
 				e.preventDefault();				
-				rpressed=true
+				rpressed=true;
+				raton()
 			});
 			$('#btnr').bind(eventypeout, function(e) {
 				e.preventDefault();
-				rpressed=false
+				rpressed=false;
+				raton()
 			});	
-			setInterval(function(){ raton()}, 500);			
+			setInterval(function(){ raton()}, 800);			
 		});
 	</script>
 
@@ -163,9 +171,9 @@
 		</div>
 		
 		<div style="position:absolute;display: table;right:0px;bottom:0px;height:50px;">
-			
-			<span class="boton" onclick="menu()">Menu</span>
 			<span class="boton" onclick="reset()">Reset</span>
+			<span class="boton" onclick="menu()">Menu</span>
+			
 			<span class="boton" onclick="exit()">Exit</span>
 		</div>			
    
