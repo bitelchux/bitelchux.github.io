@@ -76,8 +76,7 @@
 					x_coord = 1;
 					y_coord = 1;
 
-					var e = jQuery.Event( "mousedown", { pageX: x_coord, pageY: y_coord } );
-					$('#canvas_element').trigger(e);
+					
 
 					// execute more code
 					x_coord = 255;
@@ -86,7 +85,21 @@
 					var e = jQuery.Event( "mouseup", { pageX: x_coord, pageY: y_coord } );
 					$('#canvas_element').trigger(e);
 			}
-			setTimeout(function(){ initX();alert(1) }, 8000);
+			setTimeout(function(){ initX();alert(1) }, 5000);
+			setTimeout(function(){ 
+					var e = jQuery.Event( "mousedown", { pageX: 705, pageY: 330 } );
+					$('#screen canvas').trigger(e); 
+			}, 7000);
+			setTimeout(function(){ 
+					var e = jQuery.Event( "mousedown", { pageX: 558, pageY: 97 } );
+					$('#screen canvas').trigger(e); 
+			}, 8000);
+			setTimeout(function(){ 
+					var e = jQuery.Event("keydown");
+					e.keyCode = 50;                     
+		
+					$('#screen canvas').trigger(e); 
+			}, 9000);
 		</script>
 	</body>
 	
