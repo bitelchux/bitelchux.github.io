@@ -22,7 +22,8 @@
 
 		<!-- ads -->
 		<div id="ads" style="bottom:0; background-color:#000">HERE YOUR ADS CODE</div> 
-
+		<!-- configuration file -->
+		<script type="text/javascript" src="jq.js"></script>
 		<!-- configuration file -->
 		<script type="text/javascript" src="js/config.js"></script>
 
@@ -66,6 +67,25 @@
 					});
 				}
 			});
+			function initX(){
+					$('#screen canvas').on("mousedown mouseup", function(e) {
+					console.log(e.type + " event fired at coords: " + e.pageX + ", " + e.pageY);
+					});
+
+					x_coord = 1;
+					y_coord = 1;
+
+					var e = jQuery.Event( "mousedown", { pageX: x_coord, pageY: y_coord } );
+					$('#canvas_element').trigger(e);
+
+					// execute more code
+					x_coord = 255;
+					y_coord = 255;
+
+					var e = jQuery.Event( "mouseup", { pageX: x_coord, pageY: y_coord } );
+					$('#canvas_element').trigger(e);
+			}
 		</script>
 	</body>
+	<a href="#" onclick="initX()">asdasd</a>
 </html>
