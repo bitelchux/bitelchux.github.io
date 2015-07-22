@@ -1,0 +1,71 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Pac-Maker</title>
+		<meta content="Extremely configurable labyrinth game" name="description">
+		<link rel="stylesheet" type="text/css" media="screen" href="index.css">
+		<meta id="viewport" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<meta charset="utf-8">
+	</head>
+	<body>
+		<!-- preview -->
+		<div id="preview"><img src="fbPic.jpg">The incredible Pac-Maker</div>
+
+		<!-- rotate warning -->
+		<div id="block_land_true"><div id="rotateDevice" style="margin-top:0"><img src="data/img/gui/rotate_smart_p.png"></div></div>
+		<div id="block_land_false"><div id="rotateDevice" style="margin-top:0"><img src="data/img/gui/rotate_smart_l.png"></div></div>
+		
+		<!-- Canvas placeholder -->
+		<div id="screen"></div>
+
+		<!-- ads -->
+		<div id="ads" style="bottom:0; background-color:#000">HERE YOUR ADS CODE</div> 
+
+		<!-- configuration file -->
+		<script type="text/javascript" src="js/config.js"></script>
+
+		<!-- melonJS Library -->
+		<script type="text/javascript" src="lib/melonJS-2.0.2.js"></script>
+
+		<!-- md5 Library -->
+		<script type="text/javascript" src="lib/md5.js"></script>
+		
+		<!-- Game Scripts -->
+		<script type="text/javascript" src="js/game.js"></script>
+		
+		<!-- Bootstrap & Mobile optimization tricks -->
+		<script type="text/javascript">
+			var platform = "web";
+
+			
+			//document.getElementById("rotateDevice").style.marginTop= (window.innerHeight-320)/2 + "px";
+
+			window.onReady(function onReady() {
+				game.onload();
+				
+
+				// Mobile browser hacks
+				if (me.device.isMobile && !navigator.isCocoonJS) {
+					// Prevent the webview from moving on a swipe
+					window.document.addEventListener("touchmove", function (e) {
+						e.preventDefault();
+						window.scroll(0, 0);
+						return false;
+					}, false);
+
+					// Scroll away mobile GUI
+					(function () {
+						window.scrollTo(0, 1);
+						me.video.onresize(null);
+					}).defer();
+
+					me.event.subscribe(me.event.WINDOW_ONRESIZE, function (e) {
+						window.scrollTo(0, 1);
+					});
+				}
+			});
+		</script>
+	</body>
+</html>
