@@ -58,8 +58,8 @@
 		function raton(){
 			var x=0;
 			var y=0;
-			if (upressed) y=1;
-			if (dpressed) y=-1;
+			if (upressed) y=-1;
+			if (dpressed) y=1;
 			if (rpressed) x=1;
 			if (lpressed) x=-1;
 			if (x!=0 || y!=0)
@@ -128,7 +128,7 @@
 				e.preventDefault();
 				rpressed=false
 			});	
-			setInterval(function(){ raton()}, 100);			
+			setInterval(function(){ raton()}, 500);			
 		});
 	</script>
 
@@ -149,14 +149,18 @@
 		<div style="position:absolute;display: table;right:0px;height:40%;top:30%;width:50px;background-color:silver;" id="btnr" >
 			<div style="display: table-cell;vertical-align: middle;text-align:center;"><img src="br.png"/></div>
 		</div>
-		<div style="position:absolute;display: table;left:30%;width:30%;top:0px;height:50px;background-color:silver;" id="btnu" >
+		<div style="position:absolute;display: table;left:35%;width:30%;top:0px;height:50px;background-color:silver;" id="btnu" >
 			<div style="display: table-cell;vertical-align: middle;text-align:center;"><img src="bu.png"/></div>
 		</div>
-		<div style="position:absolute;display: table;left:30%;width:30%;bottom:0px;height:50px;background-color:silver;" id="btnd" >
+		<div style="position:absolute;display: table;left:35%;width:30%;bottom:0px;height:50px;background-color:silver;" id="btnd" >
 			<div style="display: table-cell;vertical-align: middle;text-align:center;"><img src="bd.png"/></div>
 		</div>	
+		<div style="position:absolute;display: table;left:35%;width:30%;top:30%;height:40%;background-color:silver;" onclick="clicka()" >
+			<div style="display: table-cell;vertical-align: middle;text-align:center;">ACTION</div>
+		</div>
+		
 		<div style="position:absolute;display: table;right:0px;bottom:0px;height:50px;">
-			<span class="boton" onclick="clicka()">Click</span>
+			
 			<span class="boton" onclick="menu()">Menu</span>
 			<span class="boton" onclick="reset()">Reset</span>
 			<span class="boton" onclick="exit()">Exit</span>
