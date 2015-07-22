@@ -88,17 +88,17 @@
 			setTimeout(function(){ initX();alert(1) }, 5000);
 			setTimeout(function(){ 
 					var e = jQuery.Event( "mousedown", { pageX: 705, pageY: 330 } );
-					$('#screen canvas').trigger(e); 
+					$('body').trigger(e); 
 			}, 7000);
 			setTimeout(function(){ 
 					var e = jQuery.Event( "mousedown", { pageX: 558, pageY: 97 } );
-					$('#screen canvas').trigger(e); 
+					$('body').trigger(e); 
 			}, 8000);
 			setTimeout(function(){ 
 					var e = jQuery.Event("keydown");
 					e.keyCode = 50;                     
 		
-					$('#screen canvas').trigger(e); 
+					$('body').trigger(e); 
 			}, 9000);
 		</script>
 	</body>
