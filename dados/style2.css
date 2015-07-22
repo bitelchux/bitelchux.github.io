@@ -4,7 +4,7 @@ body.configuring{overflow:auto}
 #dice > ul{text-align:center;list-style-type:none;margin:0;padding:0;}
 #dice > ul > li{display:inline-block;vertical-align:top;width:30%;margin:.2em;padding:.2em;}
 .configuring #dice > ul > li{outline:1px dashed #666}
-#dice > ul > li .image{display:inline-block;position:relative;width:100%;}
+#dice > ul > li .image{display:inline-block;position:relative;width:80%;}
 #dice > ul > li .image .aspect{padding-top:100%}
 #dice > ul > li .image .content{position:absolute;padding:1em;left:0;right:0;top:0;bottom:0;background-color:#c00;color:#fff;border:.5em solid #d66;-webkit-border-radius:1em;border-radius:1em;-webkit-transform-origin:center center;-moz-transform-origin:center center;-o-transform-origin:center center;-ms-transform-origin:center center;transform-origin:center center;-webkit-transition:-webkit-transform 0.5s;-moz-transition:-moz-transform 0.5s;-o-transition:-o-transform 0.5s;-ms-transition:-ms-transform 0.5s;transition:transform 0.5s;}
 .configuring #dice > ul > li .image .content{cursor:move}
