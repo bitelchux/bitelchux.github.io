@@ -49,6 +49,8 @@ Licence undecided: email me to enquire
   };
 
   updateHistory = function() {
+	if (!LOG)
+		return;
     var $history, $li, $ol;
     $history = $('#history > ol');
     $li = $('<li/>');
@@ -141,6 +143,7 @@ Licence undecided: email me to enquire
       if (getDiceNum() === getDice().filter(':has(input.hold:checked)').length) {
         return;
       }
+	  alert(GLOBALSIDES+"-"+GLOBALUSER+"-" + GLOBALWITHZERO);
       $('#sound').html('<audio autoplay="autoplay"><source src="roll.ogg" type="audio/ogg"><source src="roll.mp3" type="audio/mpeg"><embed hidden="true" autostart="true" loop="false" src="roll.mp3"></audio>');
       getDice().each(function() {
         var $circles, basezero, sides, value;

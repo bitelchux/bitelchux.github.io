@@ -20,7 +20,7 @@ body.configuring{overflow:auto}
 .configuring #dice > ul > li > .configuration{display:block}
 #dice input.sides{width:3em}
 #dice input.label{width:10em}
-#history{position:absolute;left:0;bottom:0;  height: 100%;}
+#history{position:absolute;left:0;bottom:0;  height: 100%;pointer-events: none}
 #history > ol{overflow:auto;  height: 100%;}
 #history > ol > li > ol{display:inline;list-style-type:none;margin:0;padding:0;padding-left:1em;}
 #history > ol > li > ol:before{content:'(';display:inline}
@@ -29,5 +29,5 @@ body.configuring{overflow:auto}
 #history > ol > li > ol > li:after{content:','}
 #history > ol > li > ol > li:last-child:after{content:''}
 #history > ol > li > ol > li.hold{opacity:.5;-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";filter:alpha(opacity=50)}
-#total{position:fixed;right:0;top:0;font-size:3em;-webkit-transition:color 0.5s;-moz-transition:color 0.5s;-o-transition:color 0.5s;-ms-transition:color 0.5s;transition:color 0.5s}
+#total{position:fixed;right:25px;top:0;font-size:3em;-webkit-transition:color 0.5s;-moz-transition:color 0.5s;-o-transition:color 0.5s;-ms-transition:color 0.5s;transition:color 0.5s}
 #sound{display:none}
