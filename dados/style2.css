@@ -31,3 +31,13 @@ body.configuring{overflow:auto}
 #history > ol > li > ol > li.hold{opacity:.5;-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";filter:alpha(opacity=50)}
 #total{position:fixed;right:25px;top:0;font-size:3em;-webkit-transition:color 0.5s;-moz-transition:color 0.5s;-o-transition:color 0.5s;-ms-transition:color 0.5s;transition:color 0.5s}
 #sound{display:none}
+input,select{
+color:black;
+background-color:white;
+font-weight:bold;
+}
+table{
+
+padding:0px;
+margin:0px;
+}
