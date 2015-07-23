@@ -1,0 +1,185 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />  
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+<script src="https://code.jquery.com/jquery.min.js" type="text/javascript"></script>     
+<script src="https://www.youtube.com/iframe_api" type="text/javascript"></script>
+<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+<style>
+html{
+	background-color:white;	
+}
+body{
+	margin:0px;
+	padding:0px;
+	text-align:center;
+	background-color:white;
+	vertical-align:middle;
+}
+* {
+	font-family:'Roboto',Verdana;
+	color:silver;
+	font-size:big;
+}
+#teaser{
+    background-color:black;
+	font-size:2.5em;
+	color:white;
+	position:absolute;
+	bottom:0px;
+	left:0px;
+	width:100%;	
+	padding:10px;
+	paddind-left:25px;
+	padding-right:25px;
+}	
+</style>
+
+<script>
+(function(a,d,p){a.fn.backstretch=function(c,b){(c===p||0===c.length)&&a.error("No images were supplied for Backstretch");0===a(d).scrollTop()&&d.scrollTo(0,0);return this.each(function(){var d=a(this),g=d.data("backstretch");if(g){if("string"==typeof c&&"function"==typeof g[c]){g[c](b);return}b=a.extend(g.options,b);g.destroy(!0)}g=new q(this,c,b);d.data("backstretch",g)})};a.backstretch=function(c,b){return a("body").backstretch(c,b).data("backstretch")};a.expr[":"].backstretch=function(c){return a(c).data("backstretch")!==p};a.fn.backstretch.defaults={centeredX:!0,centeredY:!0,duration:5E3,fade:0};var r={left:0,top:0,overflow:"hidden",margin:0,padding:0,height:"100%",width:"100%",zIndex:-999999},s={position:"absolute",display:"none",margin:0,padding:0,border:"none",width:"auto",height:"auto",maxHeight:"none",maxWidth:"none",zIndex:-999999},q=function(c,b,e){this.options=a.extend({},a.fn.backstretch.defaults,e||{});this.images=a.isArray(b)?b:[b];a.each(this.images,function(){a("<img />")[0].src=this});this.isBody=c===document.body;this.$container=a(c);this.$root=this.isBody?l?a(d):a(document):this.$container;c=this.$container.children(".backstretch").first();this.$wrap=c.length?c:a('<div class="backstretch"></div>').css(r).appendTo(this.$container);this.isBody||(c=this.$container.css("position"),b=this.$container.css("zIndex"),this.$container.css({position:"static"===c?"relative":c,zIndex:"auto"===b?0:b,background:"none"}),this.$wrap.css({zIndex:-999998}));this.$wrap.css({position:this.isBody&&l?"fixed":"absolute"});this.index=0;this.show(this.index);a(d).on("resize.backstretch",a.proxy(this.resize,this)).on("orientationchange.backstretch",a.proxy(function(){this.isBody&&0===d.pageYOffset&&(d.scrollTo(0,1),this.resize())},this))};q.prototype={resize:function(){try{var a={left:0,top:0},b=this.isBody?this.$root.width():this.$root.innerWidth(),e=b,g=this.isBody?d.innerHeight?d.innerHeight:this.$root.height():this.$root.innerHeight(),j=e/this.$img.data("ratio"),f;j>=g?(f=(j-g)/2,this.options.centeredY&&(a.top="-"+f+"px")):(j=g,e=j*this.$img.data("ratio"),f=(e-b)/2,this.options.centeredX&&(a.left="-"+f+"px"));this.$wrap.css({width:b,height:g}).find("img:not(.deleteable)").css({width:e,height:j}).css(a)}catch(h){}return this},show:function(c){if(!(Math.abs(c)>this.images.length-1)){var b=this,e=b.$wrap.find("img").addClass("deleteable"),d={relatedTarget:b.$container[0]};b.$container.trigger(a.Event("backstretch.before",d),[b,c]);this.index=c;clearInterval(b.interval);b.$img=a("<img />").css(s).bind("load",function(f){var h=this.width||a(f.target).width();f=this.height||a(f.target).height();a(this).data("ratio",h/f);a(this).fadeIn(b.options.speed||b.options.fade,function(){e.remove();b.paused||b.cycle();a(["after","show"]).each(function(){b.$container.trigger(a.Event("backstretch."+this,d),[b,c])})});b.resize()}).appendTo(b.$wrap);b.$img.attr("src",b.images[c]);return b}},next:function(){return this.show(this.index<this.images.length-1?this.index+1:0)},prev:function(){return this.show(0===this.index?this.images.length-1:this.index-1)},pause:function(){this.paused=!0;return this},resume:function(){this.paused=!1;this.next();return this},cycle:function(){1<this.images.length&&(clearInterval(this.interval),this.interval=setInterval(a.proxy(function(){this.paused||this.next()},this),this.options.duration));return this},destroy:function(c){a(d).off("resize.backstretch orientationchange.backstretch");clearInterval(this.interval);c||this.$wrap.remove();this.$container.removeData("backstretch")}};var l,f=navigator.userAgent,m=navigator.platform,e=f.match(/AppleWebKit\/([0-9]+)/),e=!!e&&e[1],h=f.match(/Fennec\/([0-9]+)/),h=!!h&&h[1],n=f.match(/Opera Mobi\/([0-9]+)/),t=!!n&&n[1],k=f.match(/MSIE ([0-9]+)/),k=!!k&&k[1];l=!((-1<m.indexOf("iPhone")||-1<m.indexOf("iPad")||-1<m.indexOf("iPod"))&&e&&534>e||d.operamini&&"[object OperaMini]"==={}.toString.call(d.operamini)||n&&7458>t||-1<f.indexOf("Android")&&e&&533>e||h&&6>h||"palmGetResource"in d&&e&&534>e||-1<f.indexOf("MeeGo")&&-1<f.indexOf("NokiaBrowser/8.5.0")||k&&6>=k)})(jQuery,window);
+
+function getP(name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(location.search);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
+$(document).ready(function(){
+
+})
+</script>
+<body>
+<script src="http://www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js"></script>
+<div id="dbug" style="display:none;position:absolute;top:100px;left:0px;background-color:blue">asdadasdasd</div>
+<div id="debugDiv" style="display:none;position:absolute;top:250px;left:0px;background-color:green">Console</div>
+<!--
+	<a href="https://developers.google.com/youtube/iframe_api_reference?hl=es">AYUDA</a>
+	<a href="#" onclick="playYT('list','PLoI2X2t2pTL9kx2oWXhRh601wjOjF7wKB',true)">PLAYLIST CUE</A>
+	<a href="#" onclick="playYT('list','PLoI2X2t2pTL9kx2oWXhRh601wjOjF7wKB',false)">PLAYLIST PLAY</A>
+	<a href="#" onclick="playYT('video','D2FBdabEciQ',true)">VIDEO CUE</A>
+	<a href="#" onclick="playYT('video','D2FBdabEciQ',false)">VIDEO PLAY</A>
+	-->
+<!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
+<br/>
+<div id="player"></div>
+
+<script>
+	if (typeof console  != "undefined") {
+		if (typeof console.log != 'undefined')
+			console.olog = console.log;
+		else
+			console.olog = function() {};
+	}
+	console.log = function(message) {
+		console.olog(message);
+		$('#debugDiv').html('<p>' + message + '</p>');
+	};
+	console.error = console.debug = console.info =  console.log	
+	$("#dbug").html(Math.random());
+	var packageID="botijo.relax.music";
+	var posx=0;
+	var posy=0;
+	var theSenderID=0;
+	var customMessageBus=null;	
+	function startChromeCastMode() {
+		window.onload = function() {		
+			window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
+			window.castReceiverManager.onSenderDisconnected = function(event) {
+			  $('#dbug').html('<br/>disconnect'+ event.data);
+			  if(window.castReceiverManager.getSenders().length == 0) {
+				  window.close();
+			  }
+			}
+			customMessageBus = window.castReceiverManager.getCastMessageBus('urn:x-cast:'+packageID);
+			customMessageBus.onMessage = function(event) {				 
+				theSenderID = event.senderId;
+				$('#dbug').html('<br/>connected'+ theSenderID+'recived:'+event.data);
+				var json = $.parseJSON(event.data);
+				$('#dbug').html($('#dbug').html()+"<br/>"+json.action+"<br/>"+json.p1+"<br/>"+json.p2);
+				if (json.action=="VIEW"){										
+					//var txt=decodeURIComponent(json.p2);
+					//txt = txt.replace(/^(\[url=)?(https?:\/\/)?(www\.|\S+?\.)(\S+?\.)?\S+$\s*/mg, '');
+					playYT(json.p2,json.p1,false);
+					send(theSenderID,"connected")
+					
+				}
+			}
+			window.castReceiverManager.start();
+			//$('#dbug').html('<br/>y');
+		}
+	};
+	startChromeCastMode();
+	function send(id,msg){
+		//$('#dbug').html('<br/>message sent to sender init');
+		customMessageBus.send(id,msg);
+		//$('#dbug').html('<br/>message sent to sender ok');
+	}
+</script>
+<script>
+    var player;
+    function onYouTubeIframeAPIReady() {
+		
+		player = new YT.Player('player', {
+		  height: '98%',
+		  width: '98%',
+		 
+		  playerVars: {  list: 'PLoI2X2t2pTL8m8VRlaVbNAXeN8qO9052i',listType:'playlist','autoplay': 1, 'controls': 1,'autohide':1,'wmode':'opaque' },
+		  events: {
+			'onReady': onPlayerReady,
+			'onStateChange': onPlayerStateChange
+		  }
+		});	 
+		/*
+		player = new YT.Player('player', 
+		{
+			height: '100%',
+			width: '100%',
+			playerVars: 
+			{
+				listType:'playlist',
+				list: 'PLoI2X2t2pTL9kx2oWXhRh601wjOjF7wKB',
+				'autoplay': 1, 'controls': 1,'autohide':1,'wmode':'opaque'
+			}
+		});
+		*/
+	}
+	function playYT(tipo,cual,cue){
+		$('#dbug').html($('#dbug').html()+"<br/>tipo:"+tipo+"<br/>cual:"+cual+"<br/>cue:"+cue);
+	
+		if (tipo=="list"){
+			if (cue) 
+				player.cuePlaylist({list:cual});
+			else
+				player.loadPlaylist({list:cual});
+		}
+		if (tipo=="video"){
+			if (cue) 
+				player.cueVideoById({videoId:cual});
+			else
+				player.loadVideoById({videoId:cual});
+		}	
+		player.playVideo();
+	}
+      // 4. The API will call this function when the video player is ready.
+      function onPlayerReady(event) {
+        event.target.playVideo();
+      }
+      // 5. The API calls this function when the player's state changes.
+      //    The function indicates that when playing a video (state=1),
+      //    the player should play for six seconds and then stop.
+      var done = false;
+      function onPlayerStateChange(event) {
+        if (event.data == YT.PlayerState.PLAYING) {
+         //alert("fin");
+        }
+        if (event.data == YT.PlayerState.ENDED) {
+			send(theSenderID,"videoend")
+        }
+		
+      }
+    </script>	
+	<iframe frameborder="no" src="http://contador.elracano.com/videocastandroidgameplays" width="10" height="10"></iframe>
+	
+</body>
+</html>
