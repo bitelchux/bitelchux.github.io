@@ -7,29 +7,38 @@
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />  
 <!-- Include jQuery if not present already -->
-<script src="http://mobilewebapps.me/galleries/mega/jquery/jquery-1.9.1.min.js"></script>
+<script src="jquery-1.9.1.min.js"></script>
 
 <!-- Include Youmax -->
-<script src="http://mobilewebapps.me/galleries/mega/js/jquery.youmax.min.js"></script>
+<script src="js/jquery.youmax.min.js"></script>
 
 <!-- Include Youmax Styles -->
-<link rel="stylesheet" href="http://mobilewebapps.me/galleries/mega/css/youmax_grey.min.css"/>
+<link rel="stylesheet" href="css2/youmax_grey.min.css"/>
+
 <style>
-#youmax-header{
+#youmax-headerxxxx{
 	display:none;
 }
 .selected { 
     background-color: silver !important;
 	
 }
-#youmax-tabs{
+#youmax-tabsxxxx{
 display:none;
 }
-#youmax-select-box{
+#youmax-select-boxxxxx{
 display:none !important;
 }
+.youmax-comment-box{
+display:none;
+}
+.youmax-like-box
+{
+display:none;
+}
 body{
-margin:0px;    
+margin:0px;  
+background-color:#e6e6e6;  
 }
 </style>
 </head>
@@ -40,35 +49,69 @@ margin:0px;
 
 <script type="text/javascript">
 
-$("#youmax").youmax({apiKey:"AIzaSyBkg_iWXjbD6VB6QJ0W_VY0d_EBDUne-vs",clientId:"328347664703-ge81acfbra0uch23b59gcamblqimutat.apps.googleusercontent.com",
-channel:"https://www.youtube.com/user/giantessgigantes",
-playList:["https://www.youtube.com/playlist?list=PLoI2X2t2pTL_Zsun0XHCfCGvu3sor1Yhw"],
-searchTab:[],
-selectedTab:"p1",
-displayVideo:"link",
-alwaysUseDropdown:true,
-autoPlayVideo:true,
-displayFirstVideoOnLoad:false,
-skin:"white",
-searchBoxScope:"global",
-linkNewPages:false,
-autoLoadComments:true,
-featuredVideo:"",
-alignPopupToTop:true,
-videoProtocol:"http:",
-commentOrder:"time",
-playlistSearchFile:"",
-userWebsite:"",
-videoMode:"wide",
-shareLink:"youtube",
-widgetMode:false,
-maxResults:18,
-innerOffset:25,
-outerOffset:35,
-minItemWidth:250,
-maxItemWidth:400,
-maxContainerWidth:1080
+
+$("#youmax").youmax({ 
+
+apiKey:"AIzaSyBkg_iWXjbD6VB6QJ0W_VY0d_EBDUne-vs", 
+vimeoAccessToken:"", 
+clientId:"328347664703-ge81acfbra0uch23b59gcamblqimutat.apps.googleusercontent.com", 
+channel:"https://www.youtube.com/user/videospalwhatsapp", 
+    youtube_playlist_videos:[ 
+    { 
+      name:"I love tv", 
+      url:"https://www.youtube.com/playlist?list=PLoI2X2t2pTL8lzv8ZeRx8llJYF5J2HbFR", 
+      selected:true
+    }, 
+  
+    { 
+      name:"Documentaries", 
+      url:"https://www.youtube.com/playlist?list=PLoI2X2t2pTL9kx2oWXhRh601wjOjF7wKB", 
+      selected:false
+    }, 
+
+    { 
+      name:"Tv and movie Trailers", 
+      url:"https://www.youtube.com/playlist?list=PLoI2X2t2pTL_Zsun0XHCfCGvu3sor1Yhw", 
+      selected:false
+    }, 
+
+    { 
+      name:"Classic Music", 
+      url:"https://www.youtube.com/playlist?list=PLoI2X2t2pTL8Vyr3nFwzWokAom_2bdyWS", 
+      selected:false
+    }, 
+
+    { 
+      name:"Android game trailers", 
+      url:"https://www.youtube.com/playlist?list=PLoI2X2t2pTL8KtyMMQc2VRcMfjzQdZhfS", 
+      selected:false
+    }, 
+
+  ], 
+
+  /*
+  youtube_channel_playlists:[ 
+    { 
+      name:"Other", 
+      url:"https://www.youtube.com/user/videospalwhatsapp", 
+      selected:false
+    }, 
+  ],
+	*/
+  //loadMode:"paginate-sides",
+  loadMode:"paginate-bottom", 
+  autoPlayVideo:true, 
+  displayFirstVideoOnLoad:true,
+  autoLoadComments:false, 
+  hideHeader:true, 
+  hideNavigation:false, 
+  hideComments:true, 
+  hideVideoDetails:true,   
+  alwaysUseDropdown:true, 
+  displayVideo:"link",
+
 });
+
 var interval=null;
 var lastId="";
 var lastRow=null;
@@ -140,3 +183,5 @@ selectedTab:"u",displayVideo:"popup",alwaysUseDropdown:true,autoPlayVideo:false,
 -->
 </body>
 </html>
+
+
