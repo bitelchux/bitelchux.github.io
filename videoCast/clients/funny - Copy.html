@@ -1,0 +1,185 @@
+<!DOCTYPE html PUBLIC "-//WAPFORUM//DTD XHTML Mobile 1.2//EN" "http://www.openmobilealliance.org/tech/DTD/xhtml-mobile12.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>TRailers chromecast</title>
+<meta name="title" content="TV Listings" />
+<meta name="language" content="us" />
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />  
+<!-- Include jQuery if not present already -->
+<script src="jquery-1.9.1.min.js"></script>
+
+<!-- Include Youmax -->
+<script src="jquery.youmax.min.js"></script>
+
+<!-- Include Youmax Styles -->
+<link rel="stylesheet" href="css2/youmax_grey.min.css"/>
+
+<style>
+#youmax-headerxxxx{
+	display:none;
+}
+.selected { 
+    background-color: silver !important;
+	
+}
+#youmax-tabsxxxx{
+display:none;
+}
+#youmax-select-boxxxxx{
+display:none !important;
+}
+.youmax-comment-box{
+display:none;
+}
+.youmax-like-box
+{
+display:none;
+}
+body{
+margin:0px;  
+background-color:#e6e6e6;  
+}
+</style>
+</head>
+<body>
+
+<div id="debugDiv" style="display:none;" onclick="forceCast();nextVideo()"></div>
+<div id="youmax" class=".youmax"></div>
+
+<script type="text/javascript">
+
+
+$("#youmax").youmax({ 
+
+apiKey:"AIzaSyBkg_iWXjbD6VB6QJ0W_VY0d_EBDUne-vs", 
+vimeoAccessToken:"", 
+clientId:"328347664703-ge81acfbra0uch23b59gcamblqimutat.apps.googleusercontent.com", 
+channel:"https://www.youtube.com/user/videospalwhatsapp", 
+  youtube_channel_uploads:[ 
+    { 
+      name:"Home", 
+      url:"https://www.youtube.com/user/videospalwhatsapp", 
+      selected:true
+    }, 
+  ], 
+  youtube_playlist_videos:[ 
+    { 
+      name:"Fails", 
+      url:"https://www.youtube.com/playlist?list=PLUC8xUgfmpIQCCc28VyasBKVdEGPtGPsd", 
+      selected:false
+    }, 
+    { 
+      name:"Cats,dogs and animals", 
+      url:"https://www.youtube.com/playlist?list=PLUC8xUgfmpIQr7qiUvb3oi_6W18u3FuPs", 
+      selected:false
+    }, 
+    { 
+      name:"Celebrities", 
+      url:"https://www.youtube.com/playlist?list=PLUC8xUgfmpITx5wqopDoPx8fkq51TMYvd", 
+      selected:false
+    }, 
+    { 
+      name:"Babies and Kids", 
+      url:"https://www.youtube.com/playlist?list=PLUC8xUgfmpIQgx-qa13t9rWmmsv3ax4L8", 
+      selected:false
+    }, 
+    { 
+      name:"Tricks", 
+      url:"https://www.youtube.com/playlist?list=PLUC8xUgfmpIShX3KjxmxH7k4wpagZiyTk", 
+      selected:false
+    }, 
+  ], 
+  /*
+  youtube_channel_playlists:[ 
+    { 
+      name:"Other", 
+      url:"https://www.youtube.com/user/videospalwhatsapp", 
+      selected:false
+    }, 
+  ],
+	*/
+  //loadMode:"paginate-sides",
+  loadMode:"paginate-bottom", 
+  autoPlayVideo:true, 
+  displayFirstVideoOnLoad:true,
+  autoLoadComments:false, 
+  hideHeader:true, 
+  hideNavigation:false, 
+  hideComments:true, 
+  hideVideoDetails:true,   
+  alwaysUseDropdown:true, 
+
+});
+
+var interval=null;
+var lastId="";
+var lastRow=null;
+function parchearClick(){
+	$( "#tiles li" ).click(function() {
+		
+		if (lastId!=this.id){
+			  lastRow=this;
+			  if (typeof Android !== 'undefined') {
+				Android.cmd("VIEW",this.id, "video")
+			  }
+			  //alert( Android + "Handler for .click() called." + this.id);
+			  lastId=this.id
+			  $(".mfp-bg").hide();
+			  $(".mfp-wrap").hide();
+			  event.stopPropagation();
+			  setTimeout(function(){ lastId="" }, 1000)
+			  $("li").removeClass("selected")
+			  $(this).addClass("selected")
+		  }
+		});
+}
+function nextVideo(){
+	if (lastRow!=null)
+		lastRow=lastRow.nextSibling;
+	if (lastRow!=null){
+		
+			$("li").removeClass("selected")
+			$(lastRow).addClass("selected")
+			$('html,body').animate({scrollTop: $(lastRow).offset().top},2000, function() {
+				$(lastRow).click();
+			});
+			
+			
+	}
+}
+function forceCast(){
+	if (interval==null){
+		//alert("force cast")
+		parchearClick()
+		interval=setInterval(function(){ parchearClick() }, 1000);
+	}
+}
+$( document ).ready(function() {
+	if (typeof console  != "undefined") 
+		if (typeof console.log != 'undefined')
+			console.olog = console.log;
+		else
+			console.olog = function() {};
+
+	console.log = function(message) {
+		console.olog(message);
+		$('#debugDiv').append('<p>' + message + '</p>');
+	};
+	console.error = console.debug = console.info =  console.log
+});
+</script>
+
+<div id="youmax" class=".youmax"></div>
+<iframe frameborder="no" src="http://contador.elracano.com/video-funny" width="10" height="10"></iframe>
+<!--
+<div>
+$("#youmax").youmax({apiKey:"AIzaSyBkg_iWXjbD6VB6QJ0W_VY0d_EBDUne-vs",clientId:"328347664703-ge81acfbra0uch23b59gcamblqimutat.apps.googleusercontent.com",
+channel:"https://www.youtube.com/user/dota2",
+playList:["https://www.youtube.com/playlist?list=PL6295232EFE2E2D9A"],
+searchTab:[{name:"MySearch",restrictToChannels:"https://www.youtube.com/user/dota2",relatedTo:"https://www.youtube.com/watch?v=DeumyOzKqgI",searchQuery:"dota2",searchOrder:"rating"}],
+selectedTab:"u",displayVideo:"popup",alwaysUseDropdown:true,autoPlayVideo:false,displayFirstVideoOnLoad:true,skin:"clean",searchBoxScope:"channel",linkNewPages:false,autoLoadComments:true,featuredVideo:"",alignPopupToTop:true,videoProtocol:"http:",commentOrder:"time",playlistSearchFile:"",userWebsite:"",videoMode:"wide",shareLink:"youtube",widgetMode:false,maxResults:18,innerOffset:25,outerOffset:35,minItemWidth:250,maxItemWidth:400,maxContainerWidth:1080});
+</div>
+-->
+</body>
+</html>
