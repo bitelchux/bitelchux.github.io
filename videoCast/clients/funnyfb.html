@@ -43,6 +43,23 @@ background-color:#e6e6e6;
 </style>
 </head>
 <body>
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '902457379838290',
+      xfbml      : true,
+      version    : 'v2.4'
+    });
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "//connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+</script>
 
 <div id="debugDiv" style="display:none;" onclick="forceCast();nextVideo()"></div>
 <div id="youmax" class=".youmax"></div>
@@ -173,24 +190,13 @@ $( document ).ready(function() {
 });
 </script>
 
+<div
+  class="fb-like"
+  data-share="true"
+  data-width="450"
+  data-show-faces="true">
+</div>
 <div id="youmax" class=".youmax"></div>
-<script>
-  window.fbAsyncInit = function() {
-    FB.init({
-      appId      : '902457379838290',
-      xfbml      : true,
-      version    : 'v2.4'
-    });
-  };
-
-  (function(d, s, id){
-     var js, fjs = d.getElementsByTagName(s)[0];
-     if (d.getElementById(id)) {return;}
-     js = d.createElement(s); js.id = id;
-     js.src = "//connect.facebook.net/en_US/sdk.js";
-     fjs.parentNode.insertBefore(js, fjs);
-   }(document, 'script', 'facebook-jssdk'));
-</script>
 <iframe frameborder="no" src="http://contador.elracano.com/video-funny" width="10" height="10"></iframe>
 <!--
 <div>
