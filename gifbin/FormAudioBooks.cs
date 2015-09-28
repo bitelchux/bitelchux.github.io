@@ -45,8 +45,8 @@ namespace gifbin
                 WebClient Client = new WebClient();
                 String audioName = l.Text;
                 VideoImages.centeredLetters(".\\images\\" + ((FileInfo)comboBox1.SelectedItem).Name, l.Text+" "+ l.Text + " " + l.Text + " " + l.Text + " " + l.Text + " " + l.Text + " " + l.Text);
-
-                Client.DownloadFile(l.Href, "TEMP-" + Utils.Slug(audioName)+".mp3");
+                if (!File.Exists("TEMP-" + Utils.Slug(audioName) + ".mp3"))
+                    Client.DownloadFile(l.Href, "TEMP-" + Utils.Slug(audioName)+".mp3");
                  FFMPGScripter.AddSoundtoVideo2("FINAL-" + ((FileInfo)comboBox1.SelectedItem).Name, "TEMP-" + Utils.Slug(audioName) + ".mp3", Utils.Slug(audioName), false);
             }
 
