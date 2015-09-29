@@ -1,0 +1,146 @@
+div#game-container {
+  padding: 20pt;
+}
+
+div#rs-game {
+  font-family: Verdana;
+  font-size: 10pt;
+}
+
+div#rs-game label {
+  font-weight: bold;
+  color: grey;
+}
+
+div#rs-sidebar {
+  width: 140pt;
+  float: left;
+}
+
+div#rs-field {
+  width: 282px;
+  height: 282px;
+  font-size: 18px;
+  float: left;
+  margin-right: 20pt;
+  margin-bottom: 20pt;
+  border: 1px solid #DDD;
+  border-bottom: none;
+  border-right: none;
+}
+
+div#rs-field div.rs-block {
+  float: left;
+  width: 93px;
+  height: 93px;
+  border: 1px solid #DDD;
+  margin-left: -1px;
+  margin-top: -1px;
+}
+
+div#rs-field div.rs-block div.rs-cell {
+  float: left;
+  border: 1px solid #CCC;
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+  margin-left: -1px;
+  margin-top: -1px;
+  cursor: pointer;
+}
+
+div#rs-field div.rs-block div.rs-cell:hover {
+  background: pink !important;
+}
+div.rs-cell-preset {
+  color: brown;
+  cursor: default !important;
+}
+div.rs-cell-highlighted {
+  background: #FEF;
+}
+
+div.rs-cell-wrong {
+  background: #D44 !important;
+}
+
+
+div.rs-input {
+  width: 96px;
+  height: 96px;
+  position: absolute;
+  z-index: 1;
+}
+div.rs-input div {
+  float: left;
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+  border: 1px solid #AAA;
+  background: #FDD;
+  cursor: pointer;
+  
+}
+div.rs-input div:hover {
+  background: pink;
+}
+div.rs-input div.rs-input-shadow {
+  position: absolute;
+  background: black;
+  opacity: 0.4;
+  filter: alpha(opacity=40);
+  width: 100%;
+  height: 100%;
+  margin-left: 3px;
+  margin-top: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  z-index: -1;
+}
+
+
+div#rs-menu {
+  margin-bottom: 20pt;
+}
+
+div#rs-menu select {
+  width: 140pt;
+  margin-bottom: 10pt;
+}
+div#rs-menu input {
+  width: 59pt;
+}
+
+
+
+div#rs-status {
+  margin-bottom: 20pt;
+}
+div#rs-status label {
+  display: block;
+  float: left;
+  width: 70pt;
+}
+div#rs-status div span {
+  
+}
+
+
+div#rs-highscore {
+  
+}
+div#rs-highscore ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  margin-top: 5pt;
+}
+div#rs-highscore ul li {
+  margin: 0;
+  padding: 0;
+}
+div#rs-highscore ul li input {
+  width: 70pt;
+}

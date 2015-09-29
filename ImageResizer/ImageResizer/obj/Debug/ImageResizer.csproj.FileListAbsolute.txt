@@ -1,0 +1,9 @@
+C:\Users\jcf\Documents\GitHub\Projects\ImageResizer\ImageResizer\bin\Debug\ImageResizer.exe.config
+C:\Users\jcf\Documents\GitHub\Projects\ImageResizer\ImageResizer\bin\Debug\ImageResizer.exe
+C:\Users\jcf\Documents\GitHub\Projects\ImageResizer\ImageResizer\bin\Debug\ImageResizer.pdb
+C:\Users\jcf\Documents\GitHub\Projects\ImageResizer\ImageResizer\obj\Debug\ImageResizer.csprojResolveAssemblyReference.cache
+C:\Users\jcf\Documents\GitHub\Projects\ImageResizer\ImageResizer\obj\Debug\ImageResizer.Form1.resources
+C:\Users\jcf\Documents\GitHub\Projects\ImageResizer\ImageResizer\obj\Debug\ImageResizer.Properties.Resources.resources
+C:\Users\jcf\Documents\GitHub\Projects\ImageResizer\ImageResizer\obj\Debug\ImageResizer.csproj.GenerateResource.Cache
+C:\Users\jcf\Documents\GitHub\Projects\ImageResizer\ImageResizer\obj\Debug\ImageResizer.exe
+C:\Users\jcf\Documents\GitHub\Projects\ImageResizer\ImageResizer\obj\Debug\ImageResizer.pdb

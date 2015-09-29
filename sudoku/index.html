@@ -1,0 +1,90 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>Simply Sudoku</title>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <link href="src/style.css" media="screen" rel="stylesheet" type="text/css" />
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />  
+    <script type="text/javascript" src="lib/right.js"></script>
+    <script type="text/javascript" src="src/init.js"></script>
+    <script type="text/javascript">
+      // <!--
+      document.onReady(function() {
+        var game = new Sudoku('game-container');
+      });
+      // -->
+    </script>
+<link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+<style>*{font-family:Roboto;font-size:large;}
+input,select{	padding:10px;	
+    border-radius: 5px;
+ 
+}
+input[type=button]{
+   background: #00a9c2;
+   color:white;
+   border:0px;
+   margin:2px;
+}
+html, body {
+    height: 100%;	margin:0px;
+}
+
+html {
+  
+    margin:0px;
+}
+
+body {
+    display: table-cell;
+    vertical-align: middle;
+    margin: 0px;
+    padding: 0px;
+    max-width:560px;
+}
+.section h1{    	color:white;
+    
+    font-size:1.5em;
+}
+.section h2{    
+    color:white;
+    font-size:1.2em;
+}
+
+.boton{
+	margin:8px;
+	text-transform:uppercase;
+	cursor:pointer;
+	color: #fff;
+	  background-color: #6496c8;
+	  border: none;
+	  border-radius: 15px;
+	  box-shadow: 0 10px #27496d;
+}
+.boton:hover,
+.boton.hover {
+  background-color: #417cb8
+}
+
+.boton:active,
+.boton.active {
+  background-color: #417cb8;
+  box-shadow: 0 5px #27496d;
+  transform: translateY(5px);
+}
+
+</style>
+  </head>
+  <body>
+    <div id="body">
+      <div id="head">
+        
+      </div>
+      <div id="main">
+        <div id="game-container"></div>
+      </div>
+    
+    </div>
+  </body>
+</html>
