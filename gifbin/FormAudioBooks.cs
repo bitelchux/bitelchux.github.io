@@ -39,15 +39,44 @@ namespace gifbin
             if (this.textColor.SelectedItem.ToString().Equals("Fosforito"))
                 Const.textColor = System.Drawing.Color.LightYellow;
             List<LinkItem> list = Utils.getUrlLibriVox(this.url.Text);
+            Utils.ConsoleClear();
             foreach (LinkItem l in list)
             {
 
                 WebClient Client = new WebClient();
                 String audioName = l.Text;
-                VideoImages.centeredLetters(".\\images\\" + ((FileInfo)comboBox1.SelectedItem).Name, l.Text+" "+ l.Text + " " + l.Text + " " + l.Text + " " + l.Text + " " + l.Text + " " + l.Text);
+                VideoImages.centeredLetters(".\\images\\" + ((FileInfo)comboBox1.SelectedItem).Name, l.Text);
                 if (!File.Exists("TEMP-" + Utils.Slug(audioName) + ".mp3"))
                     Client.DownloadFile(l.Href, "TEMP-" + Utils.Slug(audioName)+".mp3");
                  FFMPGScripter.AddSoundtoVideo2("FINAL-" + ((FileInfo)comboBox1.SelectedItem).Name, "TEMP-" + Utils.Slug(audioName) + ".mp3", Utils.Slug(audioName), false);
+                String tags = l.Text + ",audiolibros,poesías,poemas,poesía,audiolibro,audio libro,audio libros,audio libros gratis,audiolibro gratis,";
+                DateTime d = DateTime.Today;
+                Random rnd = new Random();
+                // d = d.AddDays(Convert.ToInt16(contYtfiles++/ 2));
+                d = d.AddHours(rnd.Next(0, 24));
+                YTVideo ytVideo = new YTVideo
+                {
+                    Title = "Poesía: "+ l.Text,
+                    Descrip = l.Text + "\n Audio Libro de dominio público subido originalmente en https://librivox.org/",
+                    Tags = tags.Split(','),
+                    CategoryId = "22",
+                    PublishedAt = d,
+                   
+                    MediaFile = Utils.Slug(audioName) + ".avi",
+                    Language = "es",
+                    InfoFile = Utils.Slug(audioName) + ".ytjson"
+                };
+                Utils.writeJson(Utils.Slug(audioName) + ".ytjson", ytVideo);
+
+                new UploadVideo(ytVideo).init();
+
+                while (Const.isUploadingVideo)
+                {
+                    System.Threading.Thread.Sleep(1000);
+                    //Utils.Console("Video subiendo " + finalFile + ".avi");
+                }
+                Utils.Console("Video subido " + Utils.Slug(audioName) + ".avi");
+                Utils.CleanTempFiles();
             }
 
         }

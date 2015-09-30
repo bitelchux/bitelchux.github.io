@@ -61,7 +61,7 @@ namespace gifbin
                 shortestTxt = " -shortest ";
             //String parames = "-y -i " + Directory.GetCurrentDirectory() + "\\" + videoFile + " -i " + Directory.GetCurrentDirectory() + "\\" + audioFile + " -map 0 -map 1 -c:v copy -c:a copy " + Directory.GetCurrentDirectory() + "\\FINAL" + videoFile;
             String parames = "-y -i " + Directory.GetCurrentDirectory() + "\\" + videoFile + " -i " + Directory.GetCurrentDirectory() + "\\" + audioFile + " -map 0 -map 1 -codec copy " + shortestTxt + " " + Directory.GetCurrentDirectory() + "\\" +  outputFile + ".avi";
-            parames = "-loop 1 -i " + Directory.GetCurrentDirectory() + "\\" + videoFile + " -i " + Directory.GetCurrentDirectory() + "\\" + audioFile + " -c:v libx264 -preset ultrafast -r 1 -c:a copy " + Directory.GetCurrentDirectory() + "\\" +  outputFile + ".avi";
+            parames = "-loop 1 -i " + Directory.GetCurrentDirectory() + "\\" + videoFile + " -i " + Directory.GetCurrentDirectory() + "\\" + audioFile + " -c:v libx264 -preset ultrafast -r 1 -c:a aac -strict experimental -shortest " + Directory.GetCurrentDirectory() + "\\" +  outputFile + ".avi";
             //parames= "-i " + Directory.GetCurrentDirectory() + "\\" + audioFile + " - loop 1 -r 2 -i " + Directory.GetCurrentDirectory() + "\\" + videoFile + " -c:a copy -c:v libx264 -preset ultrafast -shortest " + Directory.GetCurrentDirectory() + "\\" + outputFile + ".avi";
             System.Diagnostics.Process p = new System.Diagnostics.Process();
 
