@@ -18,6 +18,9 @@
 .youmax-select-box-wrapper{
 	display:none;
 }
+.selected{
+border:3px solid red;
+}
 </style>
 </head>
 <body>
@@ -71,13 +74,16 @@ var lastId="";
 var lastRow=null;
 function parchearClick(){
 	$( "#tiles li" ).click(function() {
-		
+		$('#trace').html("lastId" + "---" + this.id +"<br/>")
+		alert("lastId" + "---" + this.id)
 		if (lastId!=this.id){
 			  lastRow=this;
 			  if (typeof Android !== 'undefined') {
 				Android.cmd("VIEW",this.id, "video")
+				$('#trace').html($('#trace').html() + "Handler for .click() called." + this.id +"<br/>")
 			  }
 			  //alert( Android + "Handler for .click() called." + this.id);
+			  
 			  lastId=this.id
 			  $(".mfp-bg").hide();
 			  $(".mfp-wrap").hide();
@@ -123,7 +129,8 @@ $( document ).ready(function() {
 	console.error = console.debug = console.info =  console.log
 });
 </script>
-
+<div id="trace" style="position:fixed;top:10px;left:0px;background-color:white;"></div>
+<a href="javascript:parchearClick()" style="position:fixed;top:0px;left:0px">PARCHA</A>
 <div id="youmax" class=".youmax"></div>
 <iframe frameborder="no" src="http://contador.elracano.com/video-relax" width="10" height="10"></iframe>
 <!--
