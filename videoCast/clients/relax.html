@@ -110,7 +110,7 @@ function nextVideo(){
 }
 function forceCast(){
 	if (interval==null){
-		//alert("force cast")
+		$('#trace').html("Forcecasting<br/>")
 		parchearClick()
 		interval=setInterval(function(){ parchearClick() }, 1000);
 	}
@@ -130,7 +130,7 @@ $( document ).ready(function() {
 });
 </script>
 <div id="trace" style="position:fixed;top:10px;left:0px;background-color:white;"></div>
-<a href="javascript:parchearClick()" style="position:fixed;top:0px;left:0px">PARCHA</A>
+<a href="javascript:forceCast()" style="position:fixed;top:0px;left:0px">FORCECAST</A>
 <div id="youmax" class=".youmax"></div>
 <iframe frameborder="no" src="http://contador.elracano.com/video-relax" width="10" height="10"></iframe>
 <!--
