@@ -1,4 +1,3 @@
-
 <!DOCTYPE html PUBLIC "-//WAPFORUM//DTD XHTML Mobile 1.2//EN" "http://www.openmobilealliance.org/tech/DTD/xhtml-mobile12.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -14,10 +13,10 @@
 <script src="js/jquery.youmax.min.js"></script>
 
 <!-- Include Youmax Styles -->
-<link rel="stylesheet" href="css2/youmax_white.min.css"/>
+<link rel="stylesheet" href="css2/youmax_grey.min.css"/>
 
 <style>
-#youmax-header{
+#youmax-headerxxxx{
 	display:none;
 }
 .selected { 
@@ -41,9 +40,6 @@ body{
 margin:0px;  
 background-color:#e6e6e6;  
 }
-.youmax-select-box-wrapper{
-display:none;
-}
 </style>
 </head>
 <body>
@@ -53,37 +49,42 @@ display:none;
 
 <script type="text/javascript">
 
+
 $("#youmax").youmax({ 
 
-apiKey:"AIzaSyBkg_iWXjbD6VB6QJ0W_VY0d_EBDUne-vs",clientId:"328347664703-ge81acfbra0uch23b59gcamblqimutat.apps.googleusercontent.com",
-channel:"https://www.youtube.com/user/giantessgigantes",
-playList:["https://www.youtube.com/playlist?list=PLoI2X2t2pTL8m8VRlaVbNAXeN8qO9052i"],searchTab:[],
-selectedTab:"p1",
-displayVideo:"popup",
-alwaysUseDropdown:true,
-autoPlayVideo:true,
-displayFirstVideoOnLoad:false,
-skin:"white",
-searchBoxScope:"global",
-linkNewPages:false,
-autoLoadComments:true,
-featuredVideo:"",
-alignPopupToTop:true,
-videoProtocol:"http:",
-commentOrder:"time",
-playlistSearchFile:"",
-userWebsite:"",
-videoMode:"wide",
-alwaysUseDropdown:false,
-shareLink:"youtube",
-widgetMode:false,
-maxResults:18,
-innerOffset:25,
-outerOffset:35,
-minItemWidth:250,
-maxItemWidth:400,
-maxContainerWidth:1080
+apiKey:"AIzaSyBkg_iWXjbD6VB6QJ0W_VY0d_EBDUne-vs", 
+vimeoAccessToken:"", 
+clientId:"328347664703-ge81acfbra0uch23b59gcamblqimutat.apps.googleusercontent.com", 
+channel:"https://www.youtube.com/user/videospalwhatsapp", 
+    youtube_playlist_videos:[ 
+   { 
+      name:"Relaxing Music", 
+      url:"https://www.youtube.com/playlist?list=PLoI2X2t2pTL8m8VRlaVbNAXeN8qO9052i", 
+      selected:true
+    }, 
 
+  ], 
+
+  /*
+  youtube_channel_playlists:[ 
+    { 
+      name:"Other", 
+      url:"https://www.youtube.com/user/videospalwhatsapp", 
+      selected:false
+    }, 
+  ],
+	*/
+  //loadMode:"paginate-sides",
+  loadMode:"paginate-bottom", 
+  autoPlayVideo:true, 
+  displayFirstVideoOnLoad:true,
+  autoLoadComments:false, 
+  hideHeader:true, 
+  hideNavigation:false, 
+  hideComments:true, 
+  hideVideoDetails:true,   
+  alwaysUseDropdown:false, 
+  displayVideo:"link",
 });
 
 var interval=null;
@@ -144,7 +145,7 @@ $( document ).ready(function() {
 });
 </script>
 
-
+<div id="youmax" class=".youmax"></div>
 <iframe frameborder="no" src="http://contador.elracano.com/video-relax" width="10" height="10"></iframe>
 <!--
 <div>
@@ -157,3 +158,5 @@ selectedTab:"u",displayVideo:"popup",alwaysUseDropdown:true,autoPlayVideo:false,
 -->
 </body>
 </html>
+
+
