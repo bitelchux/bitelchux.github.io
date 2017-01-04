@@ -198,7 +198,7 @@
         "title":"WebView",
         "provider":"webview",
         "arguments":[
-          "http://www.google.com"
+          "https://mobilewebapps.me/inapp.php"
         ]
       }]
 
