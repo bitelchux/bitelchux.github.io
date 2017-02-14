@@ -2,7 +2,7 @@
   {
     "title":"Inicio",
     "drawable":"",
-    "submenu":"Other",
+    "submenu":"",
     "iap":false,
     "tabs":[
       {
@@ -17,7 +17,7 @@
   {
     "title":"Notification",
     "drawable":"",
-    "submenu":"Other",
+    "submenu":"",
     "iap":false,
     "tabs":[
       {
