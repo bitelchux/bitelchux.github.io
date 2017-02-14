@@ -249,5 +249,20 @@
         ]
       }
     ]
+  },
+  {
+    "title":"Notification",
+    "drawable":"",
+    "submenu":"Other",
+    "iap":false,
+    "tabs":[
+      {
+        "title":"WebView",
+        "provider":"webview",
+        "arguments":[
+          "http://mobilewebapps.me/inapp.php"
+        ]
+      }]
+
   }
 ]
