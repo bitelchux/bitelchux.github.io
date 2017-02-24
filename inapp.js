@@ -6,3 +6,4 @@ if (confirm("confirm 1")){
 }else{
   alert("confirm ko")
 }
+dialog("titulo", "descrip", "si", "no", "alert('alert si')","alert('no')")
