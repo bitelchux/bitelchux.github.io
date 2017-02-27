@@ -1,3 +1,4 @@
+/*
 document.writeln("inapp");
 alert("inapp alert");
 if (confirm("confirm 1")){
@@ -7,3 +8,11 @@ if (confirm("confirm 1")){
   alert("confirm ko")
 }
 android.dialog("titulo", "descrip", "si", "no", "alert('alert si')","alert('no')")
+*/
+if (typeof inapploaded !== 'undefined') {
+    // the variable is defined
+  alert("inicializado")
+}else{
+   alert("sin inicializar " +inapploaded )
+}
+inapploaded=true;
