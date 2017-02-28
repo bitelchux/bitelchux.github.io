@@ -14,22 +14,7 @@
       }]
 
   },
-  {
-    "title":"test",
-    "drawable":"",
-    "submenu":"",
-    "iap":false,
-    "tabs":[
-      {
-        "title":"WebView",
-        "provider":"webview",
-        "arguments":[
-          "https://bitelchux.github.io/test.html"
-        ]
-      }]
-
-  },
-  {
+   {
     "title":"Notification",
     "drawable":"",
     "submenu":"",
@@ -39,7 +24,7 @@
         "title":"WebView",
         "provider":"webview",
         "arguments":[
-          "http://mobilewebapps.me/inapp.php"
+          "https://bitelchux.github.io/test.html"
         ]
       }]
 
