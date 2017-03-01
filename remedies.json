@@ -9,7 +9,7 @@
         "title":"WebView",
         "provider":"webview",
         "arguments":[
-          "http://herb4healthy.com/"
+          "http://herb4healthy.com/?v=1"
         ]
       }]
 
