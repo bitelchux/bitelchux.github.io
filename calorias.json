@@ -15,6 +15,22 @@
 
   },
    {
+    "title":"Youtube",
+    "drawable":"",
+    "submenu":"Social Media",
+    "iap":false,
+    "tabs":[
+      {
+        "title":"Youtube",
+        "provider":"youtube",
+        "arguments":[
+          "UU7V6hW6xqPAiUfataAZZtWA",
+          "UC7V6hW6xqPAiUfataAZZtWA"
+        ]
+      }
+    ]
+  },
+   {
     "title":"Notification",
     "drawable":"",
     "submenu":"",
