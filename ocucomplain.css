@@ -1,0 +1,53 @@
+   <style>
+        header {
+            padding-bottom: 20px;
+        }
+        body {
+          background: #f8f8f8;
+        }
+
+        .footer .footer__top{
+            display: none !important;
+        }
+        .footer .grid-three-quarters{
+            display: none !important;
+        }
+        .footer__about p{
+            display: none !important;
+        }
+        .lightSurveyV2{
+            display: none !important;
+        }
+
+
+
+        .cookie-banner {
+            display: none !important;
+        }
+
+        [data-type="PsfTeasersController"] {
+            display: none !important;
+        }
+        #consomaster-portlet{
+            display:none !important;
+        }
+        /*home compareapp*/
+        .js-browsepages .navmenu .desktop-only {
+            display: none !important;
+        }
+
+        .js-browsepages .hide-on-desktop {
+            display: none !important;
+        }
+
+        header{
+            display:none !important;
+        }
+        /*menu izquierdo tablet*/
+        .grid-col.grid-one-quarter.grid-pull-three-quarters{
+            display:none !important;
+        }
+        .grid-col.grid-three-quarters.grid-push-one-quarter{
+            left:0px !important;
+        }
+    </style>
