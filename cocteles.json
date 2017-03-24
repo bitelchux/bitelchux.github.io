@@ -9,7 +9,7 @@
         "title":"WebView",
         "provider":"webview",
         "arguments":[
-          "http://lausoncuatro.es"
+          "https://lausoncuatro.es"
         ]
       }]
 
