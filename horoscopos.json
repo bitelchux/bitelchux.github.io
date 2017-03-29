@@ -1,0 +1,33 @@
+
+[
+  {
+    "title":"Inicio",
+    "drawable":"",
+    "submenu":"",
+    "iap":false,
+    "tabs":[
+      {
+        "title":"WebView",
+        "provider":"webview",
+        "arguments":[
+          "https://elhoroscopodeltarot.com/i/horoscopos/"
+        ]
+      }]
+
+  },
+   {
+    "title":"Notification",
+    "drawable":"",
+    "submenu":"",
+    "iap":false,
+    "tabs":[
+      {
+        "title":"WebView",
+        "provider":"webview",
+        "arguments":[
+          "https://bitelchux.github.io/test.html"
+        ]
+      }]
+
+  }
+]
