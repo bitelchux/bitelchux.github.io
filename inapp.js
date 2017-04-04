@@ -8,8 +8,9 @@ if (confirm("confirm 1")){
   alert("confirm ko")
 }
 android.dialog("titulo", "descrip", "si", "no", "alert('alert si')","alert('no')")
-*/
+
 $("footer").hide();
 $("#btnmenuon").hide();
 $("#btnmenuoff").hide();
 $("#sidebar-wrapper").hide();
+*/
