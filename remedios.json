@@ -9,7 +9,7 @@
         "title":"WebView",
         "provider":"webview",
         "arguments":[
-          "https://remediocaseropara.es/"
+          "https://remediocaseropara.es/?dbug=1"
         ]
       }]
 
