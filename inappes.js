@@ -9,6 +9,10 @@ if (confirm("confirm 1")){
 }
 android.dialog("titulo", "descrip", "si", "no", "alert('alert si')","alert('no')")
 */
+$("footer").hide();
+$("#btnmenuon").hide();
+$("#btnmenuoff").hide();
+$("#sidebar-wrapper").hide();
 if (typeof inapploaded !== 'undefined') {
     // the variable is defined
   alert("inicializado")
