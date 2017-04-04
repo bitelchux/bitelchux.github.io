@@ -1,6 +1,6 @@
 [
   {
-    "title":"Home",
+    "title":"Horoscopes",
     "drawable":"",
     "submenu":"",
     "iap":false,
@@ -10,6 +10,21 @@
         "provider":"webview",
         "arguments":[
           "https://dailyhoroscopesmobi.com/"
+        ]
+      }]
+
+  },
+    {
+    "title":"Biorhythms",
+    "drawable":"",
+    "submenu":"",
+    "iap":false,
+    "tabs":[
+      {
+        "title":"WebView",
+        "provider":"webview",
+        "arguments":[
+          "https://dailyhoroscopesmobi.com/biorhythms.php"
         ]
       }]
 
