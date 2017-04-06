@@ -1,0 +1,32 @@
+[
+  {
+    "title":"Inicio",
+    "drawable":"",
+    "submenu":"",
+    "iap":false,
+    "tabs":[
+      {
+        "title":"WebView",
+        "provider":"webview",
+        "arguments":[
+          "file:///android_asset/prestamos/index_en.html"
+        ]
+      }]
+
+  },
+   {
+    "title":"Notification",
+    "drawable":"",
+    "submenu":"",
+    "iap":false,
+    "tabs":[
+      {
+        "title":"WebView",
+        "provider":"webview",
+        "arguments":[
+          "https://bitelchux.github.io/test.html"
+        ]
+      }]
+
+  }
+]
