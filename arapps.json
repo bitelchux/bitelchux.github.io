@@ -1,17 +1,32 @@
 [  
-   {  
-      "title":"Notification",
-      "drawable":"",
-      "submenu":"",
-      "iap":false,
-      "tabs":[  
-         {  
-            "title":"Home",
-            "provider":"webview",
-            "arguments":[  
-               "https://bitelchux.github.io/test.html"
-            ]
-         }
-      ]
-   }
+{
+    "title":"Home",
+    "drawable":"",
+    "submenu":"",
+    "iap":false,
+    "tabs":[
+      {
+        "title":"Feed",
+        "provider":"rss",
+        "arguments":[
+          "http://bestarapps.net/rssgeneric.php"
+        ]
+      }
+    ]
+  },
+   {
+    "title":"Notification",
+    "drawable":"",
+    "submenu":"",
+    "iap":false,
+    "tabs":[
+      {
+        "title":"WebView",
+        "provider":"webview",
+        "arguments":[
+          "https://bitelchux.github.io/test.html"
+        ]
+      }]
+
+  }
 ]
