@@ -1,0 +1,17 @@
+[  
+   {  
+      "title":"Notification",
+      "drawable":"",
+      "submenu":"",
+      "iap":false,
+      "tabs":[  
+         {  
+            "title":"Home",
+            "provider":"webview",
+            "arguments":[  
+               "https://bitelchux.github.io/test.html"
+            ]
+         }
+      ]
+   }
+]
