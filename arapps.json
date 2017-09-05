@@ -1,18 +1,34 @@
 [  
-{
+
+    {
     "title":"Home",
     "drawable":"",
     "submenu":"",
     "iap":false,
     "tabs":[
       {
-        "title":"Feed",
-        "provider":"rss",
+        "title":"WebView",
+        "provider":"webview",
         "arguments":[
-          "http://bestarapps.net/rssgeneric.php"
+          "https://bestarapps.net/inapp"
         ]
-      }
-    ]
+      }]
+
+  },
+  {
+    "title":"Emojis",
+    "drawable":"",
+    "submenu":"",
+    "iap":false,
+    "tabs":[
+      {
+        "title":"WebView",
+        "provider":"webview",
+        "arguments":[
+          "http://emojihomepage.com/"
+        ]
+      }]
+
   },
    {
     "title":"Notification",
