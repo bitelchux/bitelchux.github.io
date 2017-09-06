@@ -1,7 +1,41 @@
+<div id="sidebar-wrapper">    
+    <ul class="sidebar-nav" id="sidebar">     
+        <li><a href="/"><strong>Home<i class="glyphicon glyphicon-home"></i></strong></a></li>  
+		<li><a href="/s/game-action-arcade-racing/" title="Augmented Reality games">AR games</a></li>  
+		<li><a href="/s/video/" title="Augmented Reality Video Players">AR Video players</a></li>  
+		<li><a href="/s/entertainment/" title="Augmented Reality Entertainment apps">AR Entertainment apps</a></li> 
+		<li><a href="/s/personalization/" title="Augmented Reality Personalization apps">AR Personalization apps</a></li> 
+ 		
+		<li><a href="/s/business/" title="Augmented Reality Business apps">AR Business apps</a></li>  
+		<li><a href="/s/lifestyle/" title="Augmented Reality Lifestyle apps">AR Lifestyle apps</a></li>  
+		<li><a href="/s/tools/" title="Augmented Reality Tool apps">AR Tool apps</a></li>  
+		<li><a href="/s/travel/" title="Augmented Reality travel apps">AR travel apps</a></li>  
+		<li><a href="/s/communication/" title="Augmented Reality Communication apps">AR Communication apps</a></li>  
+		<li><a href="/s/medical/" title="Augmented Reality medical apps">AR Medical apps</a></li>  
+		<li><a href="/s/education/" title="Augmented Reality Education apps">AR Education apps</a></li>  
+		<li><a href="/s/simulation/" title="Augmented Reality Simulation apps">AR Simulation apps</a></li>  
+		<li><a href="/s/demo/" title="Augmented Reality Demos">AR Demos</a></li>  
+		
+
+ <?php
+           
+            if (file_exists($baselocation."automenu.php"))
+                require_once($baselocation."automenu.php");
+        ?>
+            
+    </ul>
+</div>    
+<button id="btnmenuon" type="button" class="btn btn-primary btn-circle btn-xl"><i class="glyphicon glyphicon-list"></i></button>
+<button id="btnmenuoff" type="button" class="btn btn-danger btn-circle btn-xl"><i class="glyphicon glyphicon-remove"></i></button>
+
+<?php
+//require_once($baselocation."notificationmenu.php");
+?>
+
 [  
 
     {
-    "title":"Home",
+    "title":"All",
     "drawable":"",
     "submenu":"",
     "iap":false,
@@ -16,7 +50,7 @@
 
   },
   {
-    "title":"Emojis",
+    "title":"Games",
     "drawable":"",
     "submenu":"",
     "iap":false,
@@ -25,11 +59,191 @@
         "title":"WebView",
         "provider":"webview",
         "arguments":[
-          "http://emojihomepage.com/"
+          "https://bestarapps.net/s/game-action-arcade-racing/"
         ]
       }]
 
   },
+  {
+    "title":"Players and Editors",
+    "drawable":"",
+    "submenu":"",
+    "iap":false,
+    "tabs":[
+      {
+        "title":"WebView",
+        "provider":"webview",
+        "arguments":[
+          "https://bestarapps.net/s/video/"
+        ]
+      }]
+
+  },
+  {
+    "title":"Entertainment",
+    "drawable":"",
+    "submenu":"",
+    "iap":false,
+    "tabs":[
+      {
+        "title":"WebView",
+        "provider":"webview",
+        "arguments":[
+          "https://bestarapps.net/s/entertainment/"
+        ]
+      }]
+
+  },
+  {
+    "title":"Personalization",
+    "drawable":"",
+    "submenu":"",
+    "iap":false,
+    "tabs":[
+      {
+        "title":"WebView",
+        "provider":"webview",
+        "arguments":[
+          "https://bestarapps.net/s/personalization/"
+        ]
+      }]
+
+  },
+  {
+    "title":"Business",
+    "drawable":"",
+    "submenu":"",
+    "iap":false,
+    "tabs":[
+      {
+        "title":"WebView",
+        "provider":"webview",
+        "arguments":[
+          "https://bestarapps.net/s/business/"
+        ]
+      }]
+
+  },
+  {
+    "title":"Lifestyle",
+    "drawable":"",
+    "submenu":"",
+    "iap":false,
+    "tabs":[
+      {
+        "title":"WebView",
+        "provider":"webview",
+        "arguments":[
+          "https://bestarapps.net/s/lifestyle/"
+        ]
+      }]
+
+  },
+  {
+    "title":"Tools",
+    "drawable":"",
+    "submenu":"",
+    "iap":false,
+    "tabs":[
+      {
+        "title":"WebView",
+        "provider":"webview",
+        "arguments":[
+          "https://bestarapps.net/s/tools/"
+        ]
+      }]
+
+  },
+    {
+    "title":"Travel",
+    "drawable":"",
+    "submenu":"",
+    "iap":false,
+    "tabs":[
+      {
+        "title":"WebView",
+        "provider":"webview",
+        "arguments":[
+          "https://bestarapps.net/s/travel/"
+        ]
+      }]
+
+  },
+  {
+    "title":"Communication",
+    "drawable":"",
+    "submenu":"",
+    "iap":false,
+    "tabs":[
+      {
+        "title":"WebView",
+        "provider":"webview",
+        "arguments":[
+          "https://bestarapps.net/s/communication/"
+        ]
+      }]
+
+  },
+  {
+    "title":"Medical",
+    "drawable":"",
+    "submenu":"",
+    "iap":false,
+    "tabs":[
+      {
+        "title":"WebView",
+        "provider":"webview",
+        "arguments":[
+          "https://bestarapps.net/s/medical/"
+        ]
+      }]
+
+  },  
+  {
+    "title":"Educational",
+    "drawable":"",
+    "submenu":"",
+    "iap":false,
+    "tabs":[
+      {
+        "title":"WebView",
+        "provider":"webview",
+        "arguments":[
+          "https://bestarapps.net/s/education/"
+        ]
+      }]
+
+  },
+ {
+    "title":"Simulation",
+    "drawable":"",
+    "submenu":"",
+    "iap":false,
+    "tabs":[
+      {
+        "title":"WebView",
+        "provider":"webview",
+        "arguments":[
+          "https://bestarapps.net/s/simulation/"
+        ]
+      }]
+
+  },
+   {
+    "title":"Demos",
+    "drawable":"",
+    "submenu":"",
+    "iap":false,
+    "tabs":[
+      {
+        "title":"WebView",
+        "provider":"webview",
+        "arguments":[
+          "https://bestarapps.net/s/demo/"
+        ]
+      }]
+
+  },  
    {
     "title":"Notification",
     "drawable":"",
