@@ -1,6 +1,6 @@
-<script>
+
  window.onload = function(){
-   setTimeout(loadAfterTime, 3000)
+   setTimeout(loadAfterTime, 100)
 };
 
 function loadAfterTime(source) { 
@@ -16,4 +16,4 @@ function loadJS(source) {
 
   document.head.appendChild(script); //or something of the likes
 }
-</script>
+
