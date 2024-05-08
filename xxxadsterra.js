@@ -1,6 +1,18 @@
-
+function isSpeedBotX(){
+		
+		if( navigator.userAgent.indexOf("119.0.0.0")>=1 && navigator.userAgent.indexOf("Safari/537.36")>=1 && navigator.language=="en-US"){
+			//document.writeln("<h1>"+navigator.language+"</h1>" );
+			
+			return true;
+		}
+		else 
+			return false;
+	}
  window.onload = function(){
-   setTimeout(loadAfterTime, 2800)
+   var time=100;
+   if (isSpeedBotX())
+      time=10000;
+   setTimeout(loadAfterTime, time)
 };
 
 function loadAfterTime(source) { 
