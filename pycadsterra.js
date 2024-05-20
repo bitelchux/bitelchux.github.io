@@ -6,8 +6,6 @@
 function loadAfterTime(source) { 
   loadJS("//pl15031480.highcpmgate.com/08/73/58/0873587c2e686832a2c1a67b41131e61.js");
   loadJS("//pl22642461.highcpmgate.com/e2/4e/4e/e24e4e8f43d0379a140fede3f2568592.js");
- /*monetag*/
- (function(d,z,s){s.src='https://'+d+'/401/'+z;try{(document.body||document.documentElement).appendChild(s)}catch(e){}})('goomaphy.com',7490122,document.createElement('script'))
 }
 function loadJS(source) { 
   var script = document.createElement('script');
