@@ -1361,7 +1361,7 @@ urls[urls.length]="https://rankdseo.com/2019/04/10/wishlistr/";
 urls[urls.length]="https://rankdseo.com/2019/04/17/dribbble/";
 urls[urls.length]="https://rankdseo.com/2019/01/26/microsoft/";
 function process(url){
-	await delay(5000);
+	
 	console.log(url);
 	
 	fetch(url).then(function (response) {
@@ -1371,7 +1371,7 @@ function process(url){
 			document.getElementsByTagName('body')[0].innerHTML=html;
 			var descrip=document.getElementsByClassName("itemBody")[0].innerHTML.replace(/"/g, "''");
 			var title=document.getElementsByClassName("page-title")[0].innerHTML.replace(/"/g, "''");
-			var slug=document.querySelector("link[rel='canonical']").getAttribute("href").replace("https://rankdseo.com/","");
+			var slug=url.replace("https://rankdseo.com/","");
 
 			const values = {
 			titulo: title,
@@ -1392,9 +1392,9 @@ function process(url){
 				},
 				body: formBody
 				})
-				.then(response => response.json()) // Convertir la respuesta a JSON si es necesario
+				.then(response => response.text()) // Convertir la respuesta a JSON si es necesario
 				.then(data => {
-				console.log('Respuesta del servidor:', data);
+				//console.log('Respuesta del servidor:', data);
 				})
 				.catch(error => {
 				console.error('Error en la solicitud:', error);
@@ -1411,4 +1411,5 @@ function process(url){
 
 for (var i=0;i<urls.length;i++){
 	process(urls[i]);
+	await delay(7000);
 }
