@@ -27,6 +27,22 @@ function loadAfterTime(source) {
 	loadJS("//pl18385895.profitablegatecpm.com/e8/e9/23/e8e9237d7e6c9674010946d09842f465.js");
 	loadJS("//pl18385961.profitablegatecpm.com/a4/e7/55/a4e7557f2067c4c0f922d9747a61a17f.js");
 	loadJS("//js.juicyads.com/jp.php?c=34e4y213q274u4q2x294x26444&u=http%3A%2F%2Fwww.juicyads.rocks");
+	loadJS("//www.freeprivacypolicy.com/public/cookie-consent/4.1.0/cookie-consent.js");
+
+	 document.addEventListener('DOMContentLoaded', function() {
+		cookieconsent.run({
+		    "notice_banner_type": "interstitial",
+		    "consent_type": "express",
+		    "palette": "light",
+		    "language": "es",
+		    "page_load_consent_levels": ["strictly-necessary"],
+		    "notice_banner_reject_button_hide": false,
+		    "preferences_center_close_button_hide": false,
+		    "page_refresh_confirmation_buttons": false,
+		    "website_name": "https://www.infoenbolas.com/",
+		    "website_privacy_policy_url": "https://www.infoenbolas.com/p/politica-de-privacidad.html"
+		});
+	    });
 /*
 	(function(w,d,o,g,r,a,m){
 	var cid=(Math.random()*1e17).toString(36);d.write('<div id="'+cid+'" ></div>');
