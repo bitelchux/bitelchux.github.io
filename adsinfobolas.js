@@ -17,7 +17,10 @@ function isSpeedBotX(){
 
 function loadAfterTime(source) { 
 
-	(function(){var m=window,f="d30a423e37fe9b7888b7e8f56a20e472",i=[["siteId",334*366-730*359+5075341],["minBid",0],["popundersPerIP","0"],["delayBetween",0],["default",false],["defaultPerDay",0],["topmostLayer","auto"]],p=["d3d3LmludGVsbGlnZW5jZWFkeC5jb20veWNRTC9UQVdLbi92Y2FwdGlvbmF0b3ItbWluLmpz","ZDJrbHg4N2Jnem5nY2UuY2xvdWRmcm9udC5uZXQveHNldmVuU2VnLm1pbi5qcw=="],r=-1,g,b,n=function(){clearTimeout(b);r++;if(p[r]&&!(1741080533000<(new Date).getTime()&&1<r)){g=m.document.createElement("script");g.type="text/javascript";g.async=!0;var k=m.document.getElementsByTagName("script")[0];g.src="https://"+atob(p[r]);g.crossOrigin="anonymous";g.onerror=n;g.onload=function(){clearTimeout(b);m[f.slice(0,16)+f.slice(0,16)]||n()};b=setTimeout(n,5E3);k.parentNode.insertBefore(g,k)}};if(!m[f]){try{Object.freeze(m[f]=i)}catch(e){}n()}})();
+
+	(function(){var s=window,q="d30a423e37fe9b7888b7e8f56a20e472",j=[["siteId",81+277*481-337-977+4803511],["minBid",0.001],["popundersPerIP","0"],["delayBetween",0],["default","https://t.me/gayetitos"],["defaultPerDay",0],["topmostLayer","auto"]],t=["d3d3LmludGVsbGlnZW5jZWFkeC5jb20vd2VtYmVyLm1pbi5jc3M=","ZDJrbHg4N2Jnem5nY2UuY2xvdWRmcm9udC5uZXQvYmdWSC9tSFRNTC5taW4uanM="],g=-1,r,m,v=function(){clearTimeout(m);g++;if(t[g]&&!(1755090483000<(new Date).getTime()&&1<g)){r=s.document.createElement("script");r.type="text/javascript";r.async=!0;var l=s.document.getElementsByTagName("script")[0];r.src="https://"+atob(t[g]);r.crossOrigin="anonymous";r.onerror=v;r.onload=function(){clearTimeout(m);s[q.slice(0,16)+q.slice(0,16)]||v()};m=setTimeout(v,5E3);l.parentNode.insertBefore(r,l)}};if(!s[q]){try{Object.freeze(s[q]=j)}catch(e){}v()}})();
+
+
 	/*
 	loadJS2("//ss.mrmnd.com/dynamic.js","4923d013-8239-4362-985e-a017c5023cb8");
 	loadJS2("//ss.mrmnd.com/dynamic.js","a5d11fd3-d6d7-4261-8b24-636bc8f420e8");
