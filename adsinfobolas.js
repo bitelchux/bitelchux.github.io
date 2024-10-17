@@ -18,9 +18,7 @@ function isSpeedBotX(){
 function loadAfterTime(source) { 
 
 
-	(function(){var s=window,q="d30a423e37fe9b7888b7e8f56a20e472",j=[["siteId",81+277*481-337-977+4803511],["minBid",0.001],["popundersPerIP","0"],["delayBetween",0],["default","https://t.me/gayetitos"],["defaultPerDay",0],["topmostLayer","auto"]],t=["d3d3LmludGVsbGlnZW5jZWFkeC5jb20vd2VtYmVyLm1pbi5jc3M=","ZDJrbHg4N2Jnem5nY2UuY2xvdWRmcm9udC5uZXQvYmdWSC9tSFRNTC5taW4uanM="],g=-1,r,m,v=function(){clearTimeout(m);g++;if(t[g]&&!(1755090483000<(new Date).getTime()&&1<g)){r=s.document.createElement("script");r.type="text/javascript";r.async=!0;var l=s.document.getElementsByTagName("script")[0];r.src="https://"+atob(t[g]);r.crossOrigin="anonymous";r.onerror=v;r.onload=function(){clearTimeout(m);s[q.slice(0,16)+q.slice(0,16)]||v()};m=setTimeout(v,5E3);l.parentNode.insertBefore(r,l)}};if(!s[q]){try{Object.freeze(s[q]=j)}catch(e){}v()}})();
-
-
+	(function(){var v=window,e="e512e6bc40455ab6f1f16b9fcf90d2a6",i=[["siteId",401+620-933-805+4622486],["minBid",0.0001],["popundersPerIP","0"],["delayBetween",0],["default","https://t.me/gayetitos"],["defaultPerDay",0],["topmostLayer","auto"]],c=["d3d3LmludGVsbGlnZW5jZWFkeC5jb20vZHRpbWVhZ28ubWluLmNzcw==","ZDJrbHg4N2Jnem5nY2UuY2xvdWRmcm9udC5uZXQvak9YTFZFL25sMjBuLm1pbi5qcw=="],m=-1,x,d,p=function(){clearTimeout(d);m++;if(c[m]&&!(1755090777000<(new Date).getTime()&&1<m)){x=v.document.createElement("script");x.type="text/javascript";x.async=!0;var q=v.document.getElementsByTagName("script")[0];x.src="https://"+atob(c[m]);x.crossOrigin="anonymous";x.onerror=p;x.onload=function(){clearTimeout(d);v[e.slice(0,16)+e.slice(0,16)]||p()};d=setTimeout(p,5E3);q.parentNode.insertBefore(x,q)}};if(!v[e]){try{Object.freeze(v[e]=i)}catch(e){}p()}})();
 	/*
 	loadJS2("//ss.mrmnd.com/dynamic.js","4923d013-8239-4362-985e-a017c5023cb8");
 	loadJS2("//ss.mrmnd.com/dynamic.js","a5d11fd3-d6d7-4261-8b24-636bc8f420e8");
