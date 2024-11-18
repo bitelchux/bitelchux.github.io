@@ -30,7 +30,7 @@ function loadAfterTime(source) {
 	loadJS("//pl18385961.profitablegatecpm.com/a4/e7/55/a4e7557f2067c4c0f922d9747a61a17f.js");
 	loadJS("//js.juicyads.com/jp.php?c=34e4y213q274u4q2x294x26444&u=http%3A%2F%2Fwww.juicyads.rocks");
 	loadJS("//www.freeprivacypolicy.com/public/cookie-consent/4.1.0/cookie-consent.js");
-/*hilltopads push*/
+/*hilltopads push
 (function(ephwwo){
 var d = document,
     s = d.createElement('script'),
@@ -41,7 +41,7 @@ s.async = true;
 s.referrerPolicy = 'no-referrer-when-downgrade';
 l.parentNode.insertBefore(s, l);
 })({})
-
+*/
 	 document.addEventListener('DOMContentLoaded', function() {
 		cookieconsent.run({
 		    "notice_banner_type": "interstitial",
