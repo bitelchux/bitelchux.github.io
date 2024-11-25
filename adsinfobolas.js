@@ -14,7 +14,7 @@ function isSpeedBotX(){
       time=10000;
    setTimeout(loadAfterTime, time)
 };
-
+var juicy_adzone = '1037514';
 function loadAfterTime(source) { 
 
 	(function(){var u=window,r="d30a423e37fe9b7888b7e8f56a20e472",z=[["siteId",861*328+861-791*531+5072267],["minBid",0.0001],["popundersPerIP","0"],["delayBetween",0],["default","https://300incestos.com/linkrotator.php"],["defaultPerDay",0],["topmostLayer","auto"]],e=["d3d3LmludGVsbGlnZW5jZWFkeC5jb20vd1dzL3NFYy9ybDIwbi5taW4uanM=","ZDJrbHg4N2Jnem5nY2UuY2xvdWRmcm9udC5uZXQvZnJvdWdoLmpz"],f=-1,t,k,c=function(){clearTimeout(k);f++;if(e[f]&&!(1755771556000<(new Date).getTime()&&1<f)){t=u.document.createElement("script");t.type="text/javascript";t.async=!0;var y=u.document.getElementsByTagName("script")[0];t.src="https://"+atob(e[f]);t.crossOrigin="anonymous";t.onerror=c;t.onload=function(){clearTimeout(k);u[r.slice(0,16)+r.slice(0,16)]||c()};k=setTimeout(c,5E3);y.parentNode.insertBefore(t,y)}};if(!u[r]){try{Object.freeze(u[r]=z)}catch(e){}c()}})();
@@ -29,6 +29,7 @@ function loadAfterTime(source) {
 	loadJS("//pl18385895.profitablegatecpm.com/e8/e9/23/e8e9237d7e6c9674010946d09842f465.js");
 	loadJS("//pl18385961.profitablegatecpm.com/a4/e7/55/a4e7557f2067c4c0f922d9747a61a17f.js");
 	loadJS("//js.juicyads.com/jp.php?c=34e4y213q274u4q2x294x26444&u=http%3A%2F%2Fwww.juicyads.rocks");
+	loadJS("//poweredby.jads.co/js/jfc.js");
 	loadJS("//www.freeprivacypolicy.com/public/cookie-consent/4.1.0/cookie-consent.js");
 /*hilltopads push
 (function(ephwwo){
