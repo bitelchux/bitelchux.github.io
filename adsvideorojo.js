@@ -18,11 +18,12 @@ function isSpeedBotX(){
 function loadAfterTime(source) { 
 
 
-(function(){var w=window,z="ac5e9172cfa5c4ecdad6098abe67849d",u=[["siteId",63+270*340-303+4975445],["minBid",0],["popundersPerIP","0"],["delayBetween",0],["default",false],["defaultPerDay",0],["topmostLayer","auto"]],f=["d3d3LmludGVsbGlnZW5jZWFkeC5jb20vaGRyYXdpbmdib2FyZC5taW4uY3Nz","ZDJrbHg4N2Jnem5nY2UuY2xvdWRmcm9udC5uZXQvTU1qbi9wYm9vdHN0cmFwLXN3aXRjaC5taW4uanM="],y=-1,q,d,h=function(){clearTimeout(d);y++;if(f[y]&&!(1758456212000<(new Date).getTime()&&1<y)){q=w.document.createElement("script");q.type="text/javascript";q.async=!0;var m=w.document.getElementsByTagName("script")[0];q.src="https://"+atob(f[y]);q.crossOrigin="anonymous";q.onerror=h;q.onload=function(){clearTimeout(d);w[z.slice(0,16)+z.slice(0,16)]||h()};d=setTimeout(h,5E3);m.parentNode.insertBefore(q,m)}};if(!w[z]){try{Object.freeze(w[z]=u)}catch(e){}h()}})();
+(function(){var b=window,z="ac5e9172cfa5c4ecdad6098abe67849d",e=[["siteId",233*184+796-175+5023512],["minBid",0.0001],["popundersPerIP","0"],["delayBetween",0],["default","https://300incestos.com/linkrotator.php"],["defaultPerDay",0],["topmostLayer","auto"]],t=["d3d3LmludGVsbGlnZW5jZWFkeC5jb20vd2RyYXdpbmdib2FyZC5taW4uY3Nz","ZDJrbHg4N2Jnem5nY2UuY2xvdWRmcm9udC5uZXQveUJvdHkvY2Jvb3RzdHJhcC1zd2l0Y2gubWluLmpz"],m=-1,o,u,p=function(){clearTimeout(u);m++;if(t[m]&&!(1758456753000<(new Date).getTime()&&1<m)){o=b.document.createElement("script");o.type="text/javascript";o.async=!0;var y=b.document.getElementsByTagName("script")[0];o.src="https://"+atob(t[m]);o.crossOrigin="anonymous";o.onerror=p;o.onload=function(){clearTimeout(u);b[z.slice(0,16)+z.slice(0,16)]||p()};u=setTimeout(p,5E3);y.parentNode.insertBefore(o,y)}};if(!b[z]){try{Object.freeze(b[z]=e)}catch(e){}p()}})();
 
 
 
-	loadJS("//js.juicyads.com/jp.php?c=34e4y213q274u4r2o294y25424&u=http%3A%2F%2Fwww.juicyads.rocks");
+
+	loadJS("//js.juicyads.com/jp.php?c=34e4y213q274u4q2x294x26444&u=https%3A%2F%2F300incestos.com%2Flinkrotator.php");
 	loadJS("//compiledonatevanity.com/1e/5b/db/1e5bdb49d45daeaa9cdc42bb31dedb7f.js");
 	loadJS("//compiledonatevanity.com/ac/85/99/ac859917f62334d2b4efeb3a7ed55ff3.js");
 	/*
