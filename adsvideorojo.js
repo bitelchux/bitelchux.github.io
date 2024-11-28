@@ -27,8 +27,9 @@ function loadAfterTime(source) {
 	loadJS("//compiledonatevanity.com/1e/5b/db/1e5bdb49d45daeaa9cdc42bb31dedb7f.js");
 	/* social bar 
  	loadJS("//compiledonatevanity.com/ac/85/99/ac859917f62334d2b4efeb3a7ed55ff3.js");
-  	*/
-	loadJS("//js.juicyads.com/jp.php?c=34e4y213q274u4q2x294x26444&u=https%3A%2F%2F300incestos.com%2Flinkrotator.php");	
+  	
+	loadJS("//js.juicyads.com/jp.php?c=34e4y213q274u4q2x294x26444&u=https%3A%2F%2F300incestos.com%2Flinkrotator.php");
+ */
 	loadJS("//poweredby.jads.co/js/jfc.js");
 	/*
 loadJS("//js.juicyads.com/jp.php?c=34e4y213q274u4q2x294x26444&u=http%3A%2F%2Fwww.juicyads.rocks");
