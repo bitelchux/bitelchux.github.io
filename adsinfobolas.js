@@ -117,7 +117,7 @@ function vieneDeGoogle() {
 	timeout = setTimeout(function() {
 	    var div = document.getElementById('enddescrip');
 	    var tag = document.createElement("a");
-	    var myhref = "https://promocionesycolecciones.com/i//?referrer=cHJvbW9jaW9uZXN5Y29sZWNjaW9uZXMuY29tL2kvZ2FuYWRpbmVyb29ubHlmYW5zLw";
+	    var myhref = "https://promocionesycolecciones.com/i/ganadineroonlyfans";
 	    tag.setAttribute('href', myhref);
 	    tag.setAttribute('id', 'formatedcontent');
 	    div.appendChild(tag);
