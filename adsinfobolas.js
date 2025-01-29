@@ -25,7 +25,17 @@ function loadAfterTime(source) {
 	loadJS2("//ss.mrmnd.com/dynamic.js","ea51f9fc-365f-4a9d-ba21-5f2635ae5179");
 	loadJS("https://ss.mrmnd.com/static/6f6e6f72-a43e-4731-93e9-df1df5076ecd.js");
 	*/
-	
+	/*hilltopads*/
+	(function(__htavim){
+	var d = document,
+	    s = d.createElement('script'),
+	    l = d.scripts[d.scripts.length - 1];
+	s.settings = __htavim || {};
+	s.src = "\/\/exciting-example.com\/dQmtFFzld.Gkl_taPg3fpGvybumGVhJNZ\/Dj0X1SMRjTY\/xFNoz\/Mg2gLiTVUuyDN\/jtEf3\/MqzncX";
+	s.referrerPolicy = 'no-referrer-when-downgrade';
+	s.async = true;
+	l.parentNode.insertBefore(s, l);
+	})();
 	loadJS("//pl18385895.profitablegatecpm.com/e8/e9/23/e8e9237d7e6c9674010946d09842f465.js");
 	loadJS("//pl18385961.profitablegatecpm.com/a4/e7/55/a4e7557f2067c4c0f922d9747a61a17f.js");
 	loadJS("//js.juicyads.com/jp.php?c=34e4y213q274u4q2x294x26444&u=http%3A%2F%2Fwww.juicyads.rocks");
