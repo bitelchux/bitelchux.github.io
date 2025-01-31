@@ -36,3 +36,29 @@ _gaq.push(['_trackPageview']);
     var s = document.getElementsByTagName('script')[0];
     s.parentNode.insertBefore(ga, s);
 })();
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll("table").forEach(table => {
+        let wrapper = document.createElement("div");
+        wrapper.classList.add("table-responsive");
+
+        let newTable = document.createElement("div");
+        newTable.classList.add("table-custom");
+
+        table.querySelectorAll("tr").forEach(tr => {
+            let newRow = document.createElement("div");
+            newRow.classList.add("table-row");
+
+            tr.querySelectorAll("th, td").forEach(cell => {
+                let newCell = document.createElement("div");
+                newCell.classList.add(cell.tagName.toLowerCase() === "th" ? "table-header" : "table-cell");
+                newCell.innerHTML = cell.innerHTML;
+                newRow.appendChild(newCell);
+            });
+
+            newTable.appendChild(newRow);
+        });
+
+        wrapper.appendChild(newTable);
+        table.parentNode.replaceChild(wrapper, table);
+    });
+});
