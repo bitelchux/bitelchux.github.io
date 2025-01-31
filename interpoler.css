@@ -1,1 +1,29 @@
+.table-responsive {
+    overflow-x: auto;
+    width: 100%;
+}
 
+.table-custom {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #ddd;
+    width: 100%;
+}
+
+.table-row {
+    display: flex;
+    flex-wrap: wrap;
+    border-bottom: 1px solid #ddd;
+}
+
+.table-header {
+    font-weight: bold;
+    background: #f4f4f4;
+}
+
+.table-cell, .table-header {
+    flex: 1;
+    padding: 8px;
+    border-right: 1px solid #ddd;
+    min-width: 100px;
+}
