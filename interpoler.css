@@ -1,3 +1,9 @@
+.julklist{
+    min-height: 4em;
+   list-style: none;
+    margin-top: 1em;
+    font-size: 1.5em;
+}
 .table-responsive {
     overflow-x: auto;
     width: 100%;
