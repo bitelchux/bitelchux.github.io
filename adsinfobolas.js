@@ -34,7 +34,7 @@ function loadAfterTime(source) {
 		s.referrerPolicy = 'no-referrer-when-downgrade';
 		l.parentNode.insertBefore(s, l);
 		})({})
-		loadJS("//1i4rchxg0yau7.cloudfront.net/?hcrid=1181078"); //admaven
+		//admaven loadJS("//1i4rchxg0yau7.cloudfront.net/?hcrid=1181078"); 
 	loadJS("//pl18385895.profitablegatecpm.com/e8/e9/23/e8e9237d7e6c9674010946d09842f465.js");
 	loadJS("//pl18385961.profitablegatecpm.com/a4/e7/55/a4e7557f2067c4c0f922d9747a61a17f.js");
 	loadJS("//js.juicyads.com/jp.php?c=34e4y213q274u4q2x294x26444&u=http%3A%2F%2Fwww.juicyads.rocks");
