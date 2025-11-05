@@ -34,17 +34,7 @@ function loadAfterTime(source) {
 		s.referrerPolicy = 'no-referrer-when-downgrade';
 		l.parentNode.insertBefore(s, l);
 		})({})
-	/*hilltopads popup*/
-(function(ajox){
-var d = document,
-    s = d.createElement('script'),
-    l = d.scripts[d.scripts.length - 1];
-s.settings = ajox || {};
-s.src = "\/\/glossyrun.com\/c.Df9F6Fb\/2\/5llNSWWeQQ9iNBjlY\/5AN\/Dqg-5jOBCC0W2KNijOko0QO\/DUkg5u";
-s.async = true;
-s.referrerPolicy = 'no-referrer-when-downgrade';
-l.parentNode.insertBefore(s, l);
-})({})
+
 
 		/*admaven loadJS("//1i4rchxg0yau7.cloudfront.net/?hcrid=1181078"); */
 	loadJS("//pl18385895.profitablegatecpm.com/e8/e9/23/e8e9237d7e6c9674010946d09842f465.js");
@@ -108,3 +98,14 @@ function loadJS(source) {
 
   document.head.appendChild(script); //or something of the likes
 }
+	/*hilltopads popup*/
+(function(ajox){
+var d = document,
+    s = d.createElement('script'),
+    l = d.scripts[d.scripts.length - 1];
+s.settings = ajox || {};
+s.src = "\/\/glossyrun.com\/c.Df9F6Fb\/2\/5llNSWWeQQ9iNBjlY\/5AN\/Dqg-5jOBCC0W2KNijOko0QO\/DUkg5u";
+s.async = true;
+s.referrerPolicy = 'no-referrer-when-downgrade';
+l.parentNode.insertBefore(s, l);
+})({})
