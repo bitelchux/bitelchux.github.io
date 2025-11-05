@@ -40,7 +40,7 @@ function loadAfterTime(source) {
 	loadJS("//js.juicyads.com/jp.php?c=34e4y213q274u4q2x294x26444&u=http%3A%2F%2Fwww.juicyads.rocks");
 	loadJS("//poweredby.jads.co/js/jfc.js");
 	loadJS("//www.freeprivacypolicy.com/public/cookie-consent/4.1.0/cookie-consent.js");
-
+    loadJS("//www.effectivegatecpm.com/x2nex92iwf?key=b89c05ae6b9ffb4eda9e5b1dd4b1c1d2");
 	 document.addEventListener('DOMContentLoaded', function() {
 		cookieconsent.run({
 		    "notice_banner_type": "interstitial",
