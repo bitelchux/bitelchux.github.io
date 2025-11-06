@@ -66,7 +66,7 @@
 
   // 🔁 Scroll y procesamiento incremental
   async function processCycle(cycle = 0) {
-    if (cycle >= 10) {
+    if (cycle >= 1000) {
       console.log(`✅ Finished after ${cycle} cycles. Downloaded ${totalDownloaded} items.`);
       saveSeen();
       return;
