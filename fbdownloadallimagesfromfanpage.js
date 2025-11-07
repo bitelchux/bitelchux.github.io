@@ -97,7 +97,7 @@
     } else {
       cyclesWithoutNew++;
       console.log(`😴 No new images (x${cyclesWithoutNew})`);
-      if (cyclesWithoutNew >= 3) {
+      if (cyclesWithoutNew >= 30) {
         console.log(`✅ No more images. Total downloaded: ${totalDownloaded}`);
         saveSeen();
         return;
