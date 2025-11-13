@@ -9,10 +9,12 @@ function isSpeedBotX(){
 			return false;
 	}
  window.onload = function(){
+	 /*
    var time=10;
    if (isSpeedBotX())
       time=10000;
-   setTimeout(loadAfterTime, time)
+   setTimeout(loadAfterTime, time);
+   */
 };
 var juicy_adzone = '1037514';
 function loadAfterTime(source) { 
