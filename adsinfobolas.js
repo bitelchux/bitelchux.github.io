@@ -35,14 +35,16 @@ function loadAfterTime(source) {
 		l.parentNode.insertBefore(s, l);
 		})({})
 
-
+		/*admaven push loadJS("https://d1i4rchxg0yau7.cloudfront.net/?hcrid=1181078"); */
 		/*admaven loadJS("//1i4rchxg0yau7.cloudfront.net/?hcrid=1181078"); */
 	loadJS("//pl18385895.profitablegatecpm.com/e8/e9/23/e8e9237d7e6c9674010946d09842f465.js");
 	loadJS("//pl18385961.profitablegatecpm.com/a4/e7/55/a4e7557f2067c4c0f922d9747a61a17f.js");
 	loadJS("//js.juicyads.com/jp.php?c=34e4y213q274u4q2x294x26444&u=http%3A%2F%2Fwww.juicyads.rocks");
 	loadJS("//poweredby.jads.co/js/jfc.js");
 	loadJS("//www.freeprivacypolicy.com/public/cookie-consent/4.1.0/cookie-consent.js");
-    loadJS("//www.effectivegatecpm.com/x2nex92iwf?key=b89c05ae6b9ffb4eda9e5b1dd4b1c1d2"); /*https://www.cpmturbo.com/*/
+	/*https://www.cpmturbo.com
+    loadJS("//www.effectivegatecpm.com/x2nex92iwf?key=b89c05ae6b9ffb4eda9e5b1dd4b1c1d2");
+	*/
 	 document.addEventListener('DOMContentLoaded', function() {
 		cookieconsent.run({
 		    "notice_banner_type": "interstitial",
