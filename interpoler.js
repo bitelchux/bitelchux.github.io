@@ -18,9 +18,13 @@ if (!re.test(userAgent)) {
     function randomIntFromInterval(min, max) {
         return Math.floor(Math.random() * (max - min + 1) + min)
     }
-    const rndInt = randomIntFromInterval(1, 100000);
-    xmlhttp.open('GET', 'https://pbnstats.promocionesycolecciones.com/add.php?rand=' + rndInt + '&referer=' + encodeURI(window.location.href), true);
-    xmlhttp.send();
+   const rndInt = randomIntFromInterval(1, 100000);
+    const url = 'https://pbnstats.promocionesycolecciones.com/add.php?rand=' + rndInt + 
+                '&referer=' + encodeURIComponent(window.location.href);
+    
+    // Opción A: Fetch simple (sin procesar respuesta)
+    fetch(url, { method: 'GET', mode: 'no-cors' })
+        .catch(err => console.log('Tracking error:', err));
 }
 var _gaq = _gaq || [];
 _gaq.push(['_setAccount', 'UA-2810994-86']);
