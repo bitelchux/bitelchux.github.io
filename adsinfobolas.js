@@ -9,12 +9,12 @@ function isSpeedBotX(){
 			return false;
 	}
  window.onload = function(){
-	 /*
+
    var time=10;
    if (isSpeedBotX())
       time=10000;
    setTimeout(loadAfterTime, time);
-   */
+
 };
 var juicy_adzone = '1037514';
 function loadAfterTime(source) { 
@@ -61,6 +61,28 @@ function loadAfterTime(source) {
 		    "website_privacy_policy_url": "https://www.infoenbolas.com/p/politica-de-privacidad.html"
 		});
 	    });
+		/* trafficstars */
+		// 1. Cargar p.js con atributos
+		loadJS("//cdn.tsyndicate.com/sdk/v1/p.js", {
+		    "data-ts-spot": "b07a926c7d0b4f6198b278302abdec0c",
+		    "data-ts-extid": "{extid}",
+		    async: "",
+		    defer: ""
+		});
+		
+		// 2. Cargar CSS
+		loadCSS("//cdn.tsyndicate.com/sdk/v1/interstitial.ts.css");
+		
+		// 3. Cargar interstitial.ts.js y luego iniciar el anuncio
+		const interstitial = loadJS("//cdn.tsyndicate.com/sdk/v1/interstitial.ts.js");
+		
+		interstitial.onload = function () {
+		    InterstitialTsAd({
+		        spot: "d4855591409845028a317401c5e578b0",
+		        extid: "{extid}"
+		    });
+		};
+
 /*
 	(function(w,d,o,g,r,a,m){
 	var cid=(Math.random()*1e17).toString(36);d.write('<div id="'+cid+'" ></div>');
@@ -83,6 +105,27 @@ function loadAfterTime(source) {
 	})(window,document,'script',['adsbetnet.com'],'ABNS');
 */	
 }
+function loadCSS(href) {
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = href;
+    document.head.appendChild(link);
+}
+
+function loadJSX(src, attrs = {}) {
+    const script = document.createElement("script");
+    script.src = src;
+    script.type = "text/javascript";
+
+    for (const key in attrs) {
+        script.setAttribute(key, attrs[key]);
+    }
+
+    document.head.appendChild(script);
+
+    return script;
+}
+
 function loadJS2(source,param) { 
 	var script = document.createElement('script');
 	
