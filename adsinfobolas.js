@@ -61,25 +61,28 @@ function loadAfterTime(source) {
 		    "website_privacy_policy_url": "https://www.infoenbolas.com/p/politica-de-privacidad.html"
 		});
 	    });
-		/* trafficstars */
-		// 1. Cargar p.js con atributos
-		loadJS("//cdn.tsyndicate.com/sdk/v1/p.js", {
+		/* trafficstars popup*/
+		loadJSX("//cdn.tsyndicate.com/sdk/v1/p.js", {
 		    "data-ts-spot": "b07a926c7d0b4f6198b278302abdec0c",
 		    "data-ts-extid": "{extid}",
 		    async: "",
 		    defer: ""
 		});
-		
-		// 2. Cargar CSS
+		/* trafficstars inters*/
 		loadCSS("//cdn.tsyndicate.com/sdk/v1/interstitial.ts.css");
-		
-		// 3. Cargar interstitial.ts.js y luego iniciar el anuncio
 		const interstitial = loadJS("//cdn.tsyndicate.com/sdk/v1/interstitial.ts.js");
-		
 		interstitial.onload = function () {
 		    InterstitialTsAd({
 		        spot: "d4855591409845028a317401c5e578b0",
 		        extid: "{extid}"
+		    });
+		};
+		/* trafficstars push*/
+		const inpagePush = loadJS("//cdn.tsyndicate.com/sdk/v1/inpage.push.js");
+		inpagePush.onload = function () {
+		    TsInPagePush({
+		        spot: "e6434178000d48449787deeceafc222b",
+		        verticalPosition: "bottom"
 		    });
 		};
 
