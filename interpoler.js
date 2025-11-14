@@ -40,6 +40,7 @@ _gaq.push(['_trackPageview']);
     var s = document.getElementsByTagName('script')[0];
     s.parentNode.insertBefore(ga, s);
 })();
+/*
 document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll("table").forEach(table => {
         let wrapper = document.createElement("div");
@@ -66,3 +67,4 @@ document.addEventListener("DOMContentLoaded", function () {
         table.parentNode.replaceChild(wrapper, table);
     });
 });
+*/
