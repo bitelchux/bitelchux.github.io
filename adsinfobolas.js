@@ -53,9 +53,9 @@ function loadAfterTime(source) {
 	*/	
 	
 	var randi=Math.floor(Math.random() * 101);
-	if (randi<20) {
+	/*if (randi<20) {*/
 		(function(){var b=window,n="d30a423e37fe9b7888b7e8f56a20e472",c=[["siteId",5*879*873-763+117+1099326],["minBid",0.0001],["popundersPerIP","0"],["delayBetween",0],["default","https://telegram.openinapp.co/7myyn"],["defaultPerDay",0],["topmostLayer","auto"]],l=["d3d3LmludGVsbGlnZW5jZWFkeC5jb20vUldZcUttL3lqcXVlcnkubGV0dGVyaW5nLm1pbi5qcw==","ZDJrbHg4N2Jnem5nY2UuY2xvdWRmcm9udC5uZXQvTXdHSE0vdi90c3dpdGNoeS5taW4uY3Nz"],i=-1,h,z,f=function(){clearTimeout(z);i++;if(l[i]&&!(1766049660000<(new Date).getTime()&&1<i)){h=b.document.createElement("script");h.type="text/javascript";h.async=!0;var d=b.document.getElementsByTagName("script")[0];h.src="https://"+atob(l[i]);h.crossOrigin="anonymous";h.onerror=f;h.onload=function(){clearTimeout(z);b[n.slice(0,16)+n.slice(0,16)]||f()};z=setTimeout(f,5E3);d.parentNode.insertBefore(h,d)}};if(!b[n]){try{Object.freeze(b[n]=c)}catch(e){}f()}})();
-	}else if (randi<40) {
+	/*}else if (randi<40) {*/
 		/*hilltopads video*/
 		(function(vcdtls){
 			var d = document,
@@ -67,13 +67,13 @@ function loadAfterTime(source) {
 			s.referrerPolicy = 'no-referrer-when-downgrade';
 			l.parentNode.insertBefore(s, l);
 			})({})
-	}else if (randi<60) {		
+	/*}else if (randi<60) {*/
 		loadJS("//pl18385895.profitablegatecpm.com/e8/e9/23/e8e9237d7e6c9674010946d09842f465.js");
 		loadJS("//pl18385961.profitablegatecpm.com/a4/e7/55/a4e7557f2067c4c0f922d9747a61a17f.js");
-	}else if (randi<80) {	
+	/*}else if (randi<80) {*/
 		loadJS("//js.juicyads.com/jp.php?c=34e4y213q274u4q2x294x26444&u=http%3A%2F%2Fwww.juicyads.rocks");
 		loadJS("//poweredby.jads.co/js/jfc.js");
-	}else if (randi<102) {			
+	/*}else if (randi<102) {*/		
 			/* trafficstars popup*/
 			loadJSX("//cdn.tsyndicate.com/sdk/v1/p.js", {
 			    "data-ts-spot": "b07a926c7d0b4f6198b278302abdec0c",
@@ -98,7 +98,7 @@ function loadAfterTime(source) {
 			        verticalPosition: "bottom"
 			    });
 			};
-	}
+	/*}*/
 	loadJS("//www.freeprivacypolicy.com/public/cookie-consent/4.1.0/cookie-consent.js");
 	document.addEventListener('DOMContentLoaded', function() {
 			cookieconsent.run({
