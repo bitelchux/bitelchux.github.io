@@ -30,11 +30,11 @@ function tienesmasde18(){
 		      remember: 'Recordarme'
 		    },
 		    en: {
-		      title: 'Age Verification',
-		      message: 'Are you 18 or older?',
-		      confirm: "Yes — I'm 18+",
-		      deny: "No — I'm under 18",
-		      remember: 'Remember me'
+		      title: 'Verificación de edad',
+		      message: '¿Eres mayor de 18 años?',
+		      confirm: 'Sí, soy mayor de 18',
+		      deny: 'No soy mayor de 18',
+		      remember: 'Recordarme'
 		    }
 		  };
 		  const t = TEXT[lang];
