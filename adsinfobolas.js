@@ -8,6 +8,128 @@ function isSpeedBotX(){
 		else 
 			return false;
 	}
+function tienesmasde18(){
+	(function(){
+		  const LS_KEY = 'aviso_mayor18_confirmed_v2';
+		
+		  function detectLang() {
+		    const navLang = (navigator.language || '').toLowerCase();
+		    if (navLang.startsWith('es')) return 'es';
+		    const ua = (navigator.userAgent || '').toLowerCase();
+		    if (ua.includes('spanish') || ua.includes('es-') || ua.includes('español')) return 'es';
+		    return 'en';
+		  }
+		
+		  const lang = detectLang();
+		  const TEXT = {
+		    es: {
+		      title: 'Verificación de edad',
+		      message: '¿Eres mayor de 18 años?',
+		      confirm: 'Sí, soy mayor de 18',
+		      deny: 'No soy mayor de 18',
+		      remember: 'Recordarme'
+		    },
+		    en: {
+		      title: 'Age Verification',
+		      message: 'Are you 18 or older?',
+		      confirm: "Yes — I'm 18+",
+		      deny: "No — I'm under 18",
+		      remember: 'Remember me'
+		    }
+		  };
+		  const t = TEXT[lang];
+		
+		  try {
+		    const saved = JSON.parse(localStorage.getItem(LS_KEY));
+		    if (saved?.confirmed) {
+		      return;
+		    }
+		  } catch(e){}
+		
+		  const css = `
+		  .age-root{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;}
+		  .age-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(2px);}
+		  .age-modal{position:relative;z-index:2;width:clamp(300px,80%,500px);
+		     padding:22px;background:#111;color:#f1f1f1;border-radius:14px;
+		     box-shadow:0 8px 35px rgba(0,0,0,0.7);font-family:system-ui, sans-serif;}
+		  .age-title{font-size:1.35rem;font-weight:600;margin-bottom:10px;}
+		  .age-msg{font-size:1.05rem;margin-bottom:20px;}
+		  .age-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;}
+		  .age-btn{padding:10px 16px;border-radius:8px;border:0;cursor:pointer;font-weight:600;}
+		  .age-btn-ok{background:#0b76ef;color:white;}
+		  .age-btn-no{background:#333;color:#eee;}
+		  .age-remember{display:flex;align-items:center;gap:7px;margin-right:auto;font-size:0.9rem;}
+		  `;
+		  
+		  const style = document.createElement('style');
+		  style.textContent = css;
+		  document.head.appendChild(style);
+		
+		  const root = document.createElement('div');
+		  root.className = 'age-root';
+		
+		  const overlay = document.createElement('div');
+		  overlay.className = 'age-overlay';
+		
+		  const modal = document.createElement('div');
+		  modal.className = 'age-modal';
+		
+		  modal.innerHTML = `
+		    <div class="age-title">${t.title}</div>
+		    <div class="age-msg">${t.message}</div>
+		  `;
+		
+		  const remember = document.createElement('label');
+		  remember.className = 'age-remember';
+		  const chk = document.createElement('input');
+		  chk.type = 'checkbox';
+		  chk.checked = true;
+		  remember.appendChild(chk);
+		  remember.append(t.remember);
+		
+		  const btnNo = document.createElement('button');
+		  btnNo.className = 'age-btn age-btn-no';
+		  btnNo.textContent = t.deny;
+		
+		  const btnOk = document.createElement('button');
+		  btnOk.className = 'age-btn age-btn-ok';
+		  btnOk.textContent = t.confirm;
+		
+		  const actions = document.createElement('div');
+		  actions.className = 'age-actions';
+		  actions.append(remember, btnNo, btnOk);
+		
+		  modal.appendChild(actions);
+		
+		  root.append(overlay, modal);
+		  document.body.appendChild(root);
+		
+		  const prev = document.documentElement.style.overflow;
+		  document.documentElement.style.overflow = 'hidden';
+		
+		  function close() {
+		    root.remove();
+		    document.documentElement.style.overflow = prev;
+		  }
+		
+		  function save(c) {
+		    if (chk.checked) {
+		      try { localStorage.setItem(LS_KEY, JSON.stringify({confirmed: c, ts: Date.now()})); }
+		      catch(e){}
+		    }
+		  }
+		
+		  btnOk.onclick = () => {
+		    save(true);
+		    close();
+		  };
+		
+		  btnNo.onclick = () => {
+		    save(false);
+		    window.location.href = "https://www.google.com";
+		  };
+		})();
+}
  window.onload = function(){
 
    var time=10;
@@ -17,7 +139,8 @@ function isSpeedBotX(){
 
 };
 var juicy_adzone = '1037514';
-function loadAfterTime(source) { 
+function loadAfterTime(source) {
+	tienesmasde18();
 	/*
 	loadJS2("//ss.mrmnd.com/dynamic.js","4923d013-8239-4362-985e-a017c5023cb8");
 	loadJS2("//ss.mrmnd.com/dynamic.js","a5d11fd3-d6d7-4261-8b24-636bc8f420e8");
