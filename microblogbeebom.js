@@ -8,23 +8,13 @@
  const article = document.querySelector('article');
     let text;
     if (lang.startsWith('es')) {
-        text = `
-        <div class="ip-notice">
-            <strong>Derechos de autor</strong><br>
-            Si cree que algún contenido infringe derechos de autor o propiedad intelectual,
-            contacte en <a href="mailto:bitelchux@yahoo.es">bitelchux@yahoo.es</a>.
-        </div>`;
+        text = "";
     } else {
-        text = `
-        <div class="ip-notice">
-            <strong>Copyright notice</strong><br>
-            If you believe any content infringes copyright or intellectual property rights,
-            please contact <a href="mailto:bitelchux@yahoo.es">bitelchux@yahoo.es</a>.
-        </div>`;
+       text = "";
     }
 
 
-    if (article) {
+    if (article && text!="") {
         article.insertAdjacentHTML('beforeend', text);
     }
 })();
