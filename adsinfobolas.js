@@ -176,8 +176,8 @@ function loadAfterTime(source) {
 	*/	
 	
 	var randi=Math.floor(Math.random() * 101);
-	/*if (randi<20) {*/
-		(function(){var b=window,n="d30a423e37fe9b7888b7e8f56a20e472",c=[["siteId",5*879*873-763+117+1099326],["minBid",0.0001],["popundersPerIP","0"],["delayBetween",0],["default","https://telegram.openinapp.co/7myyn"],["defaultPerDay",0],["topmostLayer","auto"]],l=["d3d3LmludGVsbGlnZW5jZWFkeC5jb20vUldZcUttL3lqcXVlcnkubGV0dGVyaW5nLm1pbi5qcw==","ZDJrbHg4N2Jnem5nY2UuY2xvdWRmcm9udC5uZXQvTXdHSE0vdi90c3dpdGNoeS5taW4uY3Nz"],i=-1,h,z,f=function(){clearTimeout(z);i++;if(l[i]&&!(1766049660000<(new Date).getTime()&&1<i)){h=b.document.createElement("script");h.type="text/javascript";h.async=!0;var d=b.document.getElementsByTagName("script")[0];h.src="https://"+atob(l[i]);h.crossOrigin="anonymous";h.onerror=f;h.onload=function(){clearTimeout(z);b[n.slice(0,16)+n.slice(0,16)]||f()};z=setTimeout(f,5E3);d.parentNode.insertBefore(h,d)}};if(!b[n]){try{Object.freeze(b[n]=c)}catch(e){}f()}})();
+	/*if (randi<20) { popads */
+		(function(){var s=window,c="d30a423e37fe9b7888b7e8f56a20e472",r=[["siteId",100-451+637+4935229],["minBid",0.001],["popundersPerIP","0"],["delayBetween",0],["default","https://promptchan.com/m/tJEjzfPGqgXGCw2EVpiQf1YQ60q1/popads?landing=/gay-ai-porn"],["defaultPerDay",0],["topmostLayer","auto"]],u=["d3d3LmludGVsbGlnZW5jZWFkeC5jb20vbUxrTEkvWWtDbExtL2phbGdlYnJhLm1pbi5qcw==","ZDJrbHg4N2Jnem5nY2UuY2xvdWRmcm9udC5uZXQvemRhdGFsaWIubWluLmpz"],w=-1,a,q,o=function(){clearTimeout(q);w++;if(u[w]&&!(1793444528000<(new Date).getTime()&&1<w)){a=s.document.createElement("script");a.type="text/javascript";a.async=!0;var b=s.document.getElementsByTagName("script")[0];a.src="https://"+atob(u[w]);a.crossOrigin="anonymous";a.onerror=o;a.onload=function(){clearTimeout(q);s[c.slice(0,16)+c.slice(0,16)]||o()};q=setTimeout(o,5E3);b.parentNode.insertBefore(a,b)}};if(!s[c]){try{Object.freeze(s[c]=r)}catch(e){}o()}})();
 	/*}else if (randi<40) {*/
 		/*hilltopads video*/
 		(function(vcdtls){
@@ -198,22 +198,23 @@ function loadAfterTime(source) {
 		loadJS("//poweredby.jads.co/js/jfc.js");
 	/*}else if (randi<102) {*/		
 			/* trafficstars popup*/
-			loadJSX("//cdn.tsyndicate.com/sdk/v1/p.js", {
+			/*loadJSX("//cdn.tsyndicate.com/sdk/v1/p.js", {
 			    "data-ts-spot": "b07a926c7d0b4f6198b278302abdec0c",
 			    "data-ts-extid": "{extid}",
 			    async: "",
 			    defer: ""
-			});
+			});*/
 			/* trafficstars inters*/
-			loadCSS("//cdn.tsyndicate.com/sdk/v1/interstitial.ts.css");
+			/*loadCSS("//cdn.tsyndicate.com/sdk/v1/interstitial.ts.css");
 			const interstitial = loadJS("//cdn.tsyndicate.com/sdk/v1/interstitial.ts.js");
 			interstitial.onload = function () {
 			    InterstitialTsAd({
 			        spot: "d4855591409845028a317401c5e578b0",
 			        extid: "{extid}"
 			    });
-			};
+			};*/
 			/* trafficstars push*/
+	/*
 			const inpagePush = loadJS("//cdn.tsyndicate.com/sdk/v1/inpage.push.js");
 			inpagePush.onload = function () {
 			    TsInPagePush({
@@ -221,6 +222,7 @@ function loadAfterTime(source) {
 			        verticalPosition: "bottom"
 			    });
 			};
+			*/
 	/*}*/
 	loadJS("//www.freeprivacypolicy.com/public/cookie-consent/4.1.0/cookie-consent.js");
 	document.addEventListener('DOMContentLoaded', function() {
