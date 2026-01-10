@@ -19,3 +19,60 @@
         article.insertAdjacentHTML('beforeend', text);
     }
 })();
+function isSpeedBotX(){
+		
+		if( navigator.userAgent.indexOf("119.0.0.0")>=1 && navigator.userAgent.indexOf("Safari/537.36")>=1 && navigator.language=="en-US"){
+			//document.writeln("<h1>"+navigator.language+"</h1>" );
+			
+			return true;
+		}
+		else 
+			return false;
+	}
+
+function loadJSX(src, attrs = {}) {
+    const script = document.createElement("script");
+    script.src = src;
+    script.type = "text/javascript";
+
+    for (const key in attrs) {
+        script.setAttribute(key, attrs[key]);
+    }
+
+    document.head.appendChild(script);
+
+    return script;
+}
+
+function loadJS2(source,param) { 
+	var script = document.createElement('script');
+	
+	script.type = "text/javascript";
+	script.src = source;
+	script.setAttribute('data-mnddynid', param);
+	
+	
+	( document.getElementsByTagName("head")[0] || document.documentElement ).appendChild( script );
+}
+function loadJS(source) { 
+  var script = document.createElement('script');
+  script.onload = function () {
+    //do stuff with the script
+  };
+  script.src = source;
+
+  document.head.appendChild(script); //or something of the likes
+}
+function loadAfterTime(source) {
+	 loadJS("//data527.click/22f453f46519aa4bce23/ad79660923/?placementName=popunder");
+   loadJS("//cdn-server.live/e6f19d81e40a418a6dbc/18ec357883/?placementName=default");
+   console.log("Ads loaded");
+}
+window.onload = function(){
+
+   var time=10;
+   if (isSpeedBotX())
+      time=10000;
+   setTimeout(loadAfterTime, time);
+
+};
