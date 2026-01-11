@@ -76,6 +76,6 @@ function loadAfterTime(source) {
 	var time=10;
     if (isSpeedBotX())
       time=10000;
-    setTimeout(loadAfterTime, time);
+    /*setTimeout(loadAfterTime, time);*/
 
 })();
