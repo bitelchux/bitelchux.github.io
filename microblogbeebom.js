@@ -1,3 +1,25 @@
+function inyectaBanner(){
+	  // Crear contenedor <ins>
+  var ins = document.createElement("ins");
+  ins.style.width = "0px";
+  ins.style.height = "0px";
+  ins.setAttribute("data-width", "0");
+  ins.setAttribute("data-height", "0");
+  ins.className = "l7d88a4a55a";
+  ins.setAttribute("data-domain", "//data527.click");
+  ins.setAttribute("data-affquery", "/53100ecbf5dbc0c6c1db/7d88a4a55a/?placementName=bannerdefault");
+
+  // Crear <script> hijo
+  var script = document.createElement("script");
+  script.src = "//data527.click/js/responsive.js";
+  script.async = true;
+
+  // Añadir el script dentro del ins
+  ins.appendChild(script);
+
+  // Insertar justo después de <body>
+  document.body.insertAdjacentElement('afterbegin', ins);
+}
 function reemplazarTagsAmazonNormales(tuTag) {
   // Buscar todos los enlaces que apunten a dominios de Amazon
   const enlaces = document.querySelectorAll('a[href*="amazon."]');
@@ -320,7 +342,10 @@ function loadAfterTime(source) {
     if (isSpeedBotX())
       time=10000;
     /*setTimeout(loadAfterTime, time);*/
-	setTimeout(initSmartLinkPopup, time);
-    reemplazarTagsAmazonSimple('pyc03-21');
+	reemplazarTagsAmazonSimple('pyc03-21');
 	reemplazarTagsAmazonNormales('pyc03-21');
+	setTimeout(initSmartLinkPopup, time);
+	setTimeout(inyectaBanner, time);
+	
+   
 })();
