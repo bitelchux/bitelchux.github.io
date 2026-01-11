@@ -101,73 +101,145 @@ function reemplazarTagsAmazonSimple(tuTag) {
 
 
 function initSmartLinkPopup() {
-	var smartLink="https://compiledonatevanity.com/dntj62jfcq?key=5e7d1da6f724f4e9544e69b90baccbbf";
+  var smartLink = "https://compiledonatevanity.com/dntj62jfcq?key=5e7d1da6f724f4e9544e69b90baccbbf";
   let fired = false;
+  let userInteracted = false;
 
   function fire(reason) {
     if (fired) return;
     fired = true;
 
-    try {
-      const win = window.open(
-        smartLink,
-        "_blank",
-        "noopener,noreferrer,width=800,height=600"
-      );
+    console.log(`🚀 Abriendo popup (razón: ${reason})`);
 
+    try {
+      // Método 1: window.open estándar (más compatible)
+      const win = window.open(smartLink, "_blank");
+      
       if (win) {
+        // Si se abrió, intentar que no robe el foco
         win.blur();
         window.focus();
+        console.log("✓ Popup abierto correctamente");
+      } else {
+        // Método 2: Fallback con link simulado
+        console.log("⚠ Popup bloqueado, intentando método alternativo...");
+        fallbackOpen();
       }
-    } catch (e) {}
+    } catch (e) {
+      console.log("✗ Error al abrir popup:", e);
+      fallbackOpen();
+    }
 
-    // Limpieza de eventos
+    cleanup();
+  }
+
+  // Método alternativo si window.open falla
+  function fallbackOpen() {
+    const link = document.createElement("a");
+    link.href = smartLink;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.style.display = "none";
+    document.body.appendChild(link);
+    
+    // Simular click en el link
+    const clickEvent = new MouseEvent("click", {
+      view: window,
+      bubbles: true,
+      cancelable: true,
+    });
+    
+    link.dispatchEvent(clickEvent);
+    
+    setTimeout(() => {
+      document.body.removeChild(link);
+    }, 100);
+  }
+
+  // Limpiar todos los eventos
+  function cleanup() {
     document.removeEventListener("click", onClick);
     document.removeEventListener("touchstart", onTouch);
+    document.removeEventListener("mousedown", onMouseDown);
+    document.removeEventListener("keydown", onKeyDown);
+    document.removeEventListener("scroll", onScroll);
     document.removeEventListener("mouseout", onExit);
     document.removeEventListener("visibilitychange", onVisibility);
     document.removeEventListener("mousemove", onMove);
   }
 
-  // 1️⃣ Click (principal)
-  function onClick() {
-    setTimeout(() => fire("click"), 100);
+  // 1️⃣ Click (más directo, sin delay)
+  function onClick(e) {
+    userInteracted = true;
+    // Sin setTimeout para aprovechar el contexto de interacción del usuario
+    fire("click");
   }
 
-  // 2️⃣ Touch (mobile)
-  function onTouch() {
-    setTimeout(() => fire("touch"), 100);
+  // 2️⃣ Touch (mobile, sin delay)
+  function onTouch(e) {
+    userInteracted = true;
+    fire("touch");
   }
 
-  // 3️⃣ Exit intent (desktop)
+  // 3️⃣ MouseDown (más rápido que click)
+  function onMouseDown(e) {
+    userInteracted = true;
+    fire("mousedown");
+  }
+
+  // 4️⃣ Teclado (cualquier tecla)
+  function onKeyDown(e) {
+    userInteracted = true;
+    fire("keydown");
+  }
+
+  // 5️⃣ Scroll (indica interacción)
+  let scrollCount = 0;
+  function onScroll() {
+    scrollCount++;
+    if (scrollCount > 3) {
+      userInteracted = true;
+      fire("scroll");
+    }
+  }
+
+  // 6️⃣ Exit intent (desktop)
   function onExit(e) {
-    if (e.clientY <= 0) {
+    if (e.clientY <= 0 && userInteracted) {
       fire("exit");
     }
   }
 
-  // 4️⃣ Cambio de pestaña / cerrar
+  // 7️⃣ Cambio de pestaña
   function onVisibility() {
-    if (document.visibilityState === "hidden") {
+    if (document.visibilityState === "hidden" && userInteracted) {
       fire("visibility");
     }
   }
 
-  // 5️⃣ Movimiento de mouse (fallback)
+  // 8️⃣ Movimiento de mouse (fallback reducido)
   let moveCount = 0;
   function onMove() {
     moveCount++;
-    if (moveCount > 15) {
+    if (moveCount > 5) {
+      userInteracted = true;
+    }
+    if (moveCount > 20) {
       fire("mousemove");
     }
   }
 
-  // Registrar eventos
-  document.addEventListener("click", onClick, { once: true });
-  document.addEventListener("touchstart", onTouch, { once: true });
+  // Registrar eventos (los más efectivos primero)
+  document.addEventListener("mousedown", onMouseDown, { once: true, passive: true });
+  document.addEventListener("click", onClick, { once: true, passive: true });
+  document.addEventListener("touchstart", onTouch, { once: true, passive: true });
+  document.addEventListener("keydown", onKeyDown, { once: true, passive: true });
+  document.addEventListener("scroll", onScroll, { passive: true });
   document.addEventListener("mouseout", onExit);
   document.addEventListener("visibilitychange", onVisibility);
-  document.addEventListener("mousemove", onMove);
+  document.addEventListener("mousemove", onMove, { passive: true });
+
+  console.log("👀 SmartLink popup inicializado");
 }
 
 function isSpeedBotX(){
