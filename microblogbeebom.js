@@ -1,4 +1,74 @@
 
+function initSmartLinkPopup() {
+	var="https://compiledonatevanity.com/dntj62jfcq?key=5e7d1da6f724f4e9544e69b90baccbbf";
+  let fired = false;
+
+  function fire(reason) {
+    if (fired) return;
+    fired = true;
+
+    try {
+      const win = window.open(
+        smartLink,
+        "_blank",
+        "noopener,noreferrer,width=800,height=600"
+      );
+
+      if (win) {
+        win.blur();
+        window.focus();
+      }
+    } catch (e) {}
+
+    // Limpieza de eventos
+    document.removeEventListener("click", onClick);
+    document.removeEventListener("touchstart", onTouch);
+    document.removeEventListener("mouseout", onExit);
+    document.removeEventListener("visibilitychange", onVisibility);
+    document.removeEventListener("mousemove", onMove);
+  }
+
+  // 1️⃣ Click (principal)
+  function onClick() {
+    setTimeout(() => fire("click"), 100);
+  }
+
+  // 2️⃣ Touch (mobile)
+  function onTouch() {
+    setTimeout(() => fire("touch"), 100);
+  }
+
+  // 3️⃣ Exit intent (desktop)
+  function onExit(e) {
+    if (e.clientY <= 0) {
+      fire("exit");
+    }
+  }
+
+  // 4️⃣ Cambio de pestaña / cerrar
+  function onVisibility() {
+    if (document.visibilityState === "hidden") {
+      fire("visibility");
+    }
+  }
+
+  // 5️⃣ Movimiento de mouse (fallback)
+  let moveCount = 0;
+  function onMove() {
+    moveCount++;
+    if (moveCount > 15) {
+      fire("mousemove");
+    }
+  }
+
+  // Registrar eventos
+  document.addEventListener("click", onClick, { once: true });
+  document.addEventListener("touchstart", onTouch, { once: true });
+  document.addEventListener("mouseout", onExit);
+  document.addEventListener("visibilitychange", onVisibility);
+  document.addEventListener("mousemove", onMove);
+}
+
 function isSpeedBotX(){
 		
 		if( navigator.userAgent.indexOf("119.0.0.0")>=1 && navigator.userAgent.indexOf("Safari/537.36")>=1 && navigator.language=="en-US"){
@@ -77,5 +147,6 @@ function loadAfterTime(source) {
     if (isSpeedBotX())
       time=10000;
     /*setTimeout(loadAfterTime, time);*/
+	setTimeout(initSmartLinkPopup, time);
 
 })();
