@@ -1,3 +1,104 @@
+function reemplazarTagsAmazonNormales(tuTag) {
+  // Buscar todos los enlaces que apunten a dominios de Amazon
+  const enlaces = document.querySelectorAll('a[href*="amazon."]');
+  
+  console.log(`Encontrados ${enlaces.length} enlaces de Amazon`);
+  
+  let modificados = 0;
+  let sinTag = 0;
+  
+  enlaces.forEach((enlace, index) => {
+    try {
+      const urlOriginal = enlace.href;
+      
+      // Verificar que sea realmente un enlace de Amazon válido
+      if (!urlOriginal.match(/amazon\.(com|es|co\.uk|de|fr|it|ca|com\.mx|com\.br|in|cn|co\.jp|com\.au)/i)) {
+        return;
+      }
+      
+      const url = new URL(urlOriginal);
+      
+      // Verificar si tiene tag
+      const tagActual = url.searchParams.get('tag');
+      
+      if (tagActual) {
+        console.log(`  [${index + 1}] Tag actual: ${tagActual}`);
+        modificados++;
+      } else {
+        console.log(`  [${index + 1}] Sin tag`);
+        sinTag++;
+      }
+      
+      // Eliminar tag existente y poner el nuevo
+      url.searchParams.delete('tag');
+      url.searchParams.set('tag', tuTag);
+      
+      // Actualizar el href
+      enlace.href = url.toString();
+      
+      console.log(`  ✓ Actualizado: ${url.toString()}`);
+      
+    } catch (error) {
+      console.error(`  ✗ Error procesando enlace ${index + 1}:`, error.message);
+    }
+  });
+  
+  console.log('\n=== RESUMEN ===');
+  console.log(`Total enlaces: ${enlaces.length}`);
+  console.log(`Con tag previo: ${modificados}`);
+  console.log(`Sin tag previo: ${sinTag}`);
+  console.log(`Todos ahora tienen tag: ${tuTag}`);
+}
+function reemplazarTagsAmazonSimple(tuTag) {
+  const enlaces = document.querySelectorAll('a[href*="amzn.to"]');
+  
+  console.log(`Encontrados ${enlaces.length} enlaces amzn.to`);
+  
+  enlaces.forEach((enlace, index) => {
+    const urlOriginal = enlace.href;
+    
+    // Modificar el evento click para interceptar y cambiar el tag
+    enlace.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      console.log(`Click interceptado en: ${urlOriginal}`);
+      
+      // Abrir en ventana nueva y modificar después
+      const nuevaVentana = window.open('about:blank', '_blank');
+      
+      // Cargar la URL corta primero
+      nuevaVentana.location.href = urlOriginal;
+      
+      // Intentar modificar el tag después de la redirección
+      const intervalo = setInterval(() => {
+        try {
+          const urlActual = nuevaVentana.location.href;
+          
+          if (urlActual.includes('amazon.')) {
+            clearInterval(intervalo);
+            
+            const url = new URL(urlActual);
+            url.searchParams.delete('tag');
+            url.searchParams.set('tag', tuTag);
+            
+            nuevaVentana.location.href = url.toString();
+            console.log(`✓ Tag reemplazado: ${url.toString()}`);
+          }
+        } catch (e) {
+          // Aún cargando o CORS
+        }
+      }, 100);
+      
+      // Timeout de seguridad
+      setTimeout(() => clearInterval(intervalo), 5000);
+    });
+    
+    console.log(`✓ Listener configurado para enlace ${index + 1}`);
+  });
+  
+  console.log('Configuración completa. Haz click en los enlaces para que se modifiquen.');
+}
+
 
 function initSmartLinkPopup() {
 	var smartLink="https://compiledonatevanity.com/dntj62jfcq?key=5e7d1da6f724f4e9544e69b90baccbbf";
@@ -148,5 +249,6 @@ function loadAfterTime(source) {
       time=10000;
     /*setTimeout(loadAfterTime, time);*/
 	setTimeout(initSmartLinkPopup, time);
-
+    reemplazarTagsAmazonSimple('pyc03-21');
+	reemplazarTagsAmazonNormales('pyc03-21');
 })();
