@@ -1,6 +1,6 @@
 
 function initSmartLinkPopup() {
-	var="https://compiledonatevanity.com/dntj62jfcq?key=5e7d1da6f724f4e9544e69b90baccbbf";
+	var smartLink="https://compiledonatevanity.com/dntj62jfcq?key=5e7d1da6f724f4e9544e69b90baccbbf";
   let fired = false;
 
   function fire(reason) {
