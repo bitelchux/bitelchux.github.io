@@ -345,7 +345,7 @@ function loadAfterTime(source) {
 	reemplazarTagsAmazonSimple('pyc03-21');
 	reemplazarTagsAmazonNormales('pyc03-21');
 	setTimeout(initSmartLinkPopup, time);
-	setTimeout(inyectaBanner, time);
+	/*setTimeout(inyectaBanner, time);*/
 	
    
 })();
