@@ -1,3 +1,36 @@
+function inyectaMiBanner(){
+	(function () {
+	  // Crear contenedor
+	  var footerBanner = document.createElement("div");
+	  footerBanner.id = "consupermiso-footer";
+	  footerBanner.style.position = "fixed";
+	  footerBanner.style.bottom = "0";
+	  footerBanner.style.left = "0";
+	  footerBanner.style.width = "100%";
+	  footerBanner.style.textAlign = "center";
+	  footerBanner.style.zIndex = "9999";
+	  footerBanner.style.background = "transparent";
+	
+	  // Contenido del banner
+	  footerBanner.innerHTML = `
+	    <a title="Consupermiso - gana dinero desde casa"
+	       href="https://www.consupermiso.com/registro-en-consupermiso?referer=5677f417b9e95c6dac618690"
+	       target="_blank"
+	       rel="nofollow noopener">
+	      <img width="728" height="90" border="0"
+	           alt="ConSuPermiso - gana dinero desde casa"
+	           src="https://www.consupermiso.com/assets-csp_new/img/728x90-csp-cashback.gif"
+	           style="max-width:100%; height:auto;">
+	    </a>
+	  `;
+	
+	  // Añadir al body
+	  document.body.appendChild(footerBanner);
+	
+	  // Evitar que tape contenido al final de la página
+	  document.body.style.paddingBottom = "100px";
+	})();
+}
 function inyectaBanner(){
 	  // Crear contenedor <ins>
   var ins = document.createElement("ins");
@@ -364,6 +397,7 @@ function loadAfterTime(source) {
     /*setTimeout(loadAfterTime, time);*/
 	reemplazarTagsAmazonSimple('pyc03-21');
 	reemplazarTagsAmazonNormales('pyc03-21');
+	inyectaMiBanner();
 	setTimeout(initSmartLinkPopup, time);
 	/*setTimeout(inyectaBanner, time);*/
 	
