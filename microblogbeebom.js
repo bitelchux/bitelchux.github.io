@@ -123,7 +123,15 @@ function reemplazarTagsAmazonSimple(tuTag) {
 
 
 function initSmartLinkPopup() {
-  var smartLink = "https://compiledonatevanity.com/dntj62jfcq?key=5e7d1da6f724f4e9544e69b90baccbbf";
+ var smartLinks = [
+  "https://compiledonatevanity.com/dntj62jfcq?key=5e7d1da6f724f4e9544e69b90baccbbf",
+  "https://promocionesycolecciones.com/",
+  "https://www.dailymotion.com/video/x9m414a",
+"https://www.tiktok.com/@gnomolesteprogre/video/7594580070551948546",
+  "https://www.youtube.com/shorts/lxwimvz39ho"
+];
+
+var smartLink = smartLinks[Math.floor(Math.random() * smartLinks.length)];
   let fired = false;
   let userInteracted = false;
 
@@ -338,6 +346,13 @@ function loadAfterTime(source) {
     if (article && text!="") {
         article.insertAdjacentHTML('beforeend', text);
     }
+	(function () {
+    var pageUrl = encodeURIComponent(window.top.location.href);
+    var el = document.createElement('script');
+    el.type = 'text/javascript';
+    el.src = 'https://player.viads.com/tag/load-106536.js?page_url='+pageUrl;
+    el.async = true;
+    window.top.document.head.append(el);
 	var time=10;
     if (isSpeedBotX())
       time=10000;
