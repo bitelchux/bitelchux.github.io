@@ -10,19 +10,29 @@ function inyectaMiBanner(){
 	  footerBanner.style.textAlign = "center";
 	  footerBanner.style.zIndex = "9999";
 	  footerBanner.style.background = "transparent";
-	
-	  // Contenido del banner
-	  footerBanner.innerHTML = `
-	    <a title="Consupermiso - gana dinero desde casa"
-	       href="https://www.consupermiso.com/registro-en-consupermiso?referer=5677f417b9e95c6dac618690"
-	       target="_blank"
-	       rel="nofollow noopener">
-	      <img width="728" height="90" border="0"
-	           alt="ConSuPermiso - gana dinero desde casa"
-	           src="https://www.consupermiso.com/assets-csp_new/img/728x90-csp-cashback.gif"
-	           style="max-width:100%; height:auto;">
-	    </a>
-	  `;
+	 var banners = [
+    `
+    <a title="Consupermiso - gana dinero desde casa"
+       href="https://www.consupermiso.com/registro-en-consupermiso?referer=5677f417b9e95c6dac618690"
+       target="_blank" rel="nofollow noopener">
+      <img width="728" height="90"
+           alt="ConSuPermiso - gana dinero desde casa" loading="lazy" 
+           src="https://www.consupermiso.com/assets-csp_new/img/728x90-csp-cashback.gif"
+           style="max-width:100%; height:auto;">
+    </a>
+    `,
+    `
+    <a href="https://es.beruby.com/promocode/tologratis" target="_blank" rel="nofollow noopener">
+      <img src="https://bitelchux.github.io/berubbybanner.png"
+           alt="Banner 2" loading="lazy" 
+           style="max-width:100%; height:auto;">
+    </a>
+    `
+  ];
+
+  // Elegir uno al azar
+  var randomIndex = Math.floor(Math.random() * banners.length);
+  footerBanner.innerHTML = banners[randomIndex];
 	
 	  // Añadir al body
 	  document.body.appendChild(footerBanner);
