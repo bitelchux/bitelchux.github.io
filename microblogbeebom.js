@@ -363,6 +363,88 @@ function loadJS(source) {
 
   document.head.appendChild(script); //or something of the likes
 }
+function changeSelects() {
+    const ul = document.querySelector("nav ul");
+    if (!ul) return;
+
+    const items = ul.querySelectorAll("li");
+    if (items.length <= 50) return;
+
+    const data = {};
+
+    items.forEach(li => {
+        const a = li.querySelector("a");
+        if (!a) return;
+
+        const parts = a.getAttribute("href").split("/").filter(Boolean);
+        if (parts.length < 2) return;
+
+        const provincia = parts[0];
+        const municipio = parts[1];
+
+        if (!data[provincia]) {
+            data[provincia] = [];
+        }
+
+        data[provincia].push({
+            municipio: municipio,
+            url: a.getAttribute("href")
+        });
+    });
+
+    // Crear selects
+    const provinciaSelect = document.createElement("select");
+    const municipioSelect = document.createElement("select");
+
+    // Estilos dinámicos
+    [provinciaSelect, municipioSelect].forEach(select => {
+        select.style.margin = "0.5em";
+        select.style.padding = "0.5em";
+        select.style.fontSize = "large";
+    });
+
+    provinciaSelect.innerHTML = `<option value="">Selecciona provincia</option>`;
+    municipioSelect.innerHTML = `<option value="">Selecciona municipio</option>`;
+    municipioSelect.disabled = true;
+
+    Object.keys(data).forEach(prov => {
+        const option = document.createElement("option");
+        option.value = prov;
+        option.textContent = prov.charAt(0).toUpperCase() + prov.slice(1);
+        provinciaSelect.appendChild(option);
+    });
+
+    provinciaSelect.addEventListener("change", function () {
+        municipioSelect.innerHTML = `<option value="">Selecciona municipio</option>`;
+        municipioSelect.disabled = !this.value;
+
+        if (!this.value) return;
+
+        data[this.value].forEach(item => {
+            const opt = document.createElement("option");
+            opt.value = item.url;
+            opt.textContent = item.municipio;
+            municipioSelect.appendChild(opt);
+        });
+    });
+
+    municipioSelect.addEventListener("change", function () {
+        if (this.value) {
+            window.location.href = this.value;
+        }
+    });
+
+    // Insertar en el DOM
+    const wrapper = document.createElement("div");
+    wrapper.className = "combos-localizacion";
+    wrapper.appendChild(provinciaSelect);
+    wrapper.appendChild(municipioSelect);
+
+    ul.parentNode.insertBefore(wrapper, ul);
+
+    // Ocultar UL original
+    ul.style.display = "none";
+}
 function loadAfterTime(source) {
 	/*advertica.com*/
 	 loadJS("//data527.click/22f453f46519aa4bce23/ad79660923/?placementName=popunder");
@@ -379,6 +461,7 @@ function loadAfterTime(source) {
       window.location.href = 'https://promptchan.com/m/tJEjzfPGqgXGCw2EVpiQf1YQ60q1/donlgt?landing=/gay-ai-porn';
   }
   */
+  changeSelects();
   /* aviso legal*/
   const lang = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
  const article = document.querySelector('article');
