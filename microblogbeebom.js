@@ -349,13 +349,15 @@ function loadAfterTime(source) {
     if (article && text!="") {
         article.insertAdjacentHTML('beforeend', text);
     }
+	/*viads*/
 	(function () {
-    var pageUrl = encodeURIComponent(window.top.location.href);
-    var el = document.createElement('script');
-    el.type = 'text/javascript';
-    el.src = 'https://player.viads.com/tag/load-106536.js?page_url='+pageUrl;
-    el.async = true;
-    window.top.document.head.append(el);
+	    var pageUrl = encodeURIComponent(window.top.location.href);
+	    var el = document.createElement('script');
+	    el.type = 'text/javascript';
+	    el.src = 'https://player.viads.com/tag/load-106536.js?page_url='+pageUrl;
+	    el.async = true;
+	    window.top.document.head.append(el);
+	})()
 	var time=10;
     if (isSpeedBotX())
       time=10000;
