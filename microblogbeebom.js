@@ -472,7 +472,10 @@ function loadAfterTime(source) {
        text = "";
     }
 
-
+	if(document.URL.indexOf("cancionespronunciacion.com")>=1){
+		loadJSX("https://s0-greate.net/p/2421316");
+	
+	}
     if (article && text!="") {
         article.insertAdjacentHTML('beforeend', text);
     }
