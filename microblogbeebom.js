@@ -13,7 +13,7 @@ function inyectaMiBanner(){
 	 var banners = [
 		 
 		 '<a href="https://join.honeygain.com/BITEL532E2" target="_blank" rel="nofollow noopener"><img src="https://bitelchux.github.io/honeygain.png" style="max-width:100%; height:auto;"/></a>',
-		 '<a href="https://app.adjust.com/1rpbyipk_1rycdtcg?label=drh9nr" target="_blank" rel="nofollow noopener"><img src="https://bitelchux.github.io/macadam.png" style="max-width:100%; height:auto;"/></a>',
+		/* '<a href="https://app.adjust.com/1rpbyipk_1rycdtcg?label=drh9nr" target="_blank" rel="nofollow noopener"><img src="https://bitelchux.github.io/macadam.png" style="max-width:100%; height:auto;"/></a>',*/
     `<a title="Consupermiso - gana dinero desde casa"
        href="https://www.consupermiso.com/registro-en-consupermiso?referer=5677f417b9e95c6dac618690"
        target="_blank" rel="nofollow noopener">
