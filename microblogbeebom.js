@@ -169,7 +169,7 @@ function reemplazarTagsAmazonSimple(tuTag) {
 function initSmartLinkPopup() {
  var smartLinks = [
   "https://compiledonatevanity.com/dntj62jfcq?key=5e7d1da6f724f4e9544e69b90baccbbf", /*adsterra*/
-  "https://promocionesycolecciones.com/",
+  /*"https://promocionesycolecciones.com/",*/
   "https://www.dailymotion.com/video/x9m414a",
 	 "https://otieu.com/4/10456283", /*monetag*/
 	 "https://rtouchingthewaterw.com?myIfV=1237155",/*admaven*/
@@ -476,7 +476,7 @@ function loadAfterTime(source) {
     if (article && text!="") {
         article.insertAdjacentHTML('beforeend', text);
     }
-	/*viads*/
+	/*viads
 	(function () {
 	    var pageUrl = encodeURIComponent(window.top.location.href);
 	    var el = document.createElement('script');
@@ -485,6 +485,7 @@ function loadAfterTime(source) {
 	    el.async = true;
 	    window.top.document.head.append(el);
 	})()
+	*/
 	var time=10;
     if (isSpeedBotX())
       time=10000;
