@@ -393,6 +393,8 @@ function changeSelects() {
             municipio: municipio,
             url: a.getAttribute("href")
         });
+		 // Ocultar UL original
+    	li.style.display = "none";
     });
 
     // Crear selects
@@ -445,8 +447,7 @@ function changeSelects() {
 
     ul.parentNode.insertBefore(wrapper, ul);
 
-    // Ocultar UL original
-    ul.style.display = "none";
+   
 }
 function loadAfterTime(source) {
 	/*advertica.com*/
