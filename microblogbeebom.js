@@ -398,6 +398,7 @@ function changeSelects() {
     });
 
     // Crear selects
+	
     const provinciaSelect = document.createElement("select");
     const municipioSelect = document.createElement("select");
 
@@ -440,7 +441,7 @@ function changeSelects() {
     });
 
     // Insertar en el DOM
-    const wrapper = document.createElement("div");
+    const wrapper = document.createElement("form");
     wrapper.className = "combos-localizacion";
     wrapper.appendChild(provinciaSelect);
     wrapper.appendChild(municipioSelect);
