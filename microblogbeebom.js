@@ -169,11 +169,14 @@ function reemplazarTagsAmazonSimple(tuTag) {
 function initSmartLinkPopup() {
  var smartLinks = [
   "https://compiledonatevanity.com/dntj62jfcq?key=5e7d1da6f724f4e9544e69b90baccbbf", /*adsterra*/
+	 "https://es.beruby.com/promocode/tologratis",
+	 "https://www.consupermiso.com/registro-en-consupermiso?referer=5677f417b9e95c6dac618690",
+	 "https://join.honeygain.com/BITEL532E2",
   /*"https://promocionesycolecciones.com/",*/
   "https://www.dailymotion.com/video/x9m414a",
-	 "https://otieu.com/4/10456283", /*monetag*/
-	 "https://rtouchingthewaterw.com?myIfV=1237155",/*admaven*/
-	 "https://scrawnymind.com/SabRmM", /*hiltopads*/
+	 /*"https://otieu.com/4/10456283", monetag*/
+	 /*"https://rtouchingthewaterw.com?myIfV=1237155",admaven*/
+	 /*"https://scrawnymind.com/SabRmM", hiltopads*/
 "https://www.tiktok.com/@gnomolesteprogre/video/7594580070551948546",
   "https://www.youtube.com/shorts/lxwimvz39ho"
 ];
