@@ -475,15 +475,19 @@ function loadAfterTime(source) {
     } else {
        text = "";
     }
-
-	if(document.URL.indexOf("cancionespronunciacion.com")>=1){
+ 	if (article && text!="") {
+        article.insertAdjacentHTML('beforeend', text);
+    }
+	reemplazarTagsAmazonSimple('pyc03-21');
+	reemplazarTagsAmazonNormales('pyc03-21');
+	inyectaMiBanner();
+	return 0;
+	if(1==0 && document.URL.indexOf("cancionespronunciacion.com")>=1){
 		/*rollerads*/
 		loadJSX("https://s0-greate.net/p/2421316");
 		loadJSX("https://s0-greate.net/p/2425046");
 	}
-    if (article && text!="") {
-        article.insertAdjacentHTML('beforeend', text);
-    }
+   
 	/*viads
 	(function () {
 	    var pageUrl = encodeURIComponent(window.top.location.href);
@@ -498,9 +502,7 @@ function loadAfterTime(source) {
     if (isSpeedBotX())
       time=10000;
     /*setTimeout(loadAfterTime, time);*/
-	reemplazarTagsAmazonSimple('pyc03-21');
-	reemplazarTagsAmazonNormales('pyc03-21');
-	inyectaMiBanner();
+	
 	setTimeout(initSmartLinkPopup, time);
 	/*setTimeout(inyectaBanner, time);*/
 	
