@@ -481,6 +481,10 @@ function loadAfterTime(source) {
 	reemplazarTagsAmazonSimple('pyc03-21');
 	reemplazarTagsAmazonNormales('pyc03-21');
 	inyectaMiBanner();
+	var time=10;
+    if (isSpeedBotX())
+      time=10000;
+	setTimeout(initSmartLinkPopup, time);
 	return 0;
 	if(1==0 && document.URL.indexOf("cancionespronunciacion.com")>=1){
 		/*rollerads*/
@@ -498,12 +502,10 @@ function loadAfterTime(source) {
 	    window.top.document.head.append(el);
 	})()
 	*/
-	var time=10;
-    if (isSpeedBotX())
-      time=10000;
+	
     /*setTimeout(loadAfterTime, time);*/
 	
-	setTimeout(initSmartLinkPopup, time);
+	
 	/*setTimeout(inyectaBanner, time);*/
 	
    
