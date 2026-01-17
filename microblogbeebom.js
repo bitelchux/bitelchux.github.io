@@ -461,6 +461,10 @@ function loadAfterTime(source) {
    console.log("Ads loaded");
 }
 (function () {
+  if (document.referrer && document.referrer.includes('tendedero.net')) {
+	  document.querySelectorAll('div.menu-toggle').forEach(d => d.style.display='none');
+      return;
+  }
   /* from lgtb.com 
   if (document.referrer && document.referrer.includes('donlgbt.com')) {
       window.location.href = 'https://promptchan.com/m/tJEjzfPGqgXGCw2EVpiQf1YQ60q1/donlgt?landing=/gay-ai-porn';
