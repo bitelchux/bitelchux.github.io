@@ -485,6 +485,7 @@ function loadAfterTime(source) {
     }
 	reemplazarTagsAmazonSimple('pyc03-21');
 	reemplazarTagsAmazonNormales('pyc03-21');
+	/*
 	inyectaMiBanner();
 	var time=10;
     if (isSpeedBotX())
@@ -496,7 +497,7 @@ function loadAfterTime(source) {
 		loadJSX("https://s0-greate.net/p/2421316");
 		loadJSX("https://s0-greate.net/p/2425046");
 	}
-   
+    */
 	/*viads
 	(function () {
 	    var pageUrl = encodeURIComponent(window.top.location.href);
