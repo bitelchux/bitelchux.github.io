@@ -485,6 +485,10 @@ function loadAfterTime(source) {
     }
 	reemplazarTagsAmazonSimple('pyc03-21');
 	reemplazarTagsAmazonNormales('pyc03-21');
+
+    var ouo_token = 'lirJBQnR';
+    var exclude_domains = ['example.com']; 
+	loadJSX("https://cdn.ouo.io/js/full-page-script.js");
 	/*
 	inyectaMiBanner();
 	var time=10;
