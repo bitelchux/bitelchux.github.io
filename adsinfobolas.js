@@ -141,11 +141,12 @@ function tienesmasde18(){
 var juicy_adzone = '1037514';
 function loadAfterTime(source) {
 	tienesmasde18();
+	
+
+	/*
 	var ouo_token = 'lirJBQnR';
 	var exclude_domains = ['example.com']; 
 	loadJSX("https://cdn.ouo.io/js/full-page-script.js");
-	return;
-	/*
 	loadJS2("//ss.mrmnd.com/dynamic.js","4923d013-8239-4362-985e-a017c5023cb8");
 	loadJS2("//ss.mrmnd.com/dynamic.js","a5d11fd3-d6d7-4261-8b24-636bc8f420e8");
 	loadJS2("//ss.mrmnd.com/dynamic.js","ea51f9fc-365f-4a9d-ba21-5f2635ae5179");
