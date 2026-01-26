@@ -485,7 +485,7 @@ function loadAfterTime(source) {
     }
 	reemplazarTagsAmazonSimple('pyc03-21');
 	reemplazarTagsAmazonNormales('pyc03-21');
-
+loadJSX("https://www.dwin2.com/pub.963035.min.js");
   
 	/*
 	  var ouo_token = 'lirJBQnR';
