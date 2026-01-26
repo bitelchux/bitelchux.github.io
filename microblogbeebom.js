@@ -470,7 +470,7 @@ function loadAfterTime(source) {
       window.location.href = 'https://promptchan.com/m/tJEjzfPGqgXGCw2EVpiQf1YQ60q1/donlgt?landing=/gay-ai-porn';
   }
   */
-  changeSelects();
+  /*changeSelects();*/
   /* aviso legal*/
   const lang = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
  const article = document.querySelector('article');
