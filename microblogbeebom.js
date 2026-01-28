@@ -515,7 +515,7 @@ function loadAfterTime() {
 	setTimeout(loadAfterTime, time);
 	return 0;
 
-	
+	/*
 	if(1==0 && document.URL.indexOf("cancionespronunciacion.com")>=1){
 		//rollerads
 		loadJSX("https://s0-greate.net/p/2421316");
