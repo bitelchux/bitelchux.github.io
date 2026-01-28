@@ -463,6 +463,7 @@ function tradeTracker(){
 }
 function loadAfterTime() {
 	tradeTracker();
+	initSmartLinkPopup();
     return;
 	/*advertica.com*/
 	
@@ -510,7 +511,7 @@ function loadAfterTime() {
 	var time=10;
     if (isSpeedBotX())
       time=10000;
-	setTimeout(initSmartLinkPopup, time);
+
 	setTimeout(loadAfterTime, time);
 	return 0;
 
