@@ -458,6 +458,7 @@ function tradeTracker(){
 		chk: '27177eea41cbfee01bad606470734d9c',
 		overrideOptions: {}
 	};
+	window._TradeTrackerTagOptions=_TradeTrackerTagOptions;
 	(function() {var tt = document.createElement('script'), s = document.getElementsByTagName('script')[0]; tt.setAttribute('type', 'text/javascript'); tt.setAttribute('src', (document.location.protocol == 'https:' ? 'https' : 'http') + '://tm.tradetracker.net/tag?t=' + _TradeTrackerTagOptions.t + '&s=' + _TradeTrackerTagOptions.s + '&chk=' + _TradeTrackerTagOptions.chk); s.parentNode.insertBefore(tt, s);})();
 
 }
