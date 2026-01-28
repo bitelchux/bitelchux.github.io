@@ -450,8 +450,22 @@ function changeSelects() {
 
    
 }
-function loadAfterTime(source) {
+function tradeTracker(){
+
+	var _TradeTrackerTagOptions = {
+		t: 'a',
+		s: '504902',
+		chk: '27177eea41cbfee01bad606470734d9c',
+		overrideOptions: {}
+	};
+	(function() {var tt = document.createElement('script'), s = document.getElementsByTagName('script')[0]; tt.setAttribute('type', 'text/javascript'); tt.setAttribute('src', (document.location.protocol == 'https:' ? 'https' : 'http') + '://tm.tradetracker.net/tag?t=' + _TradeTrackerTagOptions.t + '&s=' + _TradeTrackerTagOptions.s + '&chk=' + _TradeTrackerTagOptions.chk); s.parentNode.insertBefore(tt, s);})();
+
+}
+function loadAfterTime() {
+	tradeTracker();
+    return;
 	/*advertica.com*/
+	
 	 loadJS("//data527.click/22f453f46519aa4bce23/ad79660923/?placementName=popunder");
    loadJS("//cdn-server.live/e6f19d81e40a418a6dbc/18ec357883/?placementName=default");
 	/*infolinks*/
@@ -484,19 +498,23 @@ function loadAfterTime(source) {
         article.insertAdjacentHTML('beforeend', text);
     }
 	reemplazarTagsAmazonSimple('pyc03-21');
-	reemplazarTagsAmazonNormales('pyc03-21');
-loadJSX("https://www.dwin2.com/pub.963035.min.js");
+    reemplazarTagsAmazonNormales('pyc03-21');
+   loadJSX("https://www.dwin2.com/pub.963035.min.js");
   
 	/*
 	  var ouo_token = 'lirJBQnR';
     var exclude_domains = ['example.com']; 
 	loadJSX("https://cdn.ouo.io/js/full-page-script.js");
 	inyectaMiBanner();
+	*/
 	var time=10;
     if (isSpeedBotX())
       time=10000;
 	setTimeout(initSmartLinkPopup, time);
+	setTimeout(loadAfterTime, time);
 	return 0;
+
+	
 	if(1==0 && document.URL.indexOf("cancionespronunciacion.com")>=1){
 		//rollerads
 		loadJSX("https://s0-greate.net/p/2421316");
