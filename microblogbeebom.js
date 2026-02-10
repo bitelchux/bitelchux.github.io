@@ -1,3 +1,6 @@
+/* añadir https://bastadeudas.com/?ref=juliocesardelafuente
+paston.com
+*/
 function inyectaMiBanner(){
 	(function () {
 	  // Crear contenedor
