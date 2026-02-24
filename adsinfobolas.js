@@ -141,7 +141,7 @@ function tienesmasde18(){
 var juicy_adzone = '1037514';
 function loadAfterTime(source) {
 	tienesmasde18();
-	return;
+	
 
 	/*
 	var ouo_token = 'lirJBQnR';
