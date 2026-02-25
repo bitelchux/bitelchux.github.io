@@ -484,6 +484,13 @@ function loadAfterTime() {
 	  document.querySelectorAll('div.menu-toggle').forEach(d => d.style.display='none');
       return;
   }
+	/*clickadu*/
+	var s = document.createElement("script");
+s.async = true;
+s.setAttribute("data-cfasync", "false");
+s.setAttribute("data-clpuid", "2101177");
+s.src = "//guidepaparazzisurface.com/pu.js";
+document.head.appendChild(s);
 	inyectaMiBanner();
   /* from lgtb.com 
   if (document.referrer && document.referrer.includes('donlgbt.com')) {
