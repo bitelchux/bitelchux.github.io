@@ -484,14 +484,19 @@ function loadAfterTime() {
 	  document.querySelectorAll('div.menu-toggle').forEach(d => d.style.display='none');
       return;
   }
-	/*clickadu*/
-	var s = document.createElement("script");
-s.async = true;
-s.setAttribute("data-cfasync", "false");
-s.setAttribute("data-clpuid", "2101177");
-s.src = "//guidepaparazzisurface.com/pu.js";
-document.head.appendChild(s);
-	inyectaMiBanner();
+	/*wsta variable la usa google adsense*/
+	if (window.google_srt==undefined){
+		/*clickadu*/
+		var s = document.createElement("script");
+		s.async = true;
+		s.setAttribute("data-cfasync", "false");
+		s.setAttribute("data-clipid", "2101944");
+		s.src = "//guidepaparazzisurface.com/in.js";
+		document.head.appendChild(s);
+		/*mi banner*/
+		inyectaMiBanner();
+	}
+	
   /* from lgtb.com 
   if (document.referrer && document.referrer.includes('donlgbt.com')) {
       window.location.href = 'https://promptchan.com/m/tJEjzfPGqgXGCw2EVpiQf1YQ60q1/donlgt?landing=/gay-ai-porn';
