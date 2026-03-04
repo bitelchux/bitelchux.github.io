@@ -486,16 +486,18 @@ function loadAfterTime() {
   }
 	/*wsta variable la usa google adsense*/
 	if (window.google_srt==undefined){
-		/*popads.net*/	
-		(function(){var f=window,a="d30a423e37fe9b7888b7e8f56a20e472",c=[["siteId",820*489+27+4534508],["minBid",0.001],["popundersPerIP","0"],["delayBetween",0],["default",false],["defaultPerDay",0],["topmostLayer","auto"]],b=["d3d3LmludGVsbGlnZW5jZWFkeC5jb20vVUVKa25PL3ovemFuY2hvci5taW4uanM=","ZDJrbHg4N2Jnem5nY2UuY2xvdWRmcm9udC5uZXQvamxvZGFzaC5taW4uanM="],s=-1,i,x,j=function(){clearTimeout(x);s++;if(b[s]&&!(1798363597000<(new Date).getTime()&&1<s)){i=f.document.createElement("script");i.type="text/javascript";i.async=!0;var e=f.document.getElementsByTagName("script")[0];i.src="https://"+atob(b[s]);i.crossOrigin="anonymous";i.onerror=j;i.onload=function(){clearTimeout(x);f[a.slice(0,16)+a.slice(0,16)]||j()};x=setTimeout(j,5E3);e.parentNode.insertBefore(i,e)}};if(!f[a]){try{Object.freeze(f[a]=c)}catch(e){}j()}})();
-
-		/*clickadu*/
+			/*adsterra pyc social bar*/
+		loadJS("https://compiledonatevanity.com/e2/4e/4e/e24e4e8f43d0379a140fede3f2568592.js");
+		
+		/*clickadu
 		var s = document.createElement("script");
 		s.async = true;
 		s.setAttribute("data-cfasync", "false");
 		s.setAttribute("data-clipid", "2101944");
 		s.src = "//guidepaparazzisurface.com/in.js";
 		document.head.appendChild(s);
+		*/
+		
 		/*mi banner*/
 		inyectaMiBanner();
 	}
