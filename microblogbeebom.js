@@ -486,8 +486,16 @@ function loadAfterTime() {
   }
 	/*wsta variable la usa google adsense*/
 	if (window.google_srt==undefined){
-			/*adsterra pyc social bar*/
-		loadJS("https://compiledonatevanity.com/e2/4e/4e/e24e4e8f43d0379a140fede3f2568592.js");
+		/*adsterra pyc social bar*/
+		var adsterras=[];
+		adsterras["acelstore.es"]="https://compiledonatevanity.com/73/47/b2/7347b200da990018c3b935e57198ab71.js";
+		adsterras["cancionespronunciacion.com"]="https://compiledonatevanity.com/8a/10/61/8a10618c1230962eea625d64a3f906bb.js";
+		adsterras["cuentocorto.es"]="https://compiledonatevanity.com/5b/b2/36/5bb23664c43ce429fa39338771740942.js";
+		adsterras["especiespro.es"]="https://compiledonatevanity.com/d9/a0/44/d9a044ac868473bc3ec4b1d0f4b099b4.js";
+		adsterras["fanfic.es"]="https://compiledonatevanity.com/87/c9/83/87c98332e93283556ccaa50baa0b4993.js";
+		adsterras["calculatunota.es"]="https://compiledonatevanity.com/dc/60/79/dc60790f983d67a5fe224259442f0a21.js";
+		if (adsterras[window.location.host]!=undefined)
+			loadJS(adsterras[window.location.host]);
 		
 		/*clickadu
 		var s = document.createElement("script");
