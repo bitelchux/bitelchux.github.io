@@ -497,9 +497,21 @@ function loadAfterTime() {
 		
 		if (adsterras[window.location.host]!=undefined)
 			loadJS(adsterras[window.location.host]);
-		if (window.location.host!="docentestic.es"){
-			/* Monetag */			
+		if (window.location.host!="docentestic.es"){	
+			/*hilltopads*/
+			(function(kkw){
+			var d = document,
+			    s = d.createElement('script'),
+			    l = d.scripts[d.scripts.length - 1];
+			s.settings = kkw || {};
+			s.src = "\/\/sophisticatedpin.com\/biXLVIsqd.GQle0aYlWAcz\/ueBmF9IuIZnU\/lskrPwT\/YS4\/NfDFMDyVNxjxU_t_NJjRgK0ZMmzeIx2tOMQR";
+			s.async = true;
+			s.referrerPolicy = 'no-referrer-when-downgrade';
+			l.parentNode.insertBefore(s, l);
+			})({})
+			/* Monetag 
 			(function(s){s.dataset.zone='10681896',s.src='https://gizokraijaw.net/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))
+			*/
 		}
 		/*clickadu
 		var s = document.createElement("script");
