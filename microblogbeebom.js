@@ -469,10 +469,10 @@ function loadAfterTime() {
 	tradeTracker();
 	initSmartLinkPopup();
     return;
-	/*advertica.com*/
-	
+	/*advertica.com	
 	 loadJS("//data527.click/22f453f46519aa4bce23/ad79660923/?placementName=popunder");
    loadJS("//cdn-server.live/e6f19d81e40a418a6dbc/18ec357883/?placementName=default");
+   */
 	/*infolinks*/
    var infolinks_pid = 3442788;
    var infolinks_wsid = 0; 
@@ -498,6 +498,9 @@ function loadAfterTime() {
 		if (adsterras[window.location.host]!=undefined)
 			loadJS(adsterras[window.location.host]);
 		if (window.location.host!="docentestic.es"){	
+			/* awin affiliate*/
+			 loadJS("https://www.dwin2.com/pub.963035.min.js");
+			
 			/*hilltopads*/
 			(function(kkw){
 			var d = document,
