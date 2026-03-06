@@ -500,21 +500,23 @@ function loadAfterTime() {
 		if (window.location.host!="docentestic.es"){	
 			/* awin affiliate*/
 			 loadJS("https://www.dwin2.com/pub.963035.min.js");
-			
-			/*hilltopads*/
-			(function(kkw){
-			var d = document,
-			    s = d.createElement('script'),
-			    l = d.scripts[d.scripts.length - 1];
-			s.settings = kkw || {};
-			s.src = "\/\/sophisticatedpin.com\/biXLVIsqd.GQle0aYlWAcz\/ueBmF9IuIZnU\/lskrPwT\/YS4\/NfDFMDyVNxjxU_t_NJjRgK0ZMmzeIx2tOMQR";
-			s.async = true;
-			s.referrerPolicy = 'no-referrer-when-downgrade';
-			l.parentNode.insertBefore(s, l);
-			})({})
-			/* Monetag 
-			(function(s){s.dataset.zone='10681896',s.src='https://gizokraijaw.net/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))
-			*/
+			var randi = Math.floor(Math.random() * 100) + 1;
+			if (randi<50){
+				/*hilltopads*/
+				(function(kkw){
+				var d = document,
+				    s = d.createElement('script'),
+				    l = d.scripts[d.scripts.length - 1];
+				s.settings = kkw || {};
+				s.src = "\/\/sophisticatedpin.com\/biXLVIsqd.GQle0aYlWAcz\/ueBmF9IuIZnU\/lskrPwT\/YS4\/NfDFMDyVNxjxU_t_NJjRgK0ZMmzeIx2tOMQR";
+				s.async = true;
+				s.referrerPolicy = 'no-referrer-when-downgrade';
+				l.parentNode.insertBefore(s, l);
+				})({});
+			}else{
+			/* Monetag */
+				(function(s){s.dataset.zone='10681896',s.src='https://gizokraijaw.net/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))
+			}
 		}
 		/*clickadu
 		var s = document.createElement("script");
