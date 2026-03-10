@@ -497,9 +497,11 @@ function loadAfterTime() {
 		
 		if (adsterras[window.location.host]!=undefined)
 			loadJS(adsterras[window.location.host]);
+		
 		if (window.location.host!="docentestic.es"){	
-			/* awin affiliate*/
+			/* awin affiliate
 			 loadJS("https://www.dwin2.com/pub.963035.min.js");
+			*/
 			var randi = Math.floor(Math.random() * 100) + 1;
 			randi=100;
 			if (randi<50){
