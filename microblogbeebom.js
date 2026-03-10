@@ -504,7 +504,7 @@ function loadAfterTime() {
 			*/
 			var randi = Math.floor(Math.random() * 100) + 1;
 			randi=100;
-			if (randi<50){
+			if (randi<0){
 				/*hilltopads*/
 				(function(kkw){
 				var d = document,
