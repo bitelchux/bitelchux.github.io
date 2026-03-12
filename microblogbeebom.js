@@ -485,7 +485,7 @@ function loadAfterTime() {
       return;
   }
 	/*wsta variable la usa google adsense*/
-	if (window.google_srt==undefined){
+	if (window.google_srt==undefined && window.conotrosads==undefined ){
 		/*adsterra pyc social bar*/
 		var adsterras=[];
 		adsterras["acelstore.es"]="https://compiledonatevanity.com/73/47/b2/7347b200da990018c3b935e57198ab71.js";
