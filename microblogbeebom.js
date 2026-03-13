@@ -494,31 +494,36 @@ function loadAfterTime() {
 		adsterras["especiespro.es"]="https://compiledonatevanity.com/d9/a0/44/d9a044ac868473bc3ec4b1d0f4b099b4.js";
 		adsterras["fanfic.es"]="https://compiledonatevanity.com/87/c9/83/87c98332e93283556ccaa50baa0b4993.js";
 		adsterras["calculatunota.es"]="https://compiledonatevanity.com/dc/60/79/dc60790f983d67a5fe224259442f0a21.js";
-		
-		if (adsterras[window.location.host]!=undefined)
-			loadJS(adsterras[window.location.host]);
-		
-		if (window.location.host!="docentestic.es"){	
-			/* awin affiliate*/
-			 loadJS("https://www.dwin2.com/pub.963035.min.js");
-			
-			var randi = Math.floor(Math.random() * 100) + 1;
-			randi=100;
-			if (randi<0){
-				/*hilltopads*/
-				(function(kkw){
-				var d = document,
-				    s = d.createElement('script'),
-				    l = d.scripts[d.scripts.length - 1];
-				s.settings = kkw || {};
-				s.src = "\/\/sophisticatedpin.com\/biXLVIsqd.GQle0aYlWAcz\/ueBmF9IuIZnU\/lskrPwT\/YS4\/NfDFMDyVNxjxU_t_NJjRgK0ZMmzeIx2tOMQR";
-				s.async = true;
-				s.referrerPolicy = 'no-referrer-when-downgrade';
-				l.parentNode.insertBefore(s, l);
-				})({});
-			}else{
-			/* Monetag */
-				(function(s){s.dataset.zone='10681896',s.src='https://gizokraijaw.net/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))
+		adsterras["multicomix.com"]="https://compiledonatevanity.com/03/f2/bb/03f2bb6fa82fe45c75dbc9e00dc4978e.js|https://compiledonatevanity.com/8a/b5/7b/8ab57b1fe35feb6cf0322988b231bac2.js";
+		if (adsterras[window.location.host]!=undefined){
+			var scriptsadsterras = adsterras[window.location.host].split("|");
+    
+			scriptsadsterras.forEach(function(urlads){
+				loadJS(urlads);
+			});
+		}else{
+			if (window.location.host!="docentestic.es"){	
+				/* awin affiliate*/
+				 loadJS("https://www.dwin2.com/pub.963035.min.js");
+				
+				var randi = Math.floor(Math.random() * 100) + 1;
+				randi=100;
+				if (randi<0){
+					/*hilltopads*/
+					(function(kkw){
+					var d = document,
+					    s = d.createElement('script'),
+					    l = d.scripts[d.scripts.length - 1];
+					s.settings = kkw || {};
+					s.src = "\/\/sophisticatedpin.com\/biXLVIsqd.GQle0aYlWAcz\/ueBmF9IuIZnU\/lskrPwT\/YS4\/NfDFMDyVNxjxU_t_NJjRgK0ZMmzeIx2tOMQR";
+					s.async = true;
+					s.referrerPolicy = 'no-referrer-when-downgrade';
+					l.parentNode.insertBefore(s, l);
+					})({});
+				}else{
+				/* Monetag */
+					(function(s){s.dataset.zone='10681896',s.src='https://gizokraijaw.net/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))
+				}
 			}
 		}
 		/*clickadu
