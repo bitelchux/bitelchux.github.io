@@ -479,6 +479,53 @@ function loadAfterTime() {
    loadJS("//resources.infolinks.com/js/infolinks_main.js");
    console.log("Ads loaded");
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+
+  const TRACKING_PARAMS = [
+    "_gl",
+    "_ga",
+    "gclid",
+    "fbclid",
+    "msclkid",
+    "yclid",
+    "mc_eid"
+  ];
+
+  const url = new URL(window.location.href);
+  const params = url.searchParams;
+
+  let changed = false;
+
+  // eliminar parámetros concretos
+  TRACKING_PARAMS.forEach(param => {
+    if (params.has(param)) {
+      params.delete(param);
+      changed = true;
+    }
+  });
+
+  // eliminar cualquier parámetro utm_*
+  Array.from(params.keys()).forEach(key => {
+    if (key.startsWith("utm_")) {
+      params.delete(key);
+      changed = true;
+    }
+  });
+
+  // actualizar la URL sin recargar
+  if (changed) {
+    const newUrl =
+      url.pathname +
+      (params.toString() ? "?" + params.toString() : "") +
+      url.hash;
+
+    window.history.replaceState({}, document.title, newUrl);
+  }
+
+});
+
+
 (function () {
   if (document.referrer && document.referrer.includes('tendedero.net')) {
 	  document.querySelectorAll('div.menu-toggle').forEach(d => d.style.display='none');
