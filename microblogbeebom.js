@@ -538,8 +538,8 @@ document.addEventListener("DOMContentLoaded", function () {
 	adsterras["especiespro.es"]="https://compiledonatevanity.com/d9/a0/44/d9a044ac868473bc3ec4b1d0f4b099b4.js";
 	adsterras["fanfic.es"]="https://compiledonatevanity.com/87/c9/83/87c98332e93283556ccaa50baa0b4993.js";
 	adsterras["calculatunota.es"]="https://compiledonatevanity.com/dc/60/79/dc60790f983d67a5fe224259442f0a21.js";
-	adsterras["multicomix.com"]="https://compiledonatevanity.com/03/f2/bb/03f2bb6fa82fe45c75dbc9e00dc4978e.js|https://compiledonatevanity.com/8a/b5/7b/8ab57b1fe35feb6cf0322988b231bac2.js";
-	
+	/*adsterras["multicomix.com"]="https://compiledonatevanity.com/03/f2/bb/03f2bb6fa82fe45c75dbc9e00dc4978e.js|https://compiledonatevanity.com/8a/b5/7b/8ab57b1fe35feb6cf0322988b231bac2.js";
+	*/
 	/*wsta variable la usa google adsense*/
 	if (adsterras[window.location.host]!=undefined || (window.google_srt==undefined && window.conotrosads==undefined) ){
 		/*adsterra pyc social bar*/
