@@ -3,6 +3,60 @@ paston.com
 */
 function inyectaMiBanner(){
 	(function () {
+		//VIDEO BANNER
+		 const container = document.createElement("div");
+		
+		  // CONTENEDOR
+		  Object.assign(container.style, {
+		    position: "fixed",
+		    right: "10px",
+		    bottom: "10px",
+		    zIndex: "999999",
+		    cursor: "pointer",
+		    width: "200px",
+		    fontFamily: "Arial, sans-serif"
+		  });
+		
+		  // VIDEO
+		  const video = document.createElement("video");
+		
+		  video.src = "https://videos.crazygames.com/om-nom-run/3/om-nom-run-landscape-364x208_30fps.mp4";
+		  video.autoplay = true;
+		  video.muted = true;
+		  video.loop = true;
+		  video.playsInline = true;
+		
+		  Object.assign(video.style, {
+		    width: "100%",
+		    borderRadius: "8px",
+		    boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+		    display: "block"
+		  });
+		
+		  // TEXTO
+		  const text = document.createElement("div");
+		  text.innerText = "Juega gratis ahora en tu dispositivo";
+		
+		  Object.assign(text.style, {
+		    marginTop: "6px",
+		    fontSize: "13px",
+		    color: "#fff",
+		    textAlign: "center",
+		    background: "rgba(0,0,0,0.6)",
+		    padding: "6px",
+		    borderRadius: "6px"
+		  });
+		
+		  // CLICK (video + texto)
+		  container.addEventListener("click", () => {
+		    window.open("https://bit.ly/3No5l65", "_blank");
+		  });
+		
+		  container.appendChild(video);
+		  container.appendChild(text);
+		  document.body.appendChild(container);
+
+		
 	  // Crear contenedor
 	  var footerBanner = document.createElement("div");
 	  footerBanner.id = "consupermiso-footer";
