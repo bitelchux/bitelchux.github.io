@@ -13,7 +13,7 @@ function inyectaMiBanner(){
 		    bottom: "10px",
 		    zIndex: "999999",
 		    cursor: "pointer",
-		    width: "200px",
+		    width: "320px",
 		    fontFamily: "Arial, sans-serif"
 		  });
 		
