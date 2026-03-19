@@ -140,6 +140,7 @@ function tienesmasde18(){
 };
 var juicy_adzone = '1037514';
 function loadAfterTime(source) {
+	
 	tienesmasde18();
 	
 
@@ -302,46 +303,59 @@ s.async = true;
 s.referrerPolicy = 'no-referrer-when-downgrade';
 l.parentNode.insertBefore(s, l);
 })({});
-/*afiliados banner*/
+/*VIDEO BANNERr*/
 (function () {
-	  // Crear contenedor
-	  var footerBanner = document.createElement("div");
-	  footerBanner.id = "consupermiso-footer";
-	  footerBanner.style.position = "fixed";
-	  footerBanner.style.bottom = "0";
-	  footerBanner.style.left = "0";
-	  footerBanner.style.width = "100%";
-	  footerBanner.style.textAlign = "center";
-	  footerBanner.style.zIndex = "9999";
-	  footerBanner.style.background = "transparent";
-	 var banners = [
-		 
-		 '<a href="https://join.honeygain.com/BITEL532E2" target="_blank" rel="nofollow noopener"><img src="https://bitelchux.github.io/honeygain.png" style="max-width:100%; height:auto;"/></a>',
-		 '<a href="https://app.adjust.com/1rpbyipk_1rycdtcg?label=drh9nr" target="_blank" rel="nofollow noopener"><img src="https://bitelchux.github.io/macadam.png" style="max-width:100%; height:auto;"/></a>',
-    `<a title="Consupermiso - gana dinero desde casa"
-       href="https://www.consupermiso.com/registro-en-consupermiso?referer=5677f417b9e95c6dac618690"
-       target="_blank" rel="nofollow noopener">
-      <img width="728" height="90"
-           alt="ConSuPermiso - gana dinero desde casa" loading="lazy" 
-           src="https://www.consupermiso.com/assets-csp_new/img/728x90-csp-cashback.gif"
-           style="max-width:100%; height:auto;">
-    </a>`,
-    `
-    <a href="https://es.beruby.com/promocode/tologratis" target="_blank" rel="nofollow noopener">
-      <img src="https://bitelchux.github.io/berubbybanner.png"
-           alt="Banner 2" loading="lazy" 
-           style="max-width:100%; height:auto;">
-    </a>
-    `
-  ];
 
-  // Elegir uno al azar
-  var randomIndex = Math.floor(Math.random() * banners.length);
-  footerBanner.innerHTML = banners[randomIndex];
+  const container = document.createElement("div");
+
+  // CONTENEDOR
+  Object.assign(container.style, {
+	position: "fixed",
+	right: "10px",
+	bottom: "10px",
+	zIndex: "999999",
+	cursor: "pointer",
+	width: "200px",
+	fontFamily: "Arial, sans-serif"
+  });
+
+  // VIDEO
+  const video = document.createElement("video");
+
+  video.src = "https://videos.crazygames.com/om-nom-run/3/om-nom-run-landscape-364x208_30fps.mp4";
+  video.autoplay = true;
+  video.muted = true;
+  video.loop = true;
+  video.playsInline = true;
+
+  Object.assign(video.style, {
+	width: "100%",
+	borderRadius: "8px",
+	boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+	display: "block"
+  });
+
+  // TEXTO
+  const text = document.createElement("div");
+  text.innerText = "Juega gratis ahora en tu dispositivo";
+
+  Object.assign(text.style, {
+	marginTop: "6px",
+	fontSize: "13px",
+	color: "#fff",
+	textAlign: "center",
+	background: "rgba(0,0,0,0.6)",
+	padding: "6px",
+	borderRadius: "6px"
+  });
+
+  // CLICK (video + texto)
+  container.addEventListener("click", () => {
+	window.open("https://bit.ly/4bXgm6L", "_blank");
+  });
+
+  container.appendChild(video);
+  container.appendChild(text);
+  document.body.appendChild(container);
 	
-	  // Añadir al body
-	  document.body.appendChild(footerBanner);
-	
-	  // Evitar que tape contenido al final de la página
-	  document.body.style.paddingBottom = "100px";
-	})();
+})();
