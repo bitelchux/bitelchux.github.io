@@ -49,7 +49,7 @@ function inyectaMiBanner(){
 		
 		  // CLICK (video + texto)
 		  container.addEventListener("click", () => {
-		    window.open("https://bit.ly/3No5l65", "_blank");
+		    window.open("https://totally-free-games.portals.famobi.com/", "_blank");
 		  });
 		
 		  container.appendChild(video);
