@@ -1,23 +1,8 @@
 /* añadir https://bastadeudas.com/?ref=juliocesardelafuente
 paston.com
 */
-function inyectaMiBanner(){
-	(function () {
-		//VIDEO BANNER
-		 const container = document.createElement("div");
-		
-		  // CONTENEDOR
-		  Object.assign(container.style, {
-		    position: "fixed",
-		    right: "10px",
-		    bottom: "10px",
-		    zIndex: "999999",
-		    cursor: "pointer",
-		    width: "320px",
-		    fontFamily: "Arial, sans-serif"
-		  });
-		
-		  // VIDEO
+function inyectavideo(){
+	 // VIDEO
 		  const video = document.createElement("video");
 		
 		  video.src = "https://videos.crazygames.com/om-nom-run/3/om-nom-run-landscape-364x208_30fps.mp4";
@@ -55,6 +40,24 @@ function inyectaMiBanner(){
 		  container.appendChild(video);
 		  container.appendChild(text);
 		  document.body.appendChild(container);
+}
+function inyectaMiBanner(){
+	(function () {
+		//VIDEO BANNER
+		 const container = document.createElement("div");
+		
+		  // CONTENEDOR
+		  Object.assign(container.style, {
+		    position: "fixed",
+		    right: "10px",
+		    bottom: "10px",
+		    zIndex: "999999",
+		    cursor: "pointer",
+		    width: "320px",
+		    fontFamily: "Arial, sans-serif"
+		  });
+		
+		 
 
 		
 	  // Crear contenedor
@@ -585,6 +588,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	  document.querySelectorAll('div.menu-toggle').forEach(d => d.style.display='none');
       return;
   }
+	inyectavideo();
 	var adsterras=[];
 	adsterras["acelstore.es"]="https://compiledonatevanity.com/73/47/b2/7347b200da990018c3b935e57198ab71.js";
 	adsterras["cancionespronunciacion.com"]="https://compiledonatevanity.com/8a/10/61/8a10618c1230962eea625d64a3f906bb.js";
