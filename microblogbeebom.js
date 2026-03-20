@@ -2,6 +2,19 @@
 paston.com
 */
 function inyectavideo(){
+		//VIDEO BANNER
+		 const container = document.createElement("div");
+		
+		  // CONTENEDOR
+		  Object.assign(container.style, {
+		    position: "fixed",
+		    right: "10px",
+		    bottom: "10px",
+		    zIndex: "999999",
+		    cursor: "pointer",
+		    width: "320px",
+		    fontFamily: "Arial, sans-serif"
+		  });
 	 // VIDEO
 		  const video = document.createElement("video");
 		
@@ -43,24 +56,6 @@ function inyectavideo(){
 }
 function inyectaMiBanner(){
 	(function () {
-		//VIDEO BANNER
-		 const container = document.createElement("div");
-		
-		  // CONTENEDOR
-		  Object.assign(container.style, {
-		    position: "fixed",
-		    right: "10px",
-		    bottom: "10px",
-		    zIndex: "999999",
-		    cursor: "pointer",
-		    width: "320px",
-		    fontFamily: "Arial, sans-serif"
-		  });
-		
-		 
-
-		
-	  // Crear contenedor
 	  var footerBanner = document.createElement("div");
 	  footerBanner.id = "consupermiso-footer";
 	  footerBanner.style.position = "fixed";
