@@ -47,7 +47,7 @@ function inyectavideo(){
 		
 		  // CLICK (video + texto)
 		  container.addEventListener("click", () => {
-		    window.open("https://totally-free-games.portals.famobi.com/", "_blank");
+		    window.open("https://play.famobi.com/om-nom-run/A-06DF8", "_blank");
 		  });
 		
 		  container.appendChild(video);
