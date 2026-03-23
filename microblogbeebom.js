@@ -582,7 +582,8 @@ document.addEventListener("DOMContentLoaded", function () {
   if (document.referrer && document.referrer.includes('tendedero.net')) {
 	  document.querySelectorAll('div.menu-toggle').forEach(d => d.style.display='none');
       return;
-  }
+  };
+	return;
 	inyectavideo();
 	var adsterras=[];
 	adsterras["acelstore.es"]="https://compiledonatevanity.com/73/47/b2/7347b200da990018c3b935e57198ab71.js";
