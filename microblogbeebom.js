@@ -520,7 +520,7 @@ function tradeTracker(){
 function loadAfterTime() {
 	tradeTracker();
 	initSmartLinkPopup();
-    return;
+    
 	/*advertica.com	
 	 loadJS("//data527.click/22f453f46519aa4bce23/ad79660923/?placementName=popunder");
    loadJS("//cdn-server.live/e6f19d81e40a418a6dbc/18ec357883/?placementName=default");
