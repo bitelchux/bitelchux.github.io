@@ -66,9 +66,10 @@ function inyectaMiBanner(){
 	  footerBanner.style.zIndex = "9999";
 	  footerBanner.style.background = "transparent";
 	 var banners = [
-		 
+		 '<a href="https://bastadeudas.com/?ref=juliocesardelafuente">Especialistas en Ley de Segunda Oportunidad<br/>Libérate de tus deudas y empieza de nuevo.<br/>Ayudamos a particulares y autónomos. Te ayudamos a empezar de cero y recuperar tu tranquilidad financiera.</a>',
+		 '<a href="https://track.effiliation.com/servlet/effi.click?id_compteur=23254995" target="_blank"><img src="https://track.effiliation.com/servlet/effi.show?id_compteur=23254995" alt="pub" border="0"/></a>',
 		 '<a href="https://join.honeygain.com/BITEL532E2" target="_blank" rel="nofollow noopener"><img src="https://bitelchux.github.io/honeygain.png" style="max-width:100%; height:auto;"/></a>',
-		/* '<a href="https://app.adjust.com/1rpbyipk_1rycdtcg?label=drh9nr" target="_blank" rel="nofollow noopener"><img src="https://bitelchux.github.io/macadam.png" style="max-width:100%; height:auto;"/></a>',*/
+		 '<a href="https://app.adjust.com/1rpbyipk_1rycdtcg?label=drh9nr" target="_blank" rel="nofollow noopener"><img src="https://bitelchux.github.io/macadam.png" style="max-width:100%; height:auto;"/></a>',
     `<a title="Consupermiso - gana dinero desde casa"
        href="https://www.consupermiso.com/registro-en-consupermiso?referer=5677f417b9e95c6dac618690"
        target="_blank" rel="nofollow noopener">
@@ -583,6 +584,8 @@ document.addEventListener("DOMContentLoaded", function () {
 	  document.querySelectorAll('div.menu-toggle').forEach(d => d.style.display='none');
       return;
   };
+		/*mi banner*/
+		inyectaMiBanner();
 	return;
 	inyectavideo();
 	var adsterras=[];
@@ -637,8 +640,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		document.head.appendChild(s);
 		*/
 		
-		/*mi banner*/
-		inyectaMiBanner();
+	
 	}
 	
   /* from lgtb.com 
