@@ -662,6 +662,9 @@ function legalizeimages(){
   };
 		/*mi banner*/
 		inyectaMiBanner();
+		reemplazarTagsAmazonSimple('pyc03-21');
+    reemplazarTagsAmazonNormales('pyc03-21');
+	legalizeimages();
 	return;
 	inyectavideo();
 	var adsterras=[];
@@ -737,9 +740,7 @@ function legalizeimages(){
  	if (article && text!="") {
         article.insertAdjacentHTML('beforeend', text);
     }
-	reemplazarTagsAmazonSimple('pyc03-21');
-    reemplazarTagsAmazonNormales('pyc03-21');
-	legalizeimages();
+
 	return;
    loadJSX("https://www.dwin2.com/pub.963035.min.js");
   
