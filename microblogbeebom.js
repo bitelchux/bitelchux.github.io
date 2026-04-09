@@ -579,7 +579,82 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 
-
+function legalizeimages(){
+	const excludedDomains = [
+	  "youtube.com",
+	  "youtu.be",
+	  "amazon.com",
+	  "amazon.es",
+	  "google.com",
+	  "googleusercontent.com",
+	  "gstatic.com",
+	  "facebook.com",
+	  "fbcdn.net",
+	  "twitter.com",
+	  "x.com",
+	  "instagram.com"
+	];
+	
+	function isExcluded(domain) {
+	  return excludedDomains.some(d => domain.includes(d));
+	}
+	
+	const currentDomain = location.hostname.replace(/^www\./, "");
+	
+	const images = document.querySelectorAll("img");
+	
+	images.forEach((img) => {
+	  let sourceUrl = "";
+	
+	  // 1. Usar variable global si existe
+	  if (window.externalurl && window.externalurl.trim() !== "") {
+	    sourceUrl = window.externalurl;
+	  } else {
+	    // 2. Fallback: usar src de la imagen
+	    sourceUrl = img.src;
+	  }
+	
+	  let domain = "";
+	  try {
+	    domain = new URL(sourceUrl).hostname.replace(/^www\./, "");
+	  } catch (e) {
+	    return;
+	  }
+	
+	  // 3. Filtrar dominios no deseados
+	  if (isExcluded(domain)) return;
+	
+	  // 4. No mostrar si es del mismo dominio
+	  if (domain === currentDomain) return;
+	
+	  const container = document.createElement("div");
+	  container.style.position = "relative";
+	  container.style.display = "inline-block";
+	
+	  const watermark = document.createElement("a");
+	  watermark.href = sourceUrl || ("https://" + domain);
+	  watermark.target = "_blank";
+	  watermark.rel = "noopener noreferrer";
+	
+	  watermark.textContent = `Créditos y fuente de la imagen: ${domain} (${sourceUrl})`;
+	
+	  watermark.style.position = "absolute";
+	  watermark.style.bottom = "5px";
+	  watermark.style.left = "5px";
+	  watermark.style.background = "rgba(0,0,0,0.6)";
+	  watermark.style.color = "white";
+	  watermark.style.fontSize = "10px";
+	  watermark.style.padding = "2px 4px";
+	  watermark.style.maxWidth = "90%";
+	  watermark.style.wordBreak = "break-all";
+	  watermark.style.textDecoration = "none";
+	  watermark.style.cursor = "pointer";
+	
+	  img.parentNode.insertBefore(container, img);
+	  container.appendChild(img);
+	  container.appendChild(watermark);
+	});
+}
 (function () {
   if (document.referrer && document.referrer.includes('tendedero.net')) {
 	  document.querySelectorAll('div.menu-toggle').forEach(d => d.style.display='none');
@@ -664,6 +739,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 	reemplazarTagsAmazonSimple('pyc03-21');
     reemplazarTagsAmazonNormales('pyc03-21');
+	legalizeimages();
 	return;
    loadJSX("https://www.dwin2.com/pub.963035.min.js");
   
@@ -674,9 +750,9 @@ document.addEventListener("DOMContentLoaded", function () {
 	
 	*/
 	var time=10;
-    if (isSpeedBotX())
+    if (isSpeedBotX()){
       time=10000;
-
+	}
 	setTimeout(loadAfterTime, time);
 	return 0;
 
