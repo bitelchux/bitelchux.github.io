@@ -582,6 +582,7 @@ document.addEventListener("DOMContentLoaded", function () {
 function legalizeimages(){
 	const excludedDomains = [
 	  "youtube.com",
+		"i.ytimg.com",
 	  "youtu.be",
 	  "amazon.com",
 	  "amazon.es",
@@ -660,11 +661,12 @@ function legalizeimages(){
 	  document.querySelectorAll('div.menu-toggle').forEach(d => d.style.display='none');
       return;
   };
-		/*mi banner*/
-		inyectaMiBanner();
+		
 		reemplazarTagsAmazonSimple('pyc03-21');
     reemplazarTagsAmazonNormales('pyc03-21');
 	legalizeimages();
+	/*mi banner*/
+		inyectaMiBanner();
 	return;
 	inyectavideo();
 	var adsterras=[];
