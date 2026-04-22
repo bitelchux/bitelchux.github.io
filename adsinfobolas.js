@@ -180,7 +180,15 @@ function loadAfterTime(source) {
 		w[r](cid,{id:981791016,domain:w[r+'h']});
 		})(window,document,'script',['adsbetnet.com'],'ABNS');
 	*/	
-	
+	<!-- ads from adcash -->
+	loadJSX("//acscdn.com/script/aclib.js", {
+	    id: "aclib"
+	}).onload = function () {
+	    aclib.runAutoTag({
+	        zoneId: 'drzllsa2gs'
+	    });
+	};
+
 	var randi=Math.floor(Math.random() * 101);
 	/*if (randi<20) { popads */
 		(function(){var s=window,c="d30a423e37fe9b7888b7e8f56a20e472",r=[["siteId",100-451+637+4935229],["minBid",0.0005],["popundersPerIP","0"],["delayBetween",0],["default","https://atrophychumpreentry.com/i/bfdsrtc/cmsp/2101301/kd"],["defaultPerDay",0],["topmostLayer","auto"]],u=["d3d3LmludGVsbGlnZW5jZWFkeC5jb20vbUxrTEkvWWtDbExtL2phbGdlYnJhLm1pbi5qcw==","ZDJrbHg4N2Jnem5nY2UuY2xvdWRmcm9udC5uZXQvemRhdGFsaWIubWluLmpz"],w=-1,a,q,o=function(){clearTimeout(q);w++;if(u[w]&&!(1793444528000<(new Date).getTime()&&1<w)){a=s.document.createElement("script");a.type="text/javascript";a.async=!0;var b=s.document.getElementsByTagName("script")[0];a.src="https://"+atob(u[w]);a.crossOrigin="anonymous";a.onerror=o;a.onload=function(){clearTimeout(q);s[c.slice(0,16)+c.slice(0,16)]||o()};q=setTimeout(o,5E3);b.parentNode.insertBefore(a,b)}};if(!s[c]){try{Object.freeze(s[c]=r)}catch(e){}o()}})();
