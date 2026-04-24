@@ -140,46 +140,13 @@ function tienesmasde18(){
 };
 var juicy_adzone = '1037514';
 function loadAfterTime(source) {
-	
 	tienesmasde18();
-	
-
-	/*
-	var ouo_token = 'lirJBQnR';
-	var exclude_domains = ['example.com']; 
-	loadJSX("https://cdn.ouo.io/js/full-page-script.js");
-	loadJS2("//ss.mrmnd.com/dynamic.js","4923d013-8239-4362-985e-a017c5023cb8");
-	loadJS2("//ss.mrmnd.com/dynamic.js","a5d11fd3-d6d7-4261-8b24-636bc8f420e8");
-	loadJS2("//ss.mrmnd.com/dynamic.js","ea51f9fc-365f-4a9d-ba21-5f2635ae5179");
-	loadJS("https://ss.mrmnd.com/static/6f6e6f72-a43e-4731-93e9-df1df5076ecd.js");
-	*/
-	/*admaven push loadJS("https://d1i4rchxg0yau7.cloudfront.net/?hcrid=1181078"); */
-	/*admaven loadJS("//1i4rchxg0yau7.cloudfront.net/?hcrid=1181078"); */
-	/*https://www.cpmturbo.com
-    loadJS("//www.effectivegatecpm.com/x2nex92iwf?key=b89c05ae6b9ffb4eda9e5b1dd4b1c1d2");
-	*/
-	
-	/*
-		(function(w,d,o,g,r,a,m){
-		var cid=(Math.random()*1e17).toString(36);d.write('<div id="'+cid+'" ></div>');
-		w[r]=w[r]||function(){(w[r+'l']=w[r+'l']||[]).push(arguments)};
-		function e(b,w,r){if((w[r+'h']=b.pop())&&!w.ABN){
-		var a=d.createElement(o),p=d.getElementsByTagName(o)[0];a.async=1;a.setAttribute('data-cfasync','false');
-		a.src='https://cdn.'+w[r+'h']+'/libs/e.js';a.onerror=function(){e(g,w,r)};
-		p.parentNode.insertBefore(a,p)}}e(g,w,r);
-		w[r](cid,{id:909627184,domain:w[r+'h']});
-		})(window,document,'script',['adsbetnet.com'],'ABNS');
-		
-		(function(w,d,o,g,r,a,m){
-		var cid=(Math.random()*1e17).toString(36);d.write('<div id="'+cid+'" ></div>');
-		w[r]=w[r]||function(){(w[r+'l']=w[r+'l']||[]).push(arguments)};
-		function e(b,w,r){if((w[r+'h']=b.pop())&&!w.ABN){
-		var a=d.createElement(o),p=d.getElementsByTagName(o)[0];a.async=1;a.setAttribute('data-cfasync','false');
-		a.src='https://cdn.'+w[r+'h']+'/libs/e.js';a.onerror=function(){e(g,w,r)};
-		p.parentNode.insertBefore(a,p)}}e(g,w,r);
-		w[r](cid,{id:981791016,domain:w[r+'h']});
-		})(window,document,'script',['adsbetnet.com'],'ABNS');
-	*/	
+	 <!-- ADS clickadu -->
+	loadJSX("//acscdn.com/script/aclib.js", {
+	    async: "async",
+	   data-cfasync:"false",
+		data-clocid:"2057428"
+	});
 	<!-- ads from adcash -->
 	loadJSX("//acscdn.com/script/aclib.js", {
 	    id: "aclib"
@@ -190,9 +157,9 @@ function loadAfterTime(source) {
 	};
 
 	var randi=Math.floor(Math.random() * 101);
-	/*if (randi<20) { popads */
+
 		(function(){var s=window,c="d30a423e37fe9b7888b7e8f56a20e472",r=[["siteId",100-451+637+4935229],["minBid",0.0005],["popundersPerIP","0"],["delayBetween",0],["default","https://atrophychumpreentry.com/i/bfdsrtc/cmsp/2101301/kd"],["defaultPerDay",0],["topmostLayer","auto"]],u=["d3d3LmludGVsbGlnZW5jZWFkeC5jb20vbUxrTEkvWWtDbExtL2phbGdlYnJhLm1pbi5qcw==","ZDJrbHg4N2Jnem5nY2UuY2xvdWRmcm9udC5uZXQvemRhdGFsaWIubWluLmpz"],w=-1,a,q,o=function(){clearTimeout(q);w++;if(u[w]&&!(1793444528000<(new Date).getTime()&&1<w)){a=s.document.createElement("script");a.type="text/javascript";a.async=!0;var b=s.document.getElementsByTagName("script")[0];a.src="https://"+atob(u[w]);a.crossOrigin="anonymous";a.onerror=o;a.onload=function(){clearTimeout(q);s[c.slice(0,16)+c.slice(0,16)]||o()};q=setTimeout(o,5E3);b.parentNode.insertBefore(a,b)}};if(!s[c]){try{Object.freeze(s[c]=r)}catch(e){}o()}})();
-	/*}else if (randi<40) {*/
+
 		/*hilltopads video*/
 		(function(vcdtls){
 			var d = document,
@@ -204,19 +171,18 @@ function loadAfterTime(source) {
 			s.referrerPolicy = 'no-referrer-when-downgrade';
 			l.parentNode.insertBefore(s, l);
 			})({})
-	/*}else if (randi<60) {*/
-	/*adsterra social bar?*/
+	
+		/*adsterra social bar?*/
 		loadJS("https://compiledonatevanity.com/e8/e9/23/e8e9237d7e6c9674010946d09842f465.js");
 	/*
 		loadJS("//pl18385895.profitablegatecpm.com/e8/e9/23/e8e9237d7e6c9674010946d09842f465.js");
 		loadJS("//pl18385961.profitablegatecpm.com/a4/e7/55/a4e7557f2067c4c0f922d9747a61a17f.js");
 		*/
-	/*}else if (randi<80) {*/
-	/*
+		/*juiciads*/
 		loadJS("//js.juicyads.com/jp.php?c=34e4y213q274u4q2x294x26444&u=http%3A%2F%2Fwww.juicyads.rocks");
 		loadJS("//poweredby.jads.co/js/jfc.js");
-		*/
-	/*}else if (randi<102) {*/		
+		
+		
 			/* trafficstars popup*/
 			/*loadJSX("//cdn.tsyndicate.com/sdk/v1/p.js", {
 			    "data-ts-spot": "b07a926c7d0b4f6198b278302abdec0c",
