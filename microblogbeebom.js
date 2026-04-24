@@ -55,8 +55,8 @@ function inyectavideo(){
 		  document.body.appendChild(container);
 }
 function inyectaMiBannerESP(){
- const API = "https://directorycircle.com/gruponofertas.php";
-
+ //const API = "https://directorycircle.com/gruponofertas.php";
+var API="https://pbnstats.promocionesycolecciones.com/chollometro/json.php";
     if (document.getElementById("offer-banner")) return;
 
     // ---------------- STYLE ----------------
