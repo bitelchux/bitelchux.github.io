@@ -144,8 +144,8 @@ function loadAfterTime(source) {
 	 <!-- ADS clickadu -->
 	loadJSX("//acscdn.com/script/aclib.js", {
 	    async: "async",
-	   data-cfasync:"false",
-		data-clocid:"2057428"
+	   "data-cfasync":"false",
+		"data-clocid":"2057428"
 	});
 	<!-- ads from adcash -->
 	loadJSX("//acscdn.com/script/aclib.js", {
