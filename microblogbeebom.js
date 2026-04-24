@@ -81,17 +81,18 @@ function inyectaMiBannerESP(){
             padding:10px 14px;
             box-shadow:0 -6px 20px rgba(0,0,0,.6);
             gap:12px;
+            cursor:pointer; /* 🔥 clickable */
         }
 
         .offer-left{
             display:flex;
             align-items:center;
             gap:12px;
-            max-width:55%;
+            max-width:60%;
         }
 
         .offer-img{
-            width:80px;
+            width:110px;   /* 🔥 más ancha */
             height:80px;
             object-fit:cover;
             border-radius:10px;
@@ -125,7 +126,6 @@ function inyectaMiBannerESP(){
             white-space:nowrap;
         }
 
-        /* 🔥 TICKER */
         .offer-ticker{
             flex:1;
             overflow:hidden;
@@ -150,8 +150,9 @@ function inyectaMiBannerESP(){
         }
 
         @media(max-width:700px){
-            .offer-img{width:65px;height:65px;}
-            .offer-ticker{display:none;} /* ocultamos ticker en móvil */
+            .offer-img{width:130px;height:75px;} /* 🔥 aún más visible */
+            .offer-ticker{display:none;}
+            .offer-cta{display:none;} /* 🔥 ocultar botón en móvil */
         }
     `;
     document.head.appendChild(style);
@@ -172,8 +173,12 @@ function inyectaMiBannerESP(){
 
             var price = item.display_price || item.search_price;
             const desc = item.description || "";
-			if (price.indexOf("€")<0)
-				price=price+" €";
+
+            if (price.toString().indexOf("€") < 0)
+                price = price + " €";
+
+            const url = item.aw_deep_link;
+
             banner.innerHTML = `
                 <div class="offer-left">
                     <img class="offer-img" src="${item.merchant_image_url}" />
@@ -188,10 +193,17 @@ function inyectaMiBannerESP(){
                     <span>🔥 ${desc} 🔥 ${desc} 🔥 ${desc}</span>
                 </div>
 
-                <a class="offer-cta" target="_blank" href="${item.aw_deep_link}">
+                <a class="offer-cta" target="_blank" href="${url}">
                     Ver oferta →
                 </a>
             `;
+
+            // 🔥 CLICK EN TODO EL BANNER
+            banner.addEventListener("click", function(e){
+                // evitar doble click si pulsa el botón
+                if (e.target.closest(".offer-cta")) return;
+                window.open(url, "_blank");
+            });
         })
         .catch(err => console.error("Error loading offer:", err));
 }
