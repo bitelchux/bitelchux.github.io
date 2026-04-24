@@ -1,298 +1,119 @@
-function isSpeedBotX(){
-		
-		if( navigator.userAgent.indexOf("119.0.0.0")>=1 && navigator.userAgent.indexOf("Safari/537.36")>=1 && navigator.language=="en-US"){
-			//document.writeln("<h1>"+navigator.language+"</h1>" );
-			
-			return true;
-		}
-		else 
-			return false;
-	}
-function tienesmasde18(){
-	(function(){
-		  const LS_KEY = 'aviso_mayor18_confirmed_v2';
-		
-		  function detectLang() {
-		    const navLang = (navigator.language || '').toLowerCase();
-		    if (navLang.startsWith('es')) return 'es';
-		    const ua = (navigator.userAgent || '').toLowerCase();
-		    if (ua.includes('spanish') || ua.includes('es-') || ua.includes('español')) return 'es';
-		    return 'en';
-		  }
-		
-		  const lang = detectLang();
-		  const TEXT = {
-		    es: {
-		      title: 'Verificación de edad',
-		      message: '¿Eres mayor de 18 años?',
-		      confirm: 'Sí, soy mayor de 18',
-		      deny: 'No soy mayor de 18',
-		      remember: 'Recordarme'
-		    },
-		    en: {
-		      title: 'Verificación de edad',
-		      message: '¿Eres mayor de 18 años?',
-		      confirm: 'Sí, soy mayor de 18',
-		      deny: 'No soy mayor de 18',
-		      remember: 'Recordarme'
-		    }
-		  };
-		  const t = TEXT[lang];
-		
-		  try {
-		    const saved = JSON.parse(localStorage.getItem(LS_KEY));
-		    if (saved?.confirmed) {
-		      return;
-		    }
-		  } catch(e){}
-		
-		  const css = `
-		  .age-root{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;}
-		  .age-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(2px);}
-		  .age-modal{position:relative;z-index:2;width:clamp(300px,80%,500px);
-		     padding:22px;background:#111;color:#f1f1f1;border-radius:14px;
-		     box-shadow:0 8px 35px rgba(0,0,0,0.7);font-family:system-ui, sans-serif;}
-		  .age-title{font-size:1.35rem;font-weight:600;margin-bottom:10px;}
-		  .age-msg{font-size:1.05rem;margin-bottom:20px;}
-		  .age-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;}
-		  .age-btn{padding:10px 16px;border-radius:8px;border:0;cursor:pointer;font-weight:600;}
-		  .age-btn-ok{background:#0b76ef;color:white;}
-		  .age-btn-no{background:#333;color:#eee;}
-		  .age-remember{display:flex;align-items:center;gap:7px;margin-right:auto;font-size:0.9rem;}
-		  `;
-		  
-		  const style = document.createElement('style');
-		  style.textContent = css;
-		  document.head.appendChild(style);
-		
-		  const root = document.createElement('div');
-		  root.className = 'age-root';
-		
-		  const overlay = document.createElement('div');
-		  overlay.className = 'age-overlay';
-		
-		  const modal = document.createElement('div');
-		  modal.className = 'age-modal';
-		
-		  modal.innerHTML = `
-		    <div class="age-title">${t.title}</div>
-		    <div class="age-msg">${t.message}</div>
-		  `;
-		
-		  const remember = document.createElement('label');
-		  remember.className = 'age-remember';
-		  const chk = document.createElement('input');
-		  chk.type = 'checkbox';
-		  chk.checked = true;
-		  remember.appendChild(chk);
-		  remember.append(t.remember);
-		
-		  const btnNo = document.createElement('button');
-		  btnNo.className = 'age-btn age-btn-no';
-		  btnNo.textContent = t.deny;
-		
-		  const btnOk = document.createElement('button');
-		  btnOk.className = 'age-btn age-btn-ok';
-		  btnOk.textContent = t.confirm;
-		
-		  const actions = document.createElement('div');
-		  actions.className = 'age-actions';
-		  actions.append(remember, btnNo, btnOk);
-		
-		  modal.appendChild(actions);
-		
-		  root.append(overlay, modal);
-		  document.body.appendChild(root);
-		
-		  const prev = document.documentElement.style.overflow;
-		  document.documentElement.style.overflow = 'hidden';
-		
-		  function close() {
-		    root.remove();
-		    document.documentElement.style.overflow = prev;
-		  }
-		
-		  function save(c) {
-		    if (chk.checked) {
-		      try { localStorage.setItem(LS_KEY, JSON.stringify({confirmed: c, ts: Date.now()})); }
-		      catch(e){}
-		    }
-		  }
-		
-		  btnOk.onclick = () => {
-		    save(true);
-		    close();
-		  };
-		
-		  btnNo.onclick = () => {
-		    save(false);
-		    window.location.href = "https://www.google.com";
-		  };
-		})();
+// -------------------- CONFIG --------------------
+const LS_KEY = 'age_18_confirmed';
+
+// -------------------- BOT DETECT --------------------
+function isSpeedBotX() {
+    const ua = navigator.userAgent;
+    return ua.includes("119.0.0.0") && ua.includes("Safari/537.36") && navigator.language === "en-US";
 }
- window.onload = function(){
 
-   var time=10;
-   if (isSpeedBotX())
-      time=10000;
-   setTimeout(loadAfterTime, time);
+// -------------------- AGE CHECK --------------------
+function checkAge(callback) {
 
-};
-var juicy_adzone = '1037514';
-function loadAfterTime(source) {
-	tienesmasde18();
-	 <!-- ADS clickadu -->
-	loadJSX("//acscdn.com/script/aclib.js", {
-	    async: "async",
-	   "data-cfasync":"false",
-		"data-clocid":"2057428"
-	});
-	<!-- ads from adcash -->
-	loadJSX("//acscdn.com/script/aclib.js", {
-	    id: "aclib"
-	}).onload = function () {
-	    aclib.runAutoTag({
-	        zoneId: 'drzllsa2gs'
-	    });
-	};
+    try {
+        const saved = JSON.parse(localStorage.getItem(LS_KEY));
+        if (saved?.confirmed) {
+            callback(true);
+            return;
+        }
+    } catch (e) {}
 
-	var randi=Math.floor(Math.random() * 101);
+    const root = document.createElement('div');
+    root.innerHTML = `
+        <div style="
+            position:fixed;inset:0;z-index:999999;
+            background:rgba(0,0,0,0.9);
+            display:flex;align-items:center;justify-content:center;
+            font-family:sans-serif;">
+            
+            <div style="
+                background:#111;color:#fff;
+                padding:20px;border-radius:10px;text-align:center;">
+                
+                <h2>¿Eres mayor de 18?</h2>
+                <button id="yes18">Sí</button>
+                <button id="no18">No</button>
+            </div>
+        </div>
+    `;
 
-		(function(){var s=window,c="d30a423e37fe9b7888b7e8f56a20e472",r=[["siteId",100-451+637+4935229],["minBid",0.0005],["popundersPerIP","0"],["delayBetween",0],["default","https://atrophychumpreentry.com/i/bfdsrtc/cmsp/2101301/kd"],["defaultPerDay",0],["topmostLayer","auto"]],u=["d3d3LmludGVsbGlnZW5jZWFkeC5jb20vbUxrTEkvWWtDbExtL2phbGdlYnJhLm1pbi5qcw==","ZDJrbHg4N2Jnem5nY2UuY2xvdWRmcm9udC5uZXQvemRhdGFsaWIubWluLmpz"],w=-1,a,q,o=function(){clearTimeout(q);w++;if(u[w]&&!(1793444528000<(new Date).getTime()&&1<w)){a=s.document.createElement("script");a.type="text/javascript";a.async=!0;var b=s.document.getElementsByTagName("script")[0];a.src="https://"+atob(u[w]);a.crossOrigin="anonymous";a.onerror=o;a.onload=function(){clearTimeout(q);s[c.slice(0,16)+c.slice(0,16)]||o()};q=setTimeout(o,5E3);b.parentNode.insertBefore(a,b)}};if(!s[c]){try{Object.freeze(s[c]=r)}catch(e){}o()}})();
+    document.body.appendChild(root);
 
-		/*hilltopads video*/
-		(function(vcdtls){
-			var d = document,
-			    s = d.createElement('script'),
-			    l = d.scripts[d.scripts.length - 1];
-			s.settings = vcdtls || {};
-			s.src = "\/\/snarlingrequirement.com\/bpXqVSswd.GflI0eYwWdcq\/Fegmo9\/u\/ZmUEl\/kaPTT\/YxwhN\/T\/YBy\/Ntj\/gXtxNcjWAO1\/Nij_IH2\/OaQm";
-			s.async = true;
-			s.referrerPolicy = 'no-referrer-when-downgrade';
-			l.parentNode.insertBefore(s, l);
-			})({})
-	
-		/*adsterra social bar?*/
-		loadJS("https://compiledonatevanity.com/e8/e9/23/e8e9237d7e6c9674010946d09842f465.js");
-	/*
-		loadJS("//pl18385895.profitablegatecpm.com/e8/e9/23/e8e9237d7e6c9674010946d09842f465.js");
-		loadJS("//pl18385961.profitablegatecpm.com/a4/e7/55/a4e7557f2067c4c0f922d9747a61a17f.js");
-		*/
-		/*juiciads*/
-		loadJS("//js.juicyads.com/jp.php?c=34e4y213q274u4q2x294x26444&u=http%3A%2F%2Fwww.juicyads.rocks");
-		loadJS("//poweredby.jads.co/js/jfc.js");
-		
-		
-			/* trafficstars popup*/
-			/*loadJSX("//cdn.tsyndicate.com/sdk/v1/p.js", {
-			    "data-ts-spot": "b07a926c7d0b4f6198b278302abdec0c",
-			    "data-ts-extid": "{extid}",
-			    async: "",
-			    defer: ""
-			});*/
-			/* trafficstars inters*/
-			/*loadCSS("//cdn.tsyndicate.com/sdk/v1/interstitial.ts.css");
-			const interstitial = loadJS("//cdn.tsyndicate.com/sdk/v1/interstitial.ts.js");
-			interstitial.onload = function () {
-			    InterstitialTsAd({
-			        spot: "d4855591409845028a317401c5e578b0",
-			        extid: "{extid}"
-			    });
-			};*/
-			/* trafficstars push*/
-	/*
-			const inpagePush = loadJS("//cdn.tsyndicate.com/sdk/v1/inpage.push.js");
-			inpagePush.onload = function () {
-			    TsInPagePush({
-			        spot: "e6434178000d48449787deeceafc222b",
-			        verticalPosition: "bottom"
-			    });
-			};
-			*/
-	/*}*/
-	loadJS("//www.freeprivacypolicy.com/public/cookie-consent/4.1.0/cookie-consent.js");
-	document.addEventListener('DOMContentLoaded', function() {
-			cookieconsent.run({
-			    "notice_banner_type": "interstitial",
-			    "consent_type": "express",
-			    "palette": "light",
-			    "language": "es",
-			    "page_load_consent_levels": ["strictly-necessary"],
-			    "notice_banner_reject_button_hide": false,
-			    "preferences_center_close_button_hide": false,
-			    "page_refresh_confirmation_buttons": false,
-			    "website_name": "https://www.infoenbolas.com/",
-			    "website_privacy_policy_url": "https://www.infoenbolas.com/p/politica-de-privacidad.html"
-			});
-	});	
+    document.getElementById("yes18").onclick = () => {
+        localStorage.setItem(LS_KEY, JSON.stringify({ confirmed: true }));
+        root.remove();
+        callback(true);
+    };
+
+    document.getElementById("no18").onclick = () => {
+        window.location.href = "https://www.google.com";
+    };
 }
-function loadCSS(href) {
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = href;
-    document.head.appendChild(link);
+
+// -------------------- LOAD ADS --------------------
+function loadAds() {
+
+    console.log("Cargando ADS...");
+
+    // Clickadu
+    loadJSX("//acscdn.com/script/aclib.js", {
+        async: true,
+        "data-cfasync": "false",
+        "data-clocid": "2057428"
+    });
+
+    // Adcash
+    loadJSX("//acscdn.com/script/aclib.js", { id: "aclib" }).onload = function () {
+        if (window.aclib) {
+            aclib.runAutoTag({ zoneId: 'drzllsa2gs' });
+        }
+    };
+
+    // PopAds
+    (function(){
+        var s = document.createElement("script");
+        s.src = "//d3d3LmludGVsbGlnZW5jZWFkeC5jb20/Vexwr";
+        s.async = true;
+        document.head.appendChild(s);
+    })();
+
+    // Adsterra
+    loadJS("https://compiledonatevanity.com/e8/e9/23/e8e9237d7e6c9674010946d09842f465.js");
+
+    // JuicyAds
+    loadJS("//js.juicyads.com/jp.php?c=34e4y213q274u4q2x294x26444");
+}
+
+// -------------------- INIT --------------------
+window.addEventListener("load", () => {
+
+    let delay = isSpeedBotX() ? 10000 : 1000;
+
+    setTimeout(() => {
+        checkAge((isAdult) => {
+            if (isAdult) {
+                loadAds(); // 👈 SOLO aquí se cargan anuncios
+            }
+        });
+    }, delay);
+
+});
+
+// -------------------- HELPERS --------------------
+function loadJS(src) {
+    const s = document.createElement("script");
+    s.src = src;
+    document.head.appendChild(s);
 }
 
 function loadJSX(src, attrs = {}) {
-    const script = document.createElement("script");
-    script.src = src;
-    script.type = "text/javascript";
+    const s = document.createElement("script");
+    s.src = src;
 
-    for (const key in attrs) {
-        script.setAttribute(key, attrs[key]);
+    for (const k in attrs) {
+        s.setAttribute(k, attrs[k]);
     }
 
-    document.head.appendChild(script);
-
-    return script;
+    document.head.appendChild(s);
+    return s;
 }
-
-function loadJS2(source,param) { 
-	var script = document.createElement('script');
-	
-	script.type = "text/javascript";
-	script.src = source;
-	script.setAttribute('data-mnddynid', param);
-	
-	
-	( document.getElementsByTagName("head")[0] || document.documentElement ).appendChild( script );
-}
-function loadJS(source) { 
-  var script = document.createElement('script');
-  script.onload = function () {
-    //do stuff with the script
-  };
-  script.src = source;
-
-  document.head.appendChild(script); //or something of the likes
-}
-	/*hilltopads popup*/
-(function(ajox){
-var d = document,
-    s = d.createElement('script'),
-    l = d.scripts[d.scripts.length - 1];
-s.settings = ajox || {};
-s.src = "\/\/glossyrun.com\/c.Df9F6Fb\/2\/5llNSWWeQQ9iNBjlY\/5AN\/Dqg-5jOBCC0W2KNijOko0QO\/DUkg5u";
-s.async = true;
-s.referrerPolicy = 'no-referrer-when-downgrade';
-l.parentNode.insertBefore(s, l);
-})({});
-/*VIDEO BANNERr*/
-(function () {
-
-  const container = document.createElement("div");
-
-  // CONTENEDOR
-  Object.assign(container.style, {
-	position: "fixed",
-	right: "10px",
-	bottom: "10px",
-	zIndex: "999999",
-	cursor: "pointer",
-	width: "200px",
-	fontFamily: "Arial, sans-serif"
-  });
-
- 
-	
-})();
