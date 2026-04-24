@@ -301,12 +301,13 @@ function reemplazarTagsAmazonNormales(tuTag) {
       console.error(`  ✗ Error procesando enlace ${index + 1}:`, error.message);
     }
   });
-  
+  /*
   console.log('\n=== RESUMEN ===');
   console.log(`Total enlaces: ${enlaces.length}`);
   console.log(`Con tag previo: ${modificados}`);
   console.log(`Sin tag previo: ${sinTag}`);
   console.log(`Todos ahora tienen tag: ${tuTag}`);
+  */
 }
 function reemplazarTagsAmazonSimple(tuTag) {
   const enlaces = document.querySelectorAll('a[href*="amzn.to"]');
