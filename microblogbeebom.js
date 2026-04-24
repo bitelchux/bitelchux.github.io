@@ -1,6 +1,7 @@
 /* añadir https://bastadeudas.com/?ref=juliocesardelafuente
 paston.com
 */
+console.log("github js cargado");
 function inyectavideo(){
 		//VIDEO BANNER
 		 const container = document.createElement("div");
@@ -88,14 +89,13 @@ function inyectaMiBannerESP(){
             display:flex;
             align-items:center;
             gap:12px;
-            max-width:60%;
         }
 
         .offer-img{
             width:110px;   /* 🔥 más ancha */
             height:80px;
             object-fit:cover;
-            border-radius:10px;
+            border-radius:2px;
             flex-shrink:0;
         }
 
@@ -278,7 +278,7 @@ function reemplazarTagsAmazonNormales(tuTag) {
   // Buscar todos los enlaces que apunten a dominios de Amazon
   const enlaces = document.querySelectorAll('a[href*="amazon."]');
   
-  console.log(`Encontrados ${enlaces.length} enlaces de Amazon`);
+  //console.log(`Encontrados ${enlaces.length} enlaces de Amazon`);
   
   let modificados = 0;
   let sinTag = 0;
@@ -298,10 +298,10 @@ function reemplazarTagsAmazonNormales(tuTag) {
       const tagActual = url.searchParams.get('tag');
       
       if (tagActual) {
-        console.log(`  [${index + 1}] Tag actual: ${tagActual}`);
+        //console.log(`  [${index + 1}] Tag actual: ${tagActual}`);
         modificados++;
       } else {
-        console.log(`  [${index + 1}] Sin tag`);
+        //console.log(`  [${index + 1}] Sin tag`);
         sinTag++;
       }
       
@@ -312,7 +312,7 @@ function reemplazarTagsAmazonNormales(tuTag) {
       // Actualizar el href
       enlace.href = url.toString();
       
-      console.log(`  ✓ Actualizado: ${url.toString()}`);
+      //console.log(`  ✓ Actualizado: ${url.toString()}`);
       
     } catch (error) {
       console.error(`  ✗ Error procesando enlace ${index + 1}:`, error.message);
@@ -329,7 +329,7 @@ function reemplazarTagsAmazonNormales(tuTag) {
 function reemplazarTagsAmazonSimple(tuTag) {
   const enlaces = document.querySelectorAll('a[href*="amzn.to"]');
   
-  console.log(`Encontrados ${enlaces.length} enlaces amzn.to`);
+  //console.log(`Encontrados ${enlaces.length} enlaces amzn.to`);
   
   enlaces.forEach((enlace, index) => {
     const urlOriginal = enlace.href;
@@ -338,7 +338,7 @@ function reemplazarTagsAmazonSimple(tuTag) {
     enlace.addEventListener('click', function(e) {
       e.preventDefault();
       
-      console.log(`Click interceptado en: ${urlOriginal}`);
+      //console.log(`Click interceptado en: ${urlOriginal}`);
       
       // Abrir en ventana nueva y modificar después
       const nuevaVentana = window.open('about:blank', '_blank');
@@ -359,7 +359,7 @@ function reemplazarTagsAmazonSimple(tuTag) {
             url.searchParams.set('tag', tuTag);
             
             nuevaVentana.location.href = url.toString();
-            console.log(`✓ Tag reemplazado: ${url.toString()}`);
+            //console.log(`✓ Tag reemplazado: ${url.toString()}`);
           }
         } catch (e) {
           // Aún cargando o CORS
@@ -370,10 +370,10 @@ function reemplazarTagsAmazonSimple(tuTag) {
       setTimeout(() => clearInterval(intervalo), 5000);
     });
     
-    console.log(`✓ Listener configurado para enlace ${index + 1}`);
+    //console.log(`✓ Listener configurado para enlace ${index + 1}`);
   });
   
-  console.log('Configuración completa. Haz click en los enlaces para que se modifiquen.');
+  //console.log('Configuración completa. Haz click en los enlaces para que se modifiquen.');
 }
 
 
@@ -400,7 +400,7 @@ var smartLink = smartLinks[Math.floor(Math.random() * smartLinks.length)];
     if (fired) return;
     fired = true;
 
-    console.log(`🚀 Abriendo popup (razón: ${reason})`);
+    //console.log(`🚀 Abriendo popup (razón: ${reason})`);
 
     try {
       // Método 1: window.open estándar (más compatible)
@@ -410,14 +410,14 @@ var smartLink = smartLinks[Math.floor(Math.random() * smartLinks.length)];
         // Si se abrió, intentar que no robe el foco
         win.blur();
         window.focus();
-        console.log("✓ Popup abierto correctamente");
+        //console.log("✓ Popup abierto correctamente");
       } else {
         // Método 2: Fallback con link simulado
-        console.log("⚠ Popup bloqueado, intentando método alternativo...");
+        //console.log("⚠ Popup bloqueado, intentando método alternativo...");
         fallbackOpen();
       }
     } catch (e) {
-      console.log("✗ Error al abrir popup:", e);
+      //console.log("✗ Error al abrir popup:", e);
       fallbackOpen();
     }
 
@@ -530,7 +530,7 @@ var smartLink = smartLinks[Math.floor(Math.random() * smartLinks.length)];
   document.addEventListener("visibilitychange", onVisibility);
   document.addEventListener("mousemove", onMove, { passive: true });
 
-  console.log("👀 SmartLink popup inicializado");
+  //console.log("👀 SmartLink popup inicializado");
 }
 
 function isSpeedBotX(){
@@ -685,7 +685,7 @@ function loadAfterTime() {
    var infolinks_pid = 3442788;
    var infolinks_wsid = 0; 
    loadJS("//resources.infolinks.com/js/infolinks_main.js");
-   console.log("Ads loaded");
+   //console.log("Ads loaded");
 }
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -816,7 +816,17 @@ function legalizeimages(){
 	  document.querySelectorAll('div.menu-toggle').forEach(d => d.style.display='none');
       return;
   };
-		
+	const url = new URL(window.location.href);
+	const campaign = url.searchParams.get("utm-campaign");
+	const asin = url.searchParams.get("utm-source");
+	if (campaign === "facebook-dp" && asin) {
+		const amazonUrl =
+			"https://www.amazon.es/dp/" +
+			asin +
+			"?tag=pyc03-21";
+		window.location.href = amazonUrl;
+		return;
+	}
 		reemplazarTagsAmazonSimple('pyc03-21');
     reemplazarTagsAmazonNormales('pyc03-21');
 	legalizeimages();
