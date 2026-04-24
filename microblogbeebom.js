@@ -55,8 +55,12 @@ function inyectavideo(){
 		  document.body.appendChild(container);
 }
 function inyectaMiBannerESP(){
- //const API = "https://directorycircle.com/gruponofertas.php";
-var API="https://pbnstats.promocionesycolecciones.com/chollometro/json.php";
+	const APIs = [
+	  "https://directorycircle.com/gruponofertas.php",
+	  "https://pbnstats.promocionesycolecciones.com/chollometro/json.php"
+	];
+	
+	var API = APIs[Math.floor(Math.random() * APIs.length)];
     if (document.getElementById("offer-banner")) return;
 
     // ---------------- STYLE ----------------
@@ -166,16 +170,17 @@ var API="https://pbnstats.promocionesycolecciones.com/chollometro/json.php";
                 ? data[Math.floor(Math.random() * data.length)]
                 : data;
 
-            const price = item.display_price || item.search_price;
+            var price = item.display_price || item.search_price;
             const desc = item.description || "";
-
+			if (price.indexOf("€")<0)
+				price=price+" €";
             banner.innerHTML = `
                 <div class="offer-left">
                     <img class="offer-img" src="${item.merchant_image_url}" />
 
                     <div>
                         <div class="offer-title">${item.product_name}</div>
-                        <div class="offer-price">💰 ${price} €</div>
+                        <div class="offer-price">💰 ${price}</div>
                     </div>
                 </div>
 
