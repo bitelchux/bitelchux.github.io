@@ -54,6 +54,142 @@ function inyectavideo(){
 		  container.appendChild(text);
 		  document.body.appendChild(container);
 }
+function inyectaMiBannerESP(){
+ const API = "https://directorycircle.com/gruponofertas.php";
+
+    if (document.getElementById("offer-banner")) return;
+
+    // ---------------- STYLE ----------------
+    const style = document.createElement("style");
+    style.textContent = `
+        #offer-banner{
+            position:fixed;
+            bottom:0;
+            left:0;
+            width:100%;
+            background:#0f0f0f;
+            color:#fff;
+            z-index:999999;
+            font-family:Arial;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            padding:10px 14px;
+            box-shadow:0 -6px 20px rgba(0,0,0,.6);
+            gap:12px;
+        }
+
+        .offer-left{
+            display:flex;
+            align-items:center;
+            gap:12px;
+            max-width:55%;
+        }
+
+        .offer-img{
+            width:80px;
+            height:80px;
+            object-fit:cover;
+            border-radius:10px;
+            flex-shrink:0;
+        }
+
+        .offer-title{
+            font-size:14px;
+            font-weight:700;
+            line-height:1.2;
+        }
+
+        .offer-price{
+            display:inline-block;
+            margin-top:6px;
+            background:#ff2d2d;
+            color:#fff;
+            padding:5px 12px;
+            border-radius:999px;
+            font-weight:800;
+            font-size:15px;
+        }
+
+        .offer-cta{
+            background:#ffd000;
+            color:#000;
+            padding:11px 16px;
+            border-radius:10px;
+            font-weight:800;
+            text-decoration:none;
+            white-space:nowrap;
+        }
+
+        /* 🔥 TICKER */
+        .offer-ticker{
+            flex:1;
+            overflow:hidden;
+            white-space:nowrap;
+            margin:0 10px;
+            border-left:1px solid rgba(255,255,255,0.2);
+            border-right:1px solid rgba(255,255,255,0.2);
+            padding:0 10px;
+        }
+
+        .offer-ticker span{
+            display:inline-block;
+            padding-left:100%;
+            animation:ticker 18s linear infinite;
+            font-size:13px;
+            color:#ccc;
+        }
+
+        @keyframes ticker{
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+
+        @media(max-width:700px){
+            .offer-img{width:65px;height:65px;}
+            .offer-ticker{display:none;} /* ocultamos ticker en móvil */
+        }
+    `;
+    document.head.appendChild(style);
+
+    // ---------------- CREATE ----------------
+    const banner = document.createElement("div");
+    banner.id = "offer-banner";
+    document.body.appendChild(banner);
+
+    // ---------------- LOAD ----------------
+    fetch(API)
+        .then(res => res.json())
+        .then(data => {
+
+            const item = Array.isArray(data)
+                ? data[Math.floor(Math.random() * data.length)]
+                : data;
+
+            const price = item.display_price || item.search_price;
+            const desc = item.description || "";
+
+            banner.innerHTML = `
+                <div class="offer-left">
+                    <img class="offer-img" src="${item.merchant_image_url}" />
+
+                    <div>
+                        <div class="offer-title">${item.product_name}</div>
+                        <div class="offer-price">💰 ${price} €</div>
+                    </div>
+                </div>
+
+                <div class="offer-ticker">
+                    <span>🔥 ${desc} 🔥 ${desc} 🔥 ${desc}</span>
+                </div>
+
+                <a class="offer-cta" target="_blank" href="${item.aw_deep_link}">
+                    Ver oferta →
+                </a>
+            `;
+        })
+        .catch(err => console.error("Error loading offer:", err));
+}
 function inyectaMiBanner(){
 	(function () {
 	  var footerBanner = document.createElement("div");
@@ -583,6 +719,7 @@ function legalizeimages(){
 	const excludedDomains = [
 	  "youtube.com",
 		"i.ytimg.com",
+		"img.grouponcdn.com",
 	  "youtu.be",
 	  "amazon.com",
 	  "amazon.es",
@@ -665,7 +802,9 @@ function legalizeimages(){
 		reemplazarTagsAmazonSimple('pyc03-21');
     reemplazarTagsAmazonNormales('pyc03-21');
 	legalizeimages();
-	/*mi banner*/
+	if (window.cfpais=="spain")
+		inyectaMiBannerESP();
+	else
 		inyectaMiBanner();
 	return;
 	inyectavideo();
