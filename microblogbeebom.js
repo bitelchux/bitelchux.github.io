@@ -99,6 +99,8 @@ function inyectaMiBannerESP() {
       padding:4px 10px;
       border-radius:999px;
       font-weight:800;
+      text-align: center;
+      width: fit-content;
     }
 
     .offer-cta{
