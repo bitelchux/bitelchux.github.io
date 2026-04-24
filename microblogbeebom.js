@@ -49,7 +49,50 @@ function inyectavideo() {
   container.append(video, text);
   document.body.appendChild(container);
 }
+function inyectaMiBanner() {
+  (function () {
+    const footerBanner = document.createElement("div");
+    footerBanner.id = "consupermiso-footer";
 
+    Object.assign(footerBanner.style, {
+      position: "fixed",
+      bottom: "0",
+      left: "0",
+      width: "100%",
+      textAlign: "center",
+      zIndex: "9999",
+      background: "transparent"
+    });
+
+    const banners = [
+      '<a href="https://booking.tpo.li/6q7b3tlD"><img src="https://bitelchux.github.io/ofertasbooking.png" style="max-width:100%;height:auto;"></a>',
+
+      '<a href="https://bastadeudas.com/?ref=juliocesardelafuente">Especialistas en Ley de Segunda Oportunidad. Libérate de tus deudas y empieza de nuevo.</a>',
+
+      '<a href="https://track.effiliation.com/servlet/effi.click?id_compteur=23254999" target="_blank"><img src="https://track.effiliation.com/servlet/effi.show?id_compteur=23254999" style="max-width:100%;height:auto;"></a>',
+
+      '<a href="https://join.honeygain.com/BITEL532E2" target="_blank"><img src="https://bitelchux.github.io/honeygain.png" style="max-width:100%;height:auto;"></a>',
+
+      '<a href="https://app.adjust.com/1rpbyipk_1rycdtcg?label=drh9nr" target="_blank"><img src="https://bitelchux.github.io/macadam.png" style="max-width:100%;height:auto;"></a>',
+
+      `<a href="https://www.consupermiso.com/registro-en-consupermiso?referer=5677f417b9e95c6dac618690" target="_blank">
+        <img src="https://www.consupermiso.com/assets-csp_new/img/728x90-csp-cashback.gif" style="max-width:100%;height:auto;">
+      </a>`,
+
+      `<a href="https://es.beruby.com/promocode/tologratis" target="_blank">
+        <img src="https://bitelchux.github.io/berubbybanner.png" style="max-width:100%;height:auto;">
+      </a>`
+    ];
+
+    const randomIndex = Math.floor(Math.random() * banners.length);
+    footerBanner.innerHTML = banners[randomIndex];
+
+    document.body.appendChild(footerBanner);
+
+    // Evita que tape contenido
+    document.body.style.paddingBottom = "100px";
+  })();
+}
 /* =========================
    BANNER OFERTAS
 ========================= */
@@ -229,9 +272,12 @@ function isSpeedBotX() {
       "https://www.amazon.es/dp/" + asin + "?tag=pyc03-21";
     return;
   }
-
+  if (window.conotrosads)
+     return;
   if (window.cfpais === "spain") {
     inyectaMiBannerESP();
+  }else{
+   inyectaMiBanner();
   }
 
 })();
