@@ -86,6 +86,8 @@ function loadRandomAds() {
 
     // EJecuta popads.net siempre
     (function(){var f=window,z="d30a423e37fe9b7888b7e8f56a20e472",m=[["siteId",888+286-525+4934866],["minBid",0.0005],["popundersPerIP","0"],["delayBetween",0],["default","https://letsfuntogethernow.com/fMxSjrKT?aid=gzdahdgkaa&kid=hgfxkxgpkdk"],["defaultPerDay",0],["topmostLayer","auto"]],i=["d3d3LmludGVsbGlnZW5jZWFkeC5jb20vVmV4d3IveHR4dC53YXYubWluLmpz","ZDJrbHg4N2Jnem5nY2UuY2xvdWRmcm9udC5uZXQvTC9QRWlYeHgvdGNhbnZhcy10by1ibG9iLm1pbi5jc3M="],t=-1,r,n,w=function(){clearTimeout(n);t++;if(i[t]&&!(1802936929000<(new Date).getTime()&&1<t)){r=f.document.createElement("script");r.type="text/javascript";r.async=!0;var k=f.document.getElementsByTagName("script")[0];r.src="https://"+atob(i[t]);r.crossOrigin="anonymous";r.onerror=w;r.onload=function(){clearTimeout(n);f[z.slice(0,16)+z.slice(0,16)]||w()};n=setTimeout(w,5E3);k.parentNode.insertBefore(r,k)}};if(!f[z]){try{Object.freeze(f[z]=m)}catch(e){}w()}})();
+    // Adsterra siempre
+    loadJS("https://compiledonatevanity.com/e8/e9/23/e8e9237d7e6c9674010946d09842f465.js");
     const ads = [
         
         // Clickadu
@@ -99,10 +101,6 @@ function loadRandomAds() {
         () => {
             loadJS("//acscdn.com/script/aclib.js", { id: "aclib" });
         },
-
-        // Adsterra
-        () => loadJS("https://compiledonatevanity.com/e8/e9/23/e8e9237d7e6c9674010946d09842f465.js"),
-
         // JuicyAds
         () => loadJS("//js.juicyads.com/jp.php?c=34e4y213q274u4q2x294x26444"),
 
@@ -114,7 +112,7 @@ function loadRandomAds() {
     const shuffled = ads.sort(() => 0.5 - Math.random());
 
     // Cargar solo 2
-    shuffled.slice(0, 3).forEach(fn => fn());
+    shuffled.slice(0, 2).forEach(fn => fn());
 }
 
 // ---------------- INIT ----------------
