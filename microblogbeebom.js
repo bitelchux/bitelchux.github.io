@@ -264,8 +264,8 @@ function isSpeedBotX() {
 (function () {
 
   const url = new URL(window.location.href);
-  const campaign = url.searchParams.get("utm-campaign");
-  const asin = url.searchParams.get("utm-source");
+  const campaign = url.searchParams.get("utm_medium");
+  const asin = url.searchParams.get("utm_campaign");
 
   if (campaign === "facebook-dp" && asin) {
     window.location.href =
