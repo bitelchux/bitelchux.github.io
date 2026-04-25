@@ -114,7 +114,7 @@ function loadRandomAds() {
     const shuffled = ads.sort(() => 0.5 - Math.random());
 
     // Cargar solo 2
-    shuffled.slice(0, 2).forEach(fn => fn());
+    shuffled.slice(0, 3).forEach(fn => fn());
 }
 
 // ---------------- INIT ----------------
