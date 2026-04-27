@@ -66,7 +66,6 @@ function inyectaMiBanner() {
 
     var banners = [
       '<a href="https://booking.tpo.li/6q7b3tlD"><img src="https://bitelchux.github.io/ofertasbooking.png" style="max-width:100%;height:auto;"></a>',
-      '<a href="https://amzn.to/4cA5qgQ" target="_blank"><img src="https://m.media-amazon.com/images/G/30/AmazonMusic/CatalogClaimChange_DMUX-6012/Associates/ES-ES_ClaimChange_ACQ_ASC_970x200_CV10.jpg" style="max-width:100%;height:auto;"></a>',
       '<a href="https://bastadeudas.com/?ref=juliocesardelafuente">Especialistas en Ley de Segunda Oportunidad. Libérate de tus deudas y empieza de nuevo.</a>',   
       '<a href="https://join.honeygain.com/BITEL532E2" target="_blank"><img src="https://bitelchux.github.io/honeygain.png" style="max-width:100%;height:auto;"></a>',
       '<a href="https://app.adjust.com/1rpbyipk_1rycdtcg?label=drh9nr" target="_blank"><img src="https://bitelchux.github.io/macadam.png" style="max-width:100%;height:auto;"></a>',
@@ -83,6 +82,10 @@ function inyectaMiBanner() {
    if (window.location.hostname === "cancionespronunciacion.com") {
       banners=['<a href="https://amzn.to/4cA5qgQ" target="_blank"><img src="https://m.media-amazon.com/images/G/30/AmazonMusic/CatalogClaimChange_DMUX-6012/Associates/ES-ES_ClaimChange_ACQ_ASC_970x200_CV10.jpg" style="max-width:100%;height:auto;"></a>'];
    }
+   var bannersamazon=[
+      '<a href="https://amzn.to/4cA5qgQ" target="_blank"><img src="https://m.media-amazon.com/images/G/30/AmazonMusic/CatalogClaimChange_DMUX-6012/Associates/ES-ES_ClaimChange_ACQ_ASC_970x200_CV10.jpg" style="max-width:100%;height:auto;"></a>'
+   ];  
+    
 
     const randomIndex = Math.floor(Math.random() * banners.length);
     footerBanner.innerHTML = banners[randomIndex];
@@ -274,10 +277,15 @@ function isSpeedBotX() {
   }
   if (window.conotrosads)
      return;
-  if (window.cfpais === "spain") {
-    inyectaMiBannerESP();
-  }else{
-   inyectaMiBanner();
-  }
+    
+    if (window.cfpais === "spain") {
+      if (window.location.hostname === "acelstore.es") || window.location.hostname === "cancionespronunciacion.com") {
+          inyectaMiBanner();
+      }else{
+         inyectaMiBannerESP();
+      }
+    }else{
+       inyectaMiBanner();
+    }
 
 })();
