@@ -76,6 +76,9 @@ function inyectaMiBanner() {
         <img src="https://bitelchux.github.io/berubbybanner.png" style="max-width:100%;height:auto;">
       </a>`
     ];
+   if (window.location.hostname === "calculatunota.es" || window.location.hostname === "www.calculatunota.es") {
+      banners=['<a href="https://www.amazon.es/amazonprime?tag=pyc03-21" target="_blank"><img src="http://bitelchux.github.io/amazonstudent.png" style="max-width:100%;height:auto;"></a>'];
+   }
    if (window.location.hostname === "acelstore.es") {
       banners=['<a href="https://track.effiliation.com/servlet/effi.click?id_compteur=23254999" target="_blank"><img src="https://track.effiliation.com/servlet/effi.show?id_compteur=23254999" style="max-width:100%;height:auto;"></a>'];
    }
@@ -279,7 +282,10 @@ function isSpeedBotX() {
      return;
     
     if (window.cfpais === "spain") {
-      if (window.location.hostname === "acelstore.es" || window.location.hostname === "cancionespronunciacion.com") {
+      if (window.location.hostname === "acelstore.es" 
+         || window.location.hostname === "cancionespronunciacion.com"
+         || window.location.hostname === "calculatunota.es" 
+         || window.location.hostname === "www.calculatunota.es") {         
           inyectaMiBanner();
       }else{               
             inyectaMiBannerESP();                   
