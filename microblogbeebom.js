@@ -295,7 +295,7 @@ function isSpeedBotX() {
        if (n<50){
           inyectaMiBanner();
        }else{
-          inyectaVideo();
+          inyectavideo();
        }
     }
 
