@@ -43,7 +43,7 @@ function inyectavideo() {
   });
 
   container.onclick = () => {
-    window.open("https://play.famobi.com/om-nom-run/A-06DF8", "_blank");
+    window.open("https://juegosboom.com", "_blank");
   };
 
   container.append(video, text);
@@ -281,11 +281,16 @@ function isSpeedBotX() {
     if (window.cfpais === "spain") {
       if (window.location.hostname === "acelstore.es") || window.location.hostname === "cancionespronunciacion.com") {
           inyectaMiBanner();
-      }else{
-         inyectaMiBannerESP();
+      }else{               
+            inyectaMiBannerESP();                   
       }
     }else{
-       inyectaMiBanner();
+       const n = Math.floor(Math.random() * (100 - 1 + 1)) + 1;
+       if (n<50){
+          inyectaMiBanner();
+       }else{
+          inyectaVideo();
+       }
     }
 
 })();
