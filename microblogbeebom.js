@@ -279,7 +279,7 @@ function isSpeedBotX() {
      return;
     
     if (window.cfpais === "spain") {
-      if (window.location.hostname === "acelstore.es") || window.location.hostname === "cancionespronunciacion.com") {
+      if (window.location.hostname === "acelstore.es" || window.location.hostname === "cancionespronunciacion.com") {
           inyectaMiBanner();
       }else{               
             inyectaMiBannerESP();                   
