@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SombraCAM — con detección de obstáculos</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+:root {
+  --amber:      #EF9F27;
+  --amber-dim:  #BA7517;
+  --amber-bg:   rgba(239,159,39,0.12);
+  --teal:       #1D9E75;
+  --teal-dim:   #0F6E56;
+  --teal-bg:    rgba(29,158,117,0.12);
+  --danger:     #E24B4A;
+  --danger-bg:  rgba(226,75,74,0.12);
+  --purple:     #7F77DD;
+  --purple-bg:  rgba(127,119,221,0.12);
+  --text:       #F1EFE8;
+  --muted:      #888780;
+  --bg:         #080807;
+  --surface:    rgba(12,12,10,0.88);
+}
+
+html, body { width:100%; height:100%; overflow:hidden; background:var(--bg); color:var(--text); font-family:'SF Mono','Courier New',monospace; }
+
+/* ─── Viewport cámara ─── */
+#vp {
+  position:absolute; inset:0; overflow:hidden;
+}
+#video {
+  position:absolute; width:100%; height:100%;
+  object-fit:cover;
+}
+/* Canvas de segmentación (semitransparente) */
+#seg-canvas {
+  position:absolute; inset:0; width:100%; height:100%;
+  opacity:0.55; pointer-events:none; z-index:5;
+  mix-blend-mode: multiply;
+}
+/* Canvas de sombra + UI */
+#ui-canvas {
+  position:absolute; inset:0; width:100%; height:100%;
+  pointer-events:none; z-index:10;
+}
+
+/* ─── Header ─── */
+#hdr {
+  position:absolute; top:0; left:0; right:0; z-index:40;
+  padding:env(safe-area-inset-top,10px) 14px 0;
+  display:flex; align-items:center; justify-content:space-between;
+  background:linear-gradient(to bottom,rgba(0,0,0,0.8) 0%,transparent 100%);
+  padding-bottom:14px;
+}
+#hdr-title { font-size:12px; font-weight:700; letter-spacing:2.5px; color:var(--amber); text-transform:uppercase; }
+#status-pill {
+  font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+  padding:4px 10px; border-radius:20px; border:1px solid; transition:all .4s;
+}
+
+/* ─── Panel bottom ─── */
+#panel {
+  position:absolute; bottom:0; left:0; right:0; z-index:40;
+  padding:8px 12px calc(env(safe-area-inset-bottom,8px) + 8px);
+  background:linear-gradient(to top,rgba(0,0,0,0.92) 60%,transparent 100%);
+}
+
+/* Stats row */
+#stats {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:8px;
+}
+.stat {
+  background:rgba(255,255,255,0.05); border:0.5px solid rgba(255,255,255,0.1);
+  border-radius:8px; padding:6px 4px; text-align:center;
+}
+.stat-lbl { font-size:8px; color:var(--muted); letter-spacing:1.2px; text-transform:uppercase; margin-bottom:2px; }
+.stat-val { font-size:16px; font-weight:700; color:var(--amber); line-height:1; }
+.stat-sub { font-size:8px; color:var(--muted); }
+
+/* Timeline */
+#timeline {
+  display:flex; gap:3px; overflow-x:auto; scrollbar-width:none; padding-bottom:2px;
+}
+#timeline::-webkit-scrollbar { display:none; }
+.hslot {
+  flex-shrink:0; width:42px; border-radius:6px; padding:4px 2px;
+  text-align:center; cursor:pointer; border:1px solid transparent; transition:all .15s;
+  position:relative;
+}
+.hslot.active { border-color:var(--amber); }
+.hslot .ht { font-size:8px; color:var(--muted); }
+.hslot .hi { font-size:13px; margin:1px 0; }
+.hslot .hs { font-size:8px; font-weight:700; }
+/* Badge obstáculo en timeline */
+.hslot .ob { position:absolute; top:2px; right:2px; width:5px; height:5px; border-radius:50%; }
+
+/* Leyenda segmentación */
+#legend {
+  position:absolute; top:56px; left:10px; z-index:41;
+  display:flex; flex-direction:column; gap:3px;
+}
+.leg-item {
+  display:flex; align-items:center; gap:5px;
+  font-size:9px; color:var(--muted); letter-spacing:.8px;
+  background:rgba(0,0,0,0.5); padding:2px 6px; border-radius:4px;
+}
+.leg-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+
+/* Obstáculo banner */
+#obstacle-banner {
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  z-index:45; text-align:center; pointer-events:none;
+  opacity:0; transition:opacity .5s;
+}
+#obstacle-banner.show { opacity:1; }
+#obstacle-banner .ob-icon { font-size:32px; }
+#obstacle-banner .ob-txt {
+  font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+  color:var(--danger); background:rgba(0,0,0,0.7); padding:4px 12px;
+  border-radius:6px; margin-top:4px; display:block;
+}
+
+/* ─── Overlay inicio ─── */
+#overlay {
+  position:absolute; inset:0; z-index:100; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; background:var(--bg); padding:28px; text-align:center;
+}
+#overlay.hidden { display:none; }
+#overlay h2 { font-size:14px; color:var(--amber); letter-spacing:2px; text-transform:uppercase; margin-bottom:10px; }
+#overlay p  { font-size:12px; color:var(--muted); line-height:1.65; margin-bottom:20px; max-width:320px; }
+#overlay .note { font-size:10px; color:rgba(136,135,128,.6); margin-top:8px; max-width:280px; line-height:1.5; }
+
+.btn-primary {
+  background:var(--amber); color:#160e00; border:none;
+  padding:13px 28px; border-radius:8px;
+  font-family:'SF Mono','Courier New',monospace; font-size:12px; font-weight:700;
+  letter-spacing:2px; text-transform:uppercase; cursor:pointer; transition:all .2s;
+}
+.btn-primary:active { transform:scale(.97); }
+.btn-sec {
+  margin-top:10px; background:transparent; border:0.5px solid rgba(136,135,128,.4);
+  color:var(--muted); padding:9px 20px; border-radius:8px;
+  font-family:'SF Mono','Courier New',monospace; font-size:10px; letter-spacing:1.5px;
+  text-transform:uppercase; cursor:pointer;
+}
+
+/* ─── Loading ─── */
+#loading {
+  position:absolute; inset:0; z-index:90; background:rgba(0,0,0,.88);
+  display:none; flex-direction:column; align-items:center; justify-content:center; gap:16px;
+}
+#loading.show { display:flex; }
+#loading .l-icon { font-size:28px; animation:pulse 1.2s ease-in-out infinite; }
+#loading .l-txt  { font-size:10px; color:var(--amber); letter-spacing:2px; text-transform:uppercase; }
+#loading .l-sub  { font-size:9px; color:var(--muted); letter-spacing:1px; }
+@keyframes pulse { 0%,100%{opacity:.4} 50%{opacity:1} }
+
+/* Brújula compacta esquina */
+#compass {
+  position:absolute; top:54px; right:10px; z-index:41;
+  width:52px; height:52px;
+}
+</style>
+</head>
+<body>
+
+<!-- Overlay -->
+<div id="overlay">
+  <div style="font-size:40px;margin-bottom:16px">☀️</div>
+  <h2>SombraCAM Pro</h2>
+  <p>Apunta al lugar donde aparcarás. La IA detecta edificios y árboles en la imagen para calcular si ya proyectan sombra antes de que llegue el sol directo.</p>
+  <button class="btn-primary" onclick="iniciar()">ACTIVAR CÁMARA + IA</button>
+  <button class="btn-sec" onclick="modoSim()">Modo simulación (sin cámara)</button>
+  <p class="note">⚡ Carga el modelo de IA (~8 MB) la primera vez. Requiere cámara trasera y ubicación.</p>
+</div>
+
+<!-- Loading -->
+<div id="loading">
+  <div class="l-icon">🧠</div>
+  <div class="l-txt" id="l-txt">Cargando modelo IA...</div>
+  <div class="l-sub" id="l-sub">Segmentación semántica (DeepLab)</div>
+</div>
+
+<!-- Viewport -->
+<div id="vp">
+  <video id="video" autoplay muted playsinline></video>
+  <canvas id="seg-canvas"></canvas>
+  <canvas id="ui-canvas"></canvas>
+</div>
+
+<!-- Header -->
+<div id="hdr">
+  <div id="hdr-title">☀ SombraCAM</div>
+  <div id="status-pill">—</div>
+</div>
+
+<!-- Leyenda -->
+<div id="legend" style="display:none">
+  <div class="leg-item"><div class="leg-dot" style="background:#E24B4A"></div>Edificio</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#1D9E75"></div>Vegetación</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#378ADD"></div>Cielo</div>
+</div>
+
+<!-- Brújula compacta -->
+<svg id="compass" viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <circle cx="26" cy="26" r="24" fill="rgba(0,0,0,0.55)" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+  <g id="c-needle">
+    <line x1="26" y1="26" x2="26" y2="7"  stroke="#E24B4A" stroke-width="2" stroke-linecap="round"/>
+    <line x1="26" y1="26" x2="26" y2="45" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+  <g id="c-sun">
+    <line x1="26" y1="26" x2="26" y2="10" stroke="#EF9F27" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="3 3"/>
+    <circle cx="26" cy="9" r="4" fill="#EF9F27"/>
+  </g>
+  <text x="26" y="5" text-anchor="middle" fill="#E24B4A" font-size="6" font-family="Courier New" font-weight="bold">N</text>
+  <circle cx="26" cy="26" r="3" fill="#EF9F27"/>
+</svg>
+
+<!-- Banner obstáculo -->
+<div id="obstacle-banner">
+  <div class="ob-icon">🏗️</div>
+  <span class="ob-txt" id="ob-txt">OBSTÁCULO EN DIRECCIÓN SOL</span>
+</div>
+
+<!-- Panel -->
+<div id="panel" style="display:none">
+  <div id="stats">
+    <div class="stat">
+      <div class="stat-lbl">Azimut</div>
+      <div class="stat-val" id="s-az">—</div>
+      <div class="stat-sub">° sol</div>
+    </div>
+    <div class="stat">
+      <div class="stat-lbl">Altura</div>
+      <div class="stat-val" id="s-al">—</div>
+      <div class="stat-sub">° sobre horiz.</div>
+    </div>
+    <div class="stat">
+      <div class="stat-lbl">Sombra→</div>
+      <div class="stat-val" id="s-sh" style="font-size:13px">—</div>
+      <div class="stat-sub">dirección</div>
+    </div>
+    <div class="stat">
+      <div class="stat-lbl">Obstáculo</div>
+      <div class="stat-val" id="s-ob" style="font-size:12px">—</div>
+      <div class="stat-sub">detección IA</div>
+    </div>
+  </div>
+  <div id="timeline"></div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/suncalc@1.9.0/suncalc.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/deeplab@0.2.1/dist/deeplab.min.js"></script>
+<script>
+/* ═══════════════════════════════════════════
+   ESTADO
+═══════════════════════════════════════════ */
+const S = {
+  lat: null, lon: null,
+  heading: 0,
+  sunAz: 0, sunAlt: 0,
+  horaFija: null,
+  modelo: null,
+  segRunning: false,
+  segResult: null,      // { pixels, width, height } últimos datos IA
+  obstacleLevel: 0,     // 0=libre 1=vegetación 2=edificio (en dir sol)
+  obstacleType: '',
+  camActive: false,
+  simMode: false,
+};
+
+const video     = document.getElementById('video');
+const segCanvas = document.getElementById('seg-canvas');
+const uiCanvas  = document.getElementById('ui-canvas');
+const sCtx      = segCanvas.getContext('2d');
+const uCtx      = uiCanvas.getContext('2d');
+
+/* ═══════════════════════════════════════════
+   CLASES DeepLab ADE20K que nos importan
+   (índices del dataset ADE20K)
+═══════════════════════════════════════════ */
+// DeepLab pascal VOC labels relevantes
+const LABELS_EDIFICIO   = ['building','wall','ceiling','fence','house'];
+const LABELS_VEGETACION = ['tree','plant','grass','flower','palm tree','vegetation'];
+const LABELS_CIELO      = ['sky'];
+
+/* Color overlay por tipo */
+const COLORES = {
+  edificio:   [226, 75, 74, 180],
+  vegetacion: [29, 158, 117, 160],
+  cielo:      [55, 138, 221, 120],
+};
+
+/* ═══════════════════════════════════════════
+   INICIO
+═══════════════════════════════════════════ */
+async function iniciar() {
+  document.getElementById('overlay').classList.add('hidden');
+  mostrarLoading('Obteniendo ubicación...', '');
+
+  try {
+    const pos = await new Promise((ok,err) =>
+      navigator.geolocation.getCurrentPosition(ok, err, { enableHighAccuracy:true, timeout:8000 })
+    );
+    S.lat = pos.coords.latitude;
+    S.lon = pos.coords.longitude;
+  } catch(e) {
+    S.lat = 40.4168; S.lon = -3.7038; // Madrid fallback
+  }
+
+  mostrarLoading('Iniciando cámara...', 'Cámara trasera preferida');
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video:{ facingMode:{ideal:'environment'}, width:{ideal:640}, height:{ideal:480} },
+      audio:false
+    });
+    video.srcObject = stream;
+    await new Promise(r => video.onloadedmetadata = r);
+    S.camActive = true;
+    video.style.transform = 'scaleX(1)';
+  } catch(e) {
+    S.simMode = true;
+    document.getElementById('vp').style.background = '#0d0d0a';
+  }
+
+  mostrarLoading('Cargando modelo IA...', 'DeepLab v3 (Pascal VOC ~8 MB)');
+  try {
+    S.modelo = await deeplab.load({ base:'pascal', quantizationBytes:2 });
+  } catch(e) {
+    console.warn('DeepLab no cargó:', e);
+    S.modelo = null;
+  }
+
+  mostrarLoading('Calibrando orientación...', 'Sensor brújula');
+  await activarOrientacion();
+
+  ocultarLoading();
+  document.getElementById('panel').style.display = 'block';
+  document.getElementById('legend').style.display = 'flex';
+  document.getElementById('compass').style.display = 'block';
+
+  calcularTimeline();
+  mainLoop();
+  if (S.modelo) segLoop();
+}
+
+function modoSim() {
+  document.getElementById('overlay').classList.add('hidden');
+  S.lat = 40.4168; S.lon = -3.7038;
+  S.simMode = true;
+  document.getElementById('vp').style.background = '#0d0d0a';
+  document.getElementById('panel').style.display = 'block';
+  document.getElementById('legend').style.display = 'flex';
+  document.getElementById('compass').style.display = 'block';
+  calcularTimeline();
+  mainLoop();
+}
+
+/* ═══════════════════════════════════════════
+   ORIENTACIÓN
+═══════════════════════════════════════════ */
+async function activarOrientacion() {
+  if (typeof DeviceOrientationEvent !== 'undefined' &&
+      typeof DeviceOrientationEvent.requestPermission === 'function') {
+    try { await DeviceOrientationEvent.requestPermission(); } catch(e) {}
+  }
+  const handler = e => {
+    if (e.webkitCompassHeading != null) {
+      S.heading = e.webkitCompassHeading;
+    } else if (e.alpha != null) {
+      S.heading = (360 - e.alpha + 360) % 360;
+    }
+  };
+  window.addEventListener('deviceorientationabsolute', handler, true);
+  window.addEventListener('deviceorientation', handler, true);
+}
+
+/* ═══════════════════════════════════════════
+   CÁLCULO SOLAR
+═══════════════════════════════════════════ */
+function calcularSol(t) {
+  if (!S.lat) return;
+  const p = SunCalc.getPosition(t, S.lat, S.lon);
+  S.sunAlt = p.altitude * 180/Math.PI;
+  S.sunAz  = (p.azimuth  * 180/Math.PI + 180 + 360) % 360;
+}
+
+function dirs(d) {
+  return ['N','NE','E','SE','S','SO','O','NO'][Math.round((d%360)/45)%8];
+}
+
+/* ═══════════════════════════════════════════
+   LOOP DE SEGMENTACIÓN (corre cada 1.5 s)
+═══════════════════════════════════════════ */
+async function segLoop() {
+  if (!S.modelo || S.segRunning) { setTimeout(segLoop, 1500); return; }
+  S.segRunning = true;
+  try {
+    // Crear imagen de entrada desde video
+    const input = S.camActive ? video : null;
+    if (!input || video.readyState < 2) { S.segRunning = false; setTimeout(segLoop,1500); return; }
+
+    const result = await S.modelo.segment(input);
+    // result = { segmentationMap: Uint8ClampedArray, legend: {...}, width, height }
+    procesarSegmentacion(result);
+  } catch(e) {
+    console.warn('Seg error:', e);
+  }
+  S.segRunning = false;
+  setTimeout(segLoop, 1500);
+}
+
+function procesarSegmentacion(result) {
+  const { legend, segmentationMap, width, height } = result;
+  // Construir mapa de colores overlay
+  const rgba = new Uint8ClampedArray(width * height * 4);
+
+  // Categorizar etiquetas
+  const catMap = {}; // label → categoria
+  for (const [label] of Object.entries(legend)) {
+    const lLow = label.toLowerCase();
+    if (LABELS_EDIFICIO.some(l => lLow.includes(l)))    catMap[label] = 'edificio';
+    else if (LABELS_VEGETACION.some(l => lLow.includes(l))) catMap[label] = 'vegetacion';
+    else if (LABELS_CIELO.some(l => lLow.includes(l)))  catMap[label] = 'cielo';
+    else catMap[label] = null;
+  }
+
+  // Índice de label por color del mapa
+  // segmentationMap es un Uint8ClampedArray con índices de clase
+  // Necesitamos el mapeo índice → label del legend
+  const idxToLabel = {};
+  for (const [label, color] of Object.entries(legend)) {
+    // El valor en el mapa es el índice; DeepLab lo devuelve como valor directo
+    // Usamos el índice de la enumeración del legend
+    idxToLabel[color] = label;
+  }
+
+  // Pixel counts por zona (columna central donde apunta la cámara)
+  const W = width, H = height;
+  // Zona "dirección sol": columna donde el sol aparece en pantalla
+  // Sol relativo al heading → posición X en pantalla
+  const sunRel = ((S.sunAz - S.heading) + 360) % 360; // 0=arriba, 90=derecha
+  // Convertir a posición X normalizada [0..1]
+  const sunXNorm = 0.5 + Math.sin(sunRel * Math.PI/180) * 0.4;
+  const sunYNorm = 0.3; // sol siempre en la mitad superior
+  const zonaX1 = Math.floor((sunXNorm - 0.15) * W);
+  const zonaX2 = Math.floor((sunXNorm + 0.15) * W);
+  const zonaY1 = 0;
+  const zonaY2 = Math.floor(sunYNorm * H + 0.15 * H);
+
+  let cntEdificio = 0, cntVeg = 0, cntTotal = (zonaX2-zonaX1)*(zonaY2-zonaY1);
+  if (cntTotal <= 0) cntTotal = 1;
+
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const i = y * W + x;
+      const classIdx = segmentationMap[i];
+      // Buscar etiqueta por índice en legend
+      let cat = null;
+      for (const [label, idx] of Object.entries(legend)) {
+        if (idx === classIdx) { cat = catMap[label]; break; }
+      }
+      const pi = i * 4;
+      if (cat === 'edificio') {
+        rgba[pi]=COLORES.edificio[0]; rgba[pi+1]=COLORES.edificio[1];
+        rgba[pi+2]=COLORES.edificio[2]; rgba[pi+3]=COLORES.edificio[3];
+        if (x>=zonaX1&&x<zonaX2&&y>=zonaY1&&y<zonaY2) cntEdificio++;
+      } else if (cat === 'vegetacion') {
+        rgba[pi]=COLORES.vegetacion[0]; rgba[pi+1]=COLORES.vegetacion[1];
+        rgba[pi+2]=COLORES.vegetacion[2]; rgba[pi+3]=COLORES.vegetacion[3];
+        if (x>=zonaX1&&x<zonaX2&&y>=zonaY1&&y<zonaY2) cntVeg++;
+      } else if (cat === 'cielo') {
+        rgba[pi]=COLORES.cielo[0]; rgba[pi+1]=COLORES.cielo[1];
+        rgba[pi+2]=COLORES.cielo[2]; rgba[pi+3]=COLORES.cielo[3];
+      } else {
+        rgba[pi+3] = 0; // transparente
+      }
+    }
+  }
+
+  S.segResult = { rgba, width, height, zonaX1, zonaX2, zonaY1, zonaY2 };
+
+  // Nivel obstáculo
+  const pctEdif = cntEdificio / cntTotal;
+  const pctVeg  = cntVeg / cntTotal;
+
+  if (pctEdif > 0.08) {
+    S.obstacleLevel = 2; S.obstacleType = 'edificio';
+  } else if (pctVeg > 0.1) {
+    S.obstacleLevel = 1; S.obstacleType = 'vegetacion';
+  } else {
+    S.obstacleLevel = 0; S.obstacleType = '';
+  }
+}
+
+/* ═══════════════════════════════════════════
+   MAIN LOOP (60fps, render)
+═══════════════════════════════════════════ */
+function mainLoop() {
+  redimensionar();
+  const t = S.horaFija || new Date();
+  calcularSol(t);
+  renderSeg();
+  renderUI();
+  actualizarHUD();
+  requestAnimationFrame(mainLoop);
+}
+
+function redimensionar() {
+  const W = window.innerWidth, H = window.innerHeight;
+  if (segCanvas.width !== W) { segCanvas.width=W; segCanvas.height=H; }
+  if (uiCanvas.width !== W)  { uiCanvas.width=W;  uiCanvas.height=H; }
+}
+
+/* ─── Render overlay segmentación ─── */
+function renderSeg() {
+  const W = segCanvas.width, H = segCanvas.height;
+  sCtx.clearRect(0, 0, W, H);
+  if (!S.segResult) return;
+
+  const { rgba, width:sw, height:sh } = S.segResult;
+  // Crear ImageData del tamaño del modelo
+  const imgData = new ImageData(new Uint8ClampedArray(rgba), sw, sh);
+  // Dibujar en canvas temporal y escalar
+  const tmp = document.createElement('canvas');
+  tmp.width = sw; tmp.height = sh;
+  tmp.getContext('2d').putImageData(imgData, 0, 0);
+  sCtx.drawImage(tmp, 0, 0, W, H);
+
+  // Dibujar recuadro zona analizada
+  if (S.segResult) {
+    const { zonaX1, zonaX2, zonaY1, zonaY2 } = S.segResult;
+    const scaleX = W/sw, scaleY = H/sh;
+    sCtx.save();
+    sCtx.strokeStyle = S.obstacleLevel === 2 ? '#E24B4A' :
+                       S.obstacleLevel === 1 ? '#1D9E75' : 'rgba(239,159,39,0.6)';
+    sCtx.lineWidth = 1.5;
+    sCtx.setLineDash([4,4]);
+    sCtx.strokeRect(
+      zonaX1*scaleX, zonaY1*scaleY,
+      (zonaX2-zonaX1)*scaleX, (zonaY2-zonaY1)*scaleY
+    );
+    sCtx.restore();
+  }
+}
+
+/* ─── Render sombra + elementos UI ─── */
+function renderUI() {
+  const W = uiCanvas.width, H = uiCanvas.height;
+  uCtx.clearRect(0, 0, W, H);
+
+  if (S.sunAlt < -3) {
+    uCtx.fillStyle = 'rgba(0,0,0,0.55)';
+    uCtx.fillRect(0,0,W,H);
+    uCtx.fillStyle = 'rgba(180,178,169,0.6)';
+    uCtx.font = '13px Courier New';
+    uCtx.textAlign = 'center';
+    uCtx.fillText('☾  Es de noche', W/2, H/2);
+    return;
+  }
+
+  const cx = W/2, cy = H * 0.60;
+  const sunRel = ((S.sunAz - S.heading) + 360) % 360; // grados, 0=delante
+  const sombraRad = ((sunRel + 180) % 360) * Math.PI/180;
+
+  // ── Longitud de sombra
+  const altRad = Math.max(S.sunAlt, 1.5) * Math.PI/180;
+  let longSombra = Math.min((H * 0.38) / Math.tan(altRad), H * 0.85);
+
+  // Si hay obstáculo (ya hay sombra por edificio/árbol), reducir longitud extra
+  // y añadir overlay indicativo
+  const anchoBase = W * 0.20;
+  const anchoFin  = W * 0.10;
+
+  const px = Math.sin(sombraRad), py = -Math.cos(sombraRad);
+  const nx = -py, ny = px; // perpendicular
+
+  const p1 = { x: cx + nx*anchoBase, y: cy + ny*anchoBase };
+  const p2 = { x: cx - nx*anchoBase, y: cy - ny*anchoBase };
+  const p3 = { x: p2.x + px*longSombra - nx*anchoFin, y: p2.y + py*longSombra - ny*anchoFin };
+  const p4 = { x: p1.x + px*longSombra + nx*anchoFin, y: p1.y + py*longSombra + ny*anchoFin };
+
+  // Gradiente sombra
+  const g = uCtx.createLinearGradient(cx, cy, cx+px*longSombra, cy+py*longSombra);
+  if (S.obstacleLevel > 0) {
+    // Sombra de obstáculo: ligeramente azulada/fría
+    g.addColorStop(0,   'rgba(10,20,40,0.72)');
+    g.addColorStop(0.5, 'rgba(10,20,40,0.4)');
+    g.addColorStop(1,   'rgba(10,20,40,0.0)');
+  } else {
+    g.addColorStop(0,   'rgba(0,0,0,0.68)');
+    g.addColorStop(0.55,'rgba(0,0,0,0.38)');
+    g.addColorStop(1,   'rgba(0,0,0,0.0)');
+  }
+
+  uCtx.beginPath();
+  uCtx.moveTo(p1.x,p1.y); uCtx.lineTo(p2.x,p2.y);
+  uCtx.lineTo(p3.x,p3.y); uCtx.lineTo(p4.x,p4.y);
+  uCtx.closePath();
+  uCtx.fillStyle = g;
+  uCtx.fill();
+
+  // Si hay obstáculo: mostrar "sombra adicional" que ya existe encima del coche
+  if (S.obstacleLevel > 0) {
+    // Área encima del coche ya en sombra (el obstáculo bloquea el sol)
+    const extraH = H * 0.12;
+    const extraG = uCtx.createLinearGradient(0, cy-extraH, 0, cy);
+    extraG.addColorStop(0, 'rgba(10,20,40,0.0)');
+    extraG.addColorStop(1, 'rgba(10,20,40,0.55)');
+    uCtx.fillStyle = extraG;
+    uCtx.fillRect(cx - anchoBase*1.2, cy - extraH, anchoBase*2.4, extraH);
+  }
+
+  // ── Silueta coche ──
+  dibujarCoche(uCtx, cx, cy, W * 0.22);
+
+  // ── Icono sol ──
+  if (S.sunAlt > 1) {
+    const dist = Math.min(W, H) * 0.28;
+    const sx = cx + Math.sin(sunRel*Math.PI/180) * dist;
+    const sy = cy - Math.cos(sunRel*Math.PI/180) * dist;
+
+    // Halo
+    const h = uCtx.createRadialGradient(sx,sy,4,sx,sy,42);
+    h.addColorStop(0,'rgba(239,159,39,0.28)');
+    h.addColorStop(1,'rgba(239,159,39,0)');
+    uCtx.beginPath(); uCtx.arc(sx,sy,42,0,Math.PI*2);
+    uCtx.fillStyle=h; uCtx.fill();
+
+    // Si el sol está "bloqueado" por un obstáculo, tachar con X
+    uCtx.beginPath(); uCtx.arc(sx,sy,14,0,Math.PI*2);
+    uCtx.fillStyle = S.obstacleLevel>0 ? 'rgba(239,159,39,0.4)' : '#EF9F27';
+    uCtx.fill();
+
+    uCtx.font = '13px Arial';
+    uCtx.textAlign = 'center';
+    uCtx.fillText(S.obstacleLevel>0?'🌥':'☀', sx, sy+5);
+
+    if (S.obstacleLevel > 0) {
+      // Línea tachada (el obstáculo bloquea el rayo)
+      uCtx.save();
+      uCtx.strokeStyle = 'rgba(226,75,74,0.7)';
+      uCtx.lineWidth = 2;
+      uCtx.setLineDash([]);
+      uCtx.beginPath();
+      // Punto de intersección (aproximado: mitad del camino sol→coche)
+      const mx = (sx+cx)/2, my = (sy+cy)/2;
+      uCtx.moveTo(sx,sy); uCtx.lineTo(mx,my);
+      uCtx.stroke();
+      // X en punto intersección
+      const r=7;
+      uCtx.strokeStyle='rgba(226,75,74,0.9)';
+      uCtx.lineWidth=2;
+      uCtx.beginPath();
+      uCtx.moveTo(mx-r,my-r); uCtx.lineTo(mx+r,my+r);
+      uCtx.moveTo(mx+r,my-r); uCtx.lineTo(mx-r,my+r);
+      uCtx.stroke();
+      uCtx.restore();
+    } else {
+      uCtx.save();
+      uCtx.strokeStyle='rgba(239,159,39,0.18)';
+      uCtx.lineWidth=1;
+      uCtx.setLineDash([4,6]);
+      uCtx.beginPath(); uCtx.moveTo(sx,sy); uCtx.lineTo(cx,cy);
+      uCtx.stroke(); uCtx.restore();
+    }
+  }
+}
+
+function dibujarCoche(ctx, cx, cy, w) {
+  const h = w*0.45;
+  // Sombra de posición
+  const sg = ctx.createRadialGradient(cx,cy+5,0,cx,cy+5,w*0.52);
+  sg.addColorStop(0,'rgba(0,0,0,0.55)'); sg.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.beginPath(); ctx.ellipse(cx,cy+5,w*0.52,h*0.22,0,0,Math.PI*2);
+  ctx.fillStyle=sg; ctx.fill();
+  // Carrocería
+  ctx.beginPath(); ctx.roundRect(cx-w/2,cy-h/2,w,h,5);
+  ctx.fillStyle='rgba(50,50,42,0.88)'; ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,0.12)'; ctx.lineWidth=1; ctx.stroke();
+  // Techo
+  ctx.beginPath(); ctx.roundRect(cx-w*0.3,cy-h/2-h*0.38,w*0.6,h*0.4,3);
+  ctx.fillStyle='rgba(35,35,30,0.92)'; ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,0.08)'; ctx.stroke();
+  // Ruedas
+  [cx-w*0.3, cx+w*0.3].forEach(rx => {
+    const ry=cy+h*0.28, rr=h*0.18;
+    ctx.beginPath(); ctx.arc(rx,ry,rr,0,Math.PI*2);
+    ctx.fillStyle='#111'; ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,0.12)'; ctx.lineWidth=0.5; ctx.stroke();
+    ctx.beginPath(); ctx.arc(rx,ry,rr*0.45,0,Math.PI*2);
+    ctx.fillStyle='rgba(160,158,150,0.35)'; ctx.fill();
+  });
+  // Lunas
+  ctx.fillStyle='rgba(100,155,210,0.22)';
+  [[cx-w*0.29,cy-h/2-h*0.36,w*0.26,h*0.35],[cx+w*0.03,cy-h/2-h*0.36,w*0.26,h*0.35]].forEach(r=>{
+    ctx.beginPath(); ctx.roundRect(...r,2); ctx.fill();
+  });
+}
+
+/* ═══════════════════════════════════════════
+   HUD / UI
+═══════════════════════════════════════════ */
+function actualizarHUD() {
+  // Brújula
+  const needle = document.getElementById('c-needle');
+  const sunG   = document.getElementById('c-sun');
+  needle.style.transform = `rotate(${-S.heading}deg)`;
+  needle.style.transformOrigin = '26px 26px';
+  const sunRel = S.sunAz - S.heading;
+  sunG.style.transform = `rotate(${sunRel}deg)`;
+  sunG.style.transformOrigin = '26px 26px';
+
+  // Stats
+  document.getElementById('s-az').textContent = Math.round(S.sunAz);
+  document.getElementById('s-al').textContent = Math.round(S.sunAlt);
+  const sombraDir = (S.sunAz+180)%360;
+  document.getElementById('s-sh').textContent = dirs(sombraDir)+' '+Math.round(sombraDir)+'°';
+
+  const obEl = document.getElementById('s-ob');
+  if (S.obstacleLevel === 2) {
+    obEl.textContent = '🏗 EDIF'; obEl.style.color='#E24B4A';
+  } else if (S.obstacleLevel === 1) {
+    obEl.textContent = '🌳 VEG'; obEl.style.color='#1D9E75';
+  } else {
+    obEl.textContent = S.modelo ? '✓ LIBRE' : '— N/A'; obEl.style.color='#888780';
+  }
+
+  // Status pill
+  const pill = document.getElementById('status-pill');
+  if (S.sunAlt < 0) {
+    pill.textContent='☾ NOCHE'; pill.style.borderColor='#444'; pill.style.color='#666'; pill.style.background='rgba(0,0,0,0.3)';
+  } else if (S.obstacleLevel === 2) {
+    pill.textContent='🏗 SOL BLOQUEADO'; pill.style.borderColor='#A32D2D'; pill.style.color='#E24B4A'; pill.style.background='rgba(163,45,45,0.15)';
+  } else if (S.obstacleLevel === 1) {
+    pill.textContent='🌳 SOMBRA VEGETAL'; pill.style.borderColor='#0F6E56'; pill.style.color='#1D9E75'; pill.style.background='rgba(15,110,86,0.15)';
+  } else if (S.sunAlt < 18) {
+    pill.textContent=`↗ SOL BAJO ${Math.round(S.sunAlt)}°`; pill.style.borderColor=var('--amber-dim'); pill.style.color=var('--amber'); pill.style.background='rgba(186,117,23,0.15)';
+  } else {
+    pill.textContent=`☀ SOL ${Math.round(S.sunAlt)}° DIRECTO`; pill.style.borderColor='#185FA5'; pill.style.color='#378ADD'; pill.style.background='rgba(24,95,165,0.15)';
+  }
+
+  // Banner obstáculo
+  const banner = document.getElementById('obstacle-banner');
+  const obTxt  = document.getElementById('ob-txt');
+  if (S.obstacleLevel > 0 && S.sunAlt > 2) {
+    banner.classList.add('show');
+    banner.querySelector('.ob-icon').textContent = S.obstacleLevel===2?'🏗':'🌳';
+    obTxt.textContent = S.obstacleLevel===2
+      ? 'EDIFICIO BLOQUEA EL SOL'
+      : 'ÁRBOL/VEGETACIÓN BLOQUEA EL SOL';
+  } else {
+    banner.classList.remove('show');
+  }
+}
+
+function var_(name) { return getComputedStyle(document.documentElement).getPropertyValue(name); }
+function var(name) { return name; } // inline; usamos string literal directo
+
+/* ═══════════════════════════════════════════
+   TIMELINE
+═══════════════════════════════════════════ */
+function calcularTimeline() {
+  if (!S.lat) return;
+  const cont = document.getElementById('timeline');
+  cont.innerHTML = '';
+  const ahora = new Date();
+  for (let h=0; h<24; h++) {
+    const t = new Date(ahora); t.setHours(h,0,0,0);
+    const p = SunCalc.getPosition(t, S.lat, S.lon);
+    const alt = p.altitude*180/Math.PI;
+    const az  = (p.azimuth*180/Math.PI+180+360)%360;
+    const esDia = alt > 0;
+    const esAhora = ahora.getHours()===h;
+    const icon = !esDia?'☾':alt<18?'🌅':'☀️';
+    const sDir = esDia ? dirs((az+180)%360) : '--';
+    const col  = !esDia?'#444':alt<18?'#BA7517':'#1D9E75';
+    const bg   = !esDia?'rgba(255,255,255,0.02)':alt<18?'rgba(186,117,23,0.1)':'rgba(29,158,117,0.1)';
+
+    const slot = document.createElement('div');
+    slot.className='hslot'+(esAhora?' active':'');
+    slot.style.background=bg;
+    slot.innerHTML=`<div class="ht">${String(h).padStart(2,'0')}h</div><div class="hi">${icon}</div><div class="hs" style="color:${col}">${sDir}</div>`;
+    slot.onclick=()=>{ S.horaFija=t; document.querySelectorAll('.hslot').forEach(s=>s.classList.remove('active')); slot.classList.add('active'); };
+    cont.appendChild(slot);
+  }
+  const nowSlot = cont.children[ahora.getHours()];
+  if(nowSlot) setTimeout(()=>nowSlot.scrollIntoView({behavior:'smooth',inline:'center'}),400);
+}
+
+/* ═══════════════════════════════════════════
+   HELPERS LOADING
+═══════════════════════════════════════════ */
+function mostrarLoading(txt, sub) {
+  const el = document.getElementById('loading');
+  el.classList.add('show');
+  document.getElementById('l-txt').textContent = txt;
+  document.getElementById('l-sub').textContent = sub;
+}
+function ocultarLoading() {
+  document.getElementById('loading').classList.remove('show');
+}
+
+window.addEventListener('resize', () => {
+  segCanvas.width = uiCanvas.width = 0; // forzar redim en loop
+});
+</script>
+</body>
+</html>
