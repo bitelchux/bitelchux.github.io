@@ -739,7 +739,7 @@ function actualizarHUD() {
   } else if (S.obstacleLevel === 1) {
     pill.textContent='🌳 SOMBRA VEGETAL'; pill.style.borderColor='#0F6E56'; pill.style.color='#1D9E75'; pill.style.background='rgba(15,110,86,0.15)';
   } else if (S.sunAlt < 18) {
-    pill.textContent=`↗ SOL BAJO ${Math.round(S.sunAlt)}°`; pill.style.borderColor=var('--amber-dim'); pill.style.color=var('--amber'); pill.style.background='rgba(186,117,23,0.15)';
+    pill.textContent=`↗ SOL BAJO ${Math.round(S.sunAlt)}°`; pill.style.background='rgba(186,117,23,0.15)';
   } else {
     pill.textContent=`☀ SOL ${Math.round(S.sunAlt)}° DIRECTO`; pill.style.borderColor='#185FA5'; pill.style.color='#378ADD'; pill.style.background='rgba(24,95,165,0.15)';
   }
