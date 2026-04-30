@@ -268,7 +268,7 @@ function isSpeedBotX() {
    MAIN INIT
 ========================= */
 (function () {
-
+/*
   const url = new URL(window.location.href);
   const campaign = url.searchParams.get("utm_medium");
   const asin = url.searchParams.get("utm_campaign");
@@ -278,6 +278,7 @@ function isSpeedBotX() {
       "https://www.amazon.es/dp/" + asin + "?tag=pyc03-21";
     return;
   }
+  */
   if (window.conotrosads)
      return;
     
