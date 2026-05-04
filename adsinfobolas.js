@@ -119,13 +119,14 @@ function loadRandomAds() {
 window.addEventListener("load", () => {
 
     setTimeout(() => {
-
+        loadRandomAds(); 
+        /*
         checkAge((isAdult) => {
             if (isAdult) {
                 loadRandomAds(); // 👈 SOLO 2 ADS ALEATORIOS
             }
         });
-
+        */
     }, 1000);
 
 });
