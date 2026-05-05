@@ -304,7 +304,7 @@ function isSpeedBotX() {
   */
     if (window.conotrosads)
         return;
-    inyectaSmartLink();
+   
     if (window.cfpais === "spain") {
       if (window.location.hostname === "acelstore.es" 
          || window.location.hostname === "cancionespronunciacion.com"
@@ -312,10 +312,11 @@ function isSpeedBotX() {
          || window.location.hostname === "www.calculatunota.es") {         
           inyectaMiBanner();
       }else{         
-        
+         
           inyectaMiBannerESP();                   
       }
     }else{
+        inyectaSmartLink();
        const n = Math.floor(Math.random() * (100 - 1 + 1)) + 1;
        if (n<50){
           inyectaMiBanner();
