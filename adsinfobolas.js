@@ -246,6 +246,11 @@ function inyectaMiBannerESP() {
 window.addEventListener("load", () => {
 
     setTimeout(() => {
+        fetch("https://ipapi.co/json/")
+          .then(res => res.json())
+          .then(data => {
+            window.cfpais = data.country; 
+        });
         if (window.cfpais === "ES") {    
             inyectaMiBannerESP();    
         
