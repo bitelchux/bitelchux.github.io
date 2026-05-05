@@ -250,13 +250,12 @@ window.addEventListener("load", () => {
           .then(res => res.json())
           .then(data => {
             window.cfpais = data.country; 
+            if (window.cfpais === "ES") {    
+                inyectaMiBannerESP();
+            }else{
+                loadRandomAds(); 
+            }
         });
-        if (window.cfpais === "ES") {    
-            inyectaMiBannerESP();    
-        
-        }else{
-            loadRandomAds(); 
-        }
         /*
         checkAge((isAdult) => {
             if (isAdult) {
