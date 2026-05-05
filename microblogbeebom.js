@@ -99,6 +99,29 @@ function inyectaMiBanner() {
     document.body.style.paddingBottom = "100px";
   })();
 }
+function inyectaSmartLink(){
+
+    /*Los Pollos smartlink*/
+          var disallowedDomain = "docentestic.es";
+          var popunder = {expire: 12, url: "https://vplpmrb.captivatingteam.org/kk32p3v"};
+      
+          if (window.location.hostname !== disallowedDomain) {
+           ! function() {
+                var e, t = popunder.url || "http://google.com",
+                    n = "click",
+                    o = "popunder",
+                    c = popunder.clicks_num || 1,
+                    i = popunder.expire || 24,		
+                    d = document.documentElement,
+                    u = "undefined",
+            		p = typeof popunder.path != u ? ";path=" + popunder.path  : "",
+                    a = function() {
+                        0 === --c && (document.cookie.match(/(^|\W)popunder=1(\W|$)/) || (window.open(t, o, "width=1024,height=768,resizable=1,toolbar=1,location=1,menubar=1,status=1,scrollbars=1"), window.focus(), e = new Date, e.setTime(e.getTime() + 3600 * i * 1e3), document.cookie = o + "=1; expires=" + e.toGMTString() + p))
+                    };
+                typeof d.addEventListener != u ? d.addEventListener(n, a, !1) : typeof d.attachEvent != u && d.attachEvent("on" + n, a)
+            }();
+          }
+}
 /* =========================
    BANNER OFERTAS
 ========================= */
@@ -279,17 +302,18 @@ function isSpeedBotX() {
     return;
   }
   */
-  if (window.conotrosads)
-     return;
-    
+    if (window.conotrosads)
+        return;
+    inyectaSmartLink();
     if (window.cfpais === "spain") {
       if (window.location.hostname === "acelstore.es" 
          || window.location.hostname === "cancionespronunciacion.com"
          || window.location.hostname === "calculatunota.es" 
          || window.location.hostname === "www.calculatunota.es") {         
           inyectaMiBanner();
-      }else{               
-            inyectaMiBannerESP();                   
+      }else{         
+        
+          inyectaMiBannerESP();                   
       }
     }else{
        const n = Math.floor(Math.random() * (100 - 1 + 1)) + 1;
@@ -299,5 +323,5 @@ function isSpeedBotX() {
           inyectavideo();
        }
     }
-
-})();
+   
+   })();
