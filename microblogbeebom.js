@@ -307,10 +307,11 @@ function isSpeedBotX() {
    
     if (window.cfpais === "spain") {
       if (window.location.hostname === "acelstore.es" 
-         || window.location.hostname === "cancionespronunciacion.com"
-         || window.location.hostname === "calculatunota.es" 
-         || window.location.hostname === "www.calculatunota.es") {         
-          inyectaMiBanner();
+         || window.location.hostname === "caddddncionespronunciacion.com"
+         || window.location.hostname === "calddddculatunota.es" 
+         || window.location.hostname === "www.calculddddatunota.es") {         
+         inyectaMiBannerESP(); 
+         
       }else{         
          
           inyectaMiBannerESP();                   
