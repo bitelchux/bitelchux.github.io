@@ -246,11 +246,12 @@ function inyectaMiBannerESP() {
 window.addEventListener("load", () => {
 
     setTimeout(() => {
-         if (window.cfpais === "spain") {    
-          inyectaMiBannerESP();                   
-      }else
-        loadRandomAds(); 
-    }
+        if (window.cfpais === "ES") {    
+            inyectaMiBannerESP();    
+        
+        }else
+            loadRandomAds(); 
+        }
         /*
         checkAge((isAdult) => {
             if (isAdult) {
