@@ -131,8 +131,8 @@ function inyectaMiBannerESP() {
     "https://pbnstats.promocionesycolecciones.com/chollometro/json.php"
   ];
 
-  const API = APIs[Math.floor(Math.random() * APIs.length)];
-
+  var API = APIs[Math.floor(Math.random() * APIs.length)];
+  API="https://pbnstats.promocionesycolecciones.com/chollometro/json.php"; //force amazon
   if (document.getElementById("offer-banner")) return;
 
   const style = document.createElement("style");
