@@ -249,7 +249,7 @@ window.addEventListener("load", () => {
         if (window.cfpais === "ES") {    
             inyectaMiBannerESP();    
         
-        }else
+        }else{
             loadRandomAds(); 
         }
         /*
