@@ -114,12 +114,143 @@ function loadRandomAds() {
     // Cargar solo 4
     shuffled.slice(0, 4).forEach(fn => fn());
 }
+function inyectaMiBannerESP() {
+  const APIs = [
+    "https://directorycircle.com/gruponofertas.php",
+    "https://pbnstats.promocionesycolecciones.com/chollometro/json.php"
+  ];
+
+  var API = APIs[Math.floor(Math.random() * APIs.length)];
+  API="https://pbnstats.promocionesycolecciones.com/chollometro/json.php"; //force amazon
+  if (document.getElementById("offer-banner")) return;
+
+  const style = document.createElement("style");
+  style.textContent = `
+    #offer-banner{
+      position:fixed;
+      bottom:0;
+      left:0;
+      width:100%;
+      background:#0f0f0f;
+      color:#fff;
+      z-index:999999;
+      font-family:Arial;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:10px 14px;
+      gap:12px;
+      cursor:pointer;
+    }
+
+    .offer-left{display:flex;align-items:center;gap:12px;}
+
+    .offer-img{
+      width:130px;
+      height:80px;
+      object-fit:cover;
+      border-radius:4px;
+    }
+
+    .offer-title{font-size:14px;font-weight:700;}
+
+    .offer-price{
+      margin-top:6px;
+      background:#ff2d2d;
+      padding:4px 10px;
+      border-radius:999px;
+      font-weight:800;
+      text-align: center;
+      width: fit-content;
+    }
+
+    .offer-cta{
+      background:#ffd000;
+      padding:10px 14px;
+      border-radius:10px;
+      font-weight:800;
+      text-decoration:none;
+      color:#000;
+      white-space:nowrap;
+    }
+
+    .offer-ticker{
+      flex:1;
+      overflow:hidden;
+      white-space:nowrap;
+      margin:0 10px;
+    }
+
+    .offer-ticker span{
+      display:inline-block;
+      padding-left:100%;
+      animation:ticker 18s linear infinite;
+      color:#ccc;
+      font-size:13px;
+    }
+
+    @keyframes ticker{
+      0%{transform:translateX(0);}
+      100%{transform:translateX(-100%);}
+    }
+
+    @media(max-width:700px){
+      .offer-ticker{display:none;}
+      .offer-cta{display:none;}
+    }
+  `;
+  document.head.appendChild(style);
+
+  const banner = document.createElement("div");
+  banner.id = "offer-banner";
+  document.body.appendChild(banner);
+
+  fetch(API)
+    .then(r => r.json())
+    .then(data => {
+      const item = Array.isArray(data)
+        ? data[Math.floor(Math.random() * data.length)]
+        : data;
+
+      let price = item.display_price || item.search_price || "";
+      if (!price.toString().includes("€")) price += " €";
+
+      const url = item.aw_deep_link;
+
+      banner.innerHTML = `
+        <div class="offer-left">
+          <img class="offer-img" src="${item.merchant_image_url}">
+          <div>
+            <div class="offer-title">${item.product_name}</div>
+            <div class="offer-price">💰 ${price}</div>
+          </div>
+        </div>
+
+        <div class="offer-ticker">
+          <span>${item.description || ""}</span>
+        </div>
+
+        <a class="offer-cta" target="_blank" href="${url}">
+          Ver oferta →
+        </a>
+      `;
+
+      banner.onclick = (e) => {
+        if (e.target.closest(".offer-cta")) return;
+        window.open(url, "_blank");
+      };
+    });
+}
 
 // ---------------- INIT ----------------
 window.addEventListener("load", () => {
 
     setTimeout(() => {
+         if (window.cfpais === "spain") {    
+          inyectaMiBannerESP();                   
+      }else
         loadRandomAds(); 
+    }
         /*
         checkAge((isAdult) => {
             if (isAdult) {
