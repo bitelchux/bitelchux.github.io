@@ -1,5 +1,39 @@
 console.log("github js cargado");
+function updateAmazonAffiliateTags() {
+  // Mapa de dominios → tags
+  const domainTagMap = {
+    "acelstore.es": "iphonesreacondicionados-21"
+  };
 
+ 
+  const fallbackTag = "otrosafiliados-21";
+  const protectedTag = "pyc03-21";
+
+  const currentDomain = window.location.hostname.replace(/^www\./, "");
+  const selectedTag = domainTagMap[currentDomain] || fallbackTag;
+
+  const links = document.querySelectorAll("a[href*='amazon.es']");
+
+  links.forEach(link => {
+    try {
+      const url = new URL(link.href);
+
+      if (!url.hostname.includes("amazon.")) return;
+
+      const currentTag = url.searchParams.get("tag");
+
+      // Si el tag es el protegido → no hacer nada
+      if (currentTag === protectedTag) return;
+
+      // Si no tiene tag o es distinto → actualizar
+      url.searchParams.set("tag", selectedTag);
+
+      link.href = url.toString();
+    } catch (e) {
+      console.warn("URL inválida:", link.href);
+    }
+  });
+}
 /* =========================
    VIDEO BANNER
 ========================= */
@@ -291,6 +325,9 @@ function isSpeedBotX() {
    MAIN INIT
 ========================= */
 (function () {
+   document.addEventListener("DOMContentLoaded", () => {
+     setTimeout(updateAmazonAffiliateTags, 2000);
+   });
 /*
   const url = new URL(window.location.href);
   const campaign = url.searchParams.get("utm_medium");
