@@ -338,7 +338,7 @@ function isSpeedBotX() {
     return;
   }
   */
-    if (window.conotrosads)
+    if (window.conotrosads || window.adsbygoogle!=undefined)
         return;
    
     if (window.cfpais === "spain") {
