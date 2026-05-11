@@ -325,9 +325,8 @@ function isSpeedBotX() {
    MAIN INIT
 ========================= */
 (function () {
-   document.addEventListener("DOMContentLoaded", () => {
-     setTimeout(updateAmazonAffiliateTags, 2000);
-   });
+  setTimeout(updateAmazonAffiliateTags, 2000);
+
 /*
   const url = new URL(window.location.href);
   const campaign = url.searchParams.get("utm_medium");
