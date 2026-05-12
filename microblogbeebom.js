@@ -338,7 +338,8 @@ function isSpeedBotX() {
     return;
   }
   */
-    if (window.conotrosads || window.adsbygoogle!=undefined)
+  /*window.conotrosads*/
+    if (window.adsbygoogle!=undefined)
         return;
    
     if (window.cfpais === "spain") {
