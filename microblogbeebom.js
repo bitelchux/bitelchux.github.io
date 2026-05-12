@@ -110,13 +110,13 @@ function inyectaMiBanner() {
         <img src="https://bitelchux.github.io/berubbybanner.png" style="max-width:100%;height:auto;">
       </a>`
     ];
-   if (window.location.hostname === "calculatunota.es" || window.location.hostname === "www.calculatunota.es") {
+   if (window.location.hostname === "calculatunotaxxxx.es" || window.location.hostname === "www.calculatunotaxxxx.es") {
       banners=['<a href="https://www.amazon.es/amazonprime?tag=pyc03-21" target="_blank"><img src="http://bitelchux.github.io/amazonstudent.png" style="max-width:100%;height:auto;"></a>'];
    }
-   if (window.location.hostname === "acelstore.es") {
+   if (window.location.hostname === "acelstorexxxx.es") {
       banners=['<a href="https://track.effiliation.com/servlet/effi.click?id_compteur=23254999" target="_blank"><img src="https://track.effiliation.com/servlet/effi.show?id_compteur=23254999" style="max-width:100%;height:auto;"></a>'];
    }
-   if (window.location.hostname === "cancionespronunciacion.com") {
+   if (window.location.hostname === "cancionespronunciacionxxxx.com") {
       banners=['<a href="https://amzn.to/4cA5qgQ" target="_blank"><img src="https://m.media-amazon.com/images/G/30/AmazonMusic/CatalogClaimChange_DMUX-6012/Associates/ES-ES_ClaimChange_ACQ_ASC_970x200_CV10.jpg" style="max-width:100%;height:auto;"></a>'];
    }
    var bannersamazon=[
