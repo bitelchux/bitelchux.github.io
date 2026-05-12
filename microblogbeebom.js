@@ -160,6 +160,7 @@ function inyectaSmartLink(){
    BANNER OFERTAS
 ========================= */
 function inyectaMiBannerESP() {
+  
   const APIs = [
     "https://directorycircle.com/gruponofertas.php",
     "https://pbnstats.promocionesycolecciones.com/chollometro/json.php"
@@ -167,6 +168,9 @@ function inyectaMiBannerESP() {
 
   var API = APIs[Math.floor(Math.random() * APIs.length)];
   API="https://pbnstats.promocionesycolecciones.com/chollometro/json.php"; //force amazon
+  if (window.location.hostname === "acelstore.es"){
+     API="https://bitelchux.github.io/acelstore.json"; //force amazon reacondicionados
+  }
   if (document.getElementById("offer-banner")) return;
 
   const style = document.createElement("style");
