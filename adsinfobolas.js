@@ -91,6 +91,9 @@ function loadRandomAds() {
     loadJS("https://compiledonatevanity.com/e8/e9/23/e8e9237d7e6c9674010946d09842f465.js");
     //adsterra popup siempre 
     loadJS("https://compiledonatevanity.com/a4/e7/55/a4e7557f2067c4c0f922d9747a61a17f.js");
+    // ads tacoloco siempre
+    loadJS("https://laxai.inppcdn.com/ipp.js?id=TTamVW_gsUiQYnYWvzLcLw");
+    
     const ads = [
         
         // Clickadu
