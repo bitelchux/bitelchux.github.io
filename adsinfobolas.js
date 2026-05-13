@@ -88,9 +88,9 @@ function loadRandomAds() {
     // EJecuta popads.net siempre
     (function(){var f=window,z="d30a423e37fe9b7888b7e8f56a20e472",m=[["siteId",888+286-525+4934866],["minBid",0.0000001],["popundersPerIP","0"],["delayBetween",0],["default","https://vplpmrb.new-hotman.com/kkf283q"],["defaultPerDay",0],["topmostLayer","auto"]],i=["d3d3LmludGVsbGlnZW5jZWFkeC5jb20vVmV4d3IveHR4dC53YXYubWluLmpz","ZDJrbHg4N2Jnem5nY2UuY2xvdWRmcm9udC5uZXQvTC9QRWlYeHgvdGNhbnZhcy10by1ibG9iLm1pbi5jc3M="],t=-1,r,n,w=function(){clearTimeout(n);t++;if(i[t]&&!(1802936929000<(new Date).getTime()&&1<t)){r=f.document.createElement("script");r.type="text/javascript";r.async=!0;var k=f.document.getElementsByTagName("script")[0];r.src="https://"+atob(i[t]);r.crossOrigin="anonymous";r.onerror=w;r.onload=function(){clearTimeout(n);f[z.slice(0,16)+z.slice(0,16)]||w()};n=setTimeout(w,5E3);k.parentNode.insertBefore(r,k)}};if(!f[z]){try{Object.freeze(f[z]=m)}catch(e){}w()}})();
     // Adsterra sticker siempre
-    loadJS("https://compiledonatevanity.com/e8/e9/23/e8e9237d7e6c9674010946d09842f465.js");
+    //loadJS("https://compiledonatevanity.com/e8/e9/23/e8e9237d7e6c9674010946d09842f465.js");
     //adsterra popup siempre 
-    loadJS("https://compiledonatevanity.com/a4/e7/55/a4e7557f2067c4c0f922d9747a61a17f.js");
+    //loadJS("https://compiledonatevanity.com/a4/e7/55/a4e7557f2067c4c0f922d9747a61a17f.js");
     // ads tacoloco siempre
    // loadJS("https://laxai.inppcdn.com/ipp.js?id=TTamVW_gsUiQYnYWvzLcLw");
     
@@ -118,7 +118,7 @@ function loadRandomAds() {
     const shuffled = ads.sort(() => 0.5 - Math.random());
 
     // Cargar solo 4
-    shuffled.slice(0, 4).forEach(fn => fn());
+    //shuffled.slice(0, 4).forEach(fn => fn());
 }
 function inyectaMiBannerESP() {
   const APIs = [
