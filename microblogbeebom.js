@@ -346,17 +346,11 @@ function isSpeedBotX() {
     if (window.adsbygoogle!=undefined)
         return;
    
-    if (window.cfpais === "spain") {
-      if (window.location.hostname === "acelstore.es" 
-         || window.location.hostname === "caddddncionespronunciacion.com"
-         || window.location.hostname === "calddddculatunota.es" 
-         || window.location.hostname === "www.calculddddatunota.es") {         
-         inyectaMiBannerESP(); 
-         
-      }else{         
+    if (window.cfpais === "spainxxx") {
+      
          
           inyectaMiBannerESP();                   
-      }
+      
     }else{
         inyectaSmartLink();
        const n = Math.floor(Math.random() * (100 - 1 + 1)) + 1;
