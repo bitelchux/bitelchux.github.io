@@ -99,6 +99,7 @@ function inyectaMiBanner() {
     });
 
     var banners = [
+      '<a href="https://taxdown.es/referido?ref=62WTGBNEE0U7VI7Y&s=4"><img src="https://www.audiolis.com/wp-content/uploads/2021/04/banner-taxdown.gif" style="max-width:100%;height:auto;"></a>',
       '<a href="https://booking.tpo.li/6q7b3tlD"><img src="https://bitelchux.github.io/ofertasbooking.png" style="max-width:100%;height:auto;"></a>',
       '<a href="https://bastadeudas.com/?ref=juliocesardelafuente">Especialistas en Ley de Segunda Oportunidad. Libérate de tus deudas y empieza de nuevo.</a>',   
       '<a href="https://join.honeygain.com/BITEL532E2" target="_blank"><img src="https://bitelchux.github.io/honeygain.png" style="max-width:100%;height:auto;"></a>',
