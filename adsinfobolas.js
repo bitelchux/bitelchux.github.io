@@ -267,7 +267,7 @@ window.addEventListener("load", () => {
                             loadRandomAds(); 
                         }
                     });
-            }
+            });
         });
         
     }, 1000);
