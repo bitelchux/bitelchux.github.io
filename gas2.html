@@ -295,6 +295,38 @@ body {
     .panel    { padding: 8px 10px; gap: 6px; }
     .filtros  { gap: 6px; }
     .filtros input[type=range] { width: 65px; }
+
+    /* Animación suave del panel: transición de max-height */
+    .panel {
+        overflow: hidden;
+        max-height: 300px;          /* valor mayor que el panel real */
+        transition: max-height .4s ease, padding .4s ease, gap .4s ease;
+    }
+    .panel.colapsado {
+        max-height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        gap: 0;
+    }
+
+    /* Pestaña toggle — siempre visible en móvil, cambia de texto */
+    .panel-expandir {
+        display: block;             /* siempre visible en móvil */
+        width: 100%;
+        padding: 6px 12px;
+        background: #1565C0;
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+        text-align: center;
+        flex-shrink: 0;
+        z-index: 1000;
+        letter-spacing: .3px;
+        transition: background .2s;
+    }
+    .panel-expandir:hover { background: #0D47A1; }
 }
 
 @media (min-width: 601px) and (max-width: 900px) {
@@ -306,9 +338,9 @@ body {
 <div class="app">
 
     <!-- ── PANEL DE CONTROLES ────────────────────────── -->
-    <div class="panel">
+    <div class="panel" id="panel">
 
-        <!-- Fila 1: buscadores de origen / destino -->
+        <!-- Fila 1: buscadores de origen / destino (siempre visible) -->
         <div class="row">
             <div class="input-wrap">
                 <input type="text" id="origen"  placeholder="Origen"  autocomplete="off">
@@ -324,7 +356,7 @@ body {
         </div>
 
         <!-- Fila 2: estado de carga del XLS -->
-        <div class="db-bar">
+        <div class="db-bar panel-db-bar">
             <div class="db-dot" id="dbDot"></div>
             <div class="db-text">
                 <strong id="dbLabel">Cargando datos…</strong>
@@ -336,7 +368,7 @@ body {
         </div>
 
         <!-- Fila 3: filtros -->
-        <div class="filtros">
+        <div class="filtros panel-filtros">
             <label>
                 <span id="umbralVal">150</span>m
                 <input type="range" id="umbral" min="50" max="550" step="50" value="150">
@@ -363,6 +395,11 @@ body {
         <!-- Mensaje de estado -->
         <div class="msg" id="msg"></div>
     </div>
+
+    <!-- Pestaña toggle del panel — siempre visible en móvil -->
+    <button class="panel-expandir" id="btnTogglePanel">
+        ▲ Ocultar búsqueda
+    </button>
 
     <!-- ── CUERPO: MAPA + SIDEBAR ────────────────────── -->
     <div class="main" id="main">
@@ -462,11 +499,44 @@ document.getElementById("ordenar").addEventListener("change", function(){
 
 // Colapsar / expandir sidebar
 document.getElementById("btnToggle").addEventListener("click", function(e){
-    e.stopPropagation();   // evitar que el click llegue a otros listeners
+    e.stopPropagation();
     toggleSidebar();
 });
 
+// Toggle del panel de búsqueda (móvil)
+document.getElementById("btnTogglePanel").addEventListener("click", function(){
+    togglePanel();
+});
+
 cargarXLS();
+
+
+// ════════════════════════════════════════════════════════
+//  COLAPSAR / EXPANDIR PANEL (solo en móvil)
+// ════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════
+//  TOGGLE PANEL DE BÚSQUEDA (solo en móvil)
+// ════════════════════════════════════════════════════════
+function togglePanel() {
+    if (window.innerWidth > 600) return;
+    var panel = document.getElementById("panel");
+    var btn   = document.getElementById("btnTogglePanel");
+    var colapsado = panel.classList.toggle("colapsado");
+    btn.textContent = colapsado ? "▼ Mostrar búsqueda" : "▲ Ocultar búsqueda";
+    // Reajustar mapa cuando termine la transición (.4s)
+    setTimeout(function(){ mapa.invalidateSize(); }, 420);
+}
+
+function colapsarPanel() {
+    if (window.innerWidth > 600) return;
+    var panel = document.getElementById("panel");
+    var btn   = document.getElementById("btnTogglePanel");
+    if (!panel.classList.contains("colapsado")) {
+        panel.classList.add("colapsado");
+        btn.textContent = "▼ Mostrar búsqueda";
+        setTimeout(function(){ mapa.invalidateSize(); }, 420);
+    }
+}
 
 
 // ════════════════════════════════════════════════════════
@@ -618,6 +688,9 @@ function calcularRuta() {
         } else {
             msg("✓ " + dist + " · " + dur + " — los datos de gasolineras aún se están cargando…", "ok");
         }
+
+        // En móvil: colapsar el panel de parámetros para ganar espacio
+        colapsarPanel();
     });
 
     routingControl.on("routingerror", function(e) {
