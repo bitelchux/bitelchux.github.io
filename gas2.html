@@ -99,15 +99,7 @@ body {
 .btn-primary:hover:not(:disabled) { background: #1565C0; }
 .btn-secondary { background: #607D8B; color: #fff; }
 .btn-secondary:hover { background: #546E7A; }
-/* Botón de buscar gasolineras — más destacado */
-.btn-buscar {
-    background: #2E7D32; color: #fff;
-    padding: 9px 18px;
-    font-size: 13px; font-weight: 700;
-    display: flex; align-items: center; gap: 6px;
-}
-.btn-buscar:hover:not(:disabled) { background: #1B5E20; }
-.btn-buscar:disabled { opacity: .5; cursor: not-allowed; }
+
 
 /* Estado descarga XLS */
 .db-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -343,38 +335,29 @@ body {
             </div>
         </div>
 
-        <!-- Fila 3: filtros + botón de búsqueda de gasolineras -->
-        <div class="row" style="flex-wrap:wrap; gap:8px;">
-
-            <!-- Filtros -->
-            <div class="filtros" style="flex:1; min-width:200px;">
-                <label>
-                    <span id="umbralVal">150</span>m
-                    <input type="range" id="umbral" min="50" max="550" step="50" value="150">
-                </label>
-                <label>
-                    <select id="filtroLado">
-                        <option value="D">Solo derecho</option>
-                        <option value="I">Solo izquierdo</option>
-                        <option value="A">Ambos lados</option>
-                        <option value="todos">Uno u otro</option>
-                    </select>
-                </label>
-                <label>
-                    <select id="filtroComb">
-                        <option value="todos">Todos combustibles</option>
-                        <option value="g95">Gasolina 95</option>
-                        <option value="g98">Gasolina 98</option>
-                        <option value="goa">Gasóleo A</option>
-                        <option value="glp">GLP</option>
-                    </select>
-                </label>
-            </div>
-
-            <!-- Botón principal de búsqueda (solo activo si hay ruta) -->
-            <button class="btn btn-buscar" id="btnBuscar" disabled title="Primero calcula una ruta">
-                ⛽ Buscar gasolineras en ruta
-            </button>
+        <!-- Fila 3: filtros -->
+        <div class="filtros">
+            <label>
+                <span id="umbralVal">150</span>m
+                <input type="range" id="umbral" min="50" max="550" step="50" value="150">
+            </label>
+            <label>
+                <select id="filtroLado">
+                    <option value="D">Solo derecho</option>
+                    <option value="I">Solo izquierdo</option>
+                    <option value="A">Ambos lados</option>
+                    <option value="todos">Uno u otro</option>
+                </select>
+            </label>
+            <label>
+                <select id="filtroComb">
+                    <option value="todos">Todos combustibles</option>
+                    <option value="g95">Gasolina 95</option>
+                    <option value="g98">Gasolina 98</option>
+                    <option value="goa">Gasóleo A</option>
+                    <option value="glp">GLP</option>
+                </select>
+            </label>
         </div>
 
         <!-- Mensaje de estado -->
@@ -445,7 +428,6 @@ var routePolyline     = [];
 var resultadosActuales = [];
 var seguimientoActivo = false;
 var precioMin = Infinity, precioMax = -Infinity;
-var hayRuta   = false;   // ← controla si el botón de búsqueda está activo
 
 // ════════════════════════════════════════════════════════
 //  INIT LEAFLET
@@ -464,7 +446,6 @@ iniciarNominatim("destino", "sugDestino", function(c){ coordDestino = c; });
 
 // Botones
 document.getElementById("btnCalcular").addEventListener("click",    calcularRuta);
-document.getElementById("btnBuscar").addEventListener("click",      ejecutarBusqueda);
 document.getElementById("btnSeguimiento").addEventListener("click", alternarSeguimiento);
 document.getElementById("btnGeo").addEventListener("click",         usarMiUbicacion);
 
@@ -510,24 +491,6 @@ function mostrarSidebar() {
     document.getElementById("toggleTexto").textContent = "Ocultar lista";
     // Forzar reajuste del mapa
     setTimeout(function(){ mapa.invalidateSize(); }, 360);
-}
-
-
-// ════════════════════════════════════════════════════════
-//  BUSCAR GASOLINERAS — se ejecuta solo al pulsar el botón
-// ════════════════════════════════════════════════════════
-function ejecutarBusqueda() {
-    if (!hayRuta) {
-        msg("Primero calcula una ruta", "error");
-        return;
-    }
-    if (!gasolinerasDB.length) {
-        msg("Los datos de gasolineras aún se están cargando…", "info");
-        return;
-    }
-    calcularRangoPrecio();
-    filtrarYMostrar();
-    mostrarSidebar();
 }
 
 
@@ -644,14 +607,17 @@ function calcularRuta() {
         var dur  = Math.round(ruta.summary.totalTime / 60) + " min";
 
         routePolyline = ruta.coordinates.map(function(c){ return { lat: c.lat, lng: c.lng }; });
-        hayRuta = true;
 
-        // Habilitar el botón de búsqueda
-        var btnB = document.getElementById("btnBuscar");
-        btnB.disabled = false;
-        btnB.title    = "";
+        msg("✓ " + dist + " · " + dur, "ok");
 
-        msg("✓ " + dist + " · " + dur + " — ahora pulsa «Buscar gasolineras en ruta»", "ok");
+        // Buscar gasolineras automáticamente al terminar de calcular la ruta
+        if (gasolinerasDB.length) {
+            calcularRangoPrecio();
+            filtrarYMostrar();
+            mostrarSidebar();
+        } else {
+            msg("✓ " + dist + " · " + dur + " — los datos de gasolineras aún se están cargando…", "ok");
+        }
     });
 
     routingControl.on("routingerror", function(e) {
