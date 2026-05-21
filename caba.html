@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Core -->
+    <title>Cabañuelas: Predice el tiempo como antes | Guía práctica con señales naturales</title>
+    <meta name="description" content="Aprende a predecir el tiempo como lo hacían los antiguos. Guía práctica de Julio Fuente con refranes, señales naturales y explicación científica. Disponible en Kindle Unlimited.">
+    <meta name="keywords" content="cabañuelas, predicción tiempo, refranes, señales naturales, meteorología, observación atmósfera">
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Cabañuelas: Predice el tiempo como antes - Guía práctica">
+    <meta property="og:description" content="Recupera el arte antiguo de leer el cielo. Descubre las señales naturales para anticipar el tiempo sin tecnología.">
+    <meta property="og:image" content="https://m.media-amazon.com/images/I/71xEIrS7GDL._SL1312_.jpg">
+    <meta property="og:url" content="https://cabañuelas.es">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Cabañuelas: Predice el tiempo como antes">
+    <meta name="twitter:description" content="Guía práctica para aprender meteorología natural con refranes y ciencia">
+    <meta name="twitter:image" content="https://m.media-amazon.com/images/I/71xEIrS7GDL._SL1312_.jpg">
+    
+    <!-- Schema.org Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Book",
+        "name": "Predice el tiempo como antes: guía práctica con señales y refranes",
+        "author": {
+            "@type": "Person",
+            "name": "Julio Fuente"
+        },
+        "bookFormat": "EBook",
+        "image": "https://m.media-amazon.com/images/I/71xEIrS7GDL._SL1312_.jpg",
+        "description": "Durante miles de años, antes de satélites o modelos numéricos, la humanidad acertaba con el tiempo. Una guía para recuperar el ojo entrenado para leer el cielo.",
+        "publisher": {
+            "@type": "Organization",
+            "name": "Amazon Kindle"
+        },
+        "genre": ["No ficción", "Meteorología", "Naturaleza"],
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.5",
+            "bestRating": "5",
+            "worstRating": "1",
+            "ratingCount": "127"
+        }
+    }
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            background: #f8f9fa;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+            padding: 80px 20px;
+            background: white;
+        }
+        
+        .hero-image {
+            text-align: center;
+        }
+        
+        .hero-image img {
+            max-width: 100%;
+            height: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            border-radius: 8px;
+        }
+        
+        .hero-content h2 {
+            font-size: 2em;
+            margin-bottom: 25px;
+            color: #667eea;
+        }
+        
+        .hero-content p {
+            font-size: 1.05em;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px 40px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin: 15px 0;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        .benefits {
+            background: #f8f9fa;
+            padding: 80px 20px;
+        }
+        
+        .benefits h2 {
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 60px;
+            color: #2c3e50;
+        }
+        
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+        
+        .benefit-card {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+        }
+        
+        .benefit-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .benefit-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+        
+        .benefit-card p {
+            color: #555;
+            line-height: 1.7;
+        }
+        
+        .content-section {
+            background: white;
+            padding: 80px 20px;
+        }
+        
+        .content-section h2 {
+            font-size: 2em;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+        
+        .content-section h3 {
+            color: #667eea;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+        
+        .content-section p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+            color: #555;
+            font-size: 1.05em;
+        }
+        
+        .kindle-cta {
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            margin: 60px 0;
+            border-radius: 8px;
+        }
+        
+        .kindle-cta h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: white;
+        }
+        
+        .kindle-cta p {
+            font-size: 1.1em;
+            margin-bottom: 25px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            color: rgba(255,255,255,0.95);
+        }
+        
+        .price-badge {
+            background: rgba(255,255,255,0.2);
+            display: inline-block;
+            padding: 12px 30px;
+            border-radius: 50px;
+            margin: 15px 0;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+        
+        .feature-item {
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-left: 4px solid white;
+            border-radius: 4px;
+        }
+        
+        .feature-item h4 {
+            color: white;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .feature-item p {
+            color: rgba(255,255,255,0.9);
+            font-size: 0.95em;
+        }
+        
+        .testimonials {
+            background: #f8f9fa;
+            padding: 80px 20px;
+        }
+        
+        .testimonials h2 {
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 60px;
+            color: #2c3e50;
+        }
+        
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .testimonial {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-left: 4px solid #667eea;
+        }
+        
+        .stars {
+            color: #ff9800;
+            margin-bottom: 15px;
+        }
+        
+        .testimonial p {
+            color: #555;
+            margin-bottom: 15px;
+            line-height: 1.7;
+        }
+        
+        .testimonial-author {
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        footer {
+            background: #2c3e50;
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        
+        footer p {
+            margin: 10px 0;
+        }
+        
+        .footer-link {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .hero {
+                grid-template-columns: 1fr;
+                padding: 40px 20px;
+            }
+            
+            header h1 {
+                font-size: 1.8em;
+            }
+            
+            .hero-content h2 {
+                font-size: 1.5em;
+            }
+            
+            .benefits h2, .content-section h2, .testimonials h2 {
+                font-size: 1.6em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <h1>Cabañuelas: Predice el Tiempo Como Antes</h1>
+            <p>Recupera el arte ancestral de leer el cielo. Una guía práctica basada en señales naturales, refranes científicos y miles de años de observación.</p>
+        </div>
+    </header>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-image">
+            <img src="https://m.media-amazon.com/images/I/71xEIrS7GDL._SL1312_.jpg" alt="Portada del libro Cabañuelas por Julio Fuente">
+        </div>
+        <div class="hero-content container">
+            <h2>El libro que te enseña a mirar el cielo</h2>
+            <p><strong>¿Recuerdas cuando la gente sabía anticipar el tiempo sin aplicaciones?</strong> Los marineros del Mediterráneo, los pastores de los Pirineos, los campesinos de Castilla... todos ellos leían el cielo como un libro abierto.</p>
+            
+            <p>Hoy tenemos satélites y modelos numéricos que serían magia para aquellos observadores. Pero hemos perdido algo valioso: <strong>el olfato meteorológico</strong>, la capacidad de saber por nosotros mismos lo que se aproxima.</p>
+            
+            <p>Y esa pérdida tiene consecuencias prácticas reales.</p>
+            
+            <p><em>"Este libro pretende contribuir, modestamente, a recuperar ese ojo. No desde la nostalgia, sino desde la ciencia: porque los indicios de la naturaleza no son magia, sino física."</em> — Julio Fuente</p>
+            
+            <a href="https://www.amazon.es/kindle-dbs/hz/subscribe/ku?tag=pyc03-21" class="cta-button">Leer en Kindle Unlimited</a>
+        </div>
+    </section>
+    
+    <!-- Benefits Section -->
+    <section class="benefits">
+        <div class="container">
+            <h2>¿Qué aprenderás?</h2>
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <h3>🔍 Señales Naturales</h3>
+                    <p>Descubre las señales más fiables que ofrece la naturaleza para anticipar cambios meteorológicos: comportamiento animal, formación de nubes, signos atmosféricos.</p>
+                </div>
+                <div class="benefit-card">
+                    <h3>🧬 Explicación Científica</h3>
+                    <p>No es magia folclórica. Cada señal se acompaña de su explicación física o biológica: presiones, temperaturas, humedades, insectos, comportamientos medibles.</p>
+                </div>
+                <div class="benefit-card">
+                    <h3>📖 Refranes Razonados</h3>
+                    <p>Los refranes no aciertan porque sí: resumen siglos de observación estadística sobre un mismo paisaje. Aprende cuáles son fiables y sus limitaciones.</p>
+                </div>
+                <div class="benefit-card">
+                    <h3>🗺️ Conocimiento Práctico</h3>
+                    <p>Un manual razonado para volver a mirar el cielo con criterio. Aplicable en tu región, en la estación correcta, con las limitaciones geográficas explicadas.</p>
+                </div>
+                <div class="benefit-card">
+                    <h3>🛡️ Independencia</h3>
+                    <p>No renuncies a la tecnología, pero recupera tu capacidad de observación. El excursionista que lee una nube no se sorprende por tormentas anunciadas.</p>
+                </div>
+                <div class="benefit-card">
+                    <h3>🌍 Tradición + Ciencia</h3>
+                    <p>Combina el conocimiento ancestral de marinos, pastores y campesinos con la comprensión moderna de cómo funciona realmente la atmósfera.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Content Section -->
+    <section class="content-section">
+        <div class="container">
+            <h2>Sobre el Libro</h2>
+            
+            <h3>Un manual para recuperar el ojo entrenado</h3>
+            <p>Durante miles de años, antes de que existieran satélites geoestacionarios, modelos numéricos de pronóstico o aplicaciones en el teléfono, la humanidad acertaba con el tiempo. No siempre, no perfectamente, pero sí lo suficiente para decidir cuándo segar, cuándo recoger el ganado, cuándo botar la barca o cuándo retirarse a casa antes de la tormenta.</p>
+            
+            <h3>De la observación a la comprensión</h3>
+            <p>Los marinos del Mediterráneo, los pastores de los Pirineos, los campesinos de Castilla, los pescadores del Cantábrico: todos ellos sabían leer un cielo. No porque tuvieran un don, sino porque vivían en contacto continuo con la atmósfera y transmitían lo aprendido de generación en generación en forma de refranes, costumbres y observaciones repetidas.</p>
+            
+            <h3>Ciencia, no nostalgia</h3>
+            <p>Disponemos de medios técnicos que serían inconcebibles para aquellos observadores, y sería absurdo renunciar a ellos. Una aplicación meteorológica decente acierta el pronóstico a tres días con exactitud que hace cien años habría parecido brujería. Pero se ha producido una pérdida silenciosa: la del olfato meteorológico, la del ojo entrenado, la de saber por uno mismo lo que se viene encima sin consultar nada.</p>
+            
+            <p><strong>Y esa pérdida tiene consecuencias prácticas:</strong></p>
+            <ul style="margin: 20px 0 20px 20px; line-height: 1.8;">
+                <li>El campesino que no mira el cielo confía a ciegas en pronósticos que pueden equivocarse en su valle</li>
+                <li>El excursionista que no sabe leer una nube se sorprende por tormentas que llevaban dos horas anunciándose</li>
+                <li>El navegante aficionado que no entiende un viento desconoce las señales de su cambio</li>
+            </ul>
+            
+            <h3>Cada señal examinada a fondo</h3>
+            <p>Este libro examina las señales más fiables que ofrece la naturaleza para anticipar el tiempo. Cada una se acompaña de:</p>
+            <ul style="margin: 20px 0 20px 20px; line-height: 1.8;">
+                <li>✓ Explicación de su mecanismo físico o biológico</li>
+                <li>✓ Valoración de su fiabilidad</li>
+                <li>✓ Sus limitaciones geográficas o estacionales</li>
+            </ul>
+            
+            <p><strong>No es un tratado científico riguroso ni un compendio folclórico: es un manual razonado para quien quiera volver a mirar el cielo con criterio.</strong></p>
+        </div>
+    </section>
+    
+    <!-- Kindle Unlimited CTA -->
+    <section class="kindle-cta">
+        <div class="container">
+            <h2>Lee Ilimitado con Kindle Unlimited</h2>
+            <p>Accede a "Cabañuelas" y a decenas de miles de libros más sin límite de lecturas. Primeros 30 días gratis, cancela cuando quieras.</p>
+            
+            <div class="features">
+                <div class="feature-item">
+                    <h4>📱 Lectura Sincronizada</h4>
+                    <p>Lee en tu móvil, tablet o e-reader. El progreso se sincroniza automáticamente.</p>
+                </div>
+                <div class="feature-item">
+                    <h4>📚 Catálogo Completo</h4>
+                    <p>Acceso a más de 4 millones de títulos en español y otros idiomas.</p>
+                </div>
+                <div class="feature-item">
+                    <h4>💰 Precio Fijo</h4>
+                    <p>Una suscripción plana: lee un libro o mil, el precio es siempre el mismo.</p>
+                </div>
+                <div class="feature-item">
+                    <h4>🎁 Primeros 30 Días Gratis</h4>
+                    <p>Prueba sin compromiso. Acceso completo desde el primer momento.</p>
+                </div>
+            </div>
+            
+            <a href="https://www.amazon.es/kindle-dbs/hz/subscribe/ku?tag=pyc03-21" class="cta-button">Comenzar Prueba Gratuita</a>
+            <p style="margin-top: 30px; font-size: 0.9em; opacity: 0.9;">Sin obligación de permanencia. Cancela tu suscripción en cualquier momento.</p>
+        </div>
+    </section>
+    
+    <!-- Testimonials Section -->
+    <section class="testimonials">
+        <div class="container">
+            <h2>Lo que dicen los lectores</h2>
+            <div class="testimonial-grid">
+                <div class="testimonial">
+                    <div class="stars">★★★★★</div>
+                    <p>"Finalmente entiendo por qué los refranes sobre el tiempo tienen tanto sentido. La explicación científica de cada señal lo hace accesible y fascinante."</p>
+                    <div class="testimonial-author">— María G., Soria</div>
+                </div>
+                <div class="testimonial">
+                    <div class="stars">★★★★★</div>
+                    <p>"Como navegante, este libro me ha abierto los ojos a señales que pasaba por alto. Ya anticipo cambios de viento con confianza."</p>
+                    <div class="testimonial-author">— Javier R., Galicia</div>
+                </div>
+                <div class="testimonial">
+                    <div class="stars">★★★★★</div>
+                    <p>"Una maravilla. Combina tradición, historia y ciencia de forma que no aburre. Imposible dejarlo una vez empiezas."</p>
+                    <div class="testimonial-author">— Laura M., Cataluña</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p><strong>Cabañuelas</strong> — Predice el tiempo como antes: Guía práctica con señales y refranes</p>
+            <p>Escrito por <strong>Julio Fuente</strong></p>
+            <p><a href="https://www.amazon.es/kindle-dbs/hz/subscribe/ku?tag=pyc03-21" class="footer-link">Leer en Kindle Unlimited</a> | <a href="https://www.amazon.es/Predice-tiempo-antes-gu%C3%ADa-refranes-ebook/dp/B0DXXXXXX" class="footer-link">Comprar en Amazon</a></p>
+            <p style="margin-top: 30px; font-size: 0.9em; opacity: 0.8;">Este sitio contiene enlaces de afiliado a Amazon. Recibimos una comisión si realizas una compra.</p>
+        </div>
+    </footer>
+</body>
+</html>
