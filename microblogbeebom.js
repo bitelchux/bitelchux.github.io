@@ -347,13 +347,13 @@ function isSpeedBotX() {
     if (window.adsbygoogle!=undefined)
         return;
    
-    if (window.cfpais === "spainxxx") {
+    if (window.cfpais === "spain") {
       
          
           inyectaMiBannerESP();                   
       
     }else{
-        inyectaSmartLink();
+        /*inyectaSmartLink();*/
        const n = Math.floor(Math.random() * (100 - 1 + 1)) + 1;
        if (n<50){
           inyectaMiBanner();
