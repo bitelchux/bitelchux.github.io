@@ -136,9 +136,9 @@ function inyectaMiBanner() {
 }
 function inyectaSmartLink(){
 
-    /*Los Pollos smartlink*/
+    /*adsterra smartlink*/
           var disallowedDomain = "docentestic.es";
-          var popunder = {expire: 12, url: "https://vplpmrb.captivatingteam.org/kk32p3v"};
+          var popunder = {expire: 12, url: "https://www.effectivecpmnetwork.com/gkupp9px?key=9b8fd186c56b557acde03abb9ab20e1c"};
       
           if (window.location.hostname !== disallowedDomain) {
            ! function() {
@@ -353,7 +353,7 @@ function isSpeedBotX() {
           inyectaMiBannerESP();                   
       
     }else{
-        /*inyectaSmartLink();*/
+        inyectaSmartLink();
        const n = Math.floor(Math.random() * (100 - 1 + 1)) + 1;
        if (n<50){
           inyectaMiBanner();
