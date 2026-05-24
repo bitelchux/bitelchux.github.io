@@ -261,8 +261,8 @@ window.addEventListener("load", () => {
                       .then(data => {
                         window.cfpais = data.country; 
                         if (window.cfpais === "ES") {    
-                            loadRandomAds(); 
-                            /*inyectaMiBannerESP();*/
+                            //loadRandomAds(); 
+                            inyectaMiBannerESP();
                         }else{
                             loadRandomAds(); 
                         }
