@@ -501,57 +501,52 @@ function mostrarListado() {
 //  por cargarXLS() y elimina esta variable.
 // ════════════════════════════════════════════════════════
 var DATOS_PRUEBA = [
-    // ── A-4 / A-44 Madrid → Granada ─────────────────────
-    { lat:40.3172, lng:-3.7040, nombre:"Repsol Vallecas",          dir:"Av. de Vallecas 120",         muni:"Madrid",         margen:"D", g95:1.699, g98:1.829, goa:1.589, glp:null },
-    { lat:40.1050, lng:-3.7280, nombre:"BP Aranjuez Norte",        dir:"Ctra. N-4 km 46",             muni:"Aranjuez",       margen:"D", g95:1.679, g98:1.799, goa:1.569, glp:null },
-    { lat:39.8760, lng:-3.7310, nombre:"Cepsa Ocaña",              dir:"A-4 km 72",                   muni:"Ocaña",          margen:"I", g95:1.659, g98:1.779, goa:1.549, glp:0.899 },
-    { lat:39.5540, lng:-3.6820, nombre:"Galp Manzanares",          dir:"Ctra. A-4 km 173",            muni:"Manzanares",     margen:"D", g95:1.645, g98:1.765, goa:1.535, glp:null },
-    { lat:39.2110, lng:-3.6990, nombre:"Shell Valdepeñas",         dir:"A-4 km 209",                  muni:"Valdepeñas",     margen:"D", g95:1.639, g98:1.759, goa:1.529, glp:0.879 },
-    { lat:38.6840, lng:-3.7750, nombre:"Repsol La Carolina",       dir:"A-4 km 268",                  muni:"La Carolina",    margen:"I", g95:1.629, g98:1.749, goa:1.519, glp:null },
-    { lat:37.9010, lng:-3.7660, nombre:"Cepsa Bailén Sur",         dir:"A-4 km 300",                  muni:"Bailén",         margen:"D", g95:1.619, g98:1.739, goa:1.509, glp:null },
-    { lat:37.7870, lng:-3.7890, nombre:"BP Jaén Norte",            dir:"A-44 km 28",                  muni:"Jaén",           margen:"D", g95:1.635, g98:1.755, goa:1.525, glp:null },
-    { lat:37.5240, lng:-3.8340, nombre:"Repsol Alcalá la Real",    dir:"A-44 km 62",                  muni:"Alcalá la Real", margen:"I", g95:1.625, g98:1.745, goa:1.515, glp:null },
-    { lat:37.1760, lng:-3.5990, nombre:"Galp Granada Norte",       dir:"A-44 km 119",                 muni:"Granada",        margen:"D", g95:1.655, g98:1.775, goa:1.545, glp:0.889 },
+    // ── A-4 Madrid → Granada ─────────────────────────────
+    { lat:40.317,  lng:-3.7059, nombre:"Repsol Getafe",        dir:"A-4 km 0",   muni:"Getafe",       margen:"D", g95:1.699, g98:1.829, goa:1.589, glp:null  },
+    { lat:40.1574, lng:-3.6729, nombre:"BP Valdemoro",         dir:"A-4 km 22",  muni:"Valdemoro",    margen:"I", g95:1.679, g98:1.799, goa:1.569, glp:null  },
+    { lat:40.0309, lng:-3.6053, nombre:"Cepsa Aranjuez",       dir:"A-4 km 38",  muni:"Aranjuez",     margen:"D", g95:1.659, g98:1.779, goa:1.549, glp:0.899 },
+    { lat:39.9536, lng:-3.4889, nombre:"Galp Ocaña",           dir:"A-4 km 55",  muni:"Ocaña",        margen:"I", g95:1.649, g98:1.769, goa:1.539, glp:null  },
+    { lat:39.4910, lng:-3.3739, nombre:"Shell Puerto Lápice",  dir:"A-4 km 112", muni:"Puerto Lápice",margen:"D", g95:1.639, g98:1.759, goa:1.529, glp:null  },
+    { lat:39.2290, lng:-3.3549, nombre:"Repsol Manzanares",    dir:"A-4 km 145", muni:"Manzanares",   margen:"I", g95:1.629, g98:1.749, goa:1.519, glp:null  },
+    { lat:38.9986, lng:-3.3507, nombre:"BP Valdepeñas",        dir:"A-4 km 172", muni:"Valdepeñas",   margen:"D", g95:1.635, g98:1.755, goa:1.525, glp:null  },
+    { lat:38.5784, lng:-3.5989, nombre:"Cepsa La Carolina",    dir:"A-4 km 222", muni:"La Carolina",  margen:"I", g95:1.625, g98:1.745, goa:1.515, glp:null  },
+    { lat:37.9022, lng:-3.7779, nombre:"Galp Bailén",          dir:"A-4 km 305", muni:"Bailén",       margen:"D", g95:1.619, g98:1.739, goa:1.509, glp:null  },
+    { lat:37.5639, lng:-3.8507, nombre:"Shell Alcaudete",      dir:"A-44 km 348",muni:"Alcaudete",    margen:"I", g95:1.629, g98:1.749, goa:1.519, glp:0.879 },
+    { lat:37.1770, lng:-3.5990, nombre:"Repsol Granada Norte", dir:"A-44 km 424",muni:"Granada",      margen:"D", g95:1.655, g98:1.775, goa:1.545, glp:null  },
 
     // ── A-2 Madrid → Barcelona ───────────────────────────
-    { lat:40.4720, lng:-3.4520, nombre:"BP Torrejón de Ardoz",     dir:"A-2 km 19",                   muni:"Torrejón de Ardoz", margen:"D", g95:1.689, g98:1.819, goa:1.579, glp:null },
-    { lat:40.4830, lng:-3.2140, nombre:"Repsol Guadalajara Sur",   dir:"A-2 km 55",                   muni:"Guadalajara",    margen:"I", g95:1.669, g98:1.789, goa:1.559, glp:null },
-    { lat:40.6190, lng:-2.9280, nombre:"Cepsa Brihuega",           dir:"A-2 km 98",                   muni:"Brihuega",       margen:"D", g95:1.649, g98:1.769, goa:1.539, glp:null },
-    { lat:40.7380, lng:-2.4970, nombre:"Shell Sigüenza",           dir:"A-2 km 148",                  muni:"Sigüenza",       margen:"D", g95:1.639, g98:1.759, goa:1.529, glp:0.869 },
-    { lat:41.1050, lng:-1.7580, nombre:"Galp Calatayud",           dir:"A-2 km 242",                  muni:"Calatayud",      margen:"I", g95:1.629, g98:1.749, goa:1.519, glp:null },
-    { lat:41.3910, lng:-1.0410, nombre:"BP Zaragoza Sur",          dir:"A-2 km 316",                  muni:"Zaragoza",       margen:"D", g95:1.659, g98:1.779, goa:1.549, glp:null },
-    { lat:41.5380, lng:-0.4080, nombre:"Repsol Lleida Oeste",      dir:"A-2 km 458",                  muni:"Lleida",         margen:"D", g95:1.669, g98:1.789, goa:1.559, glp:0.879 },
-    { lat:41.5120, lng: 0.6780, nombre:"Cepsa Martorell",          dir:"A-2 km 567",                  muni:"Martorell",      margen:"I", g95:1.699, g98:1.819, goa:1.589, glp:null },
+    { lat:40.4712, lng:-3.4518, nombre:"BP Torrejón",          dir:"A-2 km 19",  muni:"Torrejón de Ardoz", margen:"D", g95:1.689, g98:1.819, goa:1.579, glp:null  },
+    { lat:40.5203, lng:-3.0675, nombre:"Repsol Guadalajara",   dir:"A-2 km 58",  muni:"Guadalajara",       margen:"I", g95:1.669, g98:1.789, goa:1.559, glp:null  },
+    { lat:40.7373, lng:-2.4964, nombre:"Cepsa Sigüenza",       dir:"A-2 km 112", muni:"Sigüenza",          margen:"D", g95:1.639, g98:1.759, goa:1.529, glp:0.869 },
+    { lat:41.1043, lng:-1.7575, nombre:"Galp Calatayud",       dir:"A-2 km 188", muni:"Calatayud",         margen:"I", g95:1.629, g98:1.749, goa:1.519, glp:null  },
+    { lat:41.3902, lng:-1.0407, nombre:"Shell Zaragoza",       dir:"A-2 km 257", muni:"Zaragoza",          margen:"D", g95:1.659, g98:1.779, goa:1.549, glp:null  },
+    { lat:41.5372, lng:-0.4080, nombre:"Repsol Lleida",        dir:"A-2 km 320", muni:"Lleida",            margen:"I", g95:1.669, g98:1.789, goa:1.559, glp:0.879 },
+    { lat:41.5120, lng: 0.6780, nombre:"BP Martorell",         dir:"A-2 km 430", muni:"Martorell",         margen:"D", g95:1.699, g98:1.819, goa:1.589, glp:null  },
 
-    // ── A-7 / AP-7 Barcelona → Valencia ─────────────────
-    { lat:41.3560, lng: 1.8870, nombre:"BP Tarragona Norte",       dir:"AP-7 km 1168",                muni:"Tarragona",      margen:"D", g95:1.709, g98:1.839, goa:1.599, glp:null },
-    { lat:40.8070, lng: 0.5240, nombre:"Shell Vinaròs",            dir:"AP-7 km 1050",                muni:"Vinaròs",        margen:"D", g95:1.689, g98:1.809, goa:1.579, glp:null },
-    { lat:39.9830, lng:-0.0560, nombre:"Galp Sagunto",             dir:"AP-7 km 938",                 muni:"Sagunto",        margen:"I", g95:1.669, g98:1.789, goa:1.559, glp:0.889 },
-    { lat:39.4340, lng:-0.3580, nombre:"Repsol Valencia Sur",      dir:"A-7 km 495",                  muni:"Valencia",       margen:"D", g95:1.679, g98:1.799, goa:1.569, glp:null },
+    // ── AP-7 Barcelona → Valencia ────────────────────────
+    { lat:41.3567, lng: 1.8865, nombre:"Repsol Tarragona",     dir:"AP-7 km 0",  muni:"Tarragona", margen:"D", g95:1.709, g98:1.839, goa:1.599, glp:null  },
+    { lat:40.8074, lng: 0.5231, nombre:"Cepsa Vinaròs",        dir:"AP-7 km 113",muni:"Vinaròs",   margen:"I", g95:1.689, g98:1.809, goa:1.579, glp:null  },
+    { lat:39.9833, lng:-0.0570, nombre:"BP Sagunto",           dir:"AP-7 km 183",muni:"Sagunto",   margen:"D", g95:1.669, g98:1.789, goa:1.559, glp:0.889 },
+    { lat:39.4340, lng:-0.3580, nombre:"Galp Valencia Sur",    dir:"AP-7 km 237",muni:"Valencia",  margen:"I", g95:1.679, g98:1.799, goa:1.569, glp:null  },
 
-    // ── A-6 Madrid → A Coruña ───────────────────────────
-    { lat:40.5930, lng:-4.0830, nombre:"Cepsa Las Rozas",          dir:"A-6 km 22",                   muni:"Las Rozas",      margen:"D", g95:1.699, g98:1.829, goa:1.589, glp:null },
-    { lat:40.6700, lng:-4.4880, nombre:"BP El Espinar",            dir:"A-6 km 68",                   muni:"El Espinar",     margen:"I", g95:1.669, g98:1.789, goa:1.559, glp:null },
-    { lat:40.9440, lng:-4.9250, nombre:"Repsol Villacastín",       dir:"A-6 km 96",                   muni:"Villacastín",    margen:"D", g95:1.649, g98:1.769, goa:1.539, glp:0.869 },
-    { lat:41.2390, lng:-5.2990, nombre:"Galp Salamanca Este",      dir:"A-62 km 73",                  muni:"Salamanca",      margen:"D", g95:1.639, g98:1.759, goa:1.529, glp:null },
-    { lat:42.2760, lng:-6.7720, nombre:"Shell Ponferrada",         dir:"A-6 km 390",                  muni:"Ponferrada",     margen:"I", g95:1.629, g98:1.749, goa:1.519, glp:null },
-    { lat:42.8750, lng:-8.2140, nombre:"BP Santiago de Compostela",dir:"A-54 km 5",                   muni:"Santiago de Compostela", margen:"D", g95:1.659, g98:1.779, goa:1.549, glp:null },
+    // ── A-8 Bilbao → San Sebastián ───────────────────────
+    { lat:43.2622, lng:-2.9349, nombre:"Repsol Bilbao",        dir:"A-8 km 13",  muni:"Bilbao",        margen:"D", g95:1.709, g98:1.829, goa:1.599, glp:null  },
+    { lat:43.2842, lng:-2.6240, nombre:"Cepsa Durango",        dir:"A-8 km 38",  muni:"Durango",       margen:"I", g95:1.699, g98:1.819, goa:1.589, glp:0.909 },
+    { lat:43.2702, lng:-2.1676, nombre:"BP Zarautz",           dir:"A-8 km 68",  muni:"Zarautz",       margen:"D", g95:1.719, g98:1.849, goa:1.609, glp:null  },
+    { lat:43.3200, lng:-1.9840, nombre:"Galp San Sebastián",   dir:"A-8 km 85",  muni:"San Sebastián", margen:"I", g95:1.729, g98:1.859, goa:1.619, glp:null  },
 
-    // ── A-8 Bilbao → San Sebastián ──────────────────────
-    { lat:43.2630, lng:-2.9350, nombre:"Repsol Bilbao Este",       dir:"A-8 km 13",                   muni:"Bilbao",         margen:"D", g95:1.709, g98:1.829, goa:1.599, glp:null },
-    { lat:43.2850, lng:-2.6240, nombre:"Cepsa Durango",            dir:"A-8 km 38",                   muni:"Durango",        margen:"I", g95:1.699, g98:1.819, goa:1.589, glp:0.909 },
-    { lat:43.2710, lng:-2.1680, nombre:"BP Zarautz",               dir:"A-8 km 68",                   muni:"Zarautz",        margen:"D", g95:1.719, g98:1.849, goa:1.609, glp:null },
-    { lat:43.3200, lng:-1.9840, nombre:"Galp San Sebastián Oeste", dir:"A-8 km 85",                   muni:"San Sebastián",  margen:"D", g95:1.729, g98:1.859, goa:1.619, glp:null },
+    // ── A-49 Sevilla → Huelva ────────────────────────────
+    { lat:37.3898, lng:-5.9800, nombre:"BP Sevilla Oeste",     dir:"A-49 km 8",  muni:"Sevilla", margen:"D", g95:1.679, g98:1.799, goa:1.569, glp:null  },
+    { lat:37.3788, lng:-6.4421, nombre:"Repsol Sanlúcar",      dir:"A-49 km 42", muni:"Sanlúcar la Mayor", margen:"I", g95:1.659, g98:1.779, goa:1.549, glp:null  },
+    { lat:37.3220, lng:-6.9410, nombre:"Cepsa Huelva",         dir:"A-49 km 84", muni:"Huelva",  margen:"D", g95:1.649, g98:1.769, goa:1.539, glp:0.879 },
 
-    // ── A-49 Sevilla → Huelva ───────────────────────────
-    { lat:37.3890, lng:-5.9800, nombre:"BP Sevilla Oeste",         dir:"A-49 km 8",                   muni:"Sevilla",        margen:"I", g95:1.679, g98:1.799, goa:1.569, glp:null },
-    { lat:37.3780, lng:-6.4420, nombre:"Repsol Sanlúcar la Mayor", dir:"A-49 km 38",                  muni:"Sanlúcar la Mayor", margen:"D", g95:1.659, g98:1.779, goa:1.549, glp:null },
-    { lat:37.3220, lng:-6.9410, nombre:"Cepsa Huelva Este",        dir:"A-49 km 82",                  muni:"Huelva",         margen:"D", g95:1.649, g98:1.769, goa:1.539, glp:0.879 },
-
-    // ── Fuera de ruta (para probar el filtro de umbral) ──
-    { lat:40.4168, lng:-3.7038, nombre:"Repsol Puerta del Sol",    dir:"Puerta del Sol 1",            muni:"Madrid",         margen:"A", g95:1.799, g98:1.929, goa:1.689, glp:null },
-    { lat:41.3825, lng: 2.1769, nombre:"Shell Diagonal Barcelona", dir:"Av. Diagonal 500",            muni:"Barcelona",      margen:"A", g95:1.809, g98:1.939, goa:1.699, glp:null },
-    { lat:37.3891, lng:-5.9845, nombre:"BP Nervión Sevilla",       dir:"Av. Luis Montoto 12",         muni:"Sevilla",        margen:"A", g95:1.789, g98:1.919, goa:1.679, glp:null },
+    // ── A-6 Madrid → A Coruña ────────────────────────────
+    { lat:40.5938, lng:-4.0827, nombre:"Cepsa Las Rozas",      dir:"A-6 km 28",  muni:"Las Rozas",    margen:"D", g95:1.699, g98:1.829, goa:1.589, glp:null  },
+    { lat:40.6706, lng:-4.4873, nombre:"BP El Espinar",        dir:"A-6 km 64",  muni:"El Espinar",   margen:"I", g95:1.669, g98:1.789, goa:1.559, glp:null  },
+    { lat:40.9446, lng:-4.9242, nombre:"Repsol Villacastín",   dir:"A-6 km 103", muni:"Villacastín",  margen:"D", g95:1.649, g98:1.769, goa:1.539, glp:0.869 },
+    { lat:41.2396, lng:-5.2983, nombre:"Galp Salamanca",       dir:"A-6 km 148", muni:"Salamanca",    margen:"I", g95:1.639, g98:1.759, goa:1.529, glp:null  },
+    { lat:42.2767, lng:-6.7715, nombre:"Shell Ponferrada",     dir:"A-6 km 328", muni:"Ponferrada",   margen:"D", g95:1.629, g98:1.749, goa:1.519, glp:null  },
+    { lat:42.8750, lng:-8.2140, nombre:"BP Santiago",          dir:"A-6 km 480", muni:"Santiago de Compostela", margen:"I", g95:1.659, g98:1.779, goa:1.549, glp:null  },
 ];
 
 
