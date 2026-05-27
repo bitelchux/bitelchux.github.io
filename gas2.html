@@ -310,8 +310,8 @@ body {
 
         <div class="filtros">
             <label>
-                <span id="umbralVal">150</span>m
-                <input type="range" id="umbral" min="50" max="550" step="50" value="150">
+                <span id="umbralVal">5</span>km
+                <input type="range" id="umbral" min="1" max="100" step="1" value="5">
             </label>
             <label>
                 <select id="filtroLado">
@@ -783,7 +783,7 @@ function ordenar(lista) {
 }
 
 function filtrarYMostrar() {
-    var umbral = parseInt(document.getElementById("umbral").value);
+    var umbral = parseInt(document.getElementById("umbral").value) * 1000; // km → metros
     var flado  = document.getElementById("filtroLado").value;
     var comb   = document.getElementById("filtroComb").value;
 
