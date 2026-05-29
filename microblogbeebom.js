@@ -1,4 +1,5 @@
 console.log("github js cargado");
+/*Link groupon awin curso de drones*/
 function updateAmazonAffiliateTags() {
   // Mapa de dominios → tags
   const domainTagMap = {
