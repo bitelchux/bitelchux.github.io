@@ -1,5 +1,5 @@
 console.log("github js cargado");
-/*Link groupon awin curso de drones*/
+/*Link groupon awin curso de drones https://www.awin1.com/cread.php?awinmid=117585&awinaffid=963035&ued=https%3A%2F%2Fwww.groupon.es%2Fdeals%2Fdrone-fly-service-2*/
 function updateAmazonAffiliateTags() {
   // Mapa de dominios → tags
   const domainTagMap = {
