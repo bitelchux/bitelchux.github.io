@@ -177,6 +177,9 @@ function inyectaMiBannerESP() {
   if (window.location.hostname === "acelstore.es"){
      API="https://bitelchux.github.io/acelstore.json"; //force amazon reacondicionados
   }
+  if (window.location.hostname === "dedrones.es"){
+     API="https://bitelchux.github.io/dedrones.json"; //force groupon curso drones
+  }
   if (document.getElementById("offer-banner")) return;
 
   const style = document.createElement("style");
