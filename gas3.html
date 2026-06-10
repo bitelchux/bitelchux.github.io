@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<title>Electrolineras en ruta · Buscador de puntos de carga para coche eléctrico</title>
+
+<!-- ════════════════ SEO ════════════════ -->
+<meta name="description" content="Encuentra electrolineras y puntos de carga para tu coche eléctrico a lo largo de tu ruta. Filtra por potencia (kW), tipo de conector (CCS, CHAdeMO, Type 2) y distancia a la calzada. Datos de Open Charge Map.">
+<meta name="keywords" content="electrolineras, puntos de carga, coche eléctrico, cargadores VE, recarga, CCS, CHAdeMO, Type 2, ruta, viaje eléctrico, OCU">
+<meta name="author" content="OCU — Business Technology">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#1976D2">
+<meta name="application-name" content="Electrolineras en ruta">
+<!-- Ajustar a la URL real de publicación -->
+<link rel="canonical" href="https://www.ocu.org/">
+
+<!-- Web app móvil (instalable / pantalla completa) -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Electrolineras">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_ES">
+<meta property="og:title" content="Electrolineras en ruta · Buscador de puntos de carga">
+<meta property="og:description" content="Localiza puntos de carga para coche eléctrico en tu trayecto, filtrando por potencia, conector y distancia a la calzada.">
+<meta property="og:site_name" content="Electrolineras en ruta">
+<meta property="og:url" content="https://www.ocu.org/">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Electrolineras en ruta">
+<meta name="twitter:description" content="Puntos de carga para coche eléctrico a lo largo de tu ruta.">
+
+<!-- ════════════════ JSON-LD (app / web app / mobile app) ════════════════ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "#webapp",
+      "name": "Electrolineras en ruta",
+      "alternateName": "Buscador de puntos de carga para coche eléctrico",
+      "description": "Aplicación web para localizar electrolineras y puntos de carga de vehículo eléctrico a lo largo de una ruta, con filtros por potencia, tipo de conector y distancia a la calzada.",
+      "applicationCategory": "TravelApplication",
+      "applicationSubCategory": "EV Charging",
+      "operatingSystem": "Any (HTML5)",
+      "browserRequirements": "Requiere JavaScript y geolocalización HTML5",
+      "url": "https://www.ocu.org/",
+      "inLanguage": "es-ES",
+      "isAccessibleForFree": true,
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+      "featureList": [
+        "Cálculo de ruta origen-destino",
+        "Puntos de carga a lo largo del trayecto",
+        "Filtro por potencia (kW), conector y distancia a la calzada",
+        "Geolocalización y seguimiento en tiempo real"
+      ],
+      "creator": { "@type": "Organization", "name": "OCU — Business Technology" }
+    },
+    {
+      "@type": "MobileApplication",
+      "@id": "#mobileapp",
+      "name": "Electrolineras en ruta",
+      "applicationCategory": "TravelApplication",
+      "operatingSystem": "Android, iOS (PWA)",
+      "isAccessibleForFree": true,
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" }
+    }
+  ]
+}
+</script>
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<!-- Leaflet Routing Machine CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css">
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Leaflet Routing Machine -->
+<script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f0f2f5;
+}
+
+.app { display: flex; flex-direction: column; height: 100dvh; }
+
+/* ── Panel superior ─────────────────────────────────── */
+.panel {
+    background: #fff;
+    padding: 10px 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.1);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    flex-shrink: 0;
+}
+
+.row { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
+
+.input-wrap {
+    flex: 1; min-width: 140px;
+    display: flex; align-items: center;
+    border: 1.5px solid #ddd; border-radius: 8px;
+    background: #fff; transition: border-color .2s;
+    position: relative;
+}
+.input-wrap:focus-within { border-color: #1976D2; }
+.input-wrap input {
+    flex: 1; padding: 9px 10px;
+    border: none; font-size: 14px;
+    background: transparent; outline: none; min-width: 0;
+}
+.input-wrap input:disabled { color: #aaa; }
+
+/* Sugerencias Nominatim */
+.suggestions {
+    position: absolute; top: calc(100% + 3px); left: 0; right: 0;
+    background: #fff; border: 1px solid #ddd;
+    border-radius: 8px; z-index: 9999; overflow: hidden;
+    box-shadow: 0 6px 20px rgba(0,0,0,.15); display: none;
+}
+.suggestions.open { display: block; }
+.sug-item {
+    padding: 9px 12px; font-size: 12px; cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+    line-height: 1.3;
+    transition: background .12s;
+}
+.sug-item:last-child { border-bottom: none; }
+.sug-item:hover, .sug-item.focused { background: #E3F2FD; color: #1565C0; }
+.sug-item .sug-main { font-weight: 600; color: #222; }
+.sug-item .sug-sub  { font-size: 10px; color: #888; margin-top: 1px; }
+
+.btn-geo {
+    padding: 6px 10px; border: none;
+    background: transparent; color: #888;
+    font-size: 18px; cursor: pointer; flex-shrink: 0;
+}
+.btn-geo:hover { color: #1976D2; }
+.btn-geo.spin  { animation: giro 1s linear infinite; color: #1976D2; }
+@keyframes giro { to { transform: rotate(360deg); } }
+
+.btn {
+    padding: 9px 14px; border: none;
+    border-radius: 8px; font-size: 13px;
+    font-weight: 700; cursor: pointer;
+    transition: background .2s; white-space: nowrap;
+}
+.btn-primary   { background: #1976D2; color: #fff; }
+.btn-primary:hover   { background: #1565C0; }
+.btn-secondary { background: #607D8B; color: #fff; }
+.btn-secondary:hover { background: #546E7A; }
+.btn:disabled  { opacity: .5; cursor: not-allowed; }
+
+/* Estado datos */
+.db-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.db-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #bbb; flex-shrink: 0; transition: background .3s;
+}
+.db-dot.loading { background: #FFA726; animation: pulso 1s infinite; }
+.db-dot.ok      { background: #43A047; }
+.db-dot.error   { background: #E53935; }
+@keyframes pulso { 0%,100%{ opacity:1; } 50%{ opacity:.3; } }
+.db-text { font-size: 12px; color: #555; }
+.db-text strong { font-size: 13px; color: #222; }
+
+/* Filtros */
+.filtros {
+    display: flex; gap: 8px;
+    align-items: center; flex-wrap: wrap;
+    font-size: 12px; color: #555;
+}
+.filtros label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
+.filtros input[type=range] { width: 80px; accent-color: #1976D2; }
+.filtros select {
+    padding: 4px 7px; border: 1px solid #ddd;
+    border-radius: 6px; font-size: 12px; cursor: pointer;
+    background: #fff;
+}
+
+/* Mensaje */
+.msg { font-size: 12px; padding: 6px 10px; border-radius: 6px; display: none; }
+.msg.on    { display: block; }
+.msg.info  { background: #E3F2FD; color: #0D47A1; }
+.msg.error { background: #FFEBEE; color: #B71C1C; }
+.msg.ok    { background: #E8F5E9; color: #1B5E20; }
+
+/* ── Cuerpo ─────────────────────────────────────────── */
+.main { display: flex; flex: 1; overflow: hidden; }
+#mapa { flex: 1; z-index: 1; }
+
+/* Ocultar el panel de instrucciones de Leaflet Routing */
+.leaflet-routing-container { display: none !important; }
+
+/* Sidebar */
+.sidebar {
+    width: 300px; background: #fff;
+    border-left: 1px solid #e0e0e0;
+    display: flex; flex-direction: column; overflow: hidden;
+    flex-shrink: 0; z-index: 2;
+}
+.sidebar-head {
+    padding: 10px 12px;
+    background: #1976D2; color: #fff;
+    font-weight: 700; font-size: 13px;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-shrink: 0; cursor: pointer; user-select: none;
+}
+.sidebar-head em { font-style: normal; font-size: 11px; opacity: .85; font-weight: 400; }
+.sidebar-toggle { font-size: 12px; transition: transform .3s; }
+
+.sidebar-sort {
+    padding: 7px 10px;
+    background: #f5f8ff;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex; align-items: center; gap: 7px;
+    font-size: 11px; color: #444; flex-shrink: 0;
+}
+.sidebar-sort select {
+    flex: 1; padding: 4px 6px;
+    border: 1px solid #ddd; border-radius: 6px;
+    font-size: 11px; cursor: pointer; background: #fff;
+}
+
+.gas-list { flex: 1; overflow-y: auto; padding: 5px; }
+.gas-list::-webkit-scrollbar { width: 4px; }
+.gas-list::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
+
+.gas-item {
+    padding: 8px 10px; border-radius: 8px;
+    margin-bottom: 4px; cursor: pointer;
+    border: 1.5px solid transparent;
+    transition: background .15s, border-color .15s;
+    background: #fafafa;
+    display: flex; gap: 8px; align-items: flex-start;
+}
+.gas-item:hover  { background: #E3F2FD; border-color: #90CAF9; }
+.gas-item.active { background: #E3F2FD; border-color: #1976D2; }
+
+.gas-rank {
+    min-width: 22px; height: 22px;
+    border-radius: 50%; font-size: 10px;
+    font-weight: 700; display: flex;
+    align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px; color: #fff;
+}
+
+.gas-body { flex: 1; min-width: 0; }
+.gas-nombre { font-weight: 700; font-size: 12px; color: #1a1a1a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gas-dir    { font-size: 10px; color: #777; margin: 1px 0 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gas-meta   { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+
+.badge { font-size: 10px; padding: 2px 6px; border-radius: 20px; font-weight: 700; white-space: nowrap; }
+.b-lado-D  { background: #E8F5E9; color: #2E7D32; }
+.b-lado-I  { background: #FCE4EC; color: #880E4F; }
+.b-km      { background: #F3E5F5; color: #6A1B9A; }
+.b-dist    { background: #FBE9E7; color: #BF360C; }
+.b-cur     { background: #E0F7FA; color: #006064; }   /* AC / DC */
+.b-pts     { background: #FFF3E0; color: #E65100; }   /* nº puntos */
+
+.empty-msg { text-align: center; padding: 36px 16px; color: #bbb; font-size: 13px; line-height: 1.7; }
+
+/* ── RESPONSIVE MÓVIL ──────────────────────────────── */
+@media (max-width: 600px) {
+    .main { flex-direction: column; }
+    #mapa { flex: 1; min-height: 0; }
+    .sidebar {
+        width: 100%; height: 52dvh;
+        border-left: none; border-top: 1px solid #e0e0e0;
+    }
+    .sidebar.collapsed .gas-list,
+    .sidebar.collapsed .sidebar-sort { display: none; }
+    .sidebar.collapsed { height: auto; }
+    .sidebar.collapsed .sidebar-toggle { transform: rotate(180deg); }
+    .panel { padding: 8px 10px; gap: 6px; }
+    .filtros { gap: 6px; }
+    .filtros input[type=range] { width: 65px; }
+}
+@media (min-width: 601px) and (max-width: 900px) {
+    .sidebar { width: 260px; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="panel">
+    <div class="row">
+        <div class="input-wrap">
+            <input type="text" id="origen"  placeholder="Origen" autocomplete="off">
+            <button class="btn-geo" id="btnGeo">&#x2316;</button>
+            <div class="suggestions" id="sugOrigen"></div>
+        </div>
+        <div class="input-wrap">
+            <input type="text" id="destino" placeholder="Destino" autocomplete="off">
+            <div class="suggestions" id="sugDestino"></div>
+        </div>
+        <button class="btn btn-primary"   id="btnCalcular">Calcular</button>
+        <button class="btn btn-secondary" id="btnSeguimiento">📍</button>
+    </div>
+
+    <div class="db-bar">
+        <div class="db-dot" id="dbDot"></div>
+        <div class="db-text">
+            <strong id="dbLabel">Define una ruta para buscar</strong>
+            <span id="dbSub"> · Open Charge Map</span>
+        </div>
+    </div>
+
+    <div class="filtros">
+        <label>
+            <span id="umbralVal">300</span>m
+            <input type="range" id="umbral" min="50" max="1000" step="50" value="300">
+        </label>
+        <label>
+            <select id="filtroLado">
+                <option value="todos">Uno u otro lado</option>
+                <option value="D">Solo derecho</option>
+                <option value="I">Solo izquierdo</option>
+            </select>
+        </label>
+        <label>
+            <select id="filtroConector">
+                <option value="todos">Todos conectores</option>
+                <option value="ccs">CCS (Combo)</option>
+                <option value="chademo">CHAdeMO</option>
+                <option value="type2">Type 2 (Mennekes)</option>
+                <option value="schuko">Schuko / doméstico</option>
+            </select>
+        </label>
+        <label>
+            <select id="filtroPotencia">
+                <option value="todos">Toda potencia</option>
+                <option value="lenta">Lenta (&lt;22 kW)</option>
+                <option value="rapida">Rápida (22–149 kW)</option>
+                <option value="ultra">Ultra (≥150 kW)</option>
+            </select>
+        </label>
+    </div>
+
+    <div class="msg" id="msg"></div>
+</div>
+
+<div class="main">
+    <div id="mapa"></div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-head" id="sidebarHead">
+            <span>⚡ Electrolineras en ruta</span>
+            <div style="display:flex;gap:10px;align-items:center">
+                <em id="countLabel">—</em>
+                <span class="sidebar-toggle">▲</span>
+            </div>
+        </div>
+        <div class="sidebar-sort">
+            Ordenar:
+            <select id="ordenar">
+                <option value="potencia_desc">Potencia ↓ más rápida</option>
+                <option value="potencia_asc">Potencia ↑ más lenta</option>
+                <option value="km_asc">Orden en ruta</option>
+                <option value="dist_asc">Distancia calzada</option>
+            </select>
+        </div>
+        <div class="gas-list" id="gasList">
+            <div class="empty-msg">Calcula una ruta para ver<br>los puntos de carga en camino ⚡</div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════
+//  CONFIGURACIÓN
+// ════════════════════════════════════════════════════════
+var CONFIG = {
+    // API gratuita de Open Charge Map. Consigue tu key (gratis) en:
+    //   https://openchargemap.org/site/develop  ->  "Register an application"
+    // Sin key la API puede devolver 403 / limitar las peticiones.
+    OCM_KEY:    "",            // <-- pon aquí tu API key de Open Charge Map
+    OCM_BASE:   "https://api.openchargemap.io/v3/poi/",
+    MAX_RESULTS: 1000,         // tope de puntos por consulta (rutas muy largas pueden saturarlo)
+    DEBOUNCE_MS:   500,        // ms entre pulsación y llamada a Nominatim
+    MAX_SUGERENCIAS: 5,
+};
+
+// ════════════════════════════════════════════════════════
+//  ESTADO GLOBAL
+// ════════════════════════════════════════════════════════
+var mapa, routingControl, marcadorUsuario, circuloPrecision, watchId;
+var coordOrigen  = null;   // { lat, lng }
+var coordDestino = null;
+var estacionesDB       = [];   // puntos de carga del bounding box de la ruta
+var markersEnRuta      = [];
+var routePolyline      = [];   // array de { lat, lng }
+var resultadosActuales = [];
+var seguimientoActivo  = false;
+
+// ════════════════════════════════════════════════════════
+//  INICIALIZAR LEAFLET + OSM
+// ════════════════════════════════════════════════════════
+document.addEventListener("DOMContentLoaded", function() {
+    mapa = L.map("mapa", { zoomControl: true }).setView([40.4168, -3.7038], 7);
+
+    // Tiles OpenStreetMap — 100% gratuitos
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · datos de carga © <a href="https://openchargemap.org">Open Charge Map</a>',
+        maxZoom: 19
+    }).addTo(mapa);
+
+    // Buscadores con Nominatim (gratuito, sin API key)
+    iniciarNominatim("origen",  "sugOrigen",  function(c){ coordOrigen  = c; });
+    iniciarNominatim("destino", "sugDestino", function(c){ coordDestino = c; });
+
+    document.getElementById("btnCalcular").addEventListener("click",    calcularRuta);
+    document.getElementById("btnSeguimiento").addEventListener("click", alternarSeguimiento);
+    document.getElementById("btnGeo").addEventListener("click",         usarMiUbicacion);
+
+    document.getElementById("umbral").addEventListener("input", function(){
+        document.getElementById("umbralVal").textContent = this.value;
+        if (routePolyline.length && estacionesDB.length) filtrarYMostrar();
+    });
+    // Los tres filtros son cliente (no requieren volver a llamar a OCM)
+    ["filtroLado","filtroConector","filtroPotencia"].forEach(function(id){
+        document.getElementById(id).addEventListener("change", function(){
+            if (routePolyline.length && estacionesDB.length) filtrarYMostrar();
+        });
+    });
+    document.getElementById("ordenar").addEventListener("change", function(){
+        if (resultadosActuales.length) mostrarResultados(ordenar(resultadosActuales.slice()));
+    });
+    document.getElementById("sidebarHead").addEventListener("click", function(){
+        document.getElementById("sidebar").classList.toggle("collapsed");
+    });
+
+    // Aviso si no hay API key configurada
+    if (!CONFIG.OCM_KEY) {
+        msg("Configura tu API key gratuita de Open Charge Map en CONFIG.OCM_KEY (openchargemap.org/site/develop).", "info");
+    }
+});
+
+// ════════════════════════════════════════════════════════
+//  NOMINATIM — geocoding gratuito de OpenStreetMap
+//  Límite de uso: 1 req/segundo (respetamos con debounce)
+// ════════════════════════════════════════════════════════
+function iniciarNominatim(inputId, sugId, cb) {
+    var input      = document.getElementById(inputId);
+    var sugBox     = document.getElementById(sugId);
+    var timer      = null;
+    var resultados = [];
+    var focusIdx   = -1;
+
+    function buscar() {
+        var q = input.value.trim();
+        if (q.length < 3) { cerrar(); return; }
+
+        // Nominatim: búsqueda en España, formato JSON
+        var url = "https://nominatim.openstreetmap.org/search?" + new URLSearchParams({
+            q:              q,
+            format:         "json",
+            limit:          CONFIG.MAX_SUGERENCIAS,
+            countrycodes:   "es",
+            addressdetails: 1,
+            "accept-language": "es"
+        });
+
+        fetch(url, { headers: { "Accept-Language": "es" } })
+            .then(function(r){ return r.json(); })
+            .then(function(data) {
+                if (!data.length) { cerrar(); return; }
+                resultados = data;
+                renderSugs();
+            })
+            .catch(function(){ cerrar(); });
+    }
+
+    function renderSugs() {
+        sugBox.innerHTML = "";
+        focusIdx = -1;
+        resultados.forEach(function(r, i) {
+            var div  = document.createElement("div");
+            div.className = "sug-item";
+            var main = r.name || r.display_name.split(",")[0];
+            var sub  = r.display_name;
+            div.innerHTML = '<div class="sug-main">' + escH(main) + '</div>' +
+                            '<div class="sug-sub">'  + escH(sub)  + '</div>';
+            div.addEventListener("mousedown", function(e){
+                e.preventDefault(); seleccionar(i);
+            });
+            sugBox.appendChild(div);
+        });
+        sugBox.classList.add("open");
+    }
+
+    function seleccionar(i) {
+        var r = resultados[i];
+        input.value = r.display_name;
+        cb({ lat: parseFloat(r.lat), lng: parseFloat(r.lon) });
+        cerrar();
+    }
+
+    function cerrar() {
+        sugBox.classList.remove("open");
+        sugBox.innerHTML = "";
+        resultados = []; focusIdx = -1;
+    }
+
+    function actualizarFocus() {
+        sugBox.querySelectorAll(".sug-item").forEach(function(el, i){
+            el.classList.toggle("focused", i === focusIdx);
+        });
+    }
+
+    input.addEventListener("input", function(){
+        cb(null);
+        clearTimeout(timer);
+        timer = setTimeout(buscar, CONFIG.DEBOUNCE_MS);
+    });
+
+    input.addEventListener("keydown", function(e){
+        if (e.key === "Enter") {
+            e.preventDefault();
+            if (focusIdx >= 0) { seleccionar(focusIdx); return; }
+            clearTimeout(timer); buscar(); return;
+        }
+        if (e.key === "ArrowDown") { focusIdx = Math.min(focusIdx+1, resultados.length-1); actualizarFocus(); e.preventDefault(); return; }
+        if (e.key === "ArrowUp")   { focusIdx = Math.max(focusIdx-1, -1); actualizarFocus(); e.preventDefault(); return; }
+        if (e.key === "Escape")    { cerrar(); }
+    });
+
+    input.addEventListener("blur", function(){ setTimeout(cerrar, 150); });
+}
+
+function escH(s) { return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+// ════════════════════════════════════════════════════════
+//  CALCULAR RUTA — OSRM (gratuito, sin API key)
+// ════════════════════════════════════════════════════════
+function calcularRuta() {
+    if (!coordOrigen)  { msg("Selecciona el origen de la lista", "error"); return; }
+    if (!coordDestino) { msg("Selecciona el destino de la lista", "error"); return; }
+
+    var btn = document.getElementById("btnCalcular");
+    btn.disabled = true; btn.textContent = "…";
+    msg("Calculando ruta…", "info");
+
+    if (routingControl) {
+        mapa.removeControl(routingControl);
+        routingControl = null;
+    }
+
+    routingControl = L.Routing.control({
+        waypoints: [
+            L.latLng(coordOrigen.lat,  coordOrigen.lng),
+            L.latLng(coordDestino.lat, coordDestino.lng)
+        ],
+        routeWhileDragging: false,
+        addWaypoints:       false,
+        draggableWaypoints: false,
+        fitSelectedRoutes:  true,
+        show:               false,
+        lineOptions: {
+            styles: [{ color: "#1976D2", weight: 5, opacity: 0.85 }]
+        },
+        router: L.Routing.osrmv1({
+            serviceUrl: "https://router.project-osrm.org/route/v1",
+            profile:    "driving"
+        }),
+        createMarker: function(i, wp) {
+            var letra  = i === 0 ? "A" : "B";
+            var color  = i === 0 ? "#1976D2" : "#7B1FA2";
+            var icon = L.divIcon({
+                className: "",
+                html: svgLetra(color, letra),
+                iconSize:   [28, 36],
+                iconAnchor: [14, 36]
+            });
+            return L.marker(wp.latLng, { icon: icon });
+        }
+    }).addTo(mapa);
+
+    routingControl.on("routesfound", function(e) {
+        btn.disabled = false; btn.textContent = "Calcular";
+        var ruta = e.routes[0];
+        var dist = (ruta.summary.totalDistance / 1000).toFixed(1) + " km";
+        var dur  = Math.round(ruta.summary.totalTime / 60) + " min";
+        msg("✓ " + dist + " · " + dur, "ok");
+
+        // Polyline como array de {lat, lng}
+        routePolyline = ruta.coordinates.map(function(c){ return { lat: c.lat, lng: c.lng }; });
+
+        // Buscar puntos de carga en el bounding box de la ruta
+        cargarElectrolineras();
+    });
+
+    routingControl.on("routingerror", function(e) {
+        btn.disabled = false; btn.textContent = "Calcular";
+        msg("Error al calcular la ruta: " + (e.error && e.error.message ? e.error.message : "sin conexión"), "error");
+    });
+}
+
+function svgLetra(color, letra) {
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 36" width="28" height="36">' +
+        '<path fill="' + color + '" d="M14 0C6.27 0 0 6.27 0 14c0 5.25 3.02 9.8 7.44 12.12L14 36l6.56-10.88C24.98 23.8 28 19.25 28 14 28 6.27 21.73 0 14 0z"/>' +
+        '<circle fill="white" cx="14" cy="14" r="8"/>' +
+        '<text x="14" y="18" text-anchor="middle" font-size="9" font-family="Arial" font-weight="bold" fill="' + color + '">' + letra + '</text>' +
+        '</svg>';
+}
+
+// ════════════════════════════════════════════════════════
+//  CARGA DE PUNTOS DE CARGA — Open Charge Map
+//  Consulta el bounding box de la ruta (no toda España)
+// ════════════════════════════════════════════════════════
+function bboxDeRuta(poly, margenDeg) {
+    var minLat=Infinity, maxLat=-Infinity, minLng=Infinity, maxLng=-Infinity;
+    poly.forEach(function(p){
+        if (p.lat < minLat) minLat = p.lat;
+        if (p.lat > maxLat) maxLat = p.lat;
+        if (p.lng < minLng) minLng = p.lng;
+        if (p.lng > maxLng) maxLng = p.lng;
+    });
+    var m = margenDeg || 0.04;   // ~4 km de margen para no recortar puntos junto a la vía
+    return { minLat:minLat-m, maxLat:maxLat+m, minLng:minLng-m, maxLng:maxLng+m };
+}
+
+function cargarElectrolineras() {
+    if (!routePolyline.length) return;
+    setDb("loading", "Buscando puntos de carga…", "Open Charge Map");
+
+    var bb = bboxDeRuta(routePolyline);
+    // Formato OCM: boundingbox=(lat1,lng1),(lat2,lng2)
+    var caja = "(" + bb.maxLat + "," + bb.minLng + "),(" + bb.minLat + "," + bb.maxLng + ")";
+    var url = CONFIG.OCM_BASE +
+        "?output=json&countrycode=ES&maxresults=" + CONFIG.MAX_RESULTS +
+        "&boundingbox=" + encodeURIComponent(caja);
+    if (CONFIG.OCM_KEY) url += "&key=" + encodeURIComponent(CONFIG.OCM_KEY);
+
+    fetch(url, { headers: { "Accept": "application/json" } })
+        .then(function(res) {
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            return res.json();
+        })
+        .then(function(data) {
+            estacionesDB = parsearOCM(data);
+            var hora = new Date().toLocaleTimeString("es-ES",{ hour:"2-digit", minute:"2-digit" });
+            setDb("ok", estacionesDB.length.toLocaleString("es-ES") + " puntos en la zona", "OCM · " + hora);
+            filtrarYMostrar();
+        })
+        .catch(function(err) {
+            setDb("error", "Error al cargar puntos de carga", err.message);
+            if (String(err.message).indexOf("403") >= 0) {
+                msg("Open Charge Map requiere API key. Consíguela gratis en openchargemap.org/site/develop y ponla en CONFIG.OCM_KEY.", "error");
+            } else {
+                msg("No se pudieron cargar los puntos de carga: " + err.message, "error");
+            }
+            console.error("[OCM]", err);
+        });
+}
+
+function setDb(st, label, sub) {
+    document.getElementById("dbDot").className     = "db-dot " + st;
+    document.getElementById("dbLabel").textContent = label;
+    document.getElementById("dbSub").textContent   = sub ? " · " + sub : "";
+}
+
+// ════════════════════════════════════════════════════════
+//  PARSEO RESPUESTA OCM
+// ════════════════════════════════════════════════════════
+function parsearOCM(pois) {
+    return (pois || []).reduce(function(acc, poi) {
+        var ai = poi.AddressInfo;
+        if (!ai) return acc;
+        var lat = parseFloat(ai.Latitude), lng = parseFloat(ai.Longitude);
+        if (isNaN(lat) || isNaN(lng)) return acc;
+
+        var conns  = poi.Connections || [];
+        var maxKW  = 0;
+        var tipos  = {};            // { "CCS (Type 2)": cantidad, ... }
+        var ac = false, dc = false;
+
+        conns.forEach(function(c) {
+            if (c.PowerKW && c.PowerKW > maxKW) maxKW = c.PowerKW;
+            if (c.ConnectionType && c.ConnectionType.Title) {
+                var t = c.ConnectionType.Title;
+                tipos[t] = (tipos[t] || 0) + (c.Quantity || 1);
+            }
+            var ct = c.CurrentType && c.CurrentType.Title ? c.CurrentType.Title : "";
+            if (/DC/i.test(ct)) dc = true;
+            else if (/AC/i.test(ct)) ac = true;
+        });
+
+        acc.push({
+            lat: lat, lng: lng,
+            nombre:   String(ai.Title || "Punto de carga").trim(),
+            dir:      String(ai.AddressLine1 || "").trim(),
+            muni:     String(ai.Town || "").trim(),
+            operador: poi.OperatorInfo && poi.OperatorInfo.Title ? poi.OperatorInfo.Title : "",
+            uso:      poi.UsageType && poi.UsageType.Title ? poi.UsageType.Title : "",
+            coste:    poi.UsageCost || "",
+            puntos:   poi.NumberOfPoints || null,
+            operativa: poi.StatusType ? poi.StatusType.IsOperational : null,
+            potenciaMax: maxKW > 0 ? maxKW : null,
+            conectores: tipos,
+            ac: ac, dc: dc
+        });
+        return acc;
+    }, []);
+}
+
+// ════════════════════════════════════════════════════════
+//  COLOR POR POTENCIA  (rojo lenta → verde ultrarrápida)
+//  Escala fija: 0 kW = rojo, ≥150 kW = verde
+// ════════════════════════════════════════════════════════
+function potenciaAColor(kw) {
+    if (kw === null || kw === 0) return "#9E9E9E";    // gris: potencia desconocida
+    var t = Math.max(0, Math.min(1, kw / 150));        // 0..1 (150 kW+ = verde pleno)
+    var r, g, b;
+    if (t < 0.5) {                                     // rojo → amarillo
+        var tt = t * 2;
+        r = Math.round(220 + tt*(234-220));
+        g = Math.round(38  + tt*(179-38));
+        b = Math.round(38  + tt*(8-38));
+    } else {                                           // amarillo → verde
+        var tt2 = (t-0.5) * 2;
+        r = Math.round(234 + tt2*(34-234));
+        g = Math.round(179 + tt2*(197-179));
+        b = Math.round(8   + tt2*(94-8));
+    }
+    return "rgb(" + r + "," + g + "," + b + ")";
+}
+
+function potenciaOrden(est) {
+    return est.potenciaMax !== null ? est.potenciaMax : -1;
+}
+
+// ════════════════════════════════════════════════════════
+//  FILTROS DE CONECTOR Y POTENCIA
+// ════════════════════════════════════════════════════════
+function tieneConector(est, tipo) {
+    if (tipo === "todos") return true;
+    var titles = Object.keys(est.conectores).join(" ").toLowerCase();
+    switch (tipo) {
+        case "ccs":     return /ccs|combo/.test(titles);
+        case "chademo": return /chademo/.test(titles);
+        case "type2":   return /type\s*2|mennekes|tipo\s*2/.test(titles);
+        case "schuko":  return /schuko|domestic|dom.stic|3-?pin/.test(titles);
+    }
+    return true;
+}
+
+function pasaPotencia(est, f) {
+    var kw = est.potenciaMax;
+    switch (f) {
+        case "todos":  return true;
+        case "lenta":  return kw !== null && kw < 22;
+        case "rapida": return kw !== null && kw >= 22 && kw < 150;
+        case "ultra":  return kw !== null && kw >= 150;
+    }
+    return true;
+}
+
+// ════════════════════════════════════════════════════════
+//  GEOMETRÍA (idéntica a la versión original)
+// ════════════════════════════════════════════════════════
+function haversine(a, b) {
+    var R=6371000, dLat=(b.lat-a.lat)*Math.PI/180, dLng=(b.lng-a.lng)*Math.PI/180;
+    var h=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
+    return 2*R*Math.asin(Math.sqrt(h));
+}
+
+function proyectar(P, A, B) {
+    var cosL=Math.cos(A.lat*Math.PI/180);
+    var bx=(B.lng-A.lng)*cosL*111320, by=(B.lat-A.lat)*111320;
+    var px=(P.lng-A.lng)*cosL*111320, py=(P.lat-A.lat)*111320;
+    var ab2=bx*bx+by*by, t=ab2>0?Math.max(0,Math.min(1,(px*bx+py*by)/ab2)):0;
+    var dx=px-t*bx, dy=py-t*by;
+    return { dist:Math.sqrt(dx*dx+dy*dy), t:t, lado:bx*py-by*px>0?"I":"D" };
+}
+
+function estVsRuta(est, poly) {
+    var minD=Infinity, minL="D", minI=0, minT=0;
+    for (var i=0;i<poly.length-1;i++) {
+        var r=proyectar(est,poly[i],poly[i+1]);
+        if(r.dist<minD){minD=r.dist;minL=r.lado;minI=i;minT=r.t;}
+    }
+    var km=0;
+    for(var j=0;j<minI;j++) km+=haversine(poly[j],poly[j+1]);
+    km+=minT*haversine(poly[minI],poly[minI+1]);
+    return { distM:Math.round(minD), lado:minL, km:km/1000 };
+}
+
+// ════════════════════════════════════════════════════════
+//  FILTRAR → ORDENAR → MOSTRAR
+// ════════════════════════════════════════════════════════
+function ordenar(lista) {
+    var cr = document.getElementById("ordenar").value;
+    lista.sort(function(a,b){
+        switch(cr){
+            case "potencia_desc": return potenciaOrden(b.est)-potenciaOrden(a.est);
+            case "potencia_asc":  return potenciaOrden(a.est)-potenciaOrden(b.est);
+            case "km_asc":        return a.km-b.km;
+            case "dist_asc":      return a.distM-b.distM;
+            default: return 0;
+        }
+    });
+    return lista;
+}
+
+function filtrarYMostrar() {
+    var umbral = parseInt(document.getElementById("umbral").value);
+    var flado  = document.getElementById("filtroLado").value;
+    var fconn  = document.getElementById("filtroConector").value;
+    var fpot   = document.getElementById("filtroPotencia").value;
+
+    var enc = estacionesDB.reduce(function(acc, est) {
+        var r = estVsRuta(est, routePolyline);
+        if (r.distM > umbral) return acc;
+        // Lado: OCM no aporta margen de carretera → se usa el lado geométrico
+        if ((flado === "D" || flado === "I") && r.lado !== flado) return acc;
+        if (!tieneConector(est, fconn)) return acc;
+        if (!pasaPotencia(est, fpot))   return acc;
+        acc.push({ est:est, distM:r.distM, lado:r.lado, km:r.km });
+        return acc;
+    }, []);
+
+    resultadosActuales = enc;
+    mostrarResultados(ordenar(enc.slice()));
+}
+
+// ════════════════════════════════════════════════════════
+//  ICONO PIN SVG CON COLOR POR POTENCIA
+// ════════════════════════════════════════════════════════
+function iconoEstacion(color, kwStr) {
+    var svg =
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 34 44" width="34" height="44">' +
+        '<path fill="' + color + '" stroke="rgba(0,0,0,.2)" stroke-width="1" ' +
+              'd="M17 0C7.61 0 0 7.61 0 17c0 6.56 3.7 12.27 9.15 15.24L17 44l7.85-11.76C30.3 29.27 34 23.56 34 17 34 7.61 26.39 0 17 0z"/>' +
+        '<circle fill="white" cx="17" cy="17" r="11"/>' +
+        '<text x="17" y="14" text-anchor="middle" font-size="9" font-family="Arial,sans-serif" fill="' + color + '" font-weight="bold">⚡</text>' +
+        (kwStr ? '<text x="17" y="23" text-anchor="middle" font-size="6.5" font-family="Arial,sans-serif" fill="' + color + '" font-weight="bold">' + kwStr + '</text>' : '') +
+        '</svg>';
+    return L.divIcon({
+        className:  "",
+        html:       svg,
+        iconSize:   [34, 44],
+        iconAnchor: [17, 44],
+        popupAnchor:[0, -44]
+    });
+}
+
+// ════════════════════════════════════════════════════════
+//  PINTAR RESULTADOS
+// ════════════════════════════════════════════════════════
+function mostrarResultados(lista) {
+    markersEnRuta.forEach(function(m){ mapa.removeLayer(m); });
+    markersEnRuta = [];
+
+    document.getElementById("countLabel").textContent =
+        lista.length + " punto" + (lista.length!==1?"s":"");
+
+    var container = document.getElementById("gasList");
+    container.innerHTML = "";
+
+    if (!lista.length) {
+        container.innerHTML = '<div class="empty-msg">Sin puntos de carga con estos filtros.<br>Aumenta los metros o cambia conector/potencia. ☝️</div>';
+        return;
+    }
+
+    lista.forEach(function(item, idx) {
+        var est   = item.est;
+        var kw    = est.potenciaMax;
+        var color = potenciaAColor(kw);
+        var kwStr = kw !== null ? String(Math.round(kw)) : null;
+
+        // ── Marcador Leaflet ──
+        var marker = L.marker([est.lat, est.lng], {
+            icon:    iconoEstacion(color, kwStr),
+            title:   est.nombre,
+            zIndexOffset: 500 - idx
+        }).addTo(mapa);
+
+        // Tabla de conectores en el popup
+        var conn = Object.keys(est.conectores);
+        var tabla = conn.length ? conn.map(function(t){
+            return '<tr><td style="color:#555;padding-right:12px">' + escH(t) + '</td>' +
+                   '<td style="font-weight:700;text-align:right;color:#1976D2">×' + est.conectores[t] + '</td></tr>';
+        }).join("") : '<tr><td style="color:#999">Conectores no especificados</td></tr>';
+
+        var potTxt = kw !== null ? Math.round(kw) + " kW" : "potencia n/d";
+        var curTxt = est.dc ? "DC" : (est.ac ? "AC" : "");
+
+        marker.bindPopup(
+            '<div style="min-width:180px;font-family:sans-serif;font-size:13px">' +
+            '<strong style="font-size:14px">' + escH(est.nombre) + '</strong><br>' +
+            '<span style="color:#666;font-size:11px">' + escH(est.dir) + (est.muni?" · "+escH(est.muni):"") + '</span>' +
+            (est.operador?'<br><span style="font-size:11px;color:#777">🏢 '+escH(est.operador)+'</span>':"") +
+            '<hr style="margin:6px 0;border:none;border-top:1px solid #eee">' +
+            '<div style="font-weight:700;color:'+color+';font-size:13px">⚡ '+potTxt+(curTxt?" · "+curTxt:"")+'</div>' +
+            '<table style="border-collapse:collapse;width:100%;font-size:12px;margin-top:4px">' + tabla + '</table>' +
+            (est.coste?'<div style="font-size:11px;color:#555;margin-top:4px">💶 '+escH(est.coste)+'</div>':"") +
+            '<hr style="margin:6px 0;border:none;border-top:1px solid #eee">' +
+            '<span style="font-size:11px;color:#555">📍 ' +
+                (item.lado==="D"?"Lado derecho":"Lado izquierdo") +
+                ' · km ' + item.km.toFixed(1) + ' · ' + item.distM + ' m' +
+                (est.puntos?' · '+est.puntos+' puntos':"") + '</span>' +
+            (est.uso?'<br><span style="font-size:10px;color:#999">🔓 '+escH(est.uso)+'</span>':"") +
+            '<br><br><a href="https://www.google.com/maps/dir/?api=1&destination=' + est.lat + ',' + est.lng + '" ' +
+                'target="_blank" style="color:#1976D2;font-size:12px">🗺 Cómo llegar</a>' +
+            '</div>'
+        , { maxWidth: 250 });
+
+        marker.on("click", function(){ resaltarItem(idx); });
+
+        markersEnRuta.push(marker);
+        est._marker = marker;
+
+        // ── Item lista ──
+        var ladoClass = "b-lado-" + (item.lado||"D");
+        var ladoLabel = item.lado==="D"?"🟢 Dcho":"🔴 Izdo";
+        var potBadge  = "";
+        if (kw !== null) {
+            var bg = color.replace("rgb(","rgba(").replace(")",", 0.12)");
+            var bo = color.replace("rgb(","rgba(").replace(")",", 0.4)");
+            potBadge = '<span class="badge" style="background:'+bg+';color:'+color+';border:1px solid '+bo+';font-size:11px">' +
+                       Math.round(kw) + ' kW</span>';
+        }
+        var curBadge = (est.dc||est.ac) ? '<span class="badge b-cur">' + (est.dc?"DC":"AC") + '</span>' : "";
+        var ptsBadge = est.puntos ? '<span class="badge b-pts">' + est.puntos + ' pts</span>' : "";
+
+        var div = document.createElement("div");
+        div.className = "gas-item"; div.id = "item-"+idx;
+        div.innerHTML =
+            '<div class="gas-rank" style="background:'+color+'">' + (idx+1) + '</div>' +
+            '<div class="gas-body">' +
+                '<div class="gas-nombre">' + escH(est.nombre) + '</div>' +
+                '<div class="gas-dir">' + escH(est.operador || est.dir) + (est.muni?" · "+escH(est.muni):"") + '</div>' +
+                '<div class="gas-meta">' +
+                    potBadge + curBadge +
+                    '<span class="badge '+ladoClass+'">' + ladoLabel + '</span>' +
+                    '<span class="badge b-km">km ' + item.km.toFixed(1) + '</span>' +
+                    '<span class="badge b-dist">' + item.distM + 'm</span>' +
+                    ptsBadge +
+                '</div>' +
+            '</div>';
+
+        div.addEventListener("click", function(){
+            resaltarItem(idx);
+            mapa.setView([est.lat, est.lng], 16);
+            est._marker.openPopup();
+            if (window.innerWidth <= 600) document.getElementById("sidebar").classList.add("collapsed");
+        });
+
+        container.appendChild(div);
+    });
+}
+
+function resaltarItem(idx) {
+    document.querySelectorAll(".gas-item").forEach(function(el){ el.classList.remove("active"); });
+    var el = document.getElementById("item-"+idx);
+    if (el) { el.classList.add("active"); el.scrollIntoView({ behavior:"smooth", block:"nearest" }); }
+}
+
+// ════════════════════════════════════════════════════════
+//  GEOLOCALIZACIÓN
+// ════════════════════════════════════════════════════════
+function usarMiUbicacion() {
+    if (!navigator.geolocation) { msg("Geolocalización no disponible","error"); return; }
+    var btn=document.getElementById("btnGeo"), inp=document.getElementById("origen");
+    btn.classList.add("spin"); btn.textContent="↻";
+    inp.value="Obteniendo ubicación…"; inp.disabled=true;
+
+    navigator.geolocation.getCurrentPosition(
+        function(pos) {
+            var lat=pos.coords.latitude, lng=pos.coords.longitude;
+            coordOrigen = { lat:lat, lng:lng };
+
+            fetch("https://nominatim.openstreetmap.org/reverse?format=json&lat="+lat+"&lon="+lng+"&accept-language=es")
+                .then(function(r){ return r.json(); })
+                .then(function(d){
+                    btn.classList.remove("spin"); btn.textContent="⊕"; inp.disabled=false;
+                    inp.value = d.display_name || lat.toFixed(5)+", "+lng.toFixed(5);
+                    msg("Precisión GPS: ±" + Math.round(pos.coords.accuracy) + " m", "info");
+                })
+                .catch(function(){
+                    btn.classList.remove("spin"); btn.textContent="⊕"; inp.disabled=false;
+                    inp.value = lat.toFixed(5)+", "+lng.toFixed(5);
+                });
+        },
+        function(err) {
+            btn.classList.remove("spin"); btn.textContent="⊕";
+            inp.disabled=false; inp.value=""; coordOrigen=null;
+            msg({1:"Permiso denegado",2:"Sin señal",3:"Tiempo agotado"}[err.code]||err.message,"error");
+        },
+        { enableHighAccuracy:true, timeout:15000, maximumAge:0 }
+    );
+}
+
+function alternarSeguimiento() {
+    var btn = document.getElementById("btnSeguimiento");
+    if (!seguimientoActivo) {
+        iniciarSeguimiento(); btn.textContent="⏹ Stop"; seguimientoActivo=true;
+    } else {
+        detenerSeguimiento(); btn.textContent="📍"; seguimientoActivo=false;
+    }
+}
+
+function iniciarSeguimiento() {
+    if (!navigator.geolocation) { msg("Geolocalización no disponible","error"); return; }
+    watchId = navigator.geolocation.watchPosition(
+        function(pos) {
+            var loc=L.latLng(pos.coords.latitude, pos.coords.longitude), prec=pos.coords.accuracy;
+            if (!marcadorUsuario) {
+                var icon = L.divIcon({
+                    className:"",
+                    html: '<div style="width:16px;height:16px;border-radius:50%;background:#4285F4;border:3px solid #fff;box-shadow:0 0 6px rgba(0,0,0,.3)"></div>',
+                    iconSize:[16,16], iconAnchor:[8,8]
+                });
+                marcadorUsuario = L.marker(loc, { icon:icon, zIndexOffset:999 }).addTo(mapa);
+                circuloPrecision = L.circle(loc, { radius:prec, color:"#4285F4", weight:1, fillOpacity:.12 }).addTo(mapa);
+                mapa.setView(loc, 15);
+            } else {
+                marcadorUsuario.setLatLng(loc);
+                circuloPrecision.setLatLng(loc); circuloPrecision.setRadius(prec);
+            }
+            msg("📍 " + pos.coords.latitude.toFixed(5) + ", " + pos.coords.longitude.toFixed(5) + " · ±" + Math.round(prec) + " m", "info");
+        },
+        function(err) {
+            msg("Error GPS: "+err.message,"error");
+            detenerSeguimiento();
+            document.getElementById("btnSeguimiento").textContent="📍";
+            seguimientoActivo=false;
+        },
+        { enableHighAccuracy:true, timeout:15000, maximumAge:0 }
+    );
+}
+
+function detenerSeguimiento() {
+    if (watchId!=null) { navigator.geolocation.clearWatch(watchId); watchId=null; }
+    if (marcadorUsuario)  { mapa.removeLayer(marcadorUsuario);  marcadorUsuario=null; }
+    if (circuloPrecision) { mapa.removeLayer(circuloPrecision); circuloPrecision=null; }
+}
+
+function msg(txt, tipo) {
+    var el=document.getElementById("msg");
+    el.innerHTML=txt; el.className="msg on "+tipo;
+}
+
+window.addEventListener("beforeunload", detenerSeguimiento);
+</script>
+</body>
+</html>
