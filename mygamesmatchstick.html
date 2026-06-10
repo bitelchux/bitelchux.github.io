@@ -1,0 +1,1826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Matchsticks Puzzle</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap');
+
+:root {
+  --bg:       #fffbf0;
+  --bg2:      #fff8e1;
+  --card:     #ffffff;
+  --border:   #ffe082;
+  --border2:  #ffcc02;
+  --text:     #3d2b00;
+  --text2:    #7a5c00;
+  --dim:      #b8960a;
+  --accent:   #ff6b35;
+  --accent2:  #ff9a00;
+  --green:    #43c465;
+  --red:      #ff4444;
+  --blue:     #4a90e2;
+  --purple:   #9b59b6;
+  --sel:      #ffd700;
+  /* match colours */
+  --mw:       #c8732a;   /* wood */
+  --mh:       #cc3311;   /* head */
+  --ms:       #ff6644;   /* head glow */
+  --moff:     #e8dcc8;   /* slot empty */
+  --mon:      #c8732a;   /* slot filled */
+  --msel:     #ffd700;   /* selected */
+  --mglow:    rgba(255,140,0,.55);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Nunito', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  user-select: none;
+}
+
+/* ── SCREENS ── */
+.screen { display:none; position:relative; z-index:1; }
+.screen.active { display:flex; }
+
+/* ══════════════════════════════
+   INTRO
+══════════════════════════════ */
+#intro {
+  min-height:100vh;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:2rem 1.5rem;
+  gap:1.4rem;
+  background: linear-gradient(160deg, #fffde7 0%, #fff8e1 50%, #ffe0b2 100%);
+}
+
+.intro-art {
+  display:flex;
+  align-items:flex-end;
+  gap:10px;
+  justify-content:center;
+  margin-bottom:.5rem;
+}
+
+/* Big cartoon match */
+.big-match {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0;
+  animation: wobble 3s ease-in-out infinite;
+}
+.big-match-head {
+  width:22px; height:28px;
+  border-radius:50% 50% 40% 40%;
+  background: radial-gradient(circle at 40% 35%, #ff8866, #cc3311);
+  box-shadow: 0 3px 8px rgba(200,50,10,.4);
+  position:relative;
+}
+.big-match-head::after {
+  content:'';position:absolute;top:4px;left:5px;
+  width:7px;height:7px;border-radius:50%;
+  background:rgba(255,200,180,.6);
+}
+.big-match-body {
+  width:8px;
+  border-radius:0 0 4px 4px;
+  background: linear-gradient(to bottom, #d4913a, #c8732a 40%, #a85e1c);
+}
+@keyframes wobble {
+  0%,100%{transform:rotate(-4deg)} 50%{transform:rotate(4deg)}
+}
+.flame-icon {
+  font-size:2.5rem;
+  animation: flicker 1.2s ease-in-out infinite alternate;
+}
+@keyframes flicker { from{transform:scale(1) rotate(-3deg)} to{transform:scale(1.1) rotate(3deg)} }
+
+.intro-title {
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(2.8rem,12vw,5rem);
+  color: var(--accent);
+  text-shadow: 0 4px 0 #ff9a0055, 3px 3px 0 #cc3311;
+  letter-spacing:1px;
+  line-height:1;
+}
+.intro-sub {
+  font-size:.95rem;
+  color:var(--text2);
+  font-weight:700;
+  letter-spacing:2px;
+  text-transform:uppercase;
+}
+.intro-desc {
+  max-width:360px;
+  font-size:.9rem;
+  color:var(--text2);
+  line-height:1.7;
+  font-weight:600;
+  background: rgba(255,255,255,.7);
+  border-radius:16px;
+  padding:.8rem 1.2rem;
+  border:2px solid var(--border);
+}
+
+.btn-big {
+  background: linear-gradient(135deg, var(--accent), #ff9a00);
+  color:white;
+  border:none;
+  padding:1rem 3rem;
+  font-family:'Fredoka One',cursive;
+  font-size:1.4rem;
+  letter-spacing:1px;
+  cursor:pointer;
+  border-radius:50px;
+  box-shadow: 0 6px 0 #cc3311, 0 8px 20px rgba(255,107,53,.35);
+  transition:transform .15s, box-shadow .15s;
+  position:relative;
+  top:0;
+}
+.btn-big:active { transform:translateY(4px); box-shadow:0 2px 0 #cc3311, 0 4px 10px rgba(255,107,53,.25); }
+
+.btn-sm {
+  background:white;
+  color:var(--text2);
+  border:2px solid var(--border2);
+  padding:.65rem 1.8rem;
+  font-family:'Nunito',sans-serif;
+  font-size:.9rem;
+  font-weight:800;
+  cursor:pointer;
+  border-radius:50px;
+  transition:all .15s;
+  box-shadow:0 3px 0 var(--border2);
+}
+.btn-sm:active { transform:translateY(2px); box-shadow:0 1px 0 var(--border2); }
+.btn-sm:hover { background:var(--bg2); }
+
+.intro-stats {
+  display:flex;
+  gap:1.5rem;
+}
+.istat {
+  background:white;
+  border:2px solid var(--border);
+  border-radius:16px;
+  padding:.7rem 1.2rem;
+  text-align:center;
+  box-shadow:0 3px 0 var(--border);
+}
+.istat-n { font-family:'Fredoka One',cursive; font-size:1.6rem; color:var(--accent); line-height:1; }
+.istat-l { font-size:.65rem; color:var(--dim); font-weight:800; letter-spacing:2px; text-transform:uppercase; }
+
+/* ══════════════════════════════
+   LEVEL SELECT
+══════════════════════════════ */
+#levelselect {
+  min-height:100vh;
+  flex-direction:column;
+  background: var(--bg);
+  padding:0;
+}
+.ls-top {
+  background: linear-gradient(135deg, var(--accent) 0%, #ff9a00 100%);
+  padding:1.2rem 1.2rem .8rem;
+  display:flex;
+  align-items:center;
+  gap:.8rem;
+  box-shadow: 0 4px 12px rgba(255,107,53,.3);
+}
+.ls-back {
+  background:rgba(255,255,255,.25);
+  border:none;
+  color:white;
+  width:38px;height:38px;
+  border-radius:50%;
+  font-size:1.1rem;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .2s;
+  flex-shrink:0;
+}
+.ls-back:hover{background:rgba(255,255,255,.4)}
+.ls-title {
+  font-family:'Fredoka One',cursive;
+  font-size:1.6rem;
+  color:white;
+  flex:1;
+}
+.ls-pts {
+  background:rgba(255,255,255,.2);
+  border-radius:20px;
+  padding:.3rem .8rem;
+  color:white;
+  font-weight:800;
+  font-size:.85rem;
+}
+
+.worlds-container { padding:1rem; display:flex; flex-direction:column; gap:1rem; overflow-y:auto; flex:1; }
+.world-card {
+  background:white;
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:0 4px 0 var(--border), 0 2px 12px rgba(0,0,0,.06);
+  border:2px solid var(--border);
+}
+.world-header {
+  padding:.9rem 1.2rem;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  cursor:pointer;
+  transition:background .2s;
+  background:linear-gradient(135deg,var(--bg2),white);
+}
+.world-header:hover{background:linear-gradient(135deg,#fff8e1,#fffde7)}
+.world-name {
+  font-family:'Fredoka One',cursive;
+  font-size:1.15rem;
+  color:var(--accent);
+}
+.world-meta {font-size:.8rem;color:var(--dim);font-weight:700;display:flex;gap:.6rem;align-items:center}
+.levels-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(54px,1fr));
+  gap:8px;
+  padding:1rem;
+  max-height:0;
+  overflow:hidden;
+  transition:max-height .4s ease;
+}
+.world-card.open .levels-grid{max-height:700px}
+.lvl-btn {
+  aspect-ratio:1;
+  border-radius:14px;
+  border:2px solid var(--border);
+  background:var(--bg2);
+  color:var(--text2);
+  font-family:'Nunito',sans-serif;
+  font-size:.8rem;
+  font-weight:800;
+  cursor:pointer;
+  transition:all .15s;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;
+  gap:1px;
+  position:relative;
+  box-shadow:0 2px 0 var(--border);
+}
+.lvl-btn:hover{transform:scale(1.08);box-shadow:0 4px 0 var(--border2)}
+.lvl-btn:active{transform:scale(.95)}
+.lvl-btn.done{background:linear-gradient(135deg,#e8fce8,#d4f7d4);border-color:#7ec878;color:#2d8a2d;box-shadow:0 2px 0 #7ec878}
+.lvl-btn.done::after{content:'✓';font-size:.55rem;position:absolute;top:3px;right:5px;color:#2d8a2d}
+.lvl-btn.cur{background:linear-gradient(135deg,#fff3cd,#ffe082);border-color:var(--accent2);color:var(--accent);box-shadow:0 2px 0 var(--accent2)}
+.lvl-stars{font-size:.5rem;color:#f9a825;line-height:1}
+
+/* ══════════════════════════════
+   GAME SCREEN
+══════════════════════════════ */
+#game {
+  min-height:100vh;
+  flex-direction:column;
+  align-items:stretch;
+  background:var(--bg);
+}
+
+.game-topbar {
+  background:white;
+  border-bottom:3px solid var(--border);
+  padding:.7rem 1rem;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:.5rem;
+  box-shadow:0 3px 8px rgba(0,0,0,.06);
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+
+.topleft { display:flex;flex-direction:column;min-width:60px; }
+.lbl-tiny { font-size:.58rem;color:var(--dim);font-weight:800;letter-spacing:2px;text-transform:uppercase; }
+.lbl-lvl { font-family:'Fredoka One',cursive;font-size:1.2rem;color:var(--accent);line-height:1.1; }
+.streak-badge {
+  display:none;
+  font-size:.65rem;font-weight:800;
+  background:linear-gradient(135deg,#ff6b35,#ff9a00);
+  color:white;border-radius:10px;padding:.1rem .5rem;
+  margin-top:.15rem;animation:popIn .3s ease;
+}
+@keyframes popIn{0%{transform:scale(.5)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+
+/* Timer ring */
+.timer-wrap{position:relative;width:52px;height:52px;flex-shrink:0}
+.timer-svg{display:block}
+.timer-lbl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Fredoka One',cursive;font-size:.9rem;color:var(--accent2);transition:color .3s}
+.timer-lbl.urgent{color:var(--red);animation:tpulse .35s infinite alternate}
+@keyframes tpulse{from{transform:scale(1)}to{transform:scale(1.25)}}
+
+.moves-chip {
+  text-align:center;
+  background:linear-gradient(135deg,#fff3cd,#ffe082);
+  border:2px solid var(--border2);
+  border-radius:14px;
+  padding:.4rem .8rem;
+  box-shadow:0 2px 0 var(--border2);
+}
+.moves-n{font-family:'Fredoka One',cursive;font-size:1.5rem;color:var(--accent);line-height:1}
+.moves-lbl{font-size:.55rem;color:var(--dim);font-weight:800;letter-spacing:1px;text-transform:uppercase}
+
+.topright{display:flex;gap:.4rem;flex-shrink:0}
+.icon-btn {
+  background:var(--bg2);
+  border:2px solid var(--border);
+  color:var(--text2);
+  width:38px;height:38px;
+  border-radius:50%;
+  font-size:1rem;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;
+  box-shadow:0 2px 0 var(--border2);
+}
+.icon-btn:hover{background:white;border-color:var(--accent2)}
+.icon-btn:active{transform:translateY(2px);box-shadow:none}
+.icon-btn.dbg{border-color:#ff6b35;color:#ff6b35}
+
+/* progress bar */
+.prog-bar{height:5px;background:var(--border);position:relative}
+.prog-fill{height:100%;background:linear-gradient(to right,var(--accent),var(--accent2));transition:width .5s ease}
+
+/* ── GAME BODY ── */
+.game-body {
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:1rem;
+  gap:1rem;
+}
+
+/* action pill */
+.action-pill {
+  background:white;
+  border:2px solid var(--border);
+  border-radius:20px;
+  padding:.4rem 1rem;
+  font-size:.75rem;
+  font-weight:800;
+  color:var(--text2);
+  letter-spacing:1px;
+  text-transform:uppercase;
+  box-shadow:0 2px 0 var(--border);
+}
+
+/* instruction bubble */
+.instr {
+  background:white;
+  border:2px solid var(--border);
+  border-radius:16px;
+  padding:.6rem 1.2rem;
+  font-size:.85rem;
+  font-weight:700;
+  color:var(--text2);
+  text-align:center;
+  max-width:340px;
+  width:100%;
+  box-shadow:0 3px 0 var(--border);
+  min-height:2.5rem;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .25s;
+}
+.instr.pick{border-color:var(--accent2);color:var(--accent);background:#fff8e1}
+.instr.place{border-color:var(--sel);color:#b8860b;background:#fffde7}
+.instr.ok{border-color:var(--green);color:#1a7a36;background:#e8fce8;animation:bumpOk .35s ease}
+.instr.bad{border-color:var(--red);color:var(--red);background:#fff0f0;animation:shake .35s ease}
+@keyframes bumpOk{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* ── PUZZLE AREA ── */
+.puzzle-wrap {
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  min-height:140px;
+  position:relative;
+}
+.eq-display {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  flex-wrap:wrap;
+  padding:.5rem;
+}
+
+/* ── MATCHSTICK DIGIT (7-seg) ── */
+.seg-digit {
+  position:relative;
+  width:44px;
+  height:70px;
+  flex-shrink:0;
+}
+@media(max-width:420px){.seg-digit{width:32px;height:52px}}
+
+/* Each segment IS a matchstick shape */
+.seg {
+  position:absolute;
+  cursor:pointer;
+  touch-action:none;
+  transition:opacity .2s;
+}
+.seg:active{opacity:.7}
+
+/* Horizontal matchstick */
+.seg.h {
+  height:10px;
+  width:62%;
+  left:19%;
+  border-radius:6px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:visible;
+}
+.seg.h::before { /* the wood stick */
+  content:'';
+  position:absolute;
+  inset:3px 0;
+  border-radius:4px;
+  transition:background .2s, box-shadow .2s;
+}
+.seg.h::after { /* the head (left end) — small oval */
+  content:'';
+  position:absolute;
+  left:-1px;top:50%;transform:translateY(-50%);
+  width:8px;height:6px;
+  border-radius:50%;
+  transition:background .2s, box-shadow .2s;
+}
+/* Vertical matchstick */
+.seg.v {
+  width:10px;
+  height:42%;
+  border-radius:6px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:visible;
+}
+.seg.v::before { /* wood */
+  content:'';
+  position:absolute;
+  inset:0 3px;
+  border-radius:4px;
+  transition:background .2s, box-shadow .2s;
+}
+.seg.v::after { /* head top — small oval */
+  content:'';
+  position:absolute;
+  top:-1px;left:50%;transform:translateX(-50%);
+  width:6px;height:8px;
+  border-radius:50%;
+  transition:background .2s, box-shadow .2s;
+}
+
+/* OFF state */
+.seg.h::before,.seg.v::before { background:rgba(0,0,0,.07); }
+.seg.h::after,.seg.v::after   { background:rgba(0,0,0,.05); }
+
+/* ON state */
+.seg.on.h::before { background:linear-gradient(to right,#d4913a,#c8732a); box-shadow:0 1px 4px rgba(150,80,0,.3); }
+.seg.on.h::after  { background:radial-gradient(circle at 40% 35%,#ff8866,#cc3311); box-shadow:0 0 5px #ff6644; }
+.seg.on.v::before { background:linear-gradient(to bottom,#d4913a,#c8732a); box-shadow:1px 0 4px rgba(150,80,0,.3); }
+.seg.on.v::after  { background:radial-gradient(circle at 40% 35%,#ff8866,#cc3311); box-shadow:0 0 5px #ff6644; }
+
+/* SELECTED state */
+.seg.selected.h::before,.seg.selected.v::before { background:linear-gradient(to right,#ffe066,#ffd700); box-shadow:0 0 8px rgba(255,210,0,.7); }
+.seg.selected.h::after,.seg.selected.v::after   { background:radial-gradient(circle,#fff176,#ffd700); box-shadow:0 0 10px rgba(255,215,0,.8); }
+
+/* GHOST (drag target hint) */
+.seg.ghost.h::before { background:rgba(200,115,42,.2); border:1px dashed rgba(200,115,42,.4); }
+.seg.ghost.h::after  { background:rgba(200,115,42,.15); }
+.seg.ghost.v::before { background:rgba(200,115,42,.2); border:1px dashed rgba(200,115,42,.4); }
+.seg.ghost.v::after  { background:rgba(200,115,42,.15); }
+
+/* Segment positions */
+.seg.h.a{top:2%;left:19%}
+.seg.h.g{top:46%;left:19%}
+.seg.h.d{bottom:2%;left:19%}
+.seg.v.f{top:7%;left:6%}
+.seg.v.b{top:7%;right:6%}
+.seg.v.e{bottom:7%;left:6%}
+.seg.v.c{bottom:7%;right:6%}
+
+/* Operator / equals */
+.seg-op,.seg-eq {
+  font-family:'Fredoka One',cursive;
+  font-size:1.9rem;
+  display:flex;align-items:center;justify-content:center;
+  height:70px;
+  padding:0 2px;
+  flex-shrink:0;
+  color:var(--text2);
+  line-height:1;
+}
+.seg-eq { color:var(--accent); }
+@media(max-width:420px){.seg-op,.seg-eq{font-size:1.4rem;height:52px}}
+
+/* ── DRAGGING MATCHSTICK ── */
+.drag-match {
+  position:fixed;
+  pointer-events:none;
+  z-index:9000;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  transform:translate(-50%,-50%) rotate(12deg);
+  filter:drop-shadow(0 6px 14px rgba(0,0,0,.35));
+  transition:none;
+}
+.drag-head {
+  width:14px;height:9px;
+  border-radius:50%;
+  background:radial-gradient(ellipse at 40% 35%,#ff8866,#cc3311);
+}
+.drag-body {
+  width:7px;
+  border-radius:0 0 3px 3px;
+  background:linear-gradient(to bottom,#d4913a,#c8732a);
+}
+
+/* ── TRASH BIN ── */
+.trash-zone {
+  position:fixed;
+  bottom:1rem;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:8000;
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  gap:.3rem;
+}
+.trash-can {
+  width:72px;height:72px;
+  border-radius:50%;
+  background:white;
+  border:3px solid #ffcdd2;
+  display:flex;align-items:center;justify-content:center;
+  font-size:2rem;
+  box-shadow:0 4px 12px rgba(0,0,0,.12);
+  transition:all .2s;
+}
+.trash-can.over{background:#ffebee;border-color:var(--red);transform:scale(1.2);box-shadow:0 0 0 12px rgba(255,68,68,.15),0 6px 20px rgba(255,68,68,.3)}
+.trash-lbl{font-size:.7rem;font-weight:800;color:var(--red);letter-spacing:1px;text-transform:uppercase}
+.trash-zone.show{animation:trashIn .25s ease}
+@keyframes trashIn{from{transform:translateX(-50%) scale(.5);opacity:0}to{transform:translateX(-50%) scale(1);opacity:1}}
+
+/* ── MOVE DOTS ── */
+.move-dots{display:flex;gap:7px;align-items:center;justify-content:center}
+.mdot{width:11px;height:11px;border-radius:50%;background:#f0e0c0;border:2px solid var(--border2);transition:all .3s}
+.mdot.used.move{background:var(--accent2);border-color:var(--accent);box-shadow:0 0 6px rgba(255,154,0,.5)}
+.mdot.used.remove{background:var(--red);border-color:#cc0000}
+.mdot.used.add{background:var(--green);border-color:#2d8a2d}
+
+/* ── NAV BAR ── */
+.game-nav {
+  display:flex;
+  gap:.8rem;
+  align-items:center;
+  justify-content:center;
+  padding:.8rem;
+  background:white;
+  border-top:3px solid var(--border);
+  box-shadow:0 -3px 8px rgba(0,0,0,.05);
+}
+.score-chip {
+  background:linear-gradient(135deg,#fff8e1,#ffe082);
+  border:2px solid var(--border2);
+  border-radius:14px;
+  padding:.4rem .8rem;
+  font-family:'Fredoka One',cursive;
+  font-size:1rem;
+  color:var(--accent);
+  box-shadow:0 2px 0 var(--border2);
+}
+
+/* ══════════════════════════════
+   SUCCESS OVERLAY
+══════════════════════════════ */
+.success-ov {
+  display:none;
+  position:fixed;inset:0;z-index:200;
+  background:rgba(255,251,240,.92);
+  flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:2rem;gap:1.2rem;
+  backdrop-filter:blur(4px);
+}
+.success-ov.show{display:flex;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.success-flames{display:flex;gap:.8rem;align-items:flex-end;justify-content:center}
+.sf{border-radius:50% 50% 30% 70%/60% 50% 50% 40%;animation:flicker .8s infinite alternate}
+.win-title{font-family:'Fredoka One',cursive;font-size:clamp(2.2rem,8vw,3.5rem);color:var(--accent);text-shadow:2px 3px 0 #ff9a0055}
+.stars-row{display:flex;gap:.8rem;justify-content:center}
+.star{font-size:2.2rem;filter:grayscale(1) brightness(.5);transition:all .35s}
+.star.lit{filter:none;animation:starPop .4s ease}
+@keyframes starPop{0%,100%{transform:scale(1)}50%{transform:scale(1.6)}}
+.suc-stats{display:flex;gap:.7rem;flex-wrap:wrap;justify-content:center}
+.suc-chip{background:white;border:2px solid var(--border);border-radius:20px;padding:.35rem .9rem;font-size:.8rem;font-weight:800;color:var(--text2);animation:chipIn .4s ease both;box-shadow:0 2px 0 var(--border)}
+.suc-chip:nth-child(2){animation-delay:.1s}.suc-chip:nth-child(3){animation-delay:.2s}
+@keyframes chipIn{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
+.suc-eq{font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--green)}
+.suc-btns{display:flex;gap:.8rem;flex-wrap:wrap;justify-content:center}
+
+/* ══════════════════════════════
+   DEBUG OVERLAY
+══════════════════════════════ */
+.debug-ov {
+  display:none;
+  position:fixed;inset:0;z-index:300;
+  background:rgba(0,0,0,.6);
+  align-items:center;justify-content:center;
+  padding:1.5rem;
+}
+.debug-ov.show{display:flex}
+.debug-box {
+  background:white;
+  border-radius:24px;
+  padding:1.8rem;
+  max-width:380px;
+  width:100%;
+  text-align:center;
+  box-shadow:0 20px 40px rgba(0,0,0,.2);
+  border:3px solid var(--accent);
+}
+.debug-title{font-family:'Fredoka One',cursive;font-size:1.3rem;color:var(--accent);margin-bottom:1rem}
+.debug-row{margin-bottom:.8rem}
+.debug-lbl{font-size:.65rem;font-weight:800;color:var(--dim);letter-spacing:2px;text-transform:uppercase;margin-bottom:.2rem}
+.debug-val{font-size:1rem;font-weight:800;color:var(--text)}
+.debug-sols{font-size:.95rem;color:var(--green);line-height:2.2;font-weight:700}
+.debug-close{
+  margin-top:1rem;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:white;border:none;
+  padding:.7rem 2rem;border-radius:50px;
+  font-family:'Fredoka One',cursive;font-size:1rem;
+  cursor:pointer;
+  box-shadow:0 4px 0 #cc3311;
+}
+
+/* ══════════════════════════════
+   TOAST & EFFECTS
+══════════════════════════════ */
+.toast {
+  position:fixed;bottom:1.5rem;left:50%;
+  transform:translateX(-50%) translateY(80px);
+  background:rgba(61,43,0,.85);
+  color:white;
+  padding:.65rem 1.4rem;
+  border-radius:50px;
+  font-size:.85rem;font-weight:700;
+  transition:transform .28s ease;
+  z-index:9999;
+  white-space:nowrap;
+  backdrop-filter:blur(4px);
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+.spark{position:fixed;pointer-events:none;z-index:8998;border-radius:50%;animation:sparkFly .7s ease-out both}
+@keyframes sparkFly{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(0);opacity:0}}
+.score-float{position:fixed;pointer-events:none;z-index:9990;font-family:'Fredoka One',cursive;font-size:1.6rem;color:var(--accent);text-shadow:1px 2px 0 #ff9a00;animation:floatUp 1s ease-out both}
+@keyframes floatUp{0%{transform:translateY(0) scale(.8);opacity:1}100%{transform:translateY(-80px) scale(1.1);opacity:0}}
+.screen-flash{position:fixed;inset:0;pointer-events:none;z-index:8990;animation:flashAnim .45s ease}
+@keyframes flashAnim{0%{opacity:0}25%{opacity:.4}100%{opacity:0}}
+
+/* confetti canvas fixed overlay */
+#confetti-cv{position:fixed;inset:0;pointer-events:none;z-index:199}
+
+/* scrollbar */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- ══ INTRO ══ -->
+<div id="intro" class="screen active">
+  <div class="intro-art">
+    <div class="big-match"><div class="big-match-head"></div><div class="big-match-body" style="height:70px"></div></div>
+    <div class="flame-icon">🔥</div>
+    <div class="big-match"><div class="big-match-head"></div><div class="big-match-body" style="height:90px"></div></div>
+    <div class="flame-icon" style="animation-delay:.4s">🔥</div>
+    <div class="big-match"><div class="big-match-head"></div><div class="big-match-body" style="height:60px"></div></div>
+  </div>
+  <h1 class="intro-title">MATCHSTICKS!</h1>
+  <p class="intro-sub">Number Puzzle</p>
+  <p class="intro-desc">Drag matchsticks to move them, or drag to the 🗑️ to remove. Make the equation correct!</p>
+  <div style="display:flex;gap:.8rem;flex-wrap:wrap;justify-content:center">
+    <button class="btn-big" onclick="showLevelSelect()">▶ PLAY!</button>
+    <button class="btn-sm" onclick="continueGame()">Continue</button>
+  </div>
+  <div class="intro-stats">
+    <div class="istat"><div class="istat-n" id="intro-done">0</div><div class="istat-l">Solved</div></div>
+    <div class="istat"><div class="istat-n" style="color:var(--accent2)" id="intro-pts">0</div><div class="istat-l">Points</div></div>
+    <div class="istat"><div class="istat-n" style="color:var(--green)" id="intro-lvls">0</div><div class="istat-l">Levels</div></div>
+  </div>
+</div>
+
+<!-- ══ LEVEL SELECT ══ -->
+<div id="levelselect" class="screen">
+  <div class="ls-top">
+    <button class="ls-back" onclick="showScreen('intro')">←</button>
+    <div class="ls-title">Choose Level</div>
+    <div class="ls-pts">⭐ <span id="ls-pts">0</span></div>
+  </div>
+  <div class="worlds-container" id="worlds-container"></div>
+</div>
+
+<!-- ══ GAME ══ -->
+<div id="game" class="screen">
+  <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  <div class="game-topbar">
+    <!-- left -->
+    <div class="topleft">
+      <span class="lbl-tiny">Level</span>
+      <span class="lbl-lvl" id="cur-lbl">1-1</span>
+      <div class="streak-badge" id="streak-badge">🔥 <span id="streak-n">2</span>x</div>
+    </div>
+    <!-- center -->
+    <div style="display:flex;align-items:center;gap:.6rem">
+      <div class="timer-wrap">
+        <svg class="timer-svg" width="52" height="52" viewBox="0 0 52 52">
+          <circle cx="26" cy="26" r="22" fill="none" stroke="#ffe082" stroke-width="5"/>
+          <circle id="timer-circle" cx="26" cy="26" r="22" fill="none" stroke="#ff9a00" stroke-width="5"
+            stroke-dasharray="138.2" stroke-dashoffset="0" stroke-linecap="round"
+            transform="rotate(-90 26 26)" style="transition:stroke-dashoffset 1s linear,stroke .3s"/>
+        </svg>
+        <div class="timer-lbl" id="timer-lbl">60</div>
+      </div>
+      <div class="moves-chip">
+        <div class="moves-n" id="moves-n">1</div>
+        <div class="moves-lbl">left</div>
+      </div>
+    </div>
+    <!-- right -->
+    <div class="topright">
+      <button class="icon-btn" title="Undo" onclick="undoMove()">⟲</button>
+      <button class="icon-btn" title="Reset" onclick="resetLevel()">↺</button>
+      <button class="icon-btn" title="Hint" onclick="showHint()">💡</button>
+      <button class="icon-btn dbg" title="[DEV] Solution" onclick="showDebug()">🔍</button>
+      <button class="icon-btn" title="Levels" onclick="showLevelSelect()">☰</button>
+    </div>
+  </div>
+
+  <div class="game-body">
+    <div class="action-pill" id="action-pill">MOVE 1 MATCHSTICK</div>
+    <div class="instr" id="instr">Drag a matchstick to move it</div>
+    <div class="puzzle-wrap" id="puzzle-wrap">
+      <div class="eq-display" id="eq-display"></div>
+    </div>
+    <div class="move-dots" id="move-dots"></div>
+  </div>
+
+  <div class="game-nav">
+    <button class="btn-sm" onclick="prevLevel()" id="btn-prev">← Prev</button>
+    <div class="score-chip">⭐ <span id="hud-pts">0</span></div>
+    <button class="btn-sm" onclick="nextLevel()" id="btn-next">Next →</button>
+  </div>
+</div>
+
+<!-- Trash zone (shown during drag) -->
+<div class="trash-zone" id="trash-zone">
+  <div class="trash-can" id="trash-can">🗑️</div>
+  <div class="trash-lbl">Remove</div>
+</div>
+
+<!-- Drag ghost -->
+<div class="drag-match" id="drag-ghost" style="display:none">
+  <div class="drag-head"></div>
+  <div class="drag-body" id="drag-body" style="height:50px"></div>
+</div>
+
+<!-- ══ SUCCESS ══ -->
+<div class="success-ov" id="success-ov">
+  <canvas id="confetti-cv"></canvas>
+  <div class="success-flames">
+    <div class="sf" style="width:28px;height:46px;background:linear-gradient(to top,#ff4500,#ff8c00,#ffd700)"></div>
+    <div class="sf" style="width:38px;height:66px;animation-delay:.2s;background:linear-gradient(to top,#ff4500,#ff8c00,#ffd700)"></div>
+    <div class="sf" style="width:28px;height:52px;animation-delay:.4s;background:linear-gradient(to top,#ff4500,#ff8c00,#ffd700)"></div>
+  </div>
+  <h2 class="win-title" id="win-title">Brilliant! 🎉</h2>
+  <div class="stars-row">
+    <span class="star" id="s1">⭐</span>
+    <span class="star" id="s2">⭐</span>
+    <span class="star" id="s3">⭐</span>
+  </div>
+  <div class="suc-stats">
+    <div class="suc-chip" id="sc-time">⏱ --s</div>
+    <div class="suc-chip" id="sc-pts">+0 pts</div>
+    <div class="suc-chip" id="sc-streak">🔥 ×1</div>
+  </div>
+  <div class="suc-eq" id="suc-eq">0=0</div>
+  <div class="suc-btns">
+    <button class="btn-sm" onclick="retryLevel()">↺ Retry</button>
+    <button class="btn-big" onclick="nextFromSuccess()" style="font-size:1.1rem;padding:.8rem 2rem">Next ▶</button>
+  </div>
+</div>
+
+<!-- ══ DEBUG ══ -->
+<div class="debug-ov" id="debug-ov">
+  <div class="debug-box">
+    <div class="debug-title">🔍 Dev — Solutions</div>
+    <div class="debug-row">
+      <div class="debug-lbl">Original</div>
+      <div class="debug-val" id="dbg-orig"></div>
+    </div>
+    <div class="debug-row">
+      <div class="debug-lbl">Action</div>
+      <div class="debug-val" id="dbg-action"></div>
+    </div>
+    <div class="debug-row">
+      <div class="debug-lbl">Solutions found</div>
+      <div class="debug-sols" id="dbg-sols">Computing…</div>
+    </div>
+    <button class="debug-close" onclick="document.getElementById('debug-ov').classList.remove('show')">Close</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════
+// AUDIO
+// ══════════════════════════════════════════════
+let _actx = null;
+function actx(){if(!_actx)_actx=new(window.AudioContext||window.webkitAudioContext)();if(_actx.state==='suspended')_actx.resume();return _actx;}
+function tone(f,t='sine',d=.12,v=.15,w=0){try{const a=actx(),n=a.currentTime+w,o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.type=t;o.frequency.setValueAtTime(f,n);g.gain.setValueAtTime(0,n);g.gain.linearRampToValueAtTime(v,n+.015);g.gain.exponentialRampToValueAtTime(.001,n+d);o.start(n);o.stop(n+d);}catch(e){}}
+const sfx={
+  pick:   ()=>{tone(370,'sine',.09,.10);tone(494,'sine',.07,.07,.05)},
+  place:  ()=>{tone(294,'triangle',.12,.16);tone(440,'triangle',.10,.10,.04)},
+  remove: ()=>{tone(262,'sine',.10,.12);tone(196,'sine',.08,.08,.05)},
+  add:    ()=>{tone(523,'sine',.12,.14);tone(659,'sine',.10,.10,.06)},
+  err:    ()=>{tone(196,'triangle',.18,.15);tone(165,'triangle',.14,.10,.09)},
+  ok:     ()=>{tone(523,'sine',.15,.18);tone(659,'sine',.12,.15,.10);tone(784,'sine',.10,.12,.20)},
+  win:    (s)=>{const ns=s===3?[523,659,784,1047]:s===2?[440,523,659]:[330,392,440];ns.forEach((n,i)=>tone(n,'sine',.22,.16,i*.11))},
+  tick:   ()=>tone(440,'sine',.05,.07),
+  urgent: ()=>{tone(587,'sine',.06,.14);tone(523,'sine',.05,.10,.07)},
+};
+
+// ══════════════════════════════════════════════
+// 7-SEGMENT DEFS  a=top b=top-right c=bot-right d=bot e=bot-left f=top-left g=mid
+// ══════════════════════════════════════════════
+const SEGS={
+  '0':[1,1,1,1,1,1,0],'1':[0,1,1,0,0,0,0],'2':[1,1,0,1,1,0,1],
+  '3':[1,1,1,1,0,0,1],'4':[0,1,1,0,0,1,1],'5':[1,0,1,1,0,1,1],
+  '6':[1,0,1,1,1,1,1],'7':[1,1,1,0,0,0,0],'8':[1,1,1,1,1,1,1],
+  '9':[1,1,1,1,0,1,1]
+};
+
+// ══════════════════════════════════════════════
+// LEVELS  (filtered to only solvable ones at startup)
+// ══════════════════════════════════════════════
+const EQUATION_LEVELS = [
+  // World 1
+  {world:1,num:2,id:'1-2',type:'equation',equation:'4-7=3',action:'remove',count:1},
+  {world:1,num:3,id:'1-3',type:'equation',equation:'6-3=1',action:'move',count:1},
+  {world:1,num:4,id:'1-4',type:'equation',equation:'8/3=2',action:'remove',count:1},
+  {world:1,num:8,id:'1-8',type:'equation',equation:'7*8=63',action:'remove',count:1},
+  {world:1,num:9,id:'1-9',type:'equation',equation:'6*9=16',action:'move',count:1},
+  {world:1,num:12,id:'1-12',type:'equation',equation:'4*5=36',action:'add',count:1},
+  {world:1,num:13,id:'1-13',type:'equation',equation:'1+9=15',action:'add',count:2},
+  {world:1,num:15,id:'1-15',type:'equation',equation:'6-4=0',action:'move',count:2},
+  {world:1,num:19,id:'1-19',type:'equation',equation:'3-7=2',action:'add',count:1},
+  {world:1,num:20,id:'1-20',type:'equation',equation:'2+8=75',action:'move',count:2},
+  {world:1,num:24,id:'1-24',type:'equation',equation:'4/3=2',action:'move',count:1},
+  {world:1,num:25,id:'1-25',type:'equation',equation:'3/7=8',action:'remove',count:3},
+  {world:1,num:29,id:'1-29',type:'equation',equation:'9*5=16',action:'remove',count:2},
+  {world:1,num:32,id:'1-32',type:'equation',equation:'4+5=42',action:'move',count:2},
+  {world:1,num:33,id:'1-33',type:'equation',equation:'6+5=70',action:'remove',count:2},
+  {world:1,num:34,id:'1-34',type:'equation',equation:'7-9=3',action:'remove',count:2},
+  {world:1,num:36,id:'1-36',type:'equation',equation:'9+8=13',action:'remove',count:1},
+  {world:1,num:39,id:'1-39',type:'equation',equation:'7+6=4',action:'add',count:4},
+  {world:1,num:41,id:'1-41',type:'equation',equation:'1*1=20',action:'add',count:4},
+  {world:1,num:45,id:'1-45',type:'equation',equation:'3-6=2',action:'add',count:2},
+  {world:1,num:49,id:'1-49',type:'equation',equation:'8+3=9',action:'remove',count:2},
+  {world:1,num:51,id:'1-51',type:'equation',equation:'4+8=19',action:'remove',count:2},
+  {world:1,num:53,id:'1-53',type:'equation',equation:'9*2=6',action:'remove',count:1},
+  {world:1,num:54,id:'1-54',type:'equation',equation:'1+8=15',action:'move',count:2},
+  {world:1,num:55,id:'1-55',type:'equation',equation:'3-1=6',action:'remove',count:2},
+  {world:1,num:57,id:'1-57',type:'equation',equation:'7*5=53',action:'add',count:2},
+  {world:1,num:61,id:'1-61',type:'equation',equation:'8-5=4',action:'remove',count:1},
+  {world:1,num:62,id:'1-62',type:'equation',equation:'5*7=25',action:'move',count:1},
+  {world:1,num:64,id:'1-64',type:'equation',equation:'4+7=17',action:'remove',count:1},
+  {world:1,num:67,id:'1-67',type:'equation',equation:'7+7=9',action:'move',count:1},
+  {world:1,num:69,id:'1-69',type:'equation',equation:'6*9=64',action:'remove',count:1},
+  {world:1,num:73,id:'1-73',type:'equation',equation:'0/1=6',action:'move',count:1},
+  {world:1,num:74,id:'1-74',type:'equation',equation:'2*1=11',action:'add',count:3},
+  {world:1,num:76,id:'1-76',type:'equation',equation:'1*9=98',action:'move',count:2},
+  {world:1,num:77,id:'1-77',type:'equation',equation:'5-7=2',action:'add',count:1},
+  {world:1,num:78,id:'1-78',type:'equation',equation:'6-2=1',action:'add',count:2},
+  {world:1,num:81,id:'1-81',type:'equation',equation:'7-5=1',action:'add',count:1},
+  {world:1,num:83,id:'1-83',type:'equation',equation:'9+1=1',action:'move',count:1},
+  {world:1,num:88,id:'1-88',type:'equation',equation:'5-4=5',action:'add',count:1},
+  {world:1,num:90,id:'1-90',type:'equation',equation:'9-5=0',action:'move',count:2},
+  {world:1,num:91,id:'1-91',type:'equation',equation:'5/8=1',action:'move',count:1},
+  {world:1,num:92,id:'1-92',type:'equation',equation:'2+3=8',action:'remove',count:2},
+  {world:1,num:93,id:'1-93',type:'equation',equation:'4+8=79',action:'remove',count:3},
+  {world:1,num:95,id:'1-95',type:'equation',equation:'9*9=40',action:'move',count:1},
+  {world:1,num:97,id:'1-97',type:'equation',equation:'6+9=18',action:'move',count:1},
+  {world:1,num:98,id:'1-98',type:'equation',equation:'8/4=8',action:'remove',count:2},
+  // World 2
+  {world:2,num:4,id:'2-4',type:'equation',equation:'4+4=9',action:'add',count:1},
+  {world:2,num:6,id:'2-6',type:'equation',equation:'0+1=9',action:'add',count:1},
+  {world:2,num:11,id:'2-11',type:'equation',equation:'1*2=14',action:'add',count:1},
+  {world:2,num:13,id:'2-13',type:'equation',equation:'5/1=3',action:'move',count:1},
+  {world:2,num:16,id:'2-16',type:'equation',equation:'8/2=9',action:'remove',count:2},
+  {world:2,num:19,id:'2-19',type:'equation',equation:'7*7=46',action:'move',count:1},
+  {world:2,num:22,id:'2-22',type:'equation',equation:'5-1=5',action:'add',count:1},
+  {world:2,num:26,id:'2-26',type:'equation',equation:'6+8=74',action:'remove',count:1},
+  {world:2,num:27,id:'2-27',type:'equation',equation:'6+5=18',action:'remove',count:2},
+  {world:2,num:30,id:'2-30',type:'equation',equation:'8*3=40',action:'move',count:1},
+  {world:2,num:31,id:'2-31',type:'equation',equation:'8+5=17',action:'add',count:1},
+  {world:2,num:32,id:'2-32',type:'equation',equation:'3+9=9',action:'move',count:1},
+  {world:2,num:35,id:'2-35',type:'equation',equation:'7-9=4',action:'remove',count:1},
+  {world:2,num:36,id:'2-36',type:'equation',equation:'3-2=7',action:'add',count:1},
+  {world:2,num:37,id:'2-37',type:'equation',equation:'5+1=12',action:'add',count:1},
+  {world:2,num:38,id:'2-38',type:'equation',equation:'8*8=87',action:'move',count:2},
+  {world:2,num:41,id:'2-41',type:'equation',equation:'1+3=9',action:'remove',count:2},
+  {world:2,num:42,id:'2-42',type:'equation',equation:'5+8=46',action:'move',count:2},
+  {world:2,num:45,id:'2-45',type:'equation',equation:'7*4=29',action:'add',count:1},
+  {world:2,num:46,id:'2-46',type:'equation',equation:'0+5=2',action:'move',count:2},
+  {world:2,num:51,id:'2-51',type:'equation',equation:'4+9=3',action:'move',count:1},
+  {world:2,num:52,id:'2-52',type:'equation',equation:'6/6=4',action:'move',count:2},
+  {world:2,num:54,id:'2-54',type:'equation',equation:'5+9=18',action:'add',count:1},
+  {world:2,num:58,id:'2-58',type:'equation',equation:'1/1=7',action:'add',count:1},
+  {world:2,num:62,id:'2-62',type:'equation',equation:'1+4=9',action:'remove',count:1},
+  {world:2,num:64,id:'2-64',type:'equation',equation:'2*2=6',action:'move',count:1},
+  {world:2,num:66,id:'2-66',type:'equation',equation:'4-1=8',action:'remove',count:2},
+  {world:2,num:67,id:'2-67',type:'equation',equation:'2/9=0',action:'move',count:2},
+  {world:2,num:71,id:'2-71',type:'equation',equation:'2+7=8',action:'remove',count:1},
+  {world:2,num:75,id:'2-75',type:'equation',equation:'1+1=8',action:'remove',count:2},
+  {world:2,num:76,id:'2-76',type:'equation',equation:'9-1=4',action:'remove',count:1},
+  {world:2,num:77,id:'2-77',type:'equation',equation:'3+0=71',action:'move',count:1},
+  {world:2,num:78,id:'2-78',type:'equation',equation:'9+9=14',action:'remove',count:1},
+  {world:2,num:82,id:'2-82',type:'equation',equation:'9-5=3',action:'add',count:1},
+  {world:2,num:83,id:'2-83',type:'equation',equation:'1+1=5',action:'move',count:2},
+  {world:2,num:84,id:'2-84',type:'equation',equation:'8*6=0',action:'remove',count:1},
+  {world:2,num:87,id:'2-87',type:'equation',equation:'2+9=12',action:'move',count:1},
+  {world:2,num:95,id:'2-95',type:'equation',equation:'9-2=5',action:'add',count:2},
+  {world:2,num:96,id:'2-96',type:'equation',equation:'6*6=54',action:'add',count:3},
+  {world:2,num:97,id:'2-97',type:'equation',equation:'6-8=5',action:'move',count:1},
+  // World 3
+  {world:3,num:2,id:'3-2',type:'equation',equation:'6+6=18',action:'remove',count:2},
+  {world:3,num:4,id:'3-4',type:'equation',equation:'3+7=6',action:'add',count:2},
+  {world:3,num:5,id:'3-5',type:'equation',equation:'8-6=9',action:'remove',count:2},
+  {world:3,num:7,id:'3-7',type:'equation',equation:'6*8=64',action:'remove',count:2},
+  {world:3,num:8,id:'3-8',type:'equation',equation:'8-9=5',action:'remove',count:1},
+  {world:3,num:9,id:'3-9',type:'equation',equation:'5*3=49',action:'move',count:1},
+  {world:3,num:13,id:'3-13',type:'equation',equation:'6*6=19',action:'move',count:2},
+  {world:3,num:14,id:'3-14',type:'equation',equation:'6+6=71',action:'remove',count:2},
+  {world:3,num:17,id:'3-17',type:'equation',equation:'7-2=9',action:'remove',count:1},
+  {world:3,num:18,id:'3-18',type:'equation',equation:'7+8=18',action:'remove',count:2},
+  {world:3,num:19,id:'3-19',type:'equation',equation:'5*8=54',action:'move',count:1},
+  {world:3,num:20,id:'3-20',type:'equation',equation:'0-7=9',action:'move',count:2},
+  {world:3,num:21,id:'3-21',type:'equation',equation:'3*5=12',action:'add',count:3},
+  {world:3,num:24,id:'3-24',type:'equation',equation:'4*9=28',action:'remove',count:2},
+  {world:3,num:26,id:'3-26',type:'equation',equation:'8+8=75',action:'move',count:1},
+  {world:3,num:27,id:'3-27',type:'equation',equation:'6+0=15',action:'move',count:1},
+  {world:3,num:28,id:'3-28',type:'equation',equation:'7+1=11',action:'add',count:3},
+  {world:3,num:29,id:'3-29',type:'equation',equation:'4*6=84',action:'remove',count:2},
+  {world:3,num:32,id:'3-32',type:'equation',equation:'9*1=26',action:'move',count:2},
+  {world:3,num:33,id:'3-33',type:'equation',equation:'9-1=2',action:'add',count:1},
+  {world:3,num:36,id:'3-36',type:'equation',equation:'3+9=49',action:'move',count:2},
+  {world:3,num:37,id:'3-37',type:'equation',equation:'6*8=94',action:'remove',count:2},
+  {world:3,num:39,id:'3-39',type:'equation',equation:'4*3=85',action:'move',count:2},
+  {world:3,num:40,id:'3-40',type:'equation',equation:'9*8=01',action:'move',count:1},
+  {world:3,num:41,id:'3-41',type:'equation',equation:'7+9=15',action:'move',count:2},
+  {world:3,num:44,id:'3-44',type:'equation',equation:'5*6=26',action:'remove',count:2},
+  {world:3,num:46,id:'3-46',type:'equation',equation:'9-5=2',action:'add',count:2},
+  {world:3,num:47,id:'3-47',type:'equation',equation:'4+9=10',action:'remove',count:2},
+  {world:3,num:48,id:'3-48',type:'equation',equation:'4*9=22',action:'move',count:2},
+  {world:3,num:52,id:'3-52',type:'equation',equation:'4-1=9',action:'remove',count:1},
+  {world:3,num:53,id:'3-53',type:'equation',equation:'6+8=73',action:'remove',count:2},
+  {world:3,num:54,id:'3-54',type:'equation',equation:'8-3=3',action:'remove',count:1},
+  {world:3,num:56,id:'3-56',type:'equation',equation:'8*5=78',action:'remove',count:4},
+  {world:3,num:57,id:'3-57',type:'equation',equation:'2+5=17',action:'move',count:1},
+  {world:3,num:58,id:'3-58',type:'equation',equation:'7*8=69',action:'remove',count:2},
+  {world:3,num:59,id:'3-59',type:'equation',equation:'1-1=3',action:'add',count:2},
+  {world:3,num:62,id:'3-62',type:'equation',equation:'3+9=16',action:'add',count:2},
+  {world:3,num:64,id:'3-64',type:'equation',equation:'6*5=06',action:'move',count:2},
+  {world:3,num:66,id:'3-66',type:'equation',equation:'6-5=3',action:'add',count:1},
+  {world:3,num:67,id:'3-67',type:'equation',equation:'6*9=98',action:'remove',count:3},
+  {world:3,num:68,id:'3-68',type:'equation',equation:'8/2=2',action:'remove',count:3},
+  {world:3,num:69,id:'3-69',type:'equation',equation:'9*3=3',action:'move',count:1},
+  {world:3,num:71,id:'3-71',type:'equation',equation:'2+9=6',action:'remove',count:2},
+  {world:3,num:72,id:'3-72',type:'equation',equation:'7+9=18',action:'remove',count:1},
+  {world:3,num:74,id:'3-74',type:'equation',equation:'5-2=6',action:'add',count:2},
+  {world:3,num:75,id:'3-75',type:'equation',equation:'0*9=54',action:'move',count:1},
+  {world:3,num:76,id:'3-76',type:'equation',equation:'1+5=46',action:'move',count:2},
+  {world:3,num:78,id:'3-78',type:'equation',equation:'1*8=32',action:'add',count:2},
+  {world:3,num:82,id:'3-82',type:'equation',equation:'8-9=6',action:'remove',count:2},
+  {world:3,num:83,id:'3-83',type:'equation',equation:'3*5=45',action:'add',count:1},
+  {world:3,num:84,id:'3-84',type:'equation',equation:'3*9=63',action:'remove',count:2},
+  {world:3,num:86,id:'3-86',type:'equation',equation:'6-3=5',action:'add',count:1},
+  {world:3,num:88,id:'3-88',type:'equation',equation:'7+3=15',action:'add',count:2},
+  {world:3,num:89,id:'3-89',type:'equation',equation:'1+7=41',action:'move',count:2},
+  {world:3,num:91,id:'3-91',type:'equation',equation:'3+5=12',action:'add',count:1},
+  {world:3,num:93,id:'3-93',type:'equation',equation:'3+7=9',action:'move',count:1},
+  {world:3,num:95,id:'3-95',type:'equation',equation:'5+3=18',action:'move',count:2},
+  {world:3,num:97,id:'3-97',type:'equation',equation:'1*8=06',action:'move',count:2},
+  {world:3,num:99,id:'3-99',type:'equation',equation:'4+9=11',action:'remove',count:3},
+  // World 4+
+  {world:4,num:3,id:'4-3',type:'equation',equation:'6-8=5',action:'remove',count:2},
+  {world:4,num:5,id:'4-5',type:'equation',equation:'0-0=3',action:'move',count:2},
+  {world:4,num:6,id:'4-6',type:'equation',equation:'9+8=71',action:'remove',count:2},
+  {world:4,num:7,id:'4-7',type:'equation',equation:'1-1=3',action:'add',count:3},
+  {world:4,num:9,id:'4-9',type:'equation',equation:'1*3=68',action:'move',count:2},
+  {world:4,num:10,id:'4-10',type:'equation',equation:'9/8=7',action:'remove',count:2},
+  {world:4,num:12,id:'4-12',type:'equation',equation:'9+5=13',action:'add',count:1},
+  {world:4,num:13,id:'4-13',type:'equation',equation:'1*6=24',action:'add',count:2},
+  {world:4,num:14,id:'4-14',type:'equation',equation:'2*8=1',action:'move',count:2},
+  {world:4,num:17,id:'4-17',type:'equation',equation:'8/3=5',action:'move',count:2},
+  {world:4,num:19,id:'4-19',type:'equation',equation:'2+9=14',action:'move',count:2},
+  {world:4,num:20,id:'4-20',type:'equation',equation:'6*5=40',action:'add',count:1},
+  {world:4,num:21,id:'4-21',type:'equation',equation:'6*3=54',action:'add',count:1},
+  {world:4,num:22,id:'4-22',type:'equation',equation:'6+8=19',action:'remove',count:2},
+  {world:4,num:24,id:'4-24',type:'equation',equation:'5-3=7',action:'add',count:3},
+  {world:4,num:26,id:'4-26',type:'equation',equation:'2+9=9',action:'remove',count:2},
+  {world:4,num:27,id:'4-27',type:'equation',equation:'7*9=55',action:'add',count:2},
+  {world:4,num:28,id:'4-28',type:'equation',equation:'9+9=12',action:'remove',count:1},
+  {world:4,num:30,id:'4-30',type:'equation',equation:'8-1=6',action:'move',count:1},
+  {world:4,num:31,id:'4-31',type:'equation',equation:'4*0=02',action:'move',count:2},
+  {world:4,num:34,id:'4-34',type:'equation',equation:'9-4=7',action:'remove',count:2},
+  {world:4,num:39,id:'4-39',type:'equation',equation:'9*8=48',action:'move',count:1},
+  {world:4,num:40,id:'4-40',type:'equation',equation:'5*6=38',action:'move',count:1},
+  {world:4,num:41,id:'4-41',type:'equation',equation:'9-7=8',action:'remove',count:1},
+  {world:4,num:43,id:'4-43',type:'equation',equation:'2+8=11',action:'remove',count:1},
+  {world:4,num:44,id:'4-44',type:'equation',equation:'5-8=0',action:'add',count:2},
+  {world:4,num:47,id:'4-47',type:'equation',equation:'9+6=17',action:'remove',count:2},
+  {world:4,num:49,id:'4-49',type:'equation',equation:'8-4=6',action:'remove',count:2},
+  {world:4,num:54,id:'4-54',type:'equation',equation:'9+7=72',action:'remove',count:2},
+  {world:4,num:55,id:'4-55',type:'equation',equation:'9+2=8',action:'remove',count:3},
+  {world:4,num:56,id:'4-56',type:'equation',equation:'9*8=30',action:'remove',count:2},
+  {world:4,num:57,id:'4-57',type:'equation',equation:'7+9=75',action:'move',count:1},
+  {world:4,num:58,id:'4-58',type:'equation',equation:'5*3=49',action:'move',count:2},
+  {world:4,num:62,id:'4-62',type:'equation',equation:'0+6=9',action:'move',count:1},
+  {world:4,num:63,id:'4-63',type:'equation',equation:'8-8=1',action:'remove',count:1},
+  {world:4,num:64,id:'4-64',type:'equation',equation:'8*3=9',action:'remove',count:2},
+  {world:4,num:65,id:'4-65',type:'equation',equation:'9+9=11',action:'add',count:2},
+  {world:4,num:67,id:'4-67',type:'equation',equation:'4-3=6',action:'add',count:2},
+  {world:4,num:68,id:'4-68',type:'equation',equation:'2+9=1',action:'move',count:1},
+  {world:4,num:69,id:'4-69',type:'equation',equation:'7*4=43',action:'move',count:2},
+  {world:4,num:71,id:'4-71',type:'equation',equation:'6+7=43',action:'remove',count:2},
+  {world:4,num:72,id:'4-72',type:'equation',equation:'0-6=2',action:'add',count:1},
+  {world:4,num:73,id:'4-73',type:'equation',equation:'1+3=9',action:'add',count:2},
+  {world:4,num:74,id:'4-74',type:'equation',equation:'3*8=16',action:'move',count:1},
+  {world:4,num:78,id:'4-78',type:'equation',equation:'9-1=1',action:'add',count:2},
+  {world:4,num:79,id:'4-79',type:'equation',equation:'7-1=7',action:'add',count:4},
+  {world:4,num:83,id:'4-83',type:'equation',equation:'1*6=5',action:'add',count:1},
+  {world:4,num:85,id:'4-85',type:'equation',equation:'9*8=43',action:'move',count:2},
+  {world:4,num:88,id:'4-88',type:'equation',equation:'9/2=4',action:'add',count:1},
+  {world:4,num:89,id:'4-89',type:'equation',equation:'8/3=8',action:'remove',count:2},
+  {world:4,num:92,id:'4-92',type:'equation',equation:'7*8=24',action:'add',count:2},
+  {world:4,num:93,id:'4-93',type:'equation',equation:'3*1=18',action:'move',count:2},
+  {world:4,num:96,id:'4-96',type:'equation',equation:'8/7=6',action:'move',count:1},
+  {world:4,num:99,id:'4-99',type:'equation',equation:'4-1=6',action:'add',count:3},
+  // World 5
+  {world:5,num:3,id:'5-3',type:'equation',equation:'19-8=2+3',action:'remove',count:1},
+  {world:5,num:5,id:'5-5',type:'equation',equation:'4*8=3*8',action:'remove',count:1},
+  {world:5,num:6,id:'5-6',type:'equation',equation:'3*2=15',action:'move',count:2},
+  {world:5,num:7,id:'5-7',type:'equation',equation:'8+8=5+9',action:'remove',count:1},
+  {world:5,num:8,id:'5-8',type:'equation',equation:'1*5=63',action:'add',count:2},
+  {world:5,num:9,id:'5-9',type:'equation',equation:'6+9-8=6',action:'remove',count:1},
+  {world:5,num:11,id:'5-11',type:'equation',equation:'8+8-6=8',action:'remove',count:1},
+  {world:5,num:12,id:'5-12',type:'equation',equation:'6*9=72',action:'add',count:1},
+  {world:5,num:13,id:'5-13',type:'equation',equation:'2/6=9/9',action:'remove',count:1},
+  {world:5,num:16,id:'5-16',type:'equation',equation:'9/5=7',action:'move',count:1},
+  {world:5,num:19,id:'5-19',type:'equation',equation:'2*9=18/3',action:'remove',count:1},
+  {world:5,num:20,id:'5-20',type:'equation',equation:'6+5=13',action:'add',count:1},
+  {world:5,num:22,id:'5-22',type:'equation',equation:'6*8=54',action:'add',count:2},
+  {world:5,num:23,id:'5-23',type:'equation',equation:'18-8=5+7',action:'remove',count:1},
+  {world:5,num:24,id:'5-24',type:'equation',equation:'9-2=2',action:'remove',count:2},
+  {world:5,num:25,id:'5-25',type:'equation',equation:'38+12=6*8',action:'remove',count:1},
+  {world:5,num:28,id:'5-28',type:'equation',equation:'1+5=0',action:'move',count:1},
+  {world:5,num:30,id:'5-30',type:'equation',equation:'0+1=5',action:'move',count:2},
+  {world:5,num:31,id:'5-31',type:'equation',equation:'90/9=23-5',action:'remove',count:1},
+  {world:5,num:32,id:'5-32',type:'equation',equation:'2*3=10',action:'add',count:2},
+  {world:5,num:35,id:'5-35',type:'equation',equation:'6+9-6=6',action:'move',count:1},
+  {world:5,num:36,id:'5-36',type:'equation',equation:'5+9=11',action:'add',count:2},
+  {world:5,num:37,id:'5-37',type:'equation',equation:'2*4=16/3',action:'move',count:1},
+  {world:5,num:38,id:'5-38',type:'equation',equation:'8+7=5',action:'move',count:2},
+  {world:5,num:39,id:'5-39',type:'equation',equation:'1+3=6-3',action:'move',count:1},
+  {world:5,num:41,id:'5-41',type:'equation',equation:'14+7-4=11',action:'move',count:2},
+  {world:5,num:42,id:'5-42',type:'equation',equation:'5/2=3',action:'add',count:1},
+  {world:5,num:43,id:'5-43',type:'equation',equation:'1+6=8+3',action:'move',count:2},
+  {world:5,num:44,id:'5-44',type:'equation',equation:'0*8=72',action:'move',count:1},
+  {world:5,num:45,id:'5-45',type:'equation',equation:'9+8=6+5',action:'move',count:2},
+  {world:5,num:46,id:'5-46',type:'equation',equation:'7*8=9',action:'move',count:1},
+  {world:5,num:47,id:'5-47',type:'equation',equation:'1+0+2=9',action:'move',count:1},
+  {world:5,num:48,id:'5-48',type:'equation',equation:'1-7=8',action:'move',count:1},
+  {world:5,num:49,id:'5-49',type:'equation',equation:'10+8=4*6',action:'move',count:1},
+  {world:5,num:51,id:'5-51',type:'equation',equation:'16-6=6+7',action:'move',count:1},
+  {world:5,num:52,id:'5-52',type:'equation',equation:'3/9=3',action:'move',count:1},
+  {world:5,num:54,id:'5-54',type:'equation',equation:'4-2=5',action:'move',count:2},
+  {world:5,num:55,id:'5-55',type:'equation',equation:'3*9=4*8',action:'move',count:1},
+  {world:5,num:57,id:'5-57',type:'equation',equation:'5+8+2=18',action:'move',count:1},
+  {world:5,num:58,id:'5-58',type:'equation',equation:'8-4=7',action:'remove',count:2},
+  {world:5,num:59,id:'5-59',type:'equation',equation:'8/3=2*3',action:'move',count:2},
+  {world:5,num:60,id:'5-60',type:'equation',equation:'3/4=2',action:'add',count:2},
+  {world:5,num:63,id:'5-63',type:'equation',equation:'1+9=8+8',action:'move',count:2},
+  {world:5,num:64,id:'5-64',type:'equation',equation:'5+7=18',action:'remove',count:2},
+  {world:5,num:65,id:'5-65',type:'equation',equation:'6+6+3=20',action:'move',count:1},
+  {world:5,num:66,id:'5-66',type:'equation',equation:'2-4=4',action:'add',count:2},
+  {world:5,num:69,id:'5-69',type:'equation',equation:'6+2=2*5',action:'add',count:1},
+  {world:5,num:70,id:'5-70',type:'equation',equation:'0*9=42',action:'move',count:2},
+  {world:5,num:73,id:'5-73',type:'equation',equation:'66-18=5*8',action:'add',count:1},
+  {world:5,num:74,id:'5-74',type:'equation',equation:'4+9=5',action:'move',count:1},
+  {world:5,num:75,id:'5-75',type:'equation',equation:'6+5+2=15',action:'add',count:1},
+  {world:5,num:76,id:'5-76',type:'equation',equation:'9/4=1',action:'remove',count:2},
+  {world:5,num:77,id:'5-77',type:'equation',equation:'6+5+2=14',action:'add',count:1},
+  {world:5,num:78,id:'5-78',type:'equation',equation:'8*9=91',action:'move',count:1},
+  {world:5,num:80,id:'5-80',type:'equation',equation:'0-6=3',action:'move',count:1},
+  {world:5,num:81,id:'5-81',type:'equation',equation:'9-1+3=5',action:'add',count:1},
+  {world:5,num:83,id:'5-83',type:'equation',equation:'12*6-90=6',action:'add',count:1},
+  {world:5,num:84,id:'5-84',type:'equation',equation:'8+3=9',action:'move',count:1},
+  {world:5,num:85,id:'5-85',type:'equation',equation:'6+1+5=15',action:'add',count:2},
+  {world:5,num:86,id:'5-86',type:'equation',equation:'3+2=4',action:'move',count:1},
+  {world:5,num:88,id:'5-88',type:'equation',equation:'6+8=11',action:'add',count:2},
+  {world:5,num:89,id:'5-89',type:'equation',equation:'10+8=10+5',action:'add',count:2},
+  {world:5,num:93,id:'5-93',type:'equation',equation:'7-2=1',action:'add',count:2},
+  {world:5,num:94,id:'5-94',type:'equation',equation:'8+3=10',action:'remove',count:4},
+  {world:5,num:95,id:'5-95',type:'equation',equation:'7*9=3',action:'remove',count:2},
+  {world:5,num:97,id:'5-97',type:'equation',equation:'6*5=45',action:'move',count:1},
+  {world:5,num:98,id:'5-98',type:'equation',equation:'9+8=19',action:'move',count:1},
+  {world:5,num:99,id:'5-99',type:'equation',equation:'6*9=40',action:'move',count:1},
+  {world:5,num:100,id:'5-100',type:'equation',equation:'4-4=6',action:'move',count:1},
+];
+
+// Build worlds map
+const WORLDS={};
+for(const lv of EQUATION_LEVELS) { if(!WORLDS[lv.world])WORLDS[lv.world]=[]; WORLDS[lv.world].push(lv); }
+
+// ══════════════════════════════════════════════
+// SOLVER (used both for debug and to pre-filter levels)
+// ══════════════════════════════════════════════
+function parseEq(eq){
+  const toks=[];
+  for(const ch of eq.replace(/\s/g,'')){
+    if(ch>='0'&&ch<='9') toks.push({type:'digit',char:ch});
+    else if('+-*/'.includes(ch)) toks.push({type:'op',char:ch});
+    else if(ch==='=') toks.push({type:'eq',char:'='});
+    else toks.push({type:'digit',char:ch});
+  }
+  return toks;
+}
+function buildSegs(toks){const a=[];for(const t of toks)if(t.type==='digit')a.push(...(SEGS[t.char]||[0,0,0,0,0,0,0]));return a;}
+function recon(segs,toks){let r='',o=0;for(const t of toks){if(t.type==='digit'){const p=segs.slice(o,o+7);let f='?';for(const[d,q]of Object.entries(SEGS)){if(q.every((v,i)=>v===p[i])){f=d;break;}}r+=f;o+=7;}else r+=t.char;}return r;}
+function evalEq(eq){
+  const c=eq.replace(/\s/g,'').replace(/×/g,'*');
+  const s=c.split('=');if(s.length!==2)return false;
+  try{const L=Function('"use strict";return('+s[0]+')')(),R=Function('"use strict";return('+s[1]+')')();return isFinite(L)&&isFinite(R)&&!isNaN(L)&&!isNaN(R)&&Math.abs(L-R)<.0001;}catch(e){return false;}
+}
+
+function combo(arr,k){const res=[];function go(st,cur){if(cur.length===k){res.push([...cur]);return;}for(let i=st;i<arr.length;i++){cur.push(arr[i]);go(i+1,cur);cur.pop();if(res.length>=8)return;}}go(0,[]);return res;}
+
+function findSolutions(lv,maxCount=6){
+  const toks=parseEq(lv.equation);
+  const orig=buildSegs(toks);
+  const sols=[];
+  const total=orig.length;
+  const onIdx=[],offIdx=[];
+  for(let i=0;i<total;i++){if(orig[i])onIdx.push(i);else offIdx.push(i);}
+  const n=lv.count;
+
+  function trySegs(s){const eq=recon(s,toks);if(!eq.includes('?')&&evalEq(eq)&&!sols.includes(eq))sols.push(eq);}
+
+  if(lv.action==='remove'){
+    for(const idxs of combo(onIdx,n)){const s=[...orig];for(const i of idxs)s[i]=0;trySegs(s);if(sols.length>=maxCount)break;}
+  } else if(lv.action==='add'){
+    for(const idxs of combo(offIdx,n)){const s=[...orig];for(const i of idxs)s[i]=1;trySegs(s);if(sols.length>=maxCount)break;}
+  } else { // move
+    if(n===1){
+      for(const fr of onIdx){for(const to of offIdx){const s=[...orig];s[fr]=0;s[to]=1;trySegs(s);if(sols.length>=maxCount)return sols;}}
+    } else if(n===2){
+      for(let a=0;a<onIdx.length&&sols.length<maxCount;a++){
+        for(const to1 of offIdx){
+          const s1=[...orig];s1[onIdx[a]]=0;s1[to1]=1;
+          const on2=[],off2=[];for(let i=0;i<total;i++){if(s1[i])on2.push(i);else off2.push(i);}
+          for(const fr2 of on2){for(const to2 of off2){if(fr2===onIdx[a]&&to2===to1)continue;const s2=[...s1];s2[fr2]=0;s2[to2]=1;trySegs(s2);if(sols.length>=maxCount)return sols;}}
+        }
+      }
+    } else {
+      // For n>=3 moves: try random combos
+      for(let t=0;t<2000&&sols.length<maxCount;t++){
+        const s=[...orig];
+        const ons=[...onIdx],offs=[...offIdx];
+        for(let m=0;m<n;m++){
+          if(!ons.length||!offs.length)break;
+          const fi=Math.floor(Math.random()*ons.length);
+          const ti=Math.floor(Math.random()*offs.length);
+          const from=ons.splice(fi,1)[0],to=offs.splice(ti,1)[0];
+          s[from]=0;s[to]=1;ons.push(to);offs.push(from);
+        }
+        trySegs(s);
+      }
+    }
+  }
+  return sols;
+}
+
+// Pre-filter: keep only levels that have at least one solution
+// Run this once at startup (can be slow for many levels but we cache result)
+let FILTERED_LEVELS = null;
+
+function filterLevels(){
+  if(FILTERED_LEVELS) return FILTERED_LEVELS;
+  const out=[];
+  for(const lv of EQUATION_LEVELS){
+    // Quick check: does current equation already evaluate correctly? (skip it)
+    const toks=parseEq(lv.equation);
+    const s=buildSegs(toks);
+    const eq=recon(s,toks);
+    if(!eq.includes('?')&&evalEq(eq)){
+      // already correct - skip (degenerate level)
+      continue;
+    }
+    const sols=findSolutions(lv,1);
+    if(sols.length>0) out.push(lv);
+  }
+  FILTERED_LEVELS=out;
+  return out;
+}
+
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+const TIMER_MAX=60;
+let G={
+  allLevels:[],   // set after filtering
+  idx:0,
+  completed:new Set(JSON.parse(localStorage.getItem('ms_done')||'[]')),
+  stars:JSON.parse(localStorage.getItem('ms_stars')||'{}'),
+  totalScore:parseInt(localStorage.getItem('ms_score')||'0'),
+  streak:0,
+  // level
+  level:null,tokens:[],segs:[],origSegs:[],
+  selectedSeg:null,
+  mode:'move',
+  movesLeft:0,movesUsed:0,
+  history:[],
+  // timer
+  timerVal:TIMER_MAX,timerInterval:null,levelStartTime:0,
+  // drag
+  dragging:false,dragGi:-1,dragFrom:{x:0,y:0},
+};
+
+function save(){
+  localStorage.setItem('ms_done',JSON.stringify([...G.completed]));
+  localStorage.setItem('ms_stars',JSON.stringify(G.stars));
+  localStorage.setItem('ms_score',G.totalScore);
+  localStorage.setItem('ms_idx',G.idx);
+}
+function loadSave(){
+  const s=localStorage.getItem('ms_idx');
+  if(s!==null){const i=parseInt(s);if(i>=0&&i<G.allLevels.length)G.idx=i;}
+}
+
+// ══════════════════════════════════════════════
+// SCREENS
+// ══════════════════════════════════════════════
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function showLevelSelect(){if(!G.allLevels.length){showToast('Still loading levels, please wait…');return;}buildLS();showScreen('levelselect');}
+function continueGame(){if(!G.allLevels.length){showToast('Still loading levels, please wait…');return;}loadSave();loadLevel(G.idx);showScreen('game');}
+
+function updateIntro(){
+  document.getElementById('intro-done').textContent=G.completed.size;
+  document.getElementById('intro-pts').textContent=G.totalScore;
+  document.getElementById('intro-lvls').textContent=G.allLevels.length;
+}
+
+// ══════════════════════════════════════════════
+// LEVEL SELECT
+// ══════════════════════════════════════════════
+function buildLS(){
+  document.getElementById('ls-pts').textContent=G.totalScore;
+  const c=document.getElementById('worlds-container');
+  c.innerHTML='';
+  const wns=[...new Set(G.allLevels.map(l=>l.world))].sort((a,b)=>a-b);
+  for(const wn of wns){
+    const lvs=G.allLevels.filter(l=>l.world===wn);
+    const done=lvs.filter(l=>G.completed.has(l.id)).length;
+    const wStars=lvs.reduce((a,l)=>a+(G.stars[l.id]||0),0);
+    const card=document.createElement('div');
+    card.className='world-card';
+    card.innerHTML=`<div class="world-header" onclick="this.parentElement.classList.toggle('open')">
+      <span class="world-name">⭐ World ${wn}</span>
+      <div class="world-meta"><span>${done}/${lvs.length}</span><span>★${done?Math.round(wStars/done):0}/3 avg</span></div>
+    </div>
+    <div class="levels-grid">${lvs.map(l=>{
+      const st=G.stars[l.id]||0;
+      const cls=G.completed.has(l.id)?'done':(G.allLevels[G.idx]?.id===l.id?'cur':'');
+      return `<button class="lvl-btn ${cls}" onclick="startLevel('${l.id}')">${l.num}${st?`<div class="lvl-stars">${'★'.repeat(st)}${'☆'.repeat(3-st)}</div>`:''}
+      </button>`;
+    }).join('')}</div>`;
+    c.appendChild(card);
+  }
+  // Open current world
+  const curW=G.allLevels[G.idx]?.world;
+  const wns2=[...new Set(G.allLevels.map(l=>l.world))].sort((a,b)=>a-b);
+  const wi=wns2.indexOf(curW);
+  const cards=c.querySelectorAll('.world-card');
+  if(cards[wi])cards[wi].classList.add('open');
+  else if(cards[0])cards[0].classList.add('open');
+}
+function startLevel(id){const i=G.allLevels.findIndex(l=>l.id===id);if(i>=0){G.idx=i;loadLevel(i);showScreen('game');}}
+
+// ══════════════════════════════════════════════
+// TIMER
+// ══════════════════════════════════════════════
+function startTimer(){
+  stopTimer();
+  G.timerVal=TIMER_MAX;G.levelStartTime=Date.now();
+  renderTimer();
+  G.timerInterval=setInterval(()=>{
+    G.timerVal--;renderTimer();
+    if(G.timerVal===10)sfx.urgent();
+    else if(G.timerVal<=5&&G.timerVal>0)sfx.tick();
+    if(G.timerVal<=0){stopTimer();onTimeUp();}
+  },1000);
+}
+function stopTimer(){clearInterval(G.timerInterval);G.timerInterval=null;}
+function renderTimer(){
+  const el=document.getElementById('timer-lbl');
+  const ci=document.getElementById('timer-circle');
+  if(!el||!ci)return;
+  const pct=G.timerVal/TIMER_MAX;
+  ci.style.strokeDashoffset=138.2*(1-pct);
+  const urg=G.timerVal<=10;
+  ci.style.stroke=urg?'#ff4444':'#ff9a00';
+  el.textContent=G.timerVal;
+  el.className='timer-lbl'+(urg?' urgent':'');
+}
+function onTimeUp(){sfx.err();setInstr("Time's up! ↺ Reset","bad");flashScreen('rgba(255,68,68,.2)');}
+function elapsed(){return Math.round((Date.now()-G.levelStartTime)/1000);}
+
+// ══════════════════════════════════════════════
+// LOAD LEVEL
+// ══════════════════════════════════════════════
+function loadLevel(idx){
+  const lv=G.allLevels[idx];
+  if(!lv)return;
+  stopTimer();
+  G.level=lv;G.selectedSeg=null;G.history=[];
+  G.tokens=parseEq(lv.equation);
+  G.segs=buildSegs(G.tokens);
+  G.origSegs=[...G.segs];
+  G.movesLeft=lv.count;G.movesUsed=0;
+  G.mode=lv.action||'move';
+  G.dragging=false;
+  document.getElementById('drag-ghost').style.display='none';
+
+  document.getElementById('cur-lbl').textContent=`${lv.world}-${lv.num}`;
+  document.getElementById('action-pill').textContent=actionLabel();
+  document.getElementById('btn-prev').disabled=idx===0;
+  document.getElementById('btn-next').disabled=idx===G.allLevels.length-1;
+  document.getElementById('hud-pts').textContent=G.totalScore;
+
+  updateMovesUI();renderEq();setInstr(defInstr(),'');updateProg();updateStreak();
+  startTimer();save();
+}
+function actionLabel(){
+  const n=G.level.count;
+  const m={move:'Move',remove:'Remove',add:'Add'}[G.level.action]||'Change';
+  return `${m} ${n} matchstick${n!==1?'s':''}`;
+}
+function defInstr(){
+  const left=G.movesLeft;
+  if(left<=0)return 'No moves left — ↺ reset to try again';
+  const n=`${left} matchstick${left!==1?'s':''}`;
+  if(G.mode==='add')    return `Tap an empty slot to add ${n}`;
+  if(G.mode==='remove') return `Drag ${n} to the 🗑️ bin to remove`;
+  return `Drag ${n} to a new position`;
+}
+function setInstr(msg,cls){const el=document.getElementById('instr');if(!el)return;el.className='instr'+(cls?' '+cls:'');el.textContent=msg;}
+function updateProg(){const p=(G.idx/G.allLevels.length)*100;const el=document.getElementById('prog-fill');if(el)el.style.width=p+'%';}
+function updateStreak(){const b=document.getElementById('streak-badge');if(!b)return;if(G.streak>=2){b.style.display='block';document.getElementById('streak-n').textContent=G.streak;}else b.style.display='none';}
+
+// ══════════════════════════════════════════════
+// RENDER EQUATION
+// ══════════════════════════════════════════════
+// seg layout: [a,b,c,d,e,f,g] => positions
+const SEG_POS=[
+  {cls:'h a',axis:'h'},{cls:'v b',axis:'v'},{cls:'v c',axis:'v'},
+  {cls:'h d',axis:'h'},{cls:'v e',axis:'v'},{cls:'v f',axis:'v'},{cls:'h g',axis:'h'}
+];
+function renderEq(){
+  const wrap=document.getElementById('eq-display');
+  wrap.innerHTML='';
+  let off=0;
+  G.tokens.forEach(tok=>{
+    if(tok.type==='digit'){
+      const dw=document.createElement('div');
+      dw.className='seg-digit';
+      SEG_POS.forEach(({cls,axis},i)=>{
+        const gi=off+i;
+        const el=document.createElement('div');
+        el.className='seg '+cls+(G.segs[gi]?' on':'')+(G.selectedSeg===gi?' selected':'');
+        el.dataset.gi=gi;
+        el.dataset.axis=axis;
+        // Touch/mouse events for drag
+        el.addEventListener('mousedown',e=>onSegPointerDown(e,gi,axis));
+        el.addEventListener('touchstart',e=>onSegPointerDown(e,gi,axis),{passive:false});
+        dw.appendChild(el);
+      });
+      off+=7;wrap.appendChild(dw);
+    } else {
+      const el=document.createElement('div');
+      el.className=tok.type==='eq'?'seg-eq':'seg-op';
+      el.textContent=tok.char==='*'?'×':tok.char;
+      wrap.appendChild(el);
+    }
+  });
+}
+
+// ══════════════════════════════════════════════
+// DRAG & DROP
+// ══════════════════════════════════════════════
+let dragData={gi:-1,axis:'h',startX:0,startY:0,moved:false};
+
+function onSegPointerDown(e,gi,axis){
+  e.preventDefault();
+  const isOn=G.segs[gi]===1;
+
+  // ADD mode: tap empty slot
+  if(G.mode==='add'){
+    if(isOn){showToast('Already has a matchstick');sfx.err();return;}
+    if(G.movesLeft<=0){showToast('No moves left!');sfx.err();return;}
+    doChange(()=>{G.segs[gi]=1;});
+    renderEq(); // MUST re-render so placed segment appears visually
+    sfx.add();spawnSparks(gi,'#43c465');
+    setTimeout(()=>checkSolution(),350);
+    return;
+  }
+
+  // Only drag ON segments for move/remove
+  if(!isOn){
+    if(G.mode==='move'&&G.movesLeft>0){
+      showToast('Tap a lit matchstick');sfx.err();
+    }
+    return;
+  }
+  if(G.movesLeft<=0){showToast('No moves left!');sfx.err();return;}
+  if(G.timerVal<=0){showToast("Time's up!");sfx.err();return;}
+
+  const pt=getPoint(e);
+  dragData={gi,axis,startX:pt.x,startY:pt.y,moved:false};
+  G.dragging=true;G.dragGi=gi;
+
+  // Show ghost
+  const ghost=document.getElementById('drag-ghost');
+  const body=document.getElementById('drag-body');
+  body.style.height=axis==='h'?'8px':'50px';
+  ghost.style.display='flex';
+  ghost.style.left=pt.x+'px';ghost.style.top=pt.y+'px';
+
+  // Show trash zone + immediately cache its rect
+  const tz=document.getElementById('trash-zone');
+  if(G.mode==='move'||G.mode==='remove'){
+    tz.style.display='flex';tz.classList.add('show');
+    // Cache rect NOW so onPointerUp always has valid coords even without a move event
+    _trashRect=document.getElementById('trash-can').getBoundingClientRect();
+  }
+
+  // Instruction depends on mode
+  const dragInstr = G.mode==='remove'
+    ? 'Drag to the 🗑️ bin to remove'
+    : 'Drop on an empty slot — or 🗑️ to remove';
+  // Highlight selected
+  G.selectedSeg=gi;renderEq();
+  setInstr(dragInstr,'pick');
+}
+
+function getPoint(e){
+  if(e.touches&&e.touches.length)return{x:e.touches[0].clientX,y:e.touches[0].clientY};
+  if(e.changedTouches&&e.changedTouches.length)return{x:e.changedTouches[0].clientX,y:e.changedTouches[0].clientY};
+  return{x:e.clientX,y:e.clientY};
+}
+
+// Store trash rect during drag so we always have valid coords
+let _trashRect = null;
+
+function isNearTrash(pt){
+  if(!_trashRect) return false;
+  const cx = _trashRect.left + _trashRect.width/2;
+  const cy = _trashRect.top  + _trashRect.height/2;
+  const RADIUS = 60; // generous hit radius in px
+  return Math.hypot(pt.x - cx, pt.y - cy) < RADIUS;
+}
+
+function onPointerMove(e){
+  if(!G.dragging)return;
+  e.preventDefault();
+  const pt=getPoint(e);
+  const ghost=document.getElementById('drag-ghost');
+  ghost.style.left=pt.x+'px';ghost.style.top=pt.y+'px';
+
+  // Cache trash rect while it's visible
+  const trashEl=document.getElementById('trash-can');
+  _trashRect=trashEl.getBoundingClientRect();
+
+  // Highlight trash when near
+  const near=isNearTrash(pt);
+  trashEl.className='trash-can'+(near?' over':'');
+
+  // Highlight hovered empty segment
+  document.querySelectorAll('.seg.ghost').forEach(s=>s.classList.remove('ghost'));
+  const el=document.elementFromPoint(pt.x,pt.y);
+  if(el&&el.classList.contains('seg')&&!el.classList.contains('on')){
+    const hgi=parseInt(el.dataset.gi);
+    if(!isNaN(hgi)&&hgi!==G.dragGi)el.classList.add('ghost');
+  }
+  dragData.moved=Math.abs(pt.x-dragData.startX)+Math.abs(pt.y-dragData.startY)>8;
+}
+
+function onPointerUp(e){
+  if(!G.dragging)return;
+  e.preventDefault();
+  const pt=getPoint(e);
+
+  // Use cached rect + proximity
+  const overTrash=isNearTrash(pt);
+
+  // Hide ghost FIRST so elementFromPoint can see what's underneath
+  document.getElementById('drag-ghost').style.display='none';
+  const tzEl=document.getElementById('trash-zone');
+  tzEl.style.display='none';tzEl.classList.remove('show');
+  document.getElementById('trash-can').className='trash-can';
+  document.querySelectorAll('.seg.ghost').forEach(s=>s.classList.remove('ghost'));
+  _trashRect=null;
+  G.dragging=false;
+  G.selectedSeg=null;
+
+  if(overTrash){
+    doChange(()=>{G.segs[G.dragGi]=0;});
+    sfx.remove();spawnSparks(G.dragGi,'#ff4444');
+    renderEq();setInstr(defInstr(),'');
+    setTimeout(()=>checkSolution(),350);
+    return;
+  }
+
+  // Move mode: find target segment — ghost is hidden so elementFromPoint works cleanly
+  if(G.mode==='move'){
+    // Try the point directly, then small offsets to handle finger/cursor imprecision
+    const candidates=[
+      document.elementFromPoint(pt.x, pt.y),
+      document.elementFromPoint(pt.x-6, pt.y),
+      document.elementFromPoint(pt.x+6, pt.y),
+      document.elementFromPoint(pt.x, pt.y-6),
+      document.elementFromPoint(pt.x, pt.y+6),
+    ];
+    for(const el of candidates){
+      if(el&&el.classList.contains('seg')){
+        const tgi=parseInt(el.dataset.gi);
+        if(!isNaN(tgi)&&tgi!==G.dragGi&&G.segs[tgi]===0){
+          doChange(()=>{G.segs[G.dragGi]=0;G.segs[tgi]=1;});
+          sfx.place();spawnSparks(tgi,'#ffd700');
+          renderEq();setInstr(defInstr(),'');
+          setTimeout(()=>checkSolution(),350);
+          return;
+        }
+      }
+    }
+  }
+
+  // Dropped nowhere valid — snap back
+  renderEq();
+  setInstr(defInstr(),'');
+}
+
+document.addEventListener('mousemove',onPointerMove);
+document.addEventListener('touchmove',onPointerMove,{passive:false});
+document.addEventListener('mouseup',onPointerUp);
+document.addEventListener('touchend',onPointerUp);
+
+// ══════════════════════════════════════════════
+// MOVES
+// ══════════════════════════════════════════════
+function doChange(fn){
+  G.history.push([...G.segs]);
+  fn();
+  G.movesLeft--;G.movesUsed++;
+  updateMovesUI();
+}
+function undoMove(){
+  if(!G.history.length){showToast('Nothing to undo');return;}
+  G.segs=G.history.pop();G.movesLeft++;G.movesUsed--;
+  G.selectedSeg=null;
+  updateMovesUI();renderEq();setInstr(defInstr(),'');sfx.pick();
+}
+function updateMovesUI(){
+  const el=document.getElementById('moves-n');
+  if(el)el.textContent=G.movesLeft;
+  const dots=document.getElementById('move-dots');if(!dots)return;
+  dots.innerHTML='';
+  const total=G.level?G.level.count:0,used=total-G.movesLeft;
+  for(let i=0;i<total;i++){const d=document.createElement('div');d.className='mdot'+(i<used?' used '+G.mode:'');dots.appendChild(d);}
+}
+
+// ══════════════════════════════════════════════
+// SOLUTION CHECK
+// ══════════════════════════════════════════════
+function checkSolution(){
+  const eq=recon(G.segs,G.tokens);
+  if(eq.includes('?'))return;
+  if(evalEq(eq)){
+    setInstr(`✓ ${eq.replace(/\*/g,'×')} — Correct! 🎉`,'ok');
+    flashScreen('rgba(67,196,101,.15)');
+    sfx.ok();
+    setTimeout(()=>triggerSuccess(eq),1300);
+  } else if(G.movesLeft===0){
+    setInstr(`${eq.replace(/\*/g,'×')} ≠ correct  ↺ Reset`,'bad');
+    sfx.err();flashScreen('rgba(255,68,68,.2)');
+  }
+}
+
+// ══════════════════════════════════════════════
+// SUCCESS
+// ══════════════════════════════════════════════
+function calcStars(s){return s<=15?3:s<=35?2:1;}
+function triggerSuccess(eq){
+  stopTimer();
+  const s=elapsed(),stars=calcStars(s);
+  const prev=G.stars[G.level.id]||0;
+  const pts=stars*100+Math.min(G.streak,5)*20;
+  G.completed.add(G.level.id);
+  if(stars>prev)G.stars[G.level.id]=stars;
+  G.totalScore+=pts;G.streak++;save();
+
+  ['s1','s2','s3'].forEach((id,i)=>{
+    const el=document.getElementById(id);if(!el)return;
+    el.className='star';
+    if(i<stars)setTimeout(()=>{el.classList.add('lit');sfx.tick();},i*280+100);
+  });
+  document.getElementById('sc-time').textContent=`⏱ ${s}s`;
+  document.getElementById('sc-pts').textContent=`+${pts} pts`;
+  document.getElementById('sc-streak').textContent=`🔥 ×${G.streak}`;
+  document.getElementById('suc-eq').textContent=eq.replace(/\*/g,'×');
+  const titles=['Good job! 👍','Well done! 🌟','Brilliant! 🎉'];
+  document.getElementById('win-title').textContent=titles[stars-1]||'Solved!';
+
+  sfx.win(stars);flashScreen('rgba(67,196,101,.2)');spawnConfetti();
+  floatScore(`+${pts}`);
+  document.getElementById('hud-pts').textContent=G.totalScore;
+  document.getElementById('success-ov').classList.add('show');
+  updateStreak();
+}
+function nextFromSuccess(){document.getElementById('success-ov').classList.remove('show');stopConfetti();if(G.idx<G.allLevels.length-1){G.idx++;loadLevel(G.idx);}}
+function retryLevel(){document.getElementById('success-ov').classList.remove('show');stopConfetti();resetLevel();}
+function resetLevel(){G.streak=Math.max(0,G.streak-1);loadLevel(G.idx);}
+function prevLevel(){if(G.idx>0){G.idx--;loadLevel(G.idx);}}
+function nextLevel(){if(G.idx<G.allLevels.length-1){G.idx++;loadLevel(G.idx);}}
+
+// ══════════════════════════════════════════════
+// HINT + DEBUG
+// ══════════════════════════════════════════════
+function showHint(){const lv=G.level;if(!lv)return;showToast(`💡 Hint: change ${lv.count} matchstick${lv.count!==1?'s':''}`,3000);}
+function showDebug(){
+  const lv=G.level;if(!lv)return;
+  document.getElementById('dbg-orig').textContent=lv.equation.replace(/\*/g,'×');
+  document.getElementById('dbg-action').textContent=`${lv.action.toUpperCase()} ${lv.count}`;
+  document.getElementById('dbg-sols').textContent='Computing…';
+  document.getElementById('debug-ov').classList.add('show');
+  setTimeout(()=>{
+    const sols=findSolutions(lv,6);
+    document.getElementById('dbg-sols').innerHTML=sols.length?sols.map(s=>`<div>${s.replace(/\*/g,'×')}</div>`).join(''):'No solutions found';
+  },50);
+}
+
+// ══════════════════════════════════════════════
+// PARTICLES / VFX
+// ══════════════════════════════════════════════
+function spawnSparks(gi,color){
+  const segs=document.querySelectorAll('.seg');
+  let off=0,di=0;
+  for(const tok of G.tokens){
+    if(tok.type==='digit'){
+      if(gi>=off&&gi<off+7){di+=(gi-off);break;}
+      off+=7;di+=7;
+    }
+  }
+  const el=segs[di];if(!el)return;
+  const r=el.getBoundingClientRect();
+  const cx=r.left+r.width/2,cy=r.top+r.height/2;
+  for(let i=0;i<8;i++){
+    const sp=document.createElement('div');sp.className='spark';
+    const a=(Math.PI*2/8)*i,d=25+Math.random()*20;
+    sp.style.cssText=`left:${cx}px;top:${cy}px;background:${color};width:${4+Math.random()*4}px;height:${4+Math.random()*4}px;--dx:${Math.cos(a)*d}px;--dy:${Math.sin(a)*d}px;animation-duration:${.5+Math.random()*.3}s`;
+    document.body.appendChild(sp);setTimeout(()=>sp.remove(),900);
+  }
+}
+function floatScore(txt){
+  const el=document.createElement('div');el.className='score-float';el.textContent=txt;
+  el.style.cssText=`left:${window.innerWidth/2-30}px;top:${window.innerHeight*.35}px`;
+  document.body.appendChild(el);setTimeout(()=>el.remove(),1100);
+}
+function flashScreen(col){
+  const el=document.createElement('div');el.className='screen-flash';el.style.background=col;
+  document.body.appendChild(el);setTimeout(()=>el.remove(),600);
+}
+
+// ── Confetti ──
+let _cAnim=null;
+function spawnConfetti(){
+  const cv=document.getElementById('confetti-cv');if(!cv)return;
+  cv.width=window.innerWidth;cv.height=window.innerHeight;
+  const c=cv.getContext('2d');
+  const cols=['#ff6b35','#ff9a00','#ffd700','#43c465','#4a90e2','#9b59b6','#ff4444'];
+  const ps=Array.from({length:90},()=>({x:Math.random()*cv.width,y:-10-Math.random()*200,vx:(Math.random()-.5)*3,vy:2+Math.random()*3,rot:Math.random()*360,vr:(Math.random()-.5)*5,w:6+Math.random()*8,h:3+Math.random()*4,col:cols[Math.floor(Math.random()*cols.length)]}));
+  function draw(){c.clearRect(0,0,cv.width,cv.height);let alive=false;for(const p of ps){p.x+=p.vx;p.y+=p.vy;p.rot+=p.vr;p.vy+=.05;if(p.y<cv.height+20)alive=true;c.save();c.translate(p.x,p.y);c.rotate(p.rot*Math.PI/180);c.fillStyle=p.col;c.fillRect(-p.w/2,-p.h/2,p.w,p.h);c.restore();}if(alive)_cAnim=requestAnimationFrame(draw);else c.clearRect(0,0,cv.width,cv.height);}
+  stopConfetti();_cAnim=requestAnimationFrame(draw);
+}
+function stopConfetti(){if(_cAnim){cancelAnimationFrame(_cAnim);_cAnim=null;}const cv=document.getElementById('confetti-cv');if(cv)cv.getContext('2d').clearRect(0,0,cv.width,cv.height);}
+
+// ── Toast ──
+let _tt;
+function showToast(msg,dur=2200){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove('show'),dur);}
+
+// ══════════════════════════════════════════════
+// KEYBOARD
+// ══════════════════════════════════════════════
+document.addEventListener('keydown',e=>{
+  if(e.key==='r'||e.key==='R')resetLevel();
+  if(e.key==='ArrowRight')nextLevel();
+  if(e.key==='ArrowLeft')prevLevel();
+  if(e.key==='z'||e.key==='Z')undoMove();
+  if(e.key==='Escape'){document.getElementById('success-ov').classList.remove('show');document.getElementById('debug-ov').classList.remove('show');stopConfetti();}
+  if(e.key==='d'||e.key==='D')showDebug();
+});
+
+// ══════════════════════════════════════════════
+// INIT — filter levels first, then start
+// ══════════════════════════════════════════════
+(function init(){
+  showScreen('intro');
+
+  // Disable play buttons while loading
+  const btnPlay=document.querySelector('#intro .btn-big');
+  const btnCont=document.querySelector('#intro .btn-sm');
+  if(btnPlay){btnPlay.disabled=true;btnPlay.textContent='Loading…';btnPlay.style.opacity='.6';}
+  if(btnCont){btnCont.disabled=true;btnCont.style.opacity='.6';}
+
+  const raw=[...EQUATION_LEVELS];
+  const filtered=[];
+  let i=0;
+  const CHUNK=15;
+  function processChunk(){
+    const end=Math.min(i+CHUNK,raw.length);
+    for(;i<end;i++){
+      const lv=raw[i];
+      const toks=parseEq(lv.equation);
+      const s=buildSegs(toks);
+      const eq=recon(s,toks);
+      if(!eq.includes('?')&&evalEq(eq))continue;
+      const sols=findSolutions(lv,1);
+      if(sols.length>0)filtered.push(lv);
+    }
+    if(i<raw.length){
+      const pct=Math.round(i/raw.length*100);
+      if(btnPlay)btnPlay.textContent=`Loading ${pct}%…`;
+      document.getElementById('intro-lvls').textContent='…'+filtered.length;
+      setTimeout(processChunk,0);
+    } else {
+      const worlds={};
+      for(const lv of filtered){if(!worlds[lv.world])worlds[lv.world]=[];worlds[lv.world].push(lv);}
+      const final=[];
+      for(const w of Object.keys(worlds).sort((a,b)=>a-b)){
+        worlds[w].forEach((lv,j)=>{ final.push({...lv,num:j+1,id:`${lv.world}-${j+1}`}); });
+      }
+      G.allLevels=final;
+      loadSave();
+      loadLevel(G.idx);
+      updateIntro();
+      // Re-enable play buttons
+      if(btnPlay){btnPlay.disabled=false;btnPlay.textContent='▶ PLAY!';btnPlay.style.opacity='';}
+      if(btnCont){btnCont.disabled=false;btnCont.style.opacity='';}
+      console.log(`✓ Loaded ${final.length} solvable levels`);
+    }
+  }
+  setTimeout(processChunk,0);
+})();
+</script>
+</body>
+</html>
