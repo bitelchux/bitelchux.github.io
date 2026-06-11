@@ -160,10 +160,10 @@ function inyectaMiBannerESP() {
 
   var API = APIs[Math.floor(Math.random() * APIs.length)];
   API = "https://pbnstats.promocionesycolecciones.com/chollometro/json.php";
-  if (window.location.hostname === "acelstore.es") {
+  if (window.location.hostname === "acelstorexxx.es") {
     API = "https://bitelchux.github.io/acelstore.json";
   }
-  if (window.location.hostname === "dedrones.es") {
+  if (window.location.hostname === "dedronesxxx.es") {
     API = "https://bitelchux.github.io/dedrones.json";
   }
   if (document.getElementById("offer-banner")) return;
