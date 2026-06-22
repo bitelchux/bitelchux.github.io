@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Electrolineras de España · Mapa Reve (OCPI)</title>
+
+<!-- Leaflet (mapa base) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<!-- Leaflet.markercluster (agrupación; necesario por el volumen de localizaciones) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+
+<style>
+  :root {
+    --ink:#0d1117; --panel:#161b22; --panel-2:#1c232c; --border:#2a313c;
+    --text:#e6edf3; --muted:#8b949e; --accent:#2ee6a6; --accent-2:#00c281;
+    --ac:#3ea6ff; --semi:#2ee6a6; --fast:#f2a93b; --ultra:#ff6b6b; --danger:#ff6b6b;
+  }
+  * { box-sizing:border-box; }
+  html, body { height:100%; margin:0; }
+  body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--text); background:var(--ink); }
+  #map { position:absolute; inset:0; z-index:1; }
+
+  .panel { position:absolute; top:14px; left:14px; z-index:1000; width:330px; max-width:calc(100vw - 28px);
+    background:var(--panel); border:1px solid var(--border); border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,.45); overflow:hidden; }
+  .panel header { padding:14px 16px 12px; background:linear-gradient(180deg,var(--panel-2),var(--panel)); border-bottom:1px solid var(--border); }
+  .panel h1 { margin:0; font-size:16px; letter-spacing:.2px; display:flex; align-items:center; gap:8px; }
+  .bolt { width:18px; height:18px; color:var(--accent); flex:0 0 auto; }
+  .panel h1 small { font-weight:400; color:var(--muted); font-size:12px; }
+  .panel .body { padding:12px 16px 16px; }
+
+  .stat { display:flex; align-items:baseline; gap:8px; margin:2px 0 12px; }
+  .stat .num { font-size:28px; font-weight:700; color:var(--accent); font-variant-numeric:tabular-nums; }
+  .stat .lbl { color:var(--muted); font-size:13px; }
+
+  .search { width:100%; background:var(--ink); border:1px solid var(--border); color:var(--text); border-radius:8px; padding:9px 11px; font-size:13px; outline:none; }
+  .search:focus { border-color:var(--accent-2); }
+  .search::placeholder { color:#5d6672; }
+
+  .row { display:flex; gap:8px; margin-top:10px; }
+  button.act { flex:1; background:var(--accent); color:#04130d; border:0; border-radius:8px; padding:9px 10px; font-size:13px; font-weight:600; cursor:pointer; }
+  button.act:hover { background:var(--accent-2); }
+  button.act.ghost { background:transparent; color:var(--text); border:1px solid var(--border); }
+  button.act.ghost:hover { border-color:var(--accent-2); color:var(--accent); }
+
+  .status { margin-top:12px; font-size:12px; color:var(--muted); min-height:16px; line-height:1.5; }
+  .status.err { color:var(--danger); }
+
+  .meta { margin-top:10px; font-size:11px; color:#6b7480; display:flex; justify-content:space-between; gap:8px; }
+  .meta b { color:var(--muted); font-weight:600; }
+
+  .legend { margin-top:14px; border-top:1px solid var(--border); padding-top:12px; display:grid; grid-template-columns:1fr 1fr; gap:6px 12px; font-size:12px; color:var(--muted); }
+  .legend .item { display:flex; align-items:center; gap:7px; }
+  .legend .dot { width:10px; height:10px; border-radius:50%; flex:0 0 auto; }
+
+  .pin { width:13px; height:13px; border-radius:50%; border:2px solid rgba(255,255,255,.85); box-shadow:0 0 0 1px rgba(0,0,0,.35); }
+
+  .leaflet-popup-content-wrapper { background:var(--panel); color:var(--text); border:1px solid var(--border); border-radius:10px; }
+  .leaflet-popup-tip { background:var(--panel); border:1px solid var(--border); }
+  .leaflet-popup-content { margin:12px 14px; font-size:13px; line-height:1.5; }
+  .pop-title { font-size:14px; font-weight:700; margin-bottom:4px; }
+  .pop-row { color:var(--muted); }
+  .pop-row b { color:var(--text); font-weight:600; }
+  .pop-tag { display:inline-block; margin-top:6px; font-size:11px; padding:2px 7px; border-radius:999px; background:rgba(46,230,166,.12); color:var(--accent); border:1px solid rgba(46,230,166,.3); }
+
+  .demo-badge { position:absolute; bottom:14px; left:50%; transform:translateX(-50%); z-index:1000;
+    background:rgba(242,169,59,.15); border:1px solid rgba(242,169,59,.45); color:#f2a93b; padding:6px 12px; border-radius:999px; font-size:12px; display:none; }
+</style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<div class="panel">
+  <header>
+    <h1>
+      <svg class="bolt" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg>
+      Electrolineras de España
+    </h1>
+    <h1 style="margin-top:4px"><small>API Externa Mapa Reve (OCPI) · Red Eléctrica</small></h1>
+  </header>
+  <div class="body">
+    <div class="stat">
+      <span class="num" id="count">—</span>
+      <span class="lbl" id="countLbl">cargando…</span>
+    </div>
+
+    <input class="search" id="search" type="text" placeholder="Filtrar por nombre, operador o provincia…" autocomplete="off">
+
+    <div class="row">
+      <button class="act" id="update">Actualizar desde API</button>
+      <button class="act ghost" id="fit">Ver toda España</button>
+    </div>
+
+    <div class="status" id="status"></div>
+
+    <div class="meta">
+      <span><b>Caché:</b> <span id="cacheInfo">—</span></span>
+      <span><b>Cupo API:</b> <span id="quotaInfo">0/5 esta hora</span></span>
+    </div>
+
+    <div class="legend">
+      <div class="item"><span class="dot" style="background:var(--ac)"></span> AC ≤ 22 kW</div>
+      <div class="item"><span class="dot" style="background:var(--semi)"></span> 22–50 kW</div>
+      <div class="item"><span class="dot" style="background:var(--fast)"></span> 50–150 kW</div>
+      <div class="item"><span class="dot" style="background:var(--ultra)"></span> &gt; 150 kW</div>
+    </div>
+  </div>
+</div>
+
+<div class="demo-badge" id="demoBadge">⚠ Datos de ejemplo — configura tu API key para datos reales</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
+<script>
+/* =========================================================================
+   CONFIGURACIÓN
+   API Externa Mapa Reve · estándar OCPI · doc: /docs/api/external/v1
+   -------------------------------------------------------------------------
+   Auth: header 'x-api-key' con la clave directa.
+   LÍMITE: 5 solicitudes/hora. Por eso cacheamos en localStorage y NO
+   recargamos de la API salvo que el usuario lo pida o la caché caduque.
+   ========================================================================= */
+const CONFIG = {
+  // Apunta directo a la API (probable CORS, ver nota) o a TU proxy (Azure Function).
+  baseUrl: 'https://www.mapareve.es/api/external/v1',
+  stationsPath: '/locations',          // listado de localizaciones OCPI
+
+  // ---- Autenticación ----
+  apiKey:     '',                      // <-- pega aquí tu API key
+  authHeader: 'x-api-key',
+  authScheme: '',                      // clave directa, sin prefijo
+
+  // ---- Paginación OCPI (offset/limit) ----
+  offsetParam: 'offset',
+  limitParam:  'limit',
+  pageLimit:   1000,                   // el servidor puede recortarlo (mira cabecera X-Limit)
+  // Tope de peticiones por carga: dejamos 1 en reserva del cupo de 5/h.
+  maxRequestsPerLoad: 4,
+
+  // ---- Caché ----
+  cacheKey:   'mapareve_locations_v1',
+  cacheTtlH:  24,                      // horas que consideramos la caché "fresca"
+};
+/* ========================================================================= */
+
+// --- Mapa base -------------------------------------------------------------
+const map = L.map('map', { zoomControl:true }).setView([40.1,-3.6], 6);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  maxZoom:19, attribution:'&copy; OpenStreetMap &copy; CARTO · Datos: Reve (Red Eléctrica)'
+}).addTo(map);
+
+const cluster = L.markerClusterGroup({ chunkedLoading:true, maxClusterRadius:55, spiderfyOnMaxZoom:true });
+map.addLayer(cluster);
+const SPAIN_BOUNDS = L.latLngBounds([27.4,-18.3],[43.9,4.4]); // incluye Canarias
+
+let allStations = [];
+const $ = (id) => document.getElementById(id);
+
+// =========================================================================
+// Almacenamiento local (caché + contador de cupo). Tolerante a fallos.
+// =========================================================================
+const store = {
+  get(k){ try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+  set(k,v){ try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } },
+};
+function hourKey(){ const d=new Date(); return `mapareve_quota_${d.getFullYear()}${d.getMonth()}${d.getDate()}${d.getHours()}`; }
+function quotaUsed(){ return store.get(hourKey()) || 0; }
+function quotaBump(){ const k=hourKey(); const n=(store.get(k)||0)+1; store.set(k,n); renderQuota(); return n; }
+function renderQuota(){ $('quotaInfo').textContent = `${quotaUsed()}/5 esta hora`; }
+
+// =========================================================================
+// Mapeo OCPI (Location -> modelo interno)
+// =========================================================================
+function powerFromEvses(evses){
+  let max = 0;
+  for (const e of evses || []) for (const c of e.connectors || []) {
+    let kw = 0;
+    if (c.max_electric_power != null) kw = Number(c.max_electric_power) / 1000;   // OCPI da W
+    else if (c.max_voltage && c.max_amperage) kw = (Number(c.max_voltage) * Number(c.max_amperage)) / 1000;
+    if (kw > max) max = kw;
+  }
+  return max || null;
+}
+function countConnectors(evses){ return (evses||[]).reduce((n,e)=> n + ((e.connectors||[]).length), 0); }
+function aggStatus(evses){
+  const s = (evses||[]).map(e=>e.status).filter(Boolean);
+  if (!s.length) return '';
+  if (s.includes('AVAILABLE')) return 'Disponible';
+  if (s.includes('OUTOFORDER') || s.includes('INOPERATIVE')) return 'Fuera de servicio';
+  if (s.every(x => ['CHARGING','BLOCKED','RESERVED'].includes(x))) return 'Ocupado';
+  return s[0];
+}
+// Texto multilenguaje OCPI puede venir como [{language,text}] o string
+function txt(v){ if (Array.isArray(v)) return v[0]?.text || ''; return v || ''; }
+
+function mapLocation(raw){
+  const c = raw.coordinates;
+  if (!c || c.latitude == null || c.longitude == null) return null;
+  const lat = Number(c.latitude), lng = Number(c.longitude);
+  if (!isFinite(lat) || !isFinite(lng)) return null;
+  return {
+    lat, lng,
+    name:       raw.name || raw.address || 'Punto de recarga',
+    operator:   raw.operator?.name || raw.owner?.name || '',
+    address:    raw.address || '',
+    city:       raw.city || '',
+    province:   raw.state || '',                 // OCPI no trae provincia; usamos 'state' si existe
+    postal:     raw.postal_code || '',
+    powerKw:    powerFromEvses(raw.evses),
+    connectors: countConnectors(raw.evses) || '',
+    status:     aggStatus(raw.evses),
+  };
+}
+
+// Extrae el array de datos del envoltorio OCPI { data:[...], status_code, ... }
+function extractList(json){
+  if (Array.isArray(json)) return json;
+  if (json && Array.isArray(json.data)) return json.data;
+  if (json && Array.isArray(json.features)) return json.features; // por si fuese GeoJSON
+  if (json && typeof json === 'object') { const a = Object.values(json).find(Array.isArray); if (a) return a; }
+  return [];
+}
+
+// --- Color por potencia ----------------------------------------------------
+function getCss(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+function tierColor(kw){
+  if (kw == null) return getCss('--semi');
+  if (kw <= 22)   return getCss('--ac');
+  if (kw <= 50)   return getCss('--semi');
+  if (kw <= 150)  return getCss('--fast');
+  return getCss('--ultra');
+}
+function esc(t){ return String(t).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch])); }
+function popupHtml(s){
+  const loc = [s.address, s.postal, s.city, s.province].filter(Boolean).map(esc).join(', ');
+  const out = [`<div class="pop-title">${esc(s.name)}</div>`];
+  if (s.operator) out.push(`<div class="pop-row"><b>Operador:</b> ${esc(s.operator)}</div>`);
+  if (loc)        out.push(`<div class="pop-row">${loc}</div>`);
+  if (s.powerKw)  out.push(`<div class="pop-row"><b>Potencia máx.:</b> ${esc(Math.round(s.powerKw))} kW</div>`);
+  if (s.connectors !== '') out.push(`<div class="pop-row"><b>Conectores:</b> ${esc(s.connectors)}</div>`);
+  if (s.status)   out.push(`<span class="pop-tag">${esc(s.status)}</span>`);
+  return out.join('');
+}
+function makeMarker(s){
+  const icon = L.divIcon({ className:'', html:`<div class="pin" style="background:${tierColor(s.powerKw)}"></div>`, iconSize:[13,13], iconAnchor:[7,7] });
+  const m = L.marker([s.lat, s.lng], { icon });
+  m.bindPopup(popupHtml(s));
+  return m;
+}
+function render(stations){
+  cluster.clearLayers();
+  cluster.addLayers(stations.map(makeMarker));
+  $('count').textContent = stations.length.toLocaleString('es-ES');
+  $('countLbl').textContent = stations.length === 1 ? 'localización' : 'localizaciones';
+}
+
+// --- Filtro ----------------------------------------------------------------
+$('search').addEventListener('input', (e) => {
+  const q = e.target.value.trim().toLowerCase();
+  if (!q) return render(allStations);
+  render(allStations.filter(s => (s.name+' '+s.operator+' '+s.province+' '+s.city).toLowerCase().includes(q)));
+});
+$('fit').addEventListener('click', () => map.fitBounds(SPAIN_BOUNDS));
+$('update').addEventListener('click', () => {
+  if (quotaUsed() >= 5) { setStatus('Cupo de 5 solicitudes/hora agotado. Espera al cambio de hora.', true); return; }
+  if (confirm('La API permite solo 5 solicitudes/hora. ¿Actualizar ahora desde la API?')) loadFromApi();
+});
+
+function setStatus(msg, isErr=false){ const el=$('status'); el.textContent=msg; el.className='status'+(isErr?' err':''); }
+
+// =========================================================================
+// Carga desde API (paginación OCPI offset/limit + tope de cupo)
+// =========================================================================
+function buildHeaders(){
+  const h = { 'Accept':'application/json' };
+  if (CONFIG.apiKey) h[CONFIG.authHeader] = CONFIG.authScheme ? `${CONFIG.authScheme} ${CONFIG.apiKey}` : CONFIG.apiKey;
+  return h;
+}
+function buildUrl(offset){
+  const u = new URL(CONFIG.baseUrl.replace(/\/$/,'') + CONFIG.stationsPath);
+  u.searchParams.set(CONFIG.offsetParam, offset);
+  u.searchParams.set(CONFIG.limitParam, CONFIG.pageLimit);
+  return u.toString();
+}
+
+async function loadFromApi(){
+  $('demoBadge').style.display = 'none';
+  setStatus('Consultando la API…');
+  try {
+    let offset = 0, collected = [], total = null, reqs = 0;
+    for (; reqs < CONFIG.maxRequestsPerLoad; reqs++) {
+      if (quotaUsed() >= 5) { setStatus('Cupo de 5/h agotado a mitad de carga. Mostrando lo descargado.', true); break; }
+      const res = await fetch(buildUrl(offset), { headers: buildHeaders() });
+      quotaBump();
+      if (res.status === 429) { setStatus('La API devolvió 429: cupo de 5/h agotado.', true); break; }
+      if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+
+      // Cabeceras OCPI de paginación (si CORS las expone)
+      const xTotal = res.headers.get('X-Total-Count'); if (xTotal) total = Number(xTotal);
+      const xLimit = res.headers.get('X-Limit');
+
+      const list = extractList(await res.json());
+      if (!list.length) break;
+      collected = collected.concat(list);
+      const step = xLimit ? Number(xLimit) : CONFIG.pageLimit;
+      offset += list.length;
+      setStatus(`Descargando… ${collected.length.toLocaleString('es-ES')}${total?` de ${total.toLocaleString('es-ES')}`:''}`);
+      if (list.length < step) break;          // última página
+    }
+
+    const mapped = collected.map(mapLocation).filter(Boolean);
+    if (!mapped.length) throw new Error('Respuesta sin localizaciones con coordenadas. Revisa la API key o el endpoint.');
+
+    allStations = mapped;
+    store.set(CONFIG.cacheKey, { ts: Date.now(), total, stations: mapped });
+    render(allStations); map.fitBounds(SPAIN_BOUNDS); renderCacheInfo();
+
+    const faltan = total && total > mapped.length ? total - mapped.length : 0;
+    setStatus(
+      `Cargadas ${mapped.length.toLocaleString('es-ES')} localizaciones.` +
+      (faltan ? ` Quedan ~${faltan.toLocaleString('es-ES')}: límite de 5/h. Recomendado: proxy con caché (ver nota).` : '')
+    );
+  } catch (err) {
+    const cors = (err instanceof TypeError);
+    const cached = store.get(CONFIG.cacheKey);
+    if (cached?.stations?.length) {
+      allStations = cached.stations; render(allStations); map.fitBounds(SPAIN_BOUNDS); renderCacheInfo();
+      setStatus((cors?'No se pudo conectar (posible CORS). ':'Error: '+err.message+'. ') + 'Mostrando caché local.', true);
+    } else {
+      setStatus((cors?'No se pudo conectar (posible bloqueo CORS — la API es server-to-server). ':'Error: '+err.message+'. ') + 'Mostrando datos de ejemplo.', true);
+      loadDemo();
+    }
+    console.error(err);
+  }
+}
+
+function renderCacheInfo(){
+  const c = store.get(CONFIG.cacheKey);
+  if (!c?.ts) { $('cacheInfo').textContent = 'vacía'; return; }
+  const mins = Math.round((Date.now()-c.ts)/60000);
+  const when = mins < 60 ? `hace ${mins} min` : `hace ${Math.round(mins/60)} h`;
+  $('cacheInfo').textContent = `${(c.stations?.length||0).toLocaleString('es-ES')} pts · ${when}`;
+}
+
+// =========================================================================
+// Datos de ejemplo (para ver el mapa sin API)
+// =========================================================================
+function loadDemo(){
+  $('demoBadge').style.display = 'block';
+  allStations = [
+    { name:'Iberdrola - Plaza España', operator:'Iberdrola', city:'Madrid', province:'Madrid', lat:40.4239, lng:-3.7122, powerKw:150, connectors:4, status:'Disponible' },
+    { name:'Repsol - M30 Norte', operator:'Repsol', city:'Madrid', province:'Madrid', lat:40.4710, lng:-3.6883, powerKw:50, connectors:2, status:'Disponible' },
+    { name:'Endesa X - Diagonal', operator:'Endesa X', city:'Barcelona', province:'Barcelona', lat:41.3917, lng:2.1649, powerKw:180, connectors:6, status:'Ocupado' },
+    { name:'Zunder - Sagrera', operator:'Zunder', city:'Barcelona', province:'Barcelona', lat:41.4205, lng:2.1873, powerKw:300, connectors:8, status:'Disponible' },
+    { name:'Wenea - Centro', operator:'Wenea', city:'Valencia', province:'Valencia', lat:39.4699, lng:-0.3763, powerKw:22, connectors:2, status:'Disponible' },
+    { name:'Iberdrola - Cartuja', operator:'Iberdrola', city:'Sevilla', province:'Sevilla', lat:37.4085, lng:-6.0010, powerKw:50, connectors:2, status:'Disponible' },
+    { name:'Tesla Supercharger', operator:'Tesla', city:'Zaragoza', province:'Zaragoza', lat:41.6488, lng:-0.8891, powerKw:250, connectors:12, status:'Disponible' },
+    { name:'Endesa X - Abando', operator:'Endesa X', city:'Bilbao', province:'Bizkaia', lat:43.2627, lng:-2.9350, powerKw:50, connectors:2, status:'Fuera de servicio' },
+    { name:'Repsol - Aeropuerto', operator:'Repsol', city:'Málaga', province:'Málaga', lat:36.6749, lng:-4.4991, powerKw:150, connectors:4, status:'Disponible' },
+    { name:'Power Dot - Marineda', operator:'Power Dot', city:'A Coruña', province:'A Coruña', lat:43.3329, lng:-8.4094, powerKw:60, connectors:4, status:'Disponible' },
+    { name:'Iberdrola - Plaza Mayor', operator:'Iberdrola', city:'Valladolid', province:'Valladolid', lat:41.6520, lng:-4.7286, powerKw:22, connectors:2, status:'Disponible' },
+    { name:'Zunder - Murcia Norte', operator:'Zunder', city:'Murcia', province:'Murcia', lat:37.9922, lng:-1.1307, powerKw:120, connectors:4, status:'Disponible' },
+    { name:'Endesa X - Las Palmas', operator:'Endesa X', city:'Las Palmas', province:'Las Palmas', lat:28.1235, lng:-15.4363, powerKw:50, connectors:2, status:'Disponible' },
+    { name:'Iberdrola - Palma', operator:'Iberdrola', city:'Palma', province:'Illes Balears', lat:39.5696, lng:2.6502, powerKw:43, connectors:2, status:'Disponible' },
+  ];
+  render(allStations); map.fitBounds(SPAIN_BOUNDS);
+}
+
+// =========================================================================
+// Arranque: caché fresca -> sin gastar cupo. Si no, API. Sin key -> demo.
+// =========================================================================
+renderQuota(); renderCacheInfo();
+(function init(){
+  const cached = store.get(CONFIG.cacheKey);
+  const fresh = cached?.ts && (Date.now()-cached.ts) < CONFIG.cacheTtlH*3600*1000;
+  if (cached?.stations?.length && fresh) {
+    allStations = cached.stations; render(allStations); map.fitBounds(SPAIN_BOUNDS);
+    setStatus(`Mostrando caché local (${allStations.length.toLocaleString('es-ES')} pts). Pulsa "Actualizar" para refrescar desde la API.`);
+    return;
+  }
+  if (!CONFIG.apiKey) {
+    setStatus('Sin API key configurada — datos de ejemplo. Edita CONFIG.apiKey en el código para datos reales.', true);
+    loadDemo(); return;
+  }
+  loadFromApi();
+})();
+</script>
+</body>
+</html>
