@@ -137,6 +137,7 @@ function inyectaMiBannerESP() {
   if (window.location.hostname === "dedronesxxx.es") {
     API = "https://bitelchux.github.io/dedrones.json";
   }
+  API = "https://bitelchux.github.io/panicoenelplatanar.json";
   if (document.getElementById("offer-banner")) return;
 
   const style = document.createElement("style");
@@ -416,7 +417,7 @@ window.addEventListener("load", () => {
                       .then(res => res.json())
                       .then(data => {
                         window.cfpais = data.country; 
-                        if (window.cfpais === "ES") {    
+                        if (window.cfpais === "ES" || window.cfpais === "MX" || window.cfpais === "US") {    
                             //loadRandomAds(); 
                             inyectaMiBannerESP();
                         }else{
