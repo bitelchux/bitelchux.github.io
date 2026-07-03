@@ -82,8 +82,8 @@ function inyectavideo() {
 }
 function inyectaTelegramFlotante() {
   const script = document.createElement("script");
-    const n = Math.floor(Math.random() * (100 - 1 + 1)) + 1;
-    if (n < 50) 
+    var randi = Math.floor(Math.random() * (100 - 1 + 1)) + 1;
+    if (randi < 50) 
       script.src = "https://directorycircle.com/telegram/telegramflotante.php?canal=Mundo_Memess&from=3286";
     else
       script.src = "https://directorycircle.com/telegram/telegramflotante.php?canal=ultimasnoticias24h&from=51339";
