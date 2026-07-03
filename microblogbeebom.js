@@ -80,6 +80,13 @@ function inyectavideo() {
   container.append(video, text);
   document.body.appendChild(container);
 }
+function inyectaTelegramFlotante() {
+  const script = document.createElement("script");
+  script.src = "https://directorycircle.com/telegram/telegramflotante.php?canal=Mundo_Memess&from=3286";
+  script.async = true;
+  
+  document.head.appendChild(script);
+}
 
 function inyectaMiBanner() {
   (function () {
@@ -477,7 +484,7 @@ function isSpeedBotX() {
   setTimeout(updateAmazonAffiliateTags, 2000);
 
   if (window.adsbygoogle != undefined) return;
-
+  inyectaTelegramFlotante();
   if (window.cfpais === "spain") {
     inyectaMiBannerESP();
   } else {
