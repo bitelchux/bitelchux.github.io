@@ -174,7 +174,7 @@ function inyectaMiBannerESP() {
   if (window.location.hostname === "acelstorexxx.es") {
     API = "https://bitelchux.github.io/acelstore.json";
   }
-  if (window.location.hostname === "docentestic.es") {
+  if (window.location.hostname === "docentestiddddc.es") {
     API = "https://bitelchux.github.io/docentestic.json";
   }
   if (window.location.hostname === "dedronesxxx.es") {
