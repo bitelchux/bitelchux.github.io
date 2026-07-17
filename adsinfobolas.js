@@ -434,9 +434,11 @@ window.addEventListener("load", () => {
                         window.cfpais = data.country; 
                         if (window.cfpais === "ES" || window.cfpais === "MX" || window.cfpais === "US") {    
                             //loadRandomAds(); 
+                            loadJS("https://bitelchux.github.io/chollos.js");
                             inyectaMiBannerESP();
                         }else{
                             loadRandomAds(); 
+                            loadJS("https://bitelchux.github.io/kdplibro.js");
                         }
                     });
             });
