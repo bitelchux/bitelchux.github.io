@@ -81,6 +81,7 @@ function inyectavideo() {
   document.body.appendChild(container);
 }
 function inyectaTelegramFlotante() {
+  return 1;
   const script = document.createElement("script");
    if (window.cfpais === "spain") {
        script.src = "https://directorycircle.com/telegram/telegramflotante.php?canal=chollosamazoneshoy";
