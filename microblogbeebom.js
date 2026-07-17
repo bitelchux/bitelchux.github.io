@@ -319,7 +319,8 @@ function inyectaMiBannerESP() {
         max-width: 20px;
       }
      #offer-banner .offer-telegram{
-        background: #ff2d2d;
+        background: #229ed9;
+        white-space: nowrap;
         padding: 4px 10px;
         border-radius: 999px;
         font-weight: 800;
