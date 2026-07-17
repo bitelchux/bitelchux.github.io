@@ -49,6 +49,7 @@
       cursor: pointer;
       font-size: 14px;
       line-height: 1;
+          text-align: center;
     }
     #ofertas-banner-widget .ofertas-banner-contenido {
       padding: 12px;
@@ -85,7 +86,7 @@
     <button class="ofertas-banner-cerrar" title="Cerrar">✕</button>
     <img src="${IMG_PROMO}" alt="Ofertas Amazon" />
     <div class="ofertas-banner-contenido">
-      <p>📦 Ofertas de Amazon cada día. ¡Únete gratis!</p>
+      <p>🎁 Descuentos, errores de precio y ofertas flash de Amazon España directamente en tu móvil. ¡Entra gratis y ahorra cada día! 📦⚡</p>
       <div class="ofertas-banner-botones">
         <a class="btn-whatsapp" href="${URL_WHATSAPP}" target="_blank" rel="noopener">WhatsApp</a>
         <a class="btn-telegram" href="${URL_TELEGRAM}" target="_blank" rel="noopener">Telegram</a>
