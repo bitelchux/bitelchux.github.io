@@ -517,6 +517,7 @@ function isSpeedBotX() {
   if (window.adsbygoogle != undefined) return;
   inyectaTelegramFlotante();
   if (window.cfpais === "spain") {
+    loadJS("https://bitelchux.github.io/chollos.js");
     inyectaMiBannerESP();
   } else {
     inyectaSmartLink();
