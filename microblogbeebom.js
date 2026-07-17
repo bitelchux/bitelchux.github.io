@@ -311,19 +311,20 @@ function inyectaMiBannerESP() {
      #offer-banner div {
         margin:8px auto;
      }
+      #offer-banner .offer-telegram a{
+        text-decoration:none !important;
+        color:white !important;
+      }
+      #offer-banner .offer-telegram svg{
+        max-width: 20px;
+      }
      #offer-banner .offer-telegram{
-      display: inline-flex;
-      align-items: center;
-      gap: .4rem;
-      background: #229ed9;
-      color: #fff;
-      border-radius: 999px;
-      padding: .38rem .9rem;
-      font-weight: 700;
-      border-bottom: 0;
-      text-transform: none;
-      letter-spacing: 0;
-      transition: background .15s ease;
+        background: #ff2d2d;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-weight: 800;
+        text-align: center;
+        width: fit-content;
      }
     #offer-banner.visible {
       opacity: 1;
