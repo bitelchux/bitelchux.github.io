@@ -325,7 +325,7 @@ function inyectaMiBannerESP() {
         border-radius: 999px;
         font-weight: 800;
         text-align: center;
-        width: fit-content;
+        width: 200px;
      }
     #offer-banner.visible {
       opacity: 1;
