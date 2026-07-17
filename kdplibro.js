@@ -27,8 +27,36 @@
         overflow: hidden;
         opacity: 0;
         transform: translateY(-12px);
-        transition: opacity 0.5s ease, transform 0.5s ease;
+        transition: opacity 0.5s ease, transform 0.5s ease, box-shadow 0.2s ease;
+        cursor: pointer;
     `;
+
+    // Toda la tarjeta es clicable y lleva a Amazon
+    container.setAttribute('role', 'link');
+    container.setAttribute('tabindex', '0');
+    container.setAttribute('aria-label', `Ver "${config.libroNombre}" en Amazon`);
+
+    const abrirAmazon = () => {
+        window.open(config.urlAmazon, '_blank', 'noopener');
+    };
+
+    container.addEventListener('click', abrirAmazon);
+    container.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            abrirAmazon();
+        }
+    });
+
+    // Efecto hover para reforzar que es clicable
+    container.addEventListener('mouseenter', () => {
+        container.style.boxShadow = '0 14px 34px rgba(20,33,61,0.32)';
+        container.style.transform = 'translateY(-3px)';
+    });
+    container.addEventListener('mouseleave', () => {
+        container.style.boxShadow = '0 10px 30px rgba(20,33,61,0.25)';
+        container.style.transform = 'translateY(0)';
+    });
 
     // Cabecera
     const cabecera = document.createElement('div');
@@ -144,7 +172,8 @@
 
     container.appendChild(contenido);
 
-    // Footer con botones de acción
+    // Footer con botones de acción (mismo destino que el resto de la tarjeta;
+    // se detiene la propagación para no abrir dos pestañas al pulsarlos)
     const footer = document.createElement('div');
     footer.style.cssText = `
         padding: 14px 18px 18px;
@@ -172,6 +201,7 @@
     `;
     btnAmazon.onmouseover = () => btnAmazon.style.background = '#1d2e54';
     btnAmazon.onmouseout = () => btnAmazon.style.background = '#14213D';
+    btnAmazon.addEventListener('click', (e) => e.stopPropagation());
     footer.appendChild(btnAmazon);
 
     if (config.disponibleKindleUnlimited) {
@@ -195,12 +225,14 @@
         `;
         btnKU.onmouseover = () => { btnKU.style.background = '#7A2E2E'; btnKU.style.color = '#fff'; };
         btnKU.onmouseout = () => { btnKU.style.background = 'transparent'; btnKU.style.color = '#7A2E2E'; };
+        btnKU.addEventListener('click', (e) => e.stopPropagation());
         footer.appendChild(btnKU);
     }
 
     container.appendChild(footer);
 
-    // Botón de cerrar (aparece al pasar el ratón)
+    // Botón de cerrar (aparece al pasar el ratón; detiene la propagación
+    // para que cerrar no abra también Amazon)
     const btnCerrar = document.createElement('button');
     btnCerrar.innerHTML = '✕';
     btnCerrar.setAttribute('aria-label', 'Cerrar');
@@ -222,11 +254,14 @@
     `;
     btnCerrar.onmouseover = () => btnCerrar.style.background = 'rgba(0,0,0,0.3)';
     btnCerrar.onmouseout = () => btnCerrar.style.background = 'rgba(0,0,0,0.15)';
-    btnCerrar.onclick = () => container.remove();
+    btnCerrar.onclick = (e) => {
+        e.stopPropagation();
+        container.remove();
+    };
     container.appendChild(btnCerrar);
 
-    container.onmouseenter = () => btnCerrar.style.display = 'block';
-    container.onmouseleave = () => btnCerrar.style.display = 'none';
+    container.addEventListener('mouseenter', () => btnCerrar.style.display = 'block');
+    container.addEventListener('mouseleave', () => btnCerrar.style.display = 'none');
 
     // Responsive: en móvil lo bajamos a la esquina inferior para no tapar la cabecera de la web
     const mq = window.matchMedia('(max-width: 480px)');
