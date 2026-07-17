@@ -308,6 +308,23 @@ function inyectaMiBannerESP() {
       transform: translateY(100%);
       transition: opacity 0.45s ease, transform 0.5s cubic-bezier(.4,0,.2,1);
     }
+     #offer-banner div {
+        margin:8px auto;
+     }
+     #offer-banner .offer-telegram{
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      background: #229ed9;
+      color: #fff;
+      border-radius: 999px;
+      padding: .38rem .9rem;
+      font-weight: 700;
+      border-bottom: 0;
+      text-transform: none;
+      letter-spacing: 0;
+      transition: background .15s ease;
+     }
     #offer-banner.visible {
       opacity: 1;
       transform: translateY(0);
@@ -321,7 +338,7 @@ function inyectaMiBannerESP() {
     }
     #offer-banner .offer-title { font-size: 14px; font-weight: 700; }
     #offer-banner .offer-price {
-      margin-top: 6px;
+      
       background: #ff2d2d;
       padding: 4px 10px;
       border-radius: 999px;
@@ -437,6 +454,9 @@ function inyectaMiBannerESP() {
           <div>
             <div class="offer-title">${item.product_name}</div>
             <div class="offer-price">💰 ${price}</div>
+            <div class="offer-telegram"><a  href="https://t.me/chollosamazoneshoy" target="_blank" rel="noopener"> <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"></path></svg>
+            Canal de chollos
+            </a></div>
           </div>
         </div>
         <div class="offer-ticker">
