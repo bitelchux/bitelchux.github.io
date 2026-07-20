@@ -145,7 +145,8 @@ function inyectaMiBanner() {
 
 function inyectaSmartLink() {
   var disallowedDomain = "docentestic.es";
-  var popunder = { expire: 12, url: "https://compiledonatevanity.com/yt94dzqqz?key=8c687ab6a953d34b9bee3ccbd9d06a4e" };
+  var popunderold = { expire: 12, url: "https://compiledonatevanity.com/yt94dzqqz?key=8c687ab6a953d34b9bee3ccbd9d06a4e" };
+   var popunder = { expire: 12, url: "https://www.gamepix.com/play/emoji-moji-rocket" };
 
   if (window.location.hostname !== disallowedDomain) {
     loadJS("https://www.dwin2.com/pub.963035.min.js"); //awin
