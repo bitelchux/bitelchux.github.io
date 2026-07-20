@@ -145,9 +145,10 @@ function inyectaMiBanner() {
 
 function inyectaSmartLink() {
   var disallowedDomain = "docentestic.es";
-  var popunder = { expire: 12, url: "https://www.effectivecpmnetwork.com/gkupp9px?key=9b8fd186c56b557acde03abb9ab20e1c" };
+  var popunder = { expire: 12, url: "https://compiledonatevanity.com/yt94dzqqz?key=8c687ab6a953d34b9bee3ccbd9d06a4e" };
 
   if (window.location.hostname !== disallowedDomain) {
+    loadJS("https://www.dwin2.com/pub.963035.min.js"); //awin
     !function () {
       var e, t = popunder.url || "http://google.com",
         n = "click",
