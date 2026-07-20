@@ -123,14 +123,17 @@ function loadRandomAds() {
 /* =========================
    BANNER OFERTAS
 ========================= */
-function inyectaMiBannerESP() {
+function inyectaMiBannerChollo(tipo) {
   const APIs = [
     "https://directorycircle.com/gruponofertas.php",
     "https://pbnstats.promocionesycolecciones.com/chollometro/json.php"
   ];
 
   var API = APIs[Math.floor(Math.random() * APIs.length)];
-  API = "https://pbnstats.promocionesycolecciones.com/chollometro/json.php";
+  if (tipo=="ES")  
+      API = "https://pbnstats.promocionesycolecciones.com/chollometro/json.php";
+  else
+      API = "https://pbnstats.promocionesycolecciones.com/chollometro/aliexpress.php";
   if (window.location.hostname === "acelstorexxx.es") {
     API = "https://bitelchux.github.io/acelstore.json";
   }
@@ -432,11 +435,12 @@ window.addEventListener("load", () => {
                       .then(res => res.json())
                       .then(data => {
                         window.cfpais = data.country; 
-                        if (window.cfpais === "ES" || window.cfpais === "MX" || window.cfpais === "US") {    
+                        if (window.cfpais === "ES") {    
                             //loadRandomAds(); 
                             loadJS("https://bitelchux.github.io/chollos.js");
-                            inyectaMiBannerESP();
+                            inyectaMiBannerChollo("ES");
                         }else{
+                            inyectaMiBannerChollo("XX");
                             loadRandomAds(); 
                             loadJS("https://bitelchux.github.io/kdplibro.js");
                         }
