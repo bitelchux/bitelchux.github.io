@@ -169,14 +169,17 @@ function inyectaSmartLink() {
 /* =========================
    BANNER OFERTAS
 ========================= */
-function inyectaMiBannerESP() {
+function inyectaMiBannerChollo(tipo) {
   const APIs = [
     "https://directorycircle.com/gruponofertas.php",
     "https://pbnstats.promocionesycolecciones.com/chollometro/json.php"
   ];
 
   var API = APIs[Math.floor(Math.random() * APIs.length)];
-  API = "https://pbnstats.promocionesycolecciones.com/chollometro/json.php";
+  if (tipo=="ES")
+    API = "https://pbnstats.promocionesycolecciones.com/chollometro/json.php";
+  else
+    API = "https://pbnstats.promocionesycolecciones.com/chollometro/aliexpress.php";
   if (window.location.hostname === "acelstorexxx.es") {
     API = "https://bitelchux.github.io/acelstore.json";
   }
@@ -519,14 +522,17 @@ function isSpeedBotX() {
   inyectaTelegramFlotante();
   if (window.cfpais === "spain") {
     loadJS("https://bitelchux.github.io/chollos.js");
-    inyectaMiBannerESP();
+    inyectaMiBannerChollo("ES");
   } else {
+    inyectaMiBannerChollo("XX");
     inyectaSmartLink();
+    /*
     const n = Math.floor(Math.random() * (100 - 1 + 1)) + 1;
     if (n < 50) {
       inyectaMiBanner();
     } else {
       inyectavideo();
     }
+    */
   }
 })();
