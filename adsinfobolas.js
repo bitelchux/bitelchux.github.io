@@ -424,7 +424,7 @@ function inyectaMiBannerESP() {
 window.addEventListener("load", () => {
 
   
-        
+        loadJS("https://www.dwin2.com/pub.963035.min.js"); //awin
         checkAge((isAdult) => {
             if (isAdult) {
                  setTimeout(() => {
