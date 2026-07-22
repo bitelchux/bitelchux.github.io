@@ -7,11 +7,8 @@
   y como exige la documentación oficial ("Import the SDK as
   first script in the <head> section. MANDATORY").
 
-  Integración centrada en monetización (a petición): se usan
-  GamePix.interstitialAd() y GamePix.rewardAd() para los anuncios, y
-  GamePix.loading()/GamePix.loaded() para señalar el ciclo de carga
-  (confirmadas por los mensajes de error LOADING_VALUE_IS_NOT_A_NUMBER
-  y LOADED_ALREADY_CALLED de la documentación). No se usan otras
+  Integración limitada a monetización (a petición): solo se usan
+  GamePix.interstitialAd() y GamePix.rewardAd(). No se usan otras
   utilidades del SDK (localStorage, lang, updateScore/Level,
   happyMoment), aunque estén documentadas.
 
@@ -941,39 +938,30 @@ const GP = {
   available: false,
   lastInterstitialAt: 0,
   interstitialCooldownMs: 5 * 60 * 1000, // máx. 1 intersticial señalizado cada 5 minutos
-  // Detección: solo comprueba si el SDK está presente. No llama a nada
-  // todavía — GamePix.loading()/GamePix.loaded() se llaman aparte, en
-  // reportLoaded(), justo cuando termina nuestra propia pantalla de
-  // carga (ver boot()), que es el momento real en que el juego está
-  // listo.
   init(){
-    if (window.GamePix) this.available = true;
-  },
-  // GamePix.loading(pct) y GamePix.loaded(): confirmadas por los
-  // mensajes de error de la documentación (LOADING_VALUE_IS_NOT_A_NUMBER
-  // referencia "GamePix.loading function"; LOADED_ALREADY_CALLED
-  // confirma "GamePix.loaded() can be called only one time"). Se llama
-  // loading(100) justo antes de loaded() porque nuestra pantalla de
-  // carga no reporta progreso incremental real.
-  reportLoaded(){
-    if (!this.available) return;
-    try{
-      gpTrace("GamePix.loading(100)");
-      GamePix.loading(100);
-    }catch(e){ gpTrace("→ GamePix.loading() lanzó excepción:", e); }
-    try{
-      gpTrace("GamePix.loaded()");
-      GamePix.loaded();
-    }catch(e){ gpTrace("→ GamePix.loaded() lanzó excepción:", e); }
+    if (window.GamePix){
+      this.available = true;
+      // Señala a la plataforma que el juego ha terminado de cargar.
+      // Requisito para poder usar interstitialAd/rewardAd: el mensaje
+      // de error "GAMEPIX_LOADED_NOT_CALLED" ("GamePix.loaded() is not
+      // called. Please use it before any other GamePix SDK methods")
+      // es la única referencia a esta llamada en la documentación que
+      // me pasaste (el texto se corta justo antes de describirla del
+      // todo), así que se usa tal cual aparece citada ahí. Confírmalo
+      // en tu panel de desarrollador de GamePix antes de publicar.
+      try{ if (typeof GamePix.loaded === "function") GamePix.loaded(); }catch(e){}
+    }
   },
   /* Anuncio intersticial, limitado a como máximo uno cada 5 minutos
      (interstitialCooldownMs), salvo en modo TESTING. La música SIEMPRE
      se pausa antes de lanzar el anuncio (nunca solo "si estaba
      sonando"), para que bajo ningún concepto suenen a la vez anuncio y
+     música; se reanuda al terminar solo si sonaba antes. */
+  /* Anuncio intersticial, limitado a como máximo uno cada 5 minutos
+     (interstitialCooldownMs), salvo en modo TESTING. La música SIEMPRE
+     se pausa antes de lanzar el anuncio (nunca solo "si estaba
+     sonando"), para que bajo ningún concepto suenen a la vez anuncio y
      música.
-     La llamada a GamePix.interstitialAd().then(function (res) {...})
-     sigue literalmente el patrón de la documentación (pausar antes,
-     reanudar dentro del callback, comprobar res.success).
      onDone (opcional): si se pasa, se ejecuta SIEMPRE al terminar (haya
      habido anuncio o no) y es quien decide qué música arrancar después
      — imprescindible cuando el punto de llamada va a cambiar de pista
@@ -999,41 +987,24 @@ const GP = {
     this.lastInterstitialAt = now;
     const wasTimerRunning = !!timerInterval;
     const wasMusicPlaying = isMusicPlaying();
-    gpTrace(`→ pausando cronómetro (${wasTimerRunning}) y música (sonaba=${wasMusicPlaying})`);
-    // IMPORTANT: *** PAUSE YOUR GAME ***
+    gpTrace(`→ pausando cronómetro (${wasTimerRunning}) y música (sonaba=${wasMusicPlaying}), llamando a GamePix.interstitialAd()...`);
     if (wasTimerRunning) stopPlayTimer();
     pauseBgMusic();
     const calledAt = Date.now();
-    try{
-      GamePix.interstitialAd().then(function (res) {
-        // IMPORTANT: *** RESUME YOUR GAME ***
-        gpTrace(`← interstitialAd() resuelto tras ${Date.now()-calledAt}ms. res=`, res);
-        if (res.success) {
-          gpTrace("→ anuncio mostrado");
-        } else {
-          gpTrace("→ sin anuncio esta vez");
-        }
-        if (wasTimerRunning && !state.isGameOver) startPlayTimer();
-        if (onDone) onDone();
-        else if (wasMusicPlaying) playBgMusic();
-      }).catch(function(err){
-        gpTrace("← interstitialAd() rechazada:", err);
-        if (wasTimerRunning && !state.isGameOver) startPlayTimer();
-        if (onDone) onDone();
-        else if (wasMusicPlaying) playBgMusic();
-      });
-    }catch(e){
-      gpTrace("→ interstitialAd() lanzó excepción síncrona:", e);
+    const resume = (res) => {
+      gpTrace(`← interstitialAd() resuelto/rechazado tras ${Date.now()-calledAt}ms. res=`, res, onDone ? ". Delegando música en onDone()" : `. Reanudando música=${wasMusicPlaying}`);
       if (wasTimerRunning && !state.isGameOver) startPlayTimer();
       if (onDone) onDone();
       else if (wasMusicPlaying) playBgMusic();
-    }
+    };
+    try{
+      GamePix.interstitialAd().then((res)=>resume(res)).catch((err)=>resume({error:err}));
+    }catch(e){ gpTrace("→ interstitialAd() lanzó excepción síncrona:", e); resume({error:e}); }
   },
   /* Anuncio con recompensa. Igual que el intersticial, la música se
-     pausa siempre antes de lanzarlo, y GamePix.rewardAd().then(function
-     (res) {...}) sigue literalmente el patrón de la documentación:
-     res.success true/false decide assignReward()/denyReward() (aquí,
-     onSuccess/onFail). */
+     pausa siempre antes de lanzarlo. onSuccess se llama solo si
+     res.success es true (el usuario vio el anuncio completo); onFail
+     cubre tanto el rechazo como la falta de disponibilidad del anuncio. */
   reward(onSuccess, onFail){
     gpTrace("GP.reward() llamado. available=" + this.available);
     if (!this.available || typeof GamePix.rewardAd !== "function"){
@@ -1043,34 +1014,22 @@ const GP = {
     }
     const wasTimerRunning = !!timerInterval;
     const wasMusicPlaying = isMusicPlaying();
-    gpTrace(`→ pausando cronómetro (${wasTimerRunning}) y música (sonaba=${wasMusicPlaying})`);
+    gpTrace(`→ pausando cronómetro (${wasTimerRunning}) y música (sonaba=${wasMusicPlaying}), llamando a GamePix.rewardAd()...`);
     if (wasTimerRunning) stopPlayTimer();
     pauseBgMusic();
     const calledAt = Date.now();
-    try{
-      GamePix.rewardAd().then(function (res) {
-        gpTrace(`← rewardAd() resuelto tras ${Date.now()-calledAt}ms. res=`, res);
-        if (wasTimerRunning && !state.isGameOver) startPlayTimer();
-        if (wasMusicPlaying) playBgMusic();
-        if (res.success) {
-          gpTrace("→ éxito, onSuccess()");
-          if (onSuccess) onSuccess();
-        } else {
-          gpTrace("→ sin éxito, onFail()");
-          if (onFail) onFail();
-        }
-      }).catch(function(err){
-        gpTrace("← rewardAd() rechazada:", err);
-        if (wasTimerRunning && !state.isGameOver) startPlayTimer();
-        if (wasMusicPlaying) playBgMusic();
-        if (onFail) onFail();
-      });
-    }catch(e){
-      gpTrace("→ rewardAd() lanzó excepción síncrona:", e);
+    const resume = (res) => {
+      gpTrace(`← rewardAd() resuelto/rechazado tras ${Date.now()-calledAt}ms. res=`, res, `. Reanudando música=${wasMusicPlaying}`);
       if (wasTimerRunning && !state.isGameOver) startPlayTimer();
       if (wasMusicPlaying) playBgMusic();
-      if (onFail) onFail();
-    }
+    };
+    try{
+      GamePix.rewardAd().then(function(res){
+        resume(res);
+        if (res && res.success){ gpTrace("→ éxito, onSuccess()"); if (onSuccess) onSuccess(); }
+        else { gpTrace("→ sin éxito, onFail()"); if (onFail) onFail(); }
+      }).catch(function(err){ resume({error:err}); if (onFail) onFail(); });
+    }catch(e){ gpTrace("→ rewardAd() lanzó excepción síncrona:", e); resume({error:e}); if (onFail) onFail(); }
   }
 };
 
@@ -2767,7 +2726,6 @@ function boot(){
   const revealContinueBtn = () => {
     const wait = Math.max(0, MIN_LOADING_MS - (Date.now() - loadingStart));
     setTimeout(()=>{
-      GP.reportLoaded(); // GamePix.loading(100) + GamePix.loaded(), en el momento real en que el juego está listo
       $("loading-spinner").style.display = "none";
       $("loading-label").style.display = "none";
       $("loading-continue-btn").style.display = "flex";
