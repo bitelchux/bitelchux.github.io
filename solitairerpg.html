@@ -914,6 +914,16 @@ button{ font-family:inherit; }
 (function(){
 "use strict";
 
+// ⚠️ TESTING: true = sin cooldown entre anuncios intersticiales + trazas
+// detalladas en consola de todo el ciclo pausa→anuncio→reanuda música.
+// Poner a false antes de publicar de verdad.
+const TESTING = true;
+function gpTrace(...args){
+  if (!TESTING) return;
+  const ts = new Date().toISOString().substr(11, 12);
+  console.log(`[TESTING ${ts}]`, ...args);
+}
+
 /* ============================================================
    SDK DE GAMEPIX — envoltorio defensivo
    Todas las llamadas comprueban que window.GamePix existe antes
@@ -939,46 +949,67 @@ const GP = {
     }
   },
   /* Anuncio intersticial, limitado a como máximo uno cada 5 minutos
-     (interstitialCooldownMs). La música SIEMPRE se pausa antes de
-     lanzar el anuncio (nunca solo "si estaba sonando"), para que bajo
-     ningún concepto suenen a la vez anuncio y música; se reanuda al
-     terminar solo si sonaba antes. */
+     (interstitialCooldownMs), salvo en modo TESTING. La música SIEMPRE
+     se pausa antes de lanzar el anuncio (nunca solo "si estaba
+     sonando"), para que bajo ningún concepto suenen a la vez anuncio y
+     música; se reanuda al terminar solo si sonaba antes. */
   interstitial(){
-    if (!this.available || typeof GamePix.interstitialAd !== "function") return;
+    gpTrace("GP.interstitial() llamado. available=" + this.available);
+    if (!this.available || typeof GamePix.interstitialAd !== "function"){
+      gpTrace("→ ignorado: GamePix no disponible o interstitialAd no es función");
+      return;
+    }
     const now = Date.now();
-    if (now - this.lastInterstitialAt < this.interstitialCooldownMs) return;
+    const elapsed = now - this.lastInterstitialAt;
+    if (!TESTING && elapsed < this.interstitialCooldownMs){
+      gpTrace(`→ ignorado por cooldown: ${Math.round(elapsed/1000)}s de ${this.interstitialCooldownMs/1000}s`);
+      return;
+    }
     this.lastInterstitialAt = now;
     const wasTimerRunning = !!timerInterval;
     const wasMusicPlaying = isMusicPlaying();
+    gpTrace(`→ pausando cronómetro (${wasTimerRunning}) y música (sonaba=${wasMusicPlaying}), llamando a GamePix.interstitialAd()...`);
     if (wasTimerRunning) stopPlayTimer();
     pauseBgMusic();
-    const resume = () => {
+    const calledAt = Date.now();
+    const resume = (res) => {
+      gpTrace(`← interstitialAd() resuelto/rechazado tras ${Date.now()-calledAt}ms. res=`, res, `. Reanudando música=${wasMusicPlaying}`);
       if (wasTimerRunning && !state.isGameOver) startPlayTimer();
       if (wasMusicPlaying) playBgMusic();
     };
-    try{ GamePix.interstitialAd().then(resume).catch(resume); }
-    catch(e){ resume(); }
+    try{
+      GamePix.interstitialAd().then((res)=>resume(res)).catch((err)=>resume({error:err}));
+    }catch(e){ gpTrace("→ interstitialAd() lanzó excepción síncrona:", e); resume({error:e}); }
   },
   /* Anuncio con recompensa. Igual que el intersticial, la música se
      pausa siempre antes de lanzarlo. onSuccess se llama solo si
      res.success es true (el usuario vio el anuncio completo); onFail
      cubre tanto el rechazo como la falta de disponibilidad del anuncio. */
   reward(onSuccess, onFail){
-    if (!this.available || typeof GamePix.rewardAd !== "function"){ if (onFail) onFail(); return; }
+    gpTrace("GP.reward() llamado. available=" + this.available);
+    if (!this.available || typeof GamePix.rewardAd !== "function"){
+      gpTrace("→ ignorado: GamePix no disponible o rewardAd no es función");
+      if (onFail) onFail();
+      return;
+    }
     const wasTimerRunning = !!timerInterval;
     const wasMusicPlaying = isMusicPlaying();
+    gpTrace(`→ pausando cronómetro (${wasTimerRunning}) y música (sonaba=${wasMusicPlaying}), llamando a GamePix.rewardAd()...`);
     if (wasTimerRunning) stopPlayTimer();
     pauseBgMusic();
-    const resume = () => {
+    const calledAt = Date.now();
+    const resume = (res) => {
+      gpTrace(`← rewardAd() resuelto/rechazado tras ${Date.now()-calledAt}ms. res=`, res, `. Reanudando música=${wasMusicPlaying}`);
       if (wasTimerRunning && !state.isGameOver) startPlayTimer();
       if (wasMusicPlaying) playBgMusic();
     };
     try{
       GamePix.rewardAd().then(function(res){
-        resume();
-        if (res && res.success){ if (onSuccess) onSuccess(); } else { if (onFail) onFail(); }
-      }).catch(function(){ resume(); if (onFail) onFail(); });
-    }catch(e){ resume(); if (onFail) onFail(); }
+        resume(res);
+        if (res && res.success){ gpTrace("→ éxito, onSuccess()"); if (onSuccess) onSuccess(); }
+        else { gpTrace("→ sin éxito, onFail()"); if (onFail) onFail(); }
+      }).catch(function(err){ resume({error:err}); if (onFail) onFail(); });
+    }catch(e){ gpTrace("→ rewardAd() lanzó excepción síncrona:", e); resume({error:e}); if (onFail) onFail(); }
   }
 };
 
@@ -1641,15 +1672,22 @@ function trackFor(key){ return key === "game" ? gameMusic : menuMusic; }
 function isMusicPlaying(){ return !!((menuMusic && !menuMusic.paused) || (gameMusic && !gameMusic.paused)); }
 
 function playBgMusic(){
-  if (!settings.sound) return;
+  if (!settings.sound){ gpTrace("playBgMusic() → ignorado: settings.sound=false"); return; }
   initBgMusic();
   const track = trackFor(activeMusicKey);
   track.muted = false;
+  gpTrace(`playBgMusic() → track="${activeMusicKey}" .play() (paused antes=${track.paused}, currentTime=${track.currentTime.toFixed(2)})`);
   const p = track.play();
-  if (p && p.catch) p.catch(()=>{ /* bloqueado por el navegador; se reintenta en la próxima interacción */ });
+  if (p && p.then) p.then(()=> gpTrace(`playBgMusic() → track="${activeMusicKey}" .play() resuelto OK`));
+  if (p && p.catch) p.catch((err)=> gpTrace(`playBgMusic() → track="${activeMusicKey}" .play() BLOQUEADO/rechazado:`, err));
 }
-function pauseBgMusic(){ if (menuMusic) menuMusic.pause(); if (gameMusic) gameMusic.pause(); }
+function pauseBgMusic(){
+  gpTrace(`pauseBgMusic() → menu.paused=${menuMusic ? menuMusic.paused : "n/a"}, game.paused=${gameMusic ? gameMusic.paused : "n/a"}`);
+  if (menuMusic) menuMusic.pause();
+  if (gameMusic) gameMusic.pause();
+}
 function setMusicTrack(key){
+  gpTrace(`setMusicTrack("${key}") ← activa antes="${activeMusicKey}"`);
   initBgMusic();
   if (activeMusicKey !== key){
     trackFor(activeMusicKey).pause();
