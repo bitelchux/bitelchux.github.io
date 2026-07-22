@@ -998,7 +998,14 @@ const GP = {
       else if (wasMusicPlaying) playBgMusic();
     };
     try{
-      GamePix.interstitialAd().then((res)=>resume(res)).catch((err)=>resume({error:err}));
+      GamePix.interstitialAd().then(function (res) {
+        if (res.success) {
+          console.log("ad ok");
+        } else {
+          console.log("ad nokok");
+        }
+        resume(res);
+      })
     }catch(e){ gpTrace("→ interstitialAd() lanzó excepción síncrona:", e); resume({error:e}); }
   },
   /* Anuncio con recompensa. Igual que el intersticial, la música se
