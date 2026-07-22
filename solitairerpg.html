@@ -909,7 +909,7 @@ const GP = {
   interstitial(){
     if (!this.available || typeof GamePix.interstitialAd !== "function") return;
     const wasTimerRunning = !!timerInterval;
-    const wasMusicPlaying = !!(bgMusic && !bgMusic.paused);
+    const wasMusicPlaying = isMusicPlaying();
     if (wasTimerRunning) stopPlayTimer();
     if (wasMusicPlaying) pauseBgMusic();
     const resume = () => {
@@ -925,7 +925,7 @@ const GP = {
   reward(onSuccess, onFail){
     if (!this.available || typeof GamePix.rewardAd !== "function"){ if (onFail) onFail(); return; }
     const wasTimerRunning = !!timerInterval;
-    const wasMusicPlaying = !!(bgMusic && !bgMusic.paused);
+    const wasMusicPlaying = isMusicPlaying();
     if (wasTimerRunning) stopPlayTimer();
     if (wasMusicPlaying) pauseBgMusic();
     const resume = () => {
@@ -1562,30 +1562,68 @@ function playSound(name){
 function vibrate(pattern){ if (settings.vibration && navigator.vibrate){ try{ navigator.vibrate(pattern); }catch(e){} } }
 
 /* ============================================================
-   MÚSICA DE FONDO
-   Un único MP3 en bucle, en la misma carpeta que el juego. Los
-   navegadores bloquean el audio con sonido hasta el primer gesto
-   del usuario, así que el play() real se dispara en el primer
-   click/tecla (ver boot()). Se pausa/reanuda junto con el
-   interruptor de "Sonido" de Ajustes, durante los anuncios de
-   GamePix y al cambiar de pestaña.
+   MÚSICA DE FONDO — dos pistas
+   "menu": rpgsolitairemenu.mp3   → suena en la pantalla de menú
+   "game": rpgsolitairemusic.mp3  → suena durante la partida
+   Ambas en la misma carpeta que el juego, en bucle.
+
+   Los navegadores bloquean el audio CON SONIDO hasta el primer
+   gesto del usuario, pero casi todos permiten el autoplay
+   MUTEADO. Truco: arrancamos la pista activa muteada nada más
+   cargar (attemptAutoplayMuted) y le quitamos el mute en el
+   primer click/tecla (playBgMusic), sin reiniciarla — así en
+   cuanto el usuario toca algo, la música "ya estaba sonando
+   desde el principio" en vez de arrancar de cero en ese momento.
+
+   setMusicTrack("menu"|"game") pausa la pista anterior y activa
+   la nueva. Se pausan ambas junto con el interruptor de "Sonido"
+   de Ajustes, durante los anuncios de GamePix y al cambiar de
+   pestaña.
    ============================================================ */
-const BG_MUSIC_SRC = "./rpgsolitairemusic.mp3";
-let bgMusic = null;
+const MENU_MUSIC_SRC = "./rpgsolitairemenu.mp3";
+const GAME_MUSIC_SRC = "./rpgsolitairemusic.mp3";
+let menuMusic = null;
+let gameMusic = null;
+let activeMusicKey = "menu"; // "menu" | "game"
+
 function initBgMusic(){
-  if (bgMusic) return;
-  bgMusic = new Audio(BG_MUSIC_SRC);
-  bgMusic.loop = true;
-  bgMusic.volume = 0.35;
-  bgMusic.preload = "auto";
+  if (!menuMusic){
+    menuMusic = new Audio(MENU_MUSIC_SRC);
+    menuMusic.loop = true; menuMusic.volume = 0.35; menuMusic.preload = "auto";
+  }
+  if (!gameMusic){
+    gameMusic = new Audio(GAME_MUSIC_SRC);
+    gameMusic.loop = true; gameMusic.volume = 0.35; gameMusic.preload = "auto";
+  }
+}
+function trackFor(key){ return key === "game" ? gameMusic : menuMusic; }
+function isMusicPlaying(){ return !!((menuMusic && !menuMusic.paused) || (gameMusic && !gameMusic.paused)); }
+
+function attemptAutoplayMuted(){
+  if (!settings.sound) return;
+  initBgMusic();
+  const track = trackFor(activeMusicKey);
+  track.muted = true;
+  const p = track.play();
+  if (p && p.catch) p.catch(()=>{ /* ni el autoplay muteado está permitido aquí; se intentará igualmente tras el primer gesto */ });
 }
 function playBgMusic(){
   if (!settings.sound) return;
   initBgMusic();
-  const p = bgMusic.play();
+  const track = trackFor(activeMusicKey);
+  track.muted = false;
+  const p = track.play();
   if (p && p.catch) p.catch(()=>{ /* bloqueado por el navegador; se reintenta en la próxima interacción */ });
 }
-function pauseBgMusic(){ if (bgMusic) bgMusic.pause(); }
+function pauseBgMusic(){ if (menuMusic) menuMusic.pause(); if (gameMusic) gameMusic.pause(); }
+function setMusicTrack(key){
+  initBgMusic();
+  if (activeMusicKey !== key){
+    trackFor(activeMusicKey).pause();
+    activeMusicKey = key;
+  }
+  if (settings.sound) playBgMusic();
+}
 
 /* ============================================================
    EFECTOS VISUALES
@@ -2463,6 +2501,7 @@ function goToMainMenu(){
   stopPlayTimer();
   state.selectedObject = null;
   GP.interstitial(); // vuelta al menú: oportunidad de anuncio intersticial
+  setMusicTrack("menu");
   showMenu();
 }
 function confirmLeaveIfNeeded(){
@@ -2479,7 +2518,7 @@ $("menu-classic").addEventListener("click", ()=>{ hideMenu(); startNewGame("norm
 $("menu-infinite").addEventListener("click", ()=>{ hideMenu(); startNewGame("infinite"); });
 $("menu-continue").addEventListener("click", ()=>{
   const saved = Storage.get(SAVE_KEY, null);
-  if (saved && saved.currentRoom){ hideMenu(); loadGame(saved); startPlayTimer(); }
+  if (saved && saved.currentRoom){ hideMenu(); setMusicTrack("game"); loadGame(saved); startPlayTimer(); }
   else { hideMenu(); startNewGame("infinite"); }
 });
 $("brand-home").addEventListener("click", ()=>{ if (confirmLeaveIfNeeded()) goToMainMenu(); });
@@ -2510,7 +2549,7 @@ function initializeGame(mode){
   log(mode==="infinite" ? M("startInfinite") : M("startClassic"));
   if (mode==="infinite") saveGame(); else clearSavedGame();
 }
-function startNewGame(mode){ GP.interstitial(); initializeGame(mode || "normal"); startPlayTimer(); }
+function startNewGame(mode){ GP.interstitial(); setMusicTrack("game"); initializeGame(mode || "normal"); startPlayTimer(); }
 
 runBtn.addEventListener("click", runAway);
 restartBtn.addEventListener("click", ()=>{
@@ -2571,10 +2610,11 @@ function boot(){
   modeLabelEl.textContent = t("mode.classic");
   depthLabelEl.textContent = t("depth.label");
 
-  // Música de fondo: se prepara ya, pero el play() real solo puede
-  // dispararse tras un gesto del usuario (política de autoplay de los
-  // navegadores), así que se engancha al primer click/tecla.
+  // Música de fondo: arranca muteada de inmediato (autoplay muted sí
+  // está permitido) y se le quita el mute en el primer click/tecla,
+  // sin reiniciar la pista (ver comentario en la sección de música).
   initBgMusic();
+  attemptAutoplayMuted();
   const startMusicOnce = () => {
     playBgMusic();
     document.removeEventListener("pointerdown", startMusicOnce);
