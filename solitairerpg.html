@@ -640,25 +640,34 @@ button{ font-family:inherit; }
 .pause-overlay .lbl{ font-family: var(--font-display); font-size:22px; color: var(--frame-gold-bright); }
 </style>
 <style>
-#aviso-rotacion {
+.dialog-rotar {
   display: none;
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: #000; color: #fff;
-  z-index: 9999; text-align: center; padding-top: 50vh;
 }
 
-@media screen and (orientation: landscape) and (max-width: 900px) {
-  #aviso-rotacion {
-    display: block; /* Muestra el aviso si está en horizontal en móviles */
-  }
-  body > *:not(#aviso-rotacion) {
-    display: none; /* Oculta el contenido principal */
+/* Solo se activa si: es táctil (móvil/tablet) Y está en landscape */
+@media (hover: none) and (pointer: coarse) and (orientation: landscape) {
+  .dialog-rotar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.9);
+    color: #fff;
+    z-index: 9999;
+    text-align: center;
+    padding: 24px;
   }
 }
 </style>
 </head>
 <body>
+  
+<div class="dialog-rotar">
+  <div class="dialog-rotar__contenido">
+    <p>📱➡️🔄 Please rotate your device to portrait mode to continue viewing this page.</p>
+  </div>
+</div>
 <div id="app">
   <div class="ambient"></div>
 
