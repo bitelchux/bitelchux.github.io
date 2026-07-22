@@ -1,27 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!--
+  ============================================================
+  SDK de GamePix — importado como PRIMER script del <head>, tal
+  y como exige la documentación oficial ("Import the SDK as
+  first script in the <head> section. MANDATORY").
+
+  Integración limitada a monetización (a petición): solo se usan
+  GamePix.interstitialAd() y GamePix.rewardAd(). No se usan otras
+  utilidades del SDK (localStorage, lang, updateScore/Level,
+  happyMoment), aunque estén documentadas.
+
+  Todo el código que usa GamePix está protegido con
+  comprobaciones "if (window.GamePix)", así que si este script no
+  carga (fuera de GamePix, en local, o si la URL cambiase) el
+  juego funciona exactamente igual, simplemente sin anuncios.
+  ============================================================
+-->
+<script src="https://integration.gamepix.com/sdk/v3/gamepix.sdk.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
 <title>Solitaire RPG</title>
 <meta name="description" content="Solitaire RPG — a roguelike dungeon-crawling card game">
-
-<!--
-  ============================================================
-  SDK de GamePix (opcional, solo tiene efecto si el juego se
-  sirve dentro de la plataforma GamePix). Todo el código que lo
-  usa está protegido con comprobaciones "if (window.GamePix)",
-  así que si este script no carga (fuera de GamePix, en local,
-  o si la URL ha cambiado) el juego funciona exactamente igual.
-
-  IMPORTANTE: esta es la URL documentada públicamente por
-  GamePix en su "SDK Bible". Antes de publicar de verdad en
-  gamepix.com, confirma en tu panel de desarrollador que la URL
-  y los métodos siguen siendo los mismos, por si los han
-  actualizado desde entonces.
-  ============================================================
--->
-<script src="https://gamepix.blob.core.windows.net/gpxlib/dev/gamepix.js"></script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -607,7 +608,7 @@ button{ font-family:inherit; }
 
 .footer-note{ text-align:center; font-size:10.5px; color: var(--text-faint); padding: 0 16px 6px; }
 
-/* Pausa (GamePix on.pause) */
+/* Pausa (al cambiar de pestaña) */
 .pause-overlay{ position:fixed; inset:0; background: rgba(6,3,1,.85); backdrop-filter: blur(4px); z-index:300; display:none; align-items:center; justify-content:center; flex-direction:column; gap:8px; }
 .pause-overlay.show{ display:flex; }
 .pause-overlay .ico{ font-size:44px; }
@@ -828,6 +829,32 @@ button{ font-family:inherit; }
     </div>
   </div>
 
+  <!-- ==================== MODAL: REVIVIR CON ANUNCIO ==================== -->
+  <div class="modal-overlay" id="revive-overlay">
+    <div class="modal">
+      <div class="go-emoji">💫</div>
+      <div class="go-title" data-i18n="revive.title">One More Chance?</div>
+      <p class="sub" data-i18n="revive.subtitle">Watch a short ad to come back from the brink.</p>
+      <div class="go-buttons">
+        <button class="btn btn-primary btn-block" id="revive-watch-btn" data-i18n="revive.watch">🎬 Watch Ad & Revive</button>
+        <button class="btn btn-scroll btn-block" id="revive-decline-btn" data-i18n="revive.decline">Accept Defeat</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: REVIVIR CON ANUNCIO ==================== -->
+  <div class="modal-overlay" id="revive-overlay">
+    <div class="modal">
+      <div class="go-emoji">💫</div>
+      <div class="go-title" data-i18n="revive.title">One More Chance?</div>
+      <p class="sub" data-i18n="revive.subtitle">Watch a short ad to come back from the brink.</p>
+      <div class="go-buttons">
+        <button class="btn btn-primary btn-block" id="revive-watch-btn" data-i18n="revive.watch">🎬 Watch Ad & Revive</button>
+        <button class="btn btn-scroll btn-block" id="revive-decline-btn" data-i18n="revive.decline">Accept Defeat</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ==================== MODAL: FIN DE PARTIDA ==================== -->
   <div class="modal-overlay" id="gameover-overlay">
     <div class="modal">
@@ -862,61 +889,79 @@ button{ font-family:inherit; }
 const GP = {
   available: false,
   init(){
-    if (window.GamePix && GamePix.on){
+    if (window.GamePix){
       this.available = true;
-      try{
-        GamePix.on.pause = () => pauseForPlatform();
-        GamePix.on.resume = () => resumeForPlatform();
-        GamePix.on.soundOn = () => { settings.sound = true; persistSettings(); };
-        GamePix.on.soundOff = () => { settings.sound = false; persistSettings(); };
-      }catch(e){ /* SDK presente pero con forma inesperada: se ignora */ }
+      // Señala a la plataforma que el juego ha terminado de cargar.
+      // Requisito para poder usar interstitialAd/rewardAd: el mensaje
+      // de error "GAMEPIX_LOADED_NOT_CALLED" ("GamePix.loaded() is not
+      // called. Please use it before any other GamePix SDK methods")
+      // es la única referencia a esta llamada en la documentación que
+      // me pasaste (el texto se corta justo antes de describirla del
+      // todo), así que se usa tal cual aparece citada ahí. Confírmalo
+      // en tu panel de desarrollador de GamePix antes de publicar.
+      try{ if (typeof GamePix.loaded === "function") GamePix.loaded(); }catch(e){}
     }
   },
-  loading(pct){ if (this.available){ try{ GamePix.game.gameLoading(pct); }catch(e){} } },
-  loaded(cb){
-    if (this.available){
-      try{ GamePix.game.gameLoaded(cb); return; }catch(e){}
-    }
-    cb();
+  /* Anuncio intersticial. No todas las llamadas muestran un anuncio
+     (lo decide GamePix), así que se puede — y conviene — señalizar
+     esta oportunidad en cualquier punto de corte natural de la
+     partida. Pausa la música y el cronómetro mientras dura el anuncio. */
+  interstitial(){
+    if (!this.available || typeof GamePix.interstitialAd !== "function") return;
+    const wasTimerRunning = !!timerInterval;
+    const wasMusicPlaying = !!(bgMusic && !bgMusic.paused);
+    if (wasTimerRunning) stopPlayTimer();
+    if (wasMusicPlaying) pauseBgMusic();
+    const resume = () => {
+      if (wasTimerRunning && !state.isGameOver) startPlayTimer();
+      if (wasMusicPlaying) playBgMusic();
+    };
+    try{ GamePix.interstitialAd().then(resume).catch(resume); }
+    catch(e){ resume(); }
   },
-  ping(type, data){ if (this.available){ try{ GamePix.game.ping(type, data); }catch(e){} } },
-  lang(){
-    if (this.available){ try{ return GamePix.lang(); }catch(e){ return null; } }
-    return null;
+  /* Anuncio con recompensa. onSuccess se llama solo si res.success es
+     true (el usuario vio el anuncio completo); onFail cubre tanto el
+     rechazo como la falta de disponibilidad del anuncio. */
+  reward(onSuccess, onFail){
+    if (!this.available || typeof GamePix.rewardAd !== "function"){ if (onFail) onFail(); return; }
+    const wasTimerRunning = !!timerInterval;
+    const wasMusicPlaying = !!(bgMusic && !bgMusic.paused);
+    if (wasTimerRunning) stopPlayTimer();
+    if (wasMusicPlaying) pauseBgMusic();
+    const resume = () => {
+      if (wasTimerRunning && !state.isGameOver) startPlayTimer();
+      if (wasMusicPlaying) playBgMusic();
+    };
+    try{
+      GamePix.rewardAd().then(function(res){
+        resume();
+        if (res && res.success){ if (onSuccess) onSuccess(); } else { if (onFail) onFail(); }
+      }).catch(function(){ resume(); if (onFail) onFail(); });
+    }catch(e){ resume(); if (onFail) onFail(); }
   }
 };
 
 /* ============================================================
    ALMACENAMIENTO PERSISTENTE
-   Orden de preferencia: GamePix.localStorage (si el juego corre
-   en su plataforma) → localStorage del navegador → memoria.
+   localStorage del navegador, con memoria como fallback.
+   (No se usa GamePix.localStorage: integración limitada a
+   monetización, ver cabecera del archivo.)
    ============================================================ */
 const Storage = (function(){
   let backend = "memory";
-  try{
-    if (window.GamePix && GamePix.localStorage){
-      GamePix.localStorage.setItem("__test__","1");
-      GamePix.localStorage.removeItem("__test__");
-      backend = "gamepix";
-    }
-  }catch(e){ /* GamePix presente pero su storage falla: seguimos probando */ }
-  if (backend === "memory"){
-    try{ localStorage.setItem("__test__","1"); localStorage.removeItem("__test__"); backend = "local"; }
-    catch(e){ backend = "memory"; }
-  }
+  try{ localStorage.setItem("__test__","1"); localStorage.removeItem("__test__"); backend = "local"; }
+  catch(e){ backend = "memory"; }
   const memory = {};
   return {
     backend,
     get(key, fallback){
       try{
-        if (backend === "gamepix"){ const raw = GamePix.localStorage.getItem(key); return raw!==null && raw!==undefined ? JSON.parse(raw) : fallback; }
         if (backend === "local"){ const raw = localStorage.getItem(key); return raw!==null ? JSON.parse(raw) : fallback; }
         return key in memory ? memory[key] : fallback;
       }catch(e){ return fallback; }
     },
     set(key, value){
       try{
-        if (backend === "gamepix"){ GamePix.localStorage.setItem(key, JSON.stringify(value)); return; }
         if (backend === "local"){ localStorage.setItem(key, JSON.stringify(value)); return; }
         memory[key] = value;
       }catch(e){ memory[key] = value; }
@@ -957,7 +1002,7 @@ en: {
   "settings.easy":"Easy Mode", "settings.easyDesc":"Includes every potion and weapon (2–14)",
   "settings.events":"Random Events", "settings.eventsDesc":"Chests, traps, mini-bosses & curses — Infinite Mode only",
   "settings.presentation":"Presentation",
-  "settings.sound":"Sound", "settings.soundDesc":"Synthesised in-browser effects",
+  "settings.sound":"Sound", "settings.soundDesc":"Sound effects & background music",
   "settings.vibration":"Vibration", "settings.vibrationDesc":"Supported devices only",
   "settings.blood":"Blood Effects", "settings.bloodDesc":"Particles when you take damage",
   "settings.newGame":"🆕 New Game", "settings.mainMenu":"🏠 Main Menu", "settings.resetProgress":"⚠️ Erase All Progress",
@@ -974,11 +1019,14 @@ en: {
   "sheet.monster":"Monster", "sheet.weapon":"Weapon", "sheet.potion":"Potion", "sheet.deadMonster":"Fallen Trophy",
   "sheet.bareHands":"👊 Bare Hands", "sheet.withWeapon":"⚔️ With Weapon", "sheet.equip":"🛡️ Equip",
   "sheet.drink":"🧪 Drink", "sheet.drinkNoEffect":"🧪 Drink (no effect)",
+  "sheet.repairAd":"🎬 Watch Ad to Repair", "sheet.healAd":"🎬 Watch Ad to Heal +5",
   "mode.classic":"Classic", "mode.infinite":"Infinite", "depth.label":"Lv.",
   "confirm.restart":"Restart the current game?",
   "confirm.mainMenu":"Return to the main menu? Unsaved Classic Mode progress will be lost.",
   "confirm.reset":"This will erase stats, records, achievements and your saved game. Continue?",
   "prompt.default":"Interact with the room's cards or run. Tap a card to inspect it.",
+  "revive.title":"One More Chance?", "revive.subtitle":"Watch a short ad to come back from the brink.",
+  "revive.watch":"🎬 Watch Ad & Revive", "revive.decline":"Accept Defeat",
 },
 es: {
   "brand.sub":"mazmorra de cartas",
@@ -1009,7 +1057,7 @@ es: {
   "settings.easy":"Modo Fácil", "settings.easyDesc":"Incluye todas las pociones y armas (2–14)",
   "settings.events":"Eventos Aleatorios", "settings.eventsDesc":"Cofres, trampas, mini-jefes y maldiciones — solo en Modo Infinito",
   "settings.presentation":"Presentación",
-  "settings.sound":"Sonido", "settings.soundDesc":"Efectos sintetizados en el navegador",
+  "settings.sound":"Sonido", "settings.soundDesc":"Efectos de sonido y música de fondo",
   "settings.vibration":"Vibración", "settings.vibrationDesc":"Solo en dispositivos compatibles",
   "settings.blood":"Efectos de Sangre", "settings.bloodDesc":"Partículas al recibir daño",
   "settings.newGame":"🆕 Nueva Partida", "settings.mainMenu":"🏠 Menú Principal", "settings.resetProgress":"⚠️ Borrar Todo el Progreso",
@@ -1026,11 +1074,14 @@ es: {
   "sheet.monster":"Monstruo", "sheet.weapon":"Arma", "sheet.potion":"Poción", "sheet.deadMonster":"Trofeo Caído",
   "sheet.bareHands":"👊 Puño Limpio", "sheet.withWeapon":"⚔️ Con Arma", "sheet.equip":"🛡️ Equipar",
   "sheet.drink":"🧪 Beber", "sheet.drinkNoEffect":"🧪 Beber (sin efecto)",
+  "sheet.repairAd":"🎬 Ver Anuncio y Reparar", "sheet.healAd":"🎬 Ver Anuncio y Curar +5",
   "mode.classic":"Clásico", "mode.infinite":"Infinito", "depth.label":"Nv.",
   "confirm.restart":"¿Reiniciar la partida actual?",
   "confirm.mainMenu":"¿Volver al menú principal? El progreso no guardado del Modo Clásico se perderá.",
   "confirm.reset":"Esto borrará estadísticas, récords, logros y la partida guardada. ¿Continuar?",
   "prompt.default":"Interactúa con las cartas de la sala o huye. Toca una carta para inspeccionarla.",
+  "revive.title":"¿Una Oportunidad Más?", "revive.subtitle":"Mira un anuncio corto para volver del borde de la muerte.",
+  "revive.watch":"🎬 Ver Anuncio y Revivir", "revive.decline":"Aceptar la Derrota",
 }
 };
 
@@ -1076,6 +1127,10 @@ en: {
   startClassic:"🏰 You enter the dungeon. Good luck, scoundrel.",
   startInfinite:"♾️ Your infinite descent begins. Survive as long as you can!",
   continueDesc:(d,h)=>`Level ${d} · ${h} HP`,
+  revivedLog:"💫 An unseen force pulls you back from death's door.",
+  revivedToast:"💫 Revived! Fight on.",
+  weaponRepairedLog:"🎬 Your weapon is fully repaired.",
+  healAdLog:(h)=>`🎬 You feel restored, recovering ${h} HP.`,
 },
 es: {
   equip:(t)=>`🛡️ Equipaste ${t}.`,
@@ -1118,6 +1173,10 @@ es: {
   startClassic:"🏰 Entras en la mazmorra. Buena suerte, forastero.",
   startInfinite:"♾️ Comienza tu descenso infinito. ¡Sobrevive el mayor tiempo posible!",
   continueDesc:(d,h)=>`Nivel ${d} · ${h} HP`,
+  revivedLog:"💫 Una fuerza invisible te aparta de la puerta de la muerte.",
+  revivedToast:"💫 ¡Reviviste! Sigue luchando.",
+  weaponRepairedLog:"🎬 Tu arma queda completamente reparada.",
+  healAdLog:(h)=>`🎬 Sientes cómo te recuperas ${h} HP.`,
 }
 };
 
@@ -1292,6 +1351,7 @@ function persistAchievements(){ Storage.set("solitairerpg_achievements", achieve
 let canDrinkPotion = true;
 let lastCardPlayed = null;
 let lastPotionHadNoEffect = false;
+let reviveOffered = false;
 let pendingDealAnimation = false;
 let roomCardElements = new Map();
 let runStats = { monstersKilled:0, damageDealt:0, damageTaken:0 };
@@ -1502,6 +1562,32 @@ function playSound(name){
 function vibrate(pattern){ if (settings.vibration && navigator.vibrate){ try{ navigator.vibrate(pattern); }catch(e){} } }
 
 /* ============================================================
+   MÚSICA DE FONDO
+   Un único MP3 en bucle, en la misma carpeta que el juego. Los
+   navegadores bloquean el audio con sonido hasta el primer gesto
+   del usuario, así que el play() real se dispara en el primer
+   click/tecla (ver boot()). Se pausa/reanuda junto con el
+   interruptor de "Sonido" de Ajustes, durante los anuncios de
+   GamePix y al cambiar de pestaña.
+   ============================================================ */
+const BG_MUSIC_SRC = "./rpgsolitairemusic.mp3";
+let bgMusic = null;
+function initBgMusic(){
+  if (bgMusic) return;
+  bgMusic = new Audio(BG_MUSIC_SRC);
+  bgMusic.loop = true;
+  bgMusic.volume = 0.35;
+  bgMusic.preload = "auto";
+}
+function playBgMusic(){
+  if (!settings.sound) return;
+  initBgMusic();
+  const p = bgMusic.play();
+  if (p && p.catch) p.catch(()=>{ /* bloqueado por el navegador; se reintenta en la próxima interacción */ });
+}
+function pauseBgMusic(){ if (bgMusic) bgMusic.pause(); }
+
+/* ============================================================
    EFECTOS VISUALES
    ============================================================ */
 function spawnEmojiBurst(emoji, originEl, count=10, opts={}){
@@ -1626,7 +1712,10 @@ function takeDamage(amount, opts={}){
 
   if (state.health === 1) unlockAchievement("edgeOfAbyss");
   persistStats();
-  if (state.health === 0){ endGame(false); return false; }
+  if (state.health === 0){
+    offerRevive(() => endGame(false));
+    return false;
+  }
   saveGame();
   return true;
 }
@@ -1727,6 +1816,37 @@ function drinkPotion(card){
   playCard(card);
 }
 
+function repairWeaponWithAd(weapon){
+  if (!weapon) return;
+  GP.reward(
+    () => {
+      weapon.durability = MAX_WEAPON_DURABILITY;
+      state.weapon = weapon; // mismo objeto: fuerza el re-render con la nueva durabilidad
+      spawnSparks(weaponSlotEl, 12);
+      playSound("equip");
+      log(M("weaponRepairedLog"));
+      closeSheet();
+      saveGame();
+    },
+    () => { /* anuncio no completado: el arma sigue como estaba */ }
+  );
+}
+
+function healWithAd(){
+  GP.reward(
+    () => {
+      const restored = Math.min(5, MAX_HEALTH-state.health);
+      state.health = Math.min(MAX_HEALTH, state.health+5);
+      spawnEmojiBurst("💗", healthWidgetEl, 8, { upward:true, dist:40 });
+      playSound("heal");
+      log(M("healAdLog", restored));
+      closeSheet();
+      saveGame();
+    },
+    () => { /* anuncio no completado: sin curación */ }
+  );
+}
+
 function playCard(card){
   if (state.isGameOver || !card) return;
   lastCardPlayed = card;
@@ -1744,6 +1864,7 @@ function runAway(){
   drawRoom();
   log(M("ranAway"));
   saveGame();
+  GP.interstitial(); // huida: oportunidad de anuncio intersticial
 }
 
 /* ============================================================
@@ -1869,7 +1990,7 @@ function checkIfRoomFinished(){
       log(M("dungeonAdvance", state.dungeonDepth, heal));
       showToast("dungeon", M("dungeonToast", state.dungeonDepth));
       playSound("dungeonClear"); vibrate([60,40,60,40,120]);
-      GP.ping("level_complete", { score: calculateScore(), level: String(state.dungeonDepth), achievements });
+      GP.interstitial(); // mazmorra superada: oportunidad de anuncio intersticial
 
       buildDeck(); drawRoom(); canDrinkPotion = true;
       persistStats(); saveGame();
@@ -1886,6 +2007,7 @@ function checkIfRoomFinished(){
     state.canRun = true;
     drawRoom();
     canDrinkPotion = true;
+    GP.interstitial(); // sala completada: oportunidad de anuncio intersticial
   }
   saveGame();
 }
@@ -1920,7 +2042,7 @@ function endGame(didWin){
 
   playSound(didWin?"win":"lose");
   vibrate(didWin ? [80,50,80,50,220] : [320]);
-  GP.ping("game_over", { score: finalScore, level: state.mode==="infinite" ? String(state.dungeonDepth) : "classic", achievements });
+  GP.interstitial(); // fin de partida: oportunidad de anuncio intersticial
 
   showGameOverModal(didWin, finalScore, isNewRecord);
 }
@@ -2002,18 +2124,24 @@ function startPlayTimer(){
 function stopPlayTimer(){ if (timerInterval){ clearInterval(timerInterval); timerInterval=null; persistStats(); } }
 
 /* ============================================================
-   PAUSA (GamePix on.pause / on.resume)
+   PAUSA AL CAMBIAR DE PESTAÑA (document.visibilitychange)
+   Requisito de GamePix: "When the user switches to a new browser
+   tab, game must pause (including audio)." No usamos un callback
+   del SDK para esto (GamePix.on.pause no está en la documentación
+   que me pasaste); se resuelve con la API estándar de visibilidad.
    ============================================================ */
 let wasPlayingBeforePause = false;
 function pauseForPlatform(){
   wasPlayingBeforePause = !!timerInterval;
   stopPlayTimer();
   if (audioCtx && audioCtx.state==="running"){ try{ audioCtx.suspend(); }catch(e){} }
+  pauseBgMusic();
   pauseOverlay.classList.add("show");
 }
 function resumeForPlatform(){
   pauseOverlay.classList.remove("show");
   if (audioCtx && audioCtx.state==="suspended"){ try{ audioCtx.resume(); }catch(e){} }
+  playBgMusic();
   if (wasPlayingBeforePause && !state.isGameOver && menuScreen.classList.contains("hidden")) startPlayTimer();
 }
 
@@ -2119,10 +2247,22 @@ function renderSheet(){
     } else if (type === "dead-monster"){
       primaryActionEl.style.display = "none"; secondaryActionEl.style.display = "none";
     } else if (type === "weapon"){
-      primaryActionEl.textContent = t("sheet.equip");
-      primaryActionEl.classList.add("action-green");
-      primaryActionEl.onclick = () => equipWeapon(obj);
-      secondaryActionEl.style.display = "none";
+      const isEquipped = obj === state.weapon;
+      if (isEquipped){
+        primaryActionEl.style.display = "none";
+        if (GP.available && obj.durability < MAX_WEAPON_DURABILITY){
+          secondaryActionEl.textContent = t("sheet.repairAd");
+          secondaryActionEl.classList.add("action-green");
+          secondaryActionEl.onclick = () => repairWeaponWithAd(obj);
+        } else {
+          secondaryActionEl.style.display = "none";
+        }
+      } else {
+        primaryActionEl.textContent = t("sheet.equip");
+        primaryActionEl.classList.add("action-green");
+        primaryActionEl.onclick = () => equipWeapon(obj);
+        secondaryActionEl.style.display = "none";
+      }
     } else if (type === "potion"){
       primaryActionEl.textContent = canDrinkPotion ? t("sheet.drink") : t("sheet.drinkNoEffect");
       primaryActionEl.classList.add(canDrinkPotion ? "action-green" : "action-red");
@@ -2133,7 +2273,15 @@ function renderSheet(){
     primaryActionEl.style.display = "none"; secondaryActionEl.style.display = "none";
     const dict = CARD[currentLang];
     switch(obj){
-      case "health": cardNameEl.textContent = dict.healthName; cardTypeEl.textContent = dict.healthType; cardDescriptionEl.textContent = dict.healthDesc(MAX_HEALTH); break;
+      case "health":
+        cardNameEl.textContent = dict.healthName; cardTypeEl.textContent = dict.healthType; cardDescriptionEl.textContent = dict.healthDesc(MAX_HEALTH);
+        if (GP.available && state.health < MAX_HEALTH && !state.isGameOver){
+          primaryActionEl.style.display = "flex";
+          primaryActionEl.className = "btn action-green";
+          primaryActionEl.textContent = t("sheet.healAd");
+          primaryActionEl.onclick = () => healWithAd();
+        }
+        break;
       case "deck": cardNameEl.textContent = dict.deckName; cardTypeEl.textContent = dict.deckType; cardDescriptionEl.textContent = dict.deckDesc; break;
       case "empty-weapon": cardNameEl.textContent = dict.emptyWeaponName; cardTypeEl.textContent = dict.emptyWeaponType; cardDescriptionEl.textContent = dict.emptyWeaponDesc; break;
     }
@@ -2200,7 +2348,10 @@ function syncSettingsUI(){
 }
 $("opt-easy").addEventListener("change", e=>{ settings.easyMode = e.target.checked; persistSettings(); });
 $("opt-events").addEventListener("change", e=>{ settings.events = e.target.checked; persistSettings(); });
-$("opt-sound").addEventListener("change", e=>{ settings.sound = e.target.checked; persistSettings(); });
+$("opt-sound").addEventListener("change", e=>{
+  settings.sound = e.target.checked; persistSettings();
+  if (settings.sound) playBgMusic(); else pauseBgMusic();
+});
 $("opt-vibration").addEventListener("change", e=>{ settings.vibration = e.target.checked; persistSettings(); });
 $("opt-blood").addEventListener("change", e=>{ settings.blood = e.target.checked; persistSettings(); });
 
@@ -2262,6 +2413,29 @@ function showGameOverModal(didWin, finalScore, isNewRecord){
   $("go-combo").textContent = state.maxCombo;
   openModal("gameover-overlay");
 }
+/* ---- Revivir con anuncio (rewarded ad) ---- */
+function offerRevive(onDeclineOrFail){
+  if (reviveOffered || !GP.available){ onDeclineOrFail(); return; }
+  reviveOffered = true;
+  openModal("revive-overlay");
+  const watchBtn = $("revive-watch-btn");
+  const declineBtn = $("revive-decline-btn");
+  const cleanup = () => { closeModal("revive-overlay"); watchBtn.onclick = null; declineBtn.onclick = null; };
+  declineBtn.onclick = () => { cleanup(); onDeclineOrFail(); };
+  watchBtn.onclick = () => {
+    GP.reward(
+      () => {
+        cleanup();
+        state.health = Math.min(MAX_HEALTH, 10);
+        log(M("revivedLog"));
+        showToast("chest", M("revivedToast"), 3500);
+        saveGame();
+      },
+      () => { cleanup(); onDeclineOrFail(); }
+    );
+  };
+}
+
 $("go-again").addEventListener("click", ()=>{ closeModal("gameover-overlay"); startNewGame(state.mode); });
 $("go-menu-btn").addEventListener("click", ()=>{ closeModal("gameover-overlay"); goToMainMenu(); });
 $("go-stats-btn").addEventListener("click", ()=>{ renderStatsModal(); renderAchievements(); closeModal("gameover-overlay"); openModal("stats-overlay"); });
@@ -2288,6 +2462,7 @@ function goToMainMenu(){
   if (state.mode==="infinite" && !state.isGameOver) saveGame();
   stopPlayTimer();
   state.selectedObject = null;
+  GP.interstitial(); // vuelta al menú: oportunidad de anuncio intersticial
   showMenu();
 }
 function confirmLeaveIfNeeded(){
@@ -2327,7 +2502,7 @@ function initializeGame(mode){
   state.dungeonDepth = 1; state.dungeonStreak = 0; state.combo = 0; state.maxCombo = 0;
   state.bonusScore = 0; state.cursedDoubleDamage = false;
 
-  canDrinkPotion = true; lastCardPlayed = null; lastPotionHadNoEffect = false;
+  canDrinkPotion = true; lastCardPlayed = null; lastPotionHadNoEffect = false; reviveOffered = false;
   runStats = { monstersKilled:0, damageDealt:0, damageTaken:0 };
   sessionSeconds = 0;
 
@@ -2335,7 +2510,7 @@ function initializeGame(mode){
   log(mode==="infinite" ? M("startInfinite") : M("startClassic"));
   if (mode==="infinite") saveGame(); else clearSavedGame();
 }
-function startNewGame(mode){ initializeGame(mode || "normal"); startPlayTimer(); }
+function startNewGame(mode){ GP.interstitial(); initializeGame(mode || "normal"); startPlayTimer(); }
 
 runBtn.addEventListener("click", runAway);
 restartBtn.addEventListener("click", ()=>{
@@ -2382,13 +2557,12 @@ function boot(){
   GP.init();
   setupModalFrames();
 
-  // idioma inicial: por defecto inglés; si corre en GamePix, respeta su idioma detectado
+  // idioma inicial: por defecto inglés, o español si el navegador lo indica
   const savedLang = settings.lang;
   if (savedLang === "en" || savedLang === "es"){
     currentLang = savedLang;
   } else {
-    const gpLang = GP.lang();
-    currentLang = (gpLang === "es") ? "es" : "en";
+    currentLang = (navigator.language||"").toLowerCase().startsWith("es") ? "es" : "en";
   }
   applyTranslations();
 
@@ -2397,10 +2571,24 @@ function boot(){
   modeLabelEl.textContent = t("mode.classic");
   depthLabelEl.textContent = t("depth.label");
 
-  GP.loading(100);
-  GP.loaded(()=>{ showMenu(); });
+  // Música de fondo: se prepara ya, pero el play() real solo puede
+  // dispararse tras un gesto del usuario (política de autoplay de los
+  // navegadores), así que se engancha al primer click/tecla.
+  initBgMusic();
+  const startMusicOnce = () => {
+    playBgMusic();
+    document.removeEventListener("pointerdown", startMusicOnce);
+    document.removeEventListener("keydown", startMusicOnce);
+  };
+  document.addEventListener("pointerdown", startMusicOnce, { once:true });
+  document.addEventListener("keydown", startMusicOnce, { once:true });
 
-  window.addEventListener("visibilitychange", ()=>{ if (document.hidden){ persistStats(); saveGame(); } });
+  showMenu();
+
+  document.addEventListener("visibilitychange", ()=>{
+    if (document.hidden){ persistStats(); saveGame(); pauseForPlatform(); }
+    else { resumeForPlatform(); }
+  });
   window.addEventListener("beforeunload", ()=>{ persistStats(); saveGame(); });
 }
 boot();
