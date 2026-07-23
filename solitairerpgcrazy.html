@@ -926,7 +926,14 @@ button{ font-family:inherit; }
 // ⚠️ TESTING: true = trazas detalladas en consola de todo el ciclo
 // init→pausa→anuncio/banner→reanuda música. Poner a false antes de
 // publicar de verdad.
-const TESTING = true;
+const TESTING = false;
+// 📺 ADS_ENABLED: true = se inicializa el SDK de CrazyGames y se piden
+// anuncios midgame + banner del menú. false = el SDK ni se inicializa,
+// así que CG.available queda siempre en false y todo el código de
+// anuncios/banner (ya protegido con comprobaciones de CG.available)
+// se salta automáticamente sin tocar nada más. Útil para probar el
+// juego sin anuncios, por ejemplo en local.
+const ADS_ENABLED = true;
 function cgTrace(...args){
   if (!TESTING) return;
   const ts = new Date().toISOString().substr(11, 12);
@@ -947,6 +954,11 @@ const CG = {
   available: false,
   ready: null, // promesa que SIEMPRE resuelve (nunca rechaza), útil para esperar el arranque
   init(){
+    if (!ADS_ENABLED){
+      cgTrace("ADS_ENABLED=false → no se inicializa el SDK de CrazyGames (sin anuncios ni banner)");
+      this.ready = Promise.resolve();
+      return this.ready;
+    }
     if (!window.CrazyGames || !window.CrazyGames.SDK){
       cgTrace("CrazyGames SDK no encontrado (script no cargado)");
       this.ready = Promise.resolve();
@@ -1055,6 +1067,43 @@ window.addEventListener("unhandledrejection", (e)=>{
     e.preventDefault();
   }
 });
+
+/* ============================================================
+   GAMEPLAY START/STOP — módulo `game` del SDK de CrazyGames
+   https://docs.crazygames.com/sdk/game/#gameplay-startstop
+
+   gameplayStart() se llama cada vez que el jugador empieza o
+   retoma la partida tras una pausa (empezar partida, continuar
+   partida guardada). gameplayStop() se llama en cada corte de
+   partida (volver al menú, fin de partida). No se llama en los
+   cambios de pestaña/foco: eso ya lo gestiona CrazyGames por su
+   cuenta, según indica la documentación.
+
+   gameplayActive evita llamadas duplicadas si, por ejemplo, se
+   llama a stop dos veces seguidas (fin de partida + volver al
+   menú), y el acceso al módulo va protegido con try/catch por si
+   el getter del SDK lanzase, igual que con `banner`.
+   ============================================================ */
+function cgGameplayStart(){
+  if (gameplayActive) return;
+  gameplayActive = true;
+  if (!CG.available) return;
+  try{
+    const gameModule = window.CrazyGames.SDK.game;
+    if (gameModule && typeof gameModule.gameplayStart === "function") gameModule.gameplayStart();
+    cgTrace("game.gameplayStart()");
+  }catch(e){ cgTrace("game.gameplayStart(): excepción", e); }
+}
+function cgGameplayStop(){
+  if (!gameplayActive) return;
+  gameplayActive = false;
+  if (!CG.available) return;
+  try{
+    const gameModule = window.CrazyGames.SDK.game;
+    if (gameModule && typeof gameModule.gameplayStop === "function") gameModule.gameplayStop();
+    cgTrace("game.gameplayStop()");
+  }catch(e){ cgTrace("game.gameplayStop(): excepción", e); }
+}
 
 /* ============================================================
    ALMACENAMIENTO PERSISTENTE
@@ -1461,6 +1510,7 @@ let roomCardElements = new Map();
 let runStats = { monstersKilled:0, damageDealt:0, damageTaken:0 };
 let sessionSeconds = 0;
 let timerInterval = null;
+let gameplayActive = false; // evita llamadas duplicadas a gameplayStart/gameplayStop
 
 /* ============================================================
    ELEMENTOS DEL DOM
@@ -2136,6 +2186,7 @@ function calculateScore(){
 }
 
 function endGame(didWin){
+  cgGameplayStop();
   state.canRun = false; state.isGameOver = true; state.selectedObject = null; state.didWin = didWin;
   stopPlayTimer();
   stats.gamesPlayed++;
@@ -2533,6 +2584,7 @@ function showMenu(){
 }
 function hideMenu(){ menuScreen.classList.add("hidden"); clearMenuBanner(); }
 function goToMainMenu(){
+  cgGameplayStop();
   if (state.mode==="infinite" && !state.isGameOver) saveGame();
   stopPlayTimer();
   state.selectedObject = null;
@@ -2553,7 +2605,7 @@ $("menu-infinite").addEventListener("click", ()=>{ startNewGame("infinite"); });
 $("menu-continue").addEventListener("click", ()=>{
   const saved = Storage.get(SAVE_KEY, null);
   if (saved && saved.currentRoom){
-    CG.midgame(() => { hideMenu(); setMusicTrack("game"); loadGame(saved); startPlayTimer(); });
+    CG.midgame(() => { hideMenu(); setMusicTrack("game"); loadGame(saved); startPlayTimer(); cgGameplayStart(); });
   } else {
     startNewGame("infinite");
   }
@@ -2592,6 +2644,7 @@ function startNewGame(mode){
     setMusicTrack("game");
     initializeGame(mode || "normal");
     startPlayTimer();
+    cgGameplayStart();
   });
 }
 
