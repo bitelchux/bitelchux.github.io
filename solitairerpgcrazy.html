@@ -1,0 +1,2666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--
+  ============================================================
+  SDK de CrazyGames — cargado como primer script del <head>,
+  siguiendo la guía oficial de instalación.
+
+  Integración limitada a monetización (a petición): solo se usan
+  los módulos `ad` (anuncios midgame) y `banner` (banner estático
+  en el menú principal). No se usan reward ads ni otros módulos
+  del SDK (game, user, data, leaderboards, in-game purchases).
+
+  Todo el código que usa CrazyGames está protegido con
+  comprobaciones sobre CG.available, así que si el SDK no carga
+  o no llega a inicializarse (fuera de CrazyGames, en local, o si
+  la URL cambiase) el juego funciona exactamente igual, simplemente
+  sin anuncios ni banner.
+  ============================================================
+-->
+<script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>Solitaire RPG</title>
+<meta name="description" content="Solitaire RPG — a roguelike dungeon-crawling card game">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   SOLITAIRE RPG — hoja de estilos
+   Paladar: madera vieja + pergamino + oro de mazmorra.
+   Las cartas y los diálogos usan pergamino claro (--parch-*);
+   la mesa y el HUD usan la madera oscura (--bg-*, --wood-*).
+   ============================================================ */
+:root{
+  /* Fondo / mesa de juego */
+  --bg-void: #070402;
+  --bg-deep: #140b04;
+  --bg-mid: #201203;
+  --wood-dark: #2c1a0c;
+  --wood: #4a3018;
+  --frame-gold: #a9803a;
+  --frame-gold-bright: #d4a94f;
+
+  /* Pergamino: cartas y diálogos (más envejecido, menos "papel de impresora") */
+  --parch-1: #e6d9ae;
+  --parch-2: #c9ac74;
+  --parch-3: #a98c5a;
+  --parch-ink: #221407;
+  --parch-ink-soft: #4f3a22;
+  --parch-accent: #641f07;
+  --parch-line: rgba(34,20,7,.22);
+
+  /* Acentos */
+  --ember: #ff6a30;
+  --ember-glow: #ffa347;
+  --blood: #9c1a34;
+  --blood-dark: #500a1a;
+  --frost: #2a7194;
+  --heal: #8a1c3b;
+  --gold: #c19640;
+
+  --text-light: #ecdfbe;
+  --text-muted: #b39d75;
+  --text-faint: #786037;
+  --line: rgba(236,223,190,.08);
+
+  --card-radius: 13px;
+  --shadow-deep: 0 18px 42px rgba(0,0,0,.65);
+  --font-display: 'Cinzel Decorative', serif;
+  --font-head: 'Cinzel', serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  color-scheme: dark;
+}
+
+*,*::before,*::after{ box-sizing:border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  background: var(--bg-void);
+  color: var(--text-light);
+  font-family: var(--font-body);
+  overflow-x:hidden;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+button{ font-family:inherit; }
+::selection{ background: var(--ember); color:#1a0a02; }
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
+}
+
+/* ---------- Fondo ambiental tipo "mesa de mazmorra" ---------- */
+#app{
+  position:relative;
+  min-height:100vh; min-height:100svh;
+  display:flex; flex-direction:column;
+  max-width:640px; margin:0 auto;
+  isolation:isolate;
+  border-left:1px solid rgba(201,162,77,.12);
+  border-right:1px solid rgba(201,162,77,.12);
+}
+.ambient{
+  position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background:
+    radial-gradient(ellipse 55% 38% at 15% -5%, rgba(255,122,61,.20), transparent 60%),
+    radial-gradient(ellipse 50% 42% at 90% 6%, rgba(47,127,168,.10), transparent 60%),
+    radial-gradient(ellipse 65% 55% at 50% 108%, rgba(179,34,63,.14), transparent 60%),
+    linear-gradient(180deg, var(--bg-mid), var(--bg-deep) 45%, var(--bg-void) 100%);
+  animation: emberFlicker 7s ease-in-out infinite;
+}
+@keyframes emberFlicker{ 0%,100%{ opacity:1; } 45%{ opacity:.85; } 50%{ opacity:1; } 72%{ opacity:.92; } }
+.ambient::after{
+  content:""; position:absolute; inset:0;
+  background-image: radial-gradient(rgba(244,233,207,.035) 1px, transparent 1px);
+  background-size: 3px 3px; opacity:.5;
+}
+
+.shake-soft{ animation: shakeSoft .35s ease-in-out; }
+.shake-hard{ animation: shakeHard .45s ease-in-out; }
+@keyframes shakeSoft{ 10%,90%{transform:translateX(-2px);} 20%,80%{transform:translateX(3px);} 30%,50%,70%{transform:translateX(-6px);} 40%,60%{transform:translateX(6px);} }
+@keyframes shakeHard{ 10%,90%{transform:translate(-3px,1px);} 20%,80%{transform:translate(4px,-2px);} 30%,50%,70%{transform:translate(-9px,2px) rotate(-.4deg);} 40%,60%{transform:translate(9px,-2px) rotate(.4deg);} }
+
+/* ============================================================
+   PANTALLA DE CARGA
+   ============================================================ */
+.loading-screen{
+  position:fixed; inset:0; z-index:500;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
+  padding: max(20px, env(safe-area-inset-top)) 22px max(20px, env(safe-area-inset-bottom));
+  background: linear-gradient(165deg, #201207, var(--bg-void) 65%);
+  text-align:center;
+}
+.loading-screen.hidden{ display:none; }
+.loading-spinner{
+  width:34px; height:34px; border-radius:50%;
+  border:3px solid rgba(212,169,74,.25); border-top-color: var(--frame-gold-bright);
+  animation: loadingSpin .8s linear infinite;
+}
+@keyframes loadingSpin{ to{ transform: rotate(360deg); } }
+.loading-label{ color: var(--text-muted); font-size:13px; letter-spacing:.5px; }
+#loading-continue-btn{ flex:0 0 auto; padding:13px 34px; margin-top:4px; }
+
+/* ============================================================
+   PANTALLA DE MENÚ
+   ============================================================ */
+.menu-screen{
+  position:fixed; inset:0; z-index:200;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding: max(20px, env(safe-area-inset-top)) 22px max(20px, env(safe-area-inset-bottom));
+  background:
+    radial-gradient(ellipse 60% 45% at 20% 0%, rgba(255,122,61,.22), transparent 60%),
+    radial-gradient(ellipse 55% 45% at 85% 100%, rgba(47,127,168,.14), transparent 60%),
+    linear-gradient(165deg, #201207, var(--bg-void) 65%);
+  text-align:center;
+}
+.menu-screen.hidden{ display:none; }
+.menu-stats-btn{ position:absolute; top: max(14px, env(safe-area-inset-top)); right:16px; }
+.menu-crest{
+  font-size:44px; margin-bottom:6px;
+  filter: drop-shadow(0 6px 18px rgba(255,122,61,.35));
+  animation: crestFloat 3.4s ease-in-out infinite;
+}
+@keyframes crestFloat{ 0%,100%{ transform:translateY(0) rotate(-2deg); } 50%{ transform:translateY(-6px) rotate(2deg); } }
+.menu-title{
+  font-family: var(--font-display);
+  font-size: clamp(30px, 9vw, 44px);
+  margin: 0 0 4px;
+  letter-spacing:.5px; line-height:1.05;
+  background: linear-gradient(180deg, #fff, var(--frame-gold-bright) 55%, var(--ember));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  filter: drop-shadow(0 4px 18px rgba(255,122,61,.3));
+}
+.menu-title span{ display:block; font-size:.55em; letter-spacing:4px; color: var(--frost); -webkit-text-fill-color: var(--frost); margin-top:2px; }
+.menu-tagline{ color: var(--text-muted); font-size:13.5px; margin:0 0 30px; max-width:320px; }
+
+.menu-buttons{ display:flex; flex-direction:column; gap:12px; width:100%; max-width:380px; }
+.menu-btn{
+  display:flex; align-items:center; gap:14px; text-align:left;
+  padding:14px 16px;
+  border-radius:16px;
+  border:2px solid rgba(212,169,74,.32);
+  background: linear-gradient(160deg, rgba(212,169,74,.14), rgba(212,169,74,.03));
+  color: var(--text-light);
+  cursor:pointer;
+  transition: transform .15s ease, border-color .2s ease, box-shadow .2s ease;
+}
+.menu-btn:hover{ transform: translateY(-2px); border-color: rgba(240,207,122,.6); box-shadow: 0 10px 26px rgba(0,0,0,.4); }
+.menu-btn:active{ transform: scale(.98); }
+.menu-btn--continue{ border-color: rgba(47,127,168,.4); background: linear-gradient(160deg, rgba(47,127,168,.16), rgba(47,127,168,.03)); }
+.mb-icon{ font-size:26px; flex-shrink:0; width:34px; text-align:center; filter: drop-shadow(0 2px 6px rgba(0,0,0,.4)); }
+.mb-text{ display:flex; flex-direction:column; gap:2px; }
+.mb-title{ font-family: var(--font-head); font-weight:700; font-size:15.5px; color: var(--frame-gold-bright); }
+.mb-desc{ font-size:11.5px; color: var(--text-muted); line-height:1.35; }
+
+.menu-footer-row{ display:flex; align-items:center; justify-content:space-between; width:100%; max-width:380px; margin-top:22px; }
+.menu-link{
+  display:flex; align-items:center; gap:6px; background:none; border:none; cursor:pointer;
+  color: var(--text-muted); font-size:12.5px; font-weight:600; padding:8px 4px;
+}
+.menu-link:hover{ color: var(--text-light); }
+.menu-lang{ display:flex; gap:4px; background: rgba(244,233,207,.06); border:1px solid var(--line); border-radius:999px; padding:3px; }
+.lang-btn{ border:none; background:none; color: var(--text-muted); font-family: var(--font-mono); font-weight:700; font-size:11.5px; padding:6px 12px; border-radius:999px; cursor:pointer; transition:.15s; }
+.lang-btn.active{ background: linear-gradient(180deg, var(--frame-gold-bright), var(--gold)); color:#2b1a04; }
+
+.menu-banner-slot{ display:flex; justify-content:center; align-items:center; width:100%; margin-top:20px; min-height:50px; }
+
+/* ---------- Cabecera de partida (banner tipo cartel) ---------- */
+.topbar{
+  display:flex; align-items:center; justify-content:space-between;
+  padding: max(10px, env(safe-area-inset-top)) 16px 4px;
+}
+.brand{
+  display:flex; flex-direction:column; gap:0;
+  font-family: var(--font-display);
+  font-size: clamp(17px, 4.6vw, 22px);
+  letter-spacing:.4px; line-height:1.05;
+  background: linear-gradient(180deg, #fff, var(--frame-gold-bright) 70%, var(--ember));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  filter: drop-shadow(0 2px 10px rgba(255,122,61,.25));
+  cursor:pointer;
+}
+.brand small{ font-family: var(--font-mono); font-size:9.5px; letter-spacing:1.5px; text-transform:uppercase; color: var(--text-faint); -webkit-text-fill-color: var(--text-faint); margin-top:2px; }
+.icon-btns{ display:flex; gap:8px; }
+.icon-btn{
+  width:38px; height:38px; border-radius:50%;
+  border:1px solid rgba(212,169,74,.3);
+  background: rgba(212,169,74,.06);
+  color: var(--text-light); font-size:17px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition: transform .15s ease, background .15s ease, border-color .15s ease;
+}
+.icon-btn:hover{ background: rgba(212,169,74,.14); border-color: rgba(240,207,122,.5); }
+.icon-btn:active{ transform: scale(.9); }
+
+/* ---------- HUD ---------- */
+.hud{ display:flex; flex-wrap:wrap; gap:6px; padding: 2px 16px 8px; }
+.hud-item{
+  display:flex; align-items:center; gap:6px;
+  background: linear-gradient(180deg, rgba(244,233,207,.07), rgba(244,233,207,.02));
+  border:1px solid rgba(212,169,74,.22);
+  border-radius:999px; padding:6px 12px 6px 10px;
+  font-family: var(--font-mono); font-size:13px; font-weight:600; color: var(--text-light);
+}
+.hud-item .ico{ font-size:15px; line-height:1; }
+.hud-item.health, .hud-item.deck{ cursor:pointer; transition: transform .15s ease; }
+.hud-item.health:active, .hud-item.deck:active{ transform: scale(.94); }
+.hud-item.health{ border-color: rgba(179,34,63,.35); }
+.hud-item.health.low{ animation: lowHealthPulse 1s ease-in-out infinite; border-color: rgba(179,34,63,.85); }
+@keyframes lowHealthPulse{ 0%,100%{ box-shadow:0 0 0 0 rgba(179,34,63,.5); } 50%{ box-shadow:0 0 0 6px rgba(179,34,63,0); } }
+.hud-item.combo{ border-color: rgba(255,187,92,.4); color: var(--ember-glow); display:none; }
+.hud-item.combo.show{ display:flex; animation: comboPop .3s ease; }
+@keyframes comboPop{ 0%{transform:scale(.7);opacity:0;} 60%{transform:scale(1.12);} 100%{transform:scale(1);opacity:1;} }
+.hud-item.bonus{ border-color: rgba(212,169,74,.4); color: var(--gold); display:none; }
+.hud-item.bonus.show{ display:flex; }
+.hud-item.mode{ color: var(--frost); border-color: rgba(47,127,168,.3); }
+.hud-item.depth{ color: var(--ember); border-color: rgba(255,122,61,.35); display:none; }
+.hud-item.depth.show{ display:flex; }
+
+/* ---------- Mesa de juego ---------- */
+.table{ flex:1 1 auto; min-height:0; display:flex; flex-direction:column; gap:10px; padding: 2px 16px 8px; position:relative; }
+
+.weapon-zone{ display:flex; align-items:flex-end; gap:0; min-height:106px; position:relative; }
+.weapon-zone::before{
+  content:""; position:absolute; left:8px; top:-14px; width:120px; height:120px;
+  background: radial-gradient(circle, rgba(255,122,61,.20), transparent 70%);
+  filter: blur(6px); animation: brazier 3.2s ease-in-out infinite; pointer-events:none;
+}
+@keyframes brazier{ 0%,100%{ opacity:.55; transform:scale(1); } 50%{ opacity:.9; transform:scale(1.12); } }
+
+.weapon-slot{
+  width:74px; aspect-ratio:5/7; border-radius: var(--card-radius);
+  border:2px dashed rgba(212,169,74,.4);
+  display:flex; align-items:center; justify-content:center; font-size:26px;
+  color: rgba(212,169,74,.55); background: rgba(212,169,74,.05);
+  cursor:pointer; flex-shrink:0; transition: border-color .2s, transform .15s;
+}
+.weapon-slot:hover{ transform: translateY(-2px); border-color: rgba(240,207,122,.65); }
+.weapon-slot .card{ width:100%; height:100%; margin:0; }
+
+.divider{ width:2px; align-self:stretch; margin:6px 8px; background: linear-gradient(180deg, transparent, rgba(212,169,74,.35) 20%, rgba(212,169,74,.35) 80%, transparent); display:none; }
+.divider.show{ display:block; }
+
+.weapon-chain{ display:none; align-items:flex-end; flex:1; overflow:hidden; padding-bottom:2px; }
+.weapon-chain.show{ display:flex; }
+.weapon-chain .card{ width:58px; flex-shrink:0; }
+/* El tamaño de icono/rango de .card usa vw (relativo al viewport), lo
+   que no encaja en estas cartas mucho más pequeñas que las de la sala:
+   se fija aquí un tamaño absoluto acorde a sus 58px de ancho. */
+.weapon-chain .card .card__center{ font-size:20px; }
+.weapon-chain .card .card__corner{ font-size:9px; }
+
+.room{ display:grid; grid-template-columns: repeat(4,1fr); gap:10px; perspective:900px; }
+@media (max-width:370px){ .room{ gap:6px; } .weapon-chain .card{ width:50px; } .weapon-chain .card .card__center{ font-size:17px; } .weapon-chain .card .card__corner{ font-size:8px; } }
+
+/* ---------- Cartas: fondo de pergamino claro (bien visibles) ---------- */
+.card{
+  position:relative; width:100%; aspect-ratio:5/7;
+  border-radius: var(--card-radius);
+  border:1px solid rgba(20,12,4,.5);
+  background: linear-gradient(160deg, var(--parch-1), var(--parch-2) 60%, var(--parch-3));
+  box-shadow: var(--shadow-deep), inset 0 0 0 1px rgba(255,255,255,.35), inset 0 0 22px rgba(30,16,4,.4);
+  cursor:pointer; padding:0; color: var(--parch-ink);
+  transform-style: preserve-3d;
+  transition: box-shadow .2s ease, filter .2s ease;
+  will-change: transform;
+}
+.card:active{ filter: brightness(.94); }
+.card.card--empty{
+  border-style:dashed; border-color: rgba(244,233,207,.16);
+  background: rgba(244,233,207,.03); box-shadow:none; cursor:default;
+}
+.card__corner{ position:absolute; font-family: var(--font-head); font-weight:700; font-size: clamp(11px,3vw,14px); line-height:1.05; text-align:center; }
+.card__corner--tl{ top:6px; left:7px; }
+.card__corner--br{ bottom:6px; right:7px; transform: rotate(180deg); }
+.card__center{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size: clamp(22px,7vw,30px); filter: drop-shadow(0 1px 3px rgba(0,0,0,.15)); }
+.card__durability{
+  position:absolute; bottom:5px; left:0; right:0; text-align:center;
+  font-family: var(--font-mono); font-size:9px; font-weight:700; color:#fff;
+  text-shadow:0 1px 2px rgba(0,0,0,.5);
+}
+.card__crown{ position:absolute; top:-11px; right:-6px; font-size:18px; filter: drop-shadow(0 2px 4px rgba(0,0,0,.5)); animation: crownFloat 1.6s ease-in-out infinite; }
+@keyframes crownFloat{ 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-3px); } }
+
+.card--spade, .card--club{ color: var(--parch-ink); }
+.card--heart{ color: var(--heal); }
+.card--diamond{ color: var(--frost); }
+.card--spade .card__center, .card--club .card__center{ color: var(--parch-ink); }
+.card--heart .card__center{ color: var(--heal); }
+.card--diamond .card__center{ color: var(--frost); }
+
+.card--boss{
+  border-color: rgba(212,169,74,.75);
+  box-shadow: var(--shadow-deep), 0 0 0 1px rgba(212,169,74,.5), 0 0 22px rgba(212,169,74,.3);
+  animation: bossPulse 2.1s ease-in-out infinite;
+}
+@keyframes bossPulse{
+  0%,100%{ box-shadow: var(--shadow-deep), 0 0 0 1px rgba(212,169,74,.5), 0 0 14px rgba(212,169,74,.22); }
+  50%{ box-shadow: var(--shadow-deep), 0 0 0 1px rgba(212,169,74,.8), 0 0 30px rgba(212,169,74,.45); }
+}
+.card--selected{ border-color: var(--ember); box-shadow: var(--shadow-deep), 0 0 0 2px var(--ember), 0 0 24px rgba(255,122,61,.4); transform: translateY(-6px); }
+.card--dead{ opacity:.65; filter:saturate(.55); cursor:default; }
+
+.card--deal{ animation: dealIn .45s cubic-bezier(.2,.8,.3,1.1) both; }
+@keyframes dealIn{ 0%{opacity:0; transform: translateY(-26px) rotateY(70deg) scale(.85);} 60%{opacity:1;} 100%{opacity:1; transform: translateY(0) rotateY(0) scale(1);} }
+
+.card--slash{ animation: slashHit .38s ease; }
+@keyframes slashHit{ 0%{filter:brightness(1);} 25%{filter:brightness(1.35) saturate(1.3); transform: translateX(-3px) rotate(-2deg);} 50%{filter:brightness(1.12); transform: translateX(3px) rotate(1.5deg);} 100%{filter:brightness(1); transform:none;} }
+.card--slash::after{
+  content:""; position:absolute; inset:-4px; border-radius: var(--card-radius);
+  background: linear-gradient(115deg, transparent 42%, rgba(255,255,255,.9) 48%, rgba(255,255,255,.9) 52%, transparent 58%);
+  opacity:0; animation: slashLine .38s ease; pointer-events:none;
+}
+@keyframes slashLine{ 0%{opacity:0; transform: translateX(-40%);} 35%{opacity:1;} 100%{opacity:0; transform: translateX(40%);} }
+
+@media (hover:hover){ .card:not(.card--empty):not(.card--dead):hover{ box-shadow: var(--shadow-deep), 0 0 20px rgba(212,169,74,.25); } }
+
+/* ---------- Barra de acciones ---------- */
+.action-bar{ display:flex; gap:10px; padding: 4px 16px max(10px, env(safe-area-inset-bottom)); }
+.btn{
+  border:none; border-radius:10px; cursor:pointer;
+  font-family: var(--font-head); font-weight:600; font-size:14px; letter-spacing:.3px;
+  padding:13px 16px; display:flex; align-items:center; justify-content:center; gap:7px;
+  position:relative; top:0;
+  transition: transform .1s ease, top .08s ease, filter .15s ease, opacity .15s ease, box-shadow .08s ease;
+}
+.btn:active{ top:3px; filter:brightness(.95); }
+.btn:disabled{ opacity:.35; cursor:not-allowed; }
+.btn-primary{
+  flex:1; background: linear-gradient(180deg, var(--frame-gold-bright), var(--ember));
+  color:#2a0d02; border:1px solid rgba(0,0,0,.3);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.45), inset 0 -2px 0 rgba(0,0,0,.18), 0 4px 0 rgba(70,20,0,.55), 0 9px 18px rgba(0,0,0,.5);
+}
+.btn-primary:active{ box-shadow: inset 0 1px 0 rgba(255,255,255,.3), 0 1px 0 rgba(70,20,0,.5), 0 3px 8px rgba(0,0,0,.4); }
+.btn-primary:hover:not(:disabled){ filter:brightness(1.05); }
+.btn-ghost{
+  background: linear-gradient(180deg, rgba(236,223,190,.10), rgba(236,223,190,.03));
+  color: var(--text-light); border:1px solid rgba(169,128,58,.4);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 4px 0 rgba(0,0,0,.35), 0 8px 16px rgba(0,0,0,.35);
+}
+.btn-ghost:active{ box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 1px 0 rgba(0,0,0,.3), 0 3px 8px rgba(0,0,0,.3); }
+.btn-ghost:hover{ background: linear-gradient(180deg, rgba(236,223,190,.16), rgba(236,223,190,.05)); }
+.btn-scroll{
+  background: linear-gradient(180deg, rgba(255,255,255,.25), rgba(255,255,255,.05));
+  color: var(--parch-ink); border:1px solid rgba(34,20,7,.4);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.4), 0 4px 0 rgba(34,20,7,.3), 0 7px 14px rgba(0,0,0,.25);
+}
+.btn-scroll:active{ box-shadow: inset 0 1px 0 rgba(255,255,255,.3), 0 1px 0 rgba(34,20,7,.3), 0 3px 8px rgba(0,0,0,.2); }
+.btn-scroll:hover{ background: rgba(46,29,13,.12); }
+.btn-danger{ background: linear-gradient(180deg,#ff5470,var(--blood)); color:#2a0410; border:1px solid rgba(0,0,0,.3); box-shadow: inset 0 1px 0 rgba(255,255,255,.3), 0 4px 0 rgba(60,5,15,.5), 0 8px 16px rgba(0,0,0,.4); }
+.btn-danger:active{ box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 1px 0 rgba(60,5,15,.5), 0 3px 8px rgba(0,0,0,.3); }
+.btn-block{ width:100%; }
+.btn-sm{ padding:9px 12px; font-size:12.5px; border-radius:10px; }
+
+/* ---------- Hoja de detalle de carta ---------- */
+.sheet-overlay{ position:fixed; inset:0; background: rgba(10,6,2,.62); backdrop-filter: blur(2px); opacity:0; pointer-events:none; transition: opacity .25s ease; z-index:40; }
+.sheet-overlay.show{ opacity:1; pointer-events:auto; }
+
+.card-sheet{
+  position:fixed; left:50%; bottom:0; transform: translate(-50%,110%);
+  width:100%; max-width:560px;
+  background: linear-gradient(165deg, var(--parch-1), var(--parch-2) 55%, var(--parch-3));
+  border:3px solid var(--frame-gold); border-bottom:none;
+  border-radius:20px 20px 0 0;
+  padding: 10px 20px max(20px, env(safe-area-inset-bottom));
+  box-shadow: 0 -20px 50px rgba(0,0,0,.55);
+  transition: transform .3s cubic-bezier(.2,.85,.3,1);
+  z-index:41; color: var(--parch-ink);
+}
+.card-sheet.show{ transform: translate(-50%,0); }
+.sheet-handle{ width:40px; height:4px; border-radius:4px; background: rgba(46,29,13,.25); margin: 4px auto 12px; }
+.sheet-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+.sheet-close{ background:none; border:none; color: var(--parch-ink-soft); font-size:20px; cursor:pointer; padding:2px 6px; }
+#card-name{ font-family: var(--font-head); font-size:19px; margin:0 0 2px; }
+#card-type{ font-family: var(--font-mono); font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color: var(--parch-ink-soft); margin-bottom:10px; }
+#card-description{ font-size:14px; line-height:1.55; color: var(--parch-ink-soft); margin:0 0 16px; }
+.sheet-actions{ display:flex; gap:10px; }
+.sheet-actions .btn{ flex:1; }
+.action-orange{ background: linear-gradient(180deg,#ffb86b,#ff7a2e); color:#2b0e02; }
+.action-green{ background: linear-gradient(180deg,#7fe0a0,#2fae63); color:#04240f; }
+.action-red{ background: linear-gradient(180deg,#ff8a9c,var(--blood)); color:#2a0410; }
+
+/* ---------- FX: partículas ---------- */
+.fx-layer{ position:fixed; inset:0; pointer-events:none; z-index:60; overflow:hidden; }
+.fx-emoji{ position:fixed; will-change:transform,opacity; animation: fxFly 1s ease-out forwards; transform: translate(-50%,-50%); }
+@keyframes fxFly{ 0%{opacity:1; transform: translate(-50%,-50%) translate(0,0) scale(.6) rotate(0deg);} 100%{opacity:0; transform: translate(-50%,-50%) translate(var(--dx),var(--dy)) scale(1.1) rotate(50deg);} }
+.fx-blood{ position:fixed; border-radius:50% 50% 60% 50%; background: radial-gradient(circle at 30% 30%, #ff5a72, var(--blood) 60%, var(--blood-dark)); will-change:transform,opacity; animation: fxBlood .8s cubic-bezier(.2,.7,.4,1) forwards; transform: translate(-50%,-50%); }
+@keyframes fxBlood{ 0%{opacity:1; transform: translate(-50%,-50%) translate(0,0) scale(1);} 100%{opacity:0; transform: translate(-50%,-50%) translate(var(--dx),var(--dy)) scale(.4);} }
+.fx-spark{ position:fixed; width:14px; height:2.5px; border-radius:2px; background: linear-gradient(90deg, transparent, var(--frame-gold-bright), #fff); will-change:transform,opacity; animation: fxSpark .5s ease-out forwards; transform: translate(-50%,-50%) rotate(var(--rot)); }
+@keyframes fxSpark{ 0%{opacity:1; transform: translate(-50%,-50%) translate(0,0) rotate(var(--rot)) scaleX(.4);} 100%{opacity:0; transform: translate(-50%,-50%) translate(var(--dx),var(--dy)) rotate(var(--rot)) scaleX(1.4);} }
+
+/* ---------- Viñeta de sangre en pantalla completa (estilo FPS) ---------- */
+.damage-vignette{
+  --intensity: .5;
+  position:fixed; inset:0; z-index:64; pointer-events:none;
+  opacity:0;
+  background:
+    radial-gradient(ellipse at 50% 50%, transparent calc(34% - var(--intensity) * 16%), rgba(150,4,14,.65) calc(70% - var(--intensity) * 12%), rgba(70,2,8,.92) 100%),
+    repeating-linear-gradient(115deg, rgba(110,2,10,.55) 0 2px, transparent 2px 5px);
+  background-blend-mode: normal, multiply;
+  mix-blend-mode: multiply;
+}
+.damage-vignette::before{
+  /* goterones bajando desde el borde superior, más largos y numerosos cuanto mayor es el golpe */
+  content:"";
+  position:absolute; inset:0;
+  opacity: calc(.55 + var(--intensity) * .45);
+  background:
+    radial-gradient(ellipse 60px calc(120px + var(--intensity)*140px) at 6% 0%, rgba(150,4,14,.7), transparent 72%),
+    radial-gradient(ellipse 36px calc(80px + var(--intensity)*100px) at 22% 0%, rgba(150,4,14,.55), transparent 72%),
+    radial-gradient(ellipse 72px calc(130px + var(--intensity)*160px) at 94% 0%, rgba(150,4,14,.65), transparent 72%),
+    radial-gradient(ellipse 44px calc(90px + var(--intensity)*110px) at 76% 0%, rgba(150,4,14,.55), transparent 72%),
+    radial-gradient(ellipse 30px calc(60px + var(--intensity)*90px) at 45% 0%, rgba(150,4,14,.45), transparent 72%);
+}
+.damage-vignette.flash{ animation: bloodFlash calc(.7s + var(--intensity) * .5s) cubic-bezier(.12,.7,.25,1) forwards; }
+.damage-vignette.flash-heavy{ animation: bloodFlashHeavy calc(1.1s + var(--intensity) * .7s) cubic-bezier(.12,.7,.2,1) forwards; }
+@keyframes bloodFlash{
+  0%{ opacity:0; }
+  8%{ opacity: calc(.55 + var(--intensity) * .45); }
+  100%{ opacity:0; }
+}
+@keyframes bloodFlashHeavy{
+  /* doble latido para los golpes grandes: impacto, respiro breve, segundo impacto, se va desvaneciendo */
+  0%{ opacity:0; filter:blur(0px); }
+  5%{ opacity:1; filter:blur(calc(var(--intensity)*2px)); }
+  18%{ opacity:.4; filter:blur(0px); }
+  27%{ opacity:.95; filter:blur(calc(var(--intensity)*1.2px)); }
+  48%{ opacity:.45; }
+  100%{ opacity:0; filter:blur(0px); }
+}
+
+/* ---------- Espadazos anime a pantalla completa ---------- */
+.slash-layer{ position:fixed; inset:0; z-index:66; pointer-events:none; overflow:hidden; }
+.slash-line{
+  --mag: .5;
+  position:fixed; left:50%; top:50%;
+  width:160vmax; height: calc(3px + var(--mag) * 6px);
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.05) 30%, #fff 50%, rgba(255,255,255,.05) 70%, transparent 100%);
+  box-shadow:
+    0 0 calc(10px + var(--mag) * 16px) calc(1px + var(--mag) * 3px) rgba(255,255,255,.8),
+    0 0 calc(24px + var(--mag) * 46px) calc(5px + var(--mag) * 10px) rgba(255,168,80,.45);
+  transform: translate(-50%,-50%) rotate(var(--angle)) scaleX(0);
+  transform-origin:center; opacity:0;
+}
+.slash-line.anim{ animation: slashSweep calc(.36s + var(--mag) * .12s) cubic-bezier(.1,.85,.2,1) forwards; }
+.slash-line--punch{ width:75vmax; height: calc(5px + var(--mag) * 9px); box-shadow: 0 0 calc(14px + var(--mag)*20px) calc(2px + var(--mag)*4px) rgba(255,120,60,.85); }
+@keyframes slashSweep{
+  0%{ opacity:0; transform: translate(-50%,-50%) rotate(var(--angle)) scaleX(0); }
+  12%{ opacity:1; }
+  55%{ opacity:1; transform: translate(-50%,-50%) rotate(var(--angle)) scaleX(1); }
+  100%{ opacity:0; transform: translate(-50%,-50%) rotate(var(--angle)) scaleX(1.1); }
+}
+
+/* ---------- Toasts ---------- */
+.toast-layer{ position:fixed; top: max(10px, env(safe-area-inset-top)); left:0; right:0; display:flex; flex-direction:column; align-items:center; gap:8px; z-index:70; pointer-events:none; padding: 0 16px; }
+.toast{
+  max-width:420px; width:100%;
+  background: rgba(28,16,6,.94);
+  border:1px solid rgba(212,169,74,.25); border-left:4px solid var(--ember);
+  backdrop-filter: blur(6px); border-radius:12px; padding:10px 14px;
+  font-size:13px; font-weight:500; color: var(--text-light);
+  box-shadow: 0 12px 30px rgba(0,0,0,.45);
+  opacity:0; transform: translateY(-14px) scale(.96); transition: opacity .3s ease, transform .3s ease;
+}
+.toast.show{ opacity:1; transform: translateY(0) scale(1); }
+.toast-chest{ border-left-color: var(--gold); }
+.toast-trap{ border-left-color: var(--blood); }
+.toast-curse{ border-left-color:#9b6bff; }
+.toast-miniboss{ border-left-color: var(--ember); }
+.toast-achievement{ border-left-color: var(--gold); background: linear-gradient(90deg, rgba(212,169,74,.16), rgba(28,16,6,.94)); }
+.toast-dungeon{ border-left-color: var(--frost); }
+.toast-combo{ border-left-color: var(--ember-glow); }
+
+/* ---------- Modales: pergaminos ornamentados ---------- */
+.modal-overlay{
+  position:fixed; inset:0; background: rgba(6,3,1,.75); backdrop-filter: blur(3px);
+  display:none; align-items:flex-start; justify-content:center; z-index:210;
+  padding: max(10px, env(safe-area-inset-top)) 12px max(10px, env(safe-area-inset-bottom));
+}
+.modal-overlay.show{ display:flex; }
+@media (min-width:640px){ .modal-overlay{ align-items:center; } }
+
+.modal{
+  position:relative;
+  display:flex; flex-direction:column;
+  background: linear-gradient(165deg, var(--parch-1), var(--parch-2) 55%, var(--parch-3));
+  border:3px solid var(--frame-gold);
+  width:100%; max-width:520px; max-height:100%; overflow:hidden;
+  border-radius:16px;
+  box-shadow: 0 24px 60px rgba(0,0,0,.7), inset 0 0 0 5px rgba(0,0,0,.15), inset 0 0 30px rgba(30,16,4,.35);
+  color: var(--parch-ink);
+  animation: modalUp .28s cubic-bezier(.2,.85,.3,1);
+}
+@keyframes modalUp{ from{transform: translateY(-16px); opacity:0;} to{transform:none; opacity:1;} }
+
+.modal-scroll{
+  overflow-y:auto; flex:1 1 auto; min-height:0;
+  padding:26px 24px max(24px, env(safe-area-inset-bottom));
+  background-image: radial-gradient(rgba(34,20,7,.06) 1px, transparent 1px);
+  background-size: 3px 3px;
+}
+.modal-corner{ position:absolute; width:16px; height:16px; pointer-events:none; opacity:.85; z-index:3; filter: drop-shadow(0 1px 0 rgba(255,255,255,.35)); }
+.modal-corner--tl{ top:9px; left:9px; border-top:2px solid var(--parch-ink); border-left:2px solid var(--parch-ink); }
+.modal-corner--tr{ top:9px; right:9px; border-top:2px solid var(--parch-ink); border-right:2px solid var(--parch-ink); }
+.modal-corner--bl{ bottom:9px; left:9px; border-bottom:2px solid var(--parch-ink); border-left:2px solid var(--parch-ink); }
+.modal-corner--br{ bottom:9px; right:9px; border-bottom:2px solid var(--parch-ink); border-right:2px solid var(--parch-ink); }
+
+.modal h2{ font-family: var(--font-head); font-size:19px; margin:2px 0 0; display:flex; align-items:center; gap:8px; color: var(--parch-ink); letter-spacing:.3px; }
+.modal h2::after{
+  content:""; display:block; width:100%; height:9px; margin:7px 0 15px;
+  background: linear-gradient(90deg, transparent, var(--frame-gold) 22%, var(--parch-accent) 50%, var(--frame-gold) 78%, transparent);
+  clip-path: polygon(0 45%,44% 45%,50% 0%,56% 45%,100% 45%,100% 55%,56% 55%,50% 100%,44% 55%,0 55%);
+  opacity:.8;
+}
+.modal p.sub{ color: var(--parch-ink-soft); font-size:13px; margin:0 0 18px; }
+.modal-close{
+  position:absolute; top:11px; right:11px; z-index:4;
+  width:28px; height:28px; border-radius:50%;
+  background: radial-gradient(circle at 34% 28%, #9c3247, var(--blood-dark) 78%);
+  border:2px solid rgba(0,0,0,.35);
+  color:#f1e4c8; font-size:14px; line-height:1;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer;
+  box-shadow: 0 3px 7px rgba(0,0,0,.5), inset 0 1px 2px rgba(255,255,255,.3);
+}
+.modal-close:active{ filter:brightness(.9); }
+
+.field-group{ margin-bottom:18px; }
+.field-label{ font-family: var(--font-head); font-size:12px; letter-spacing:1px; text-transform:uppercase; color: var(--parch-ink-soft); margin-bottom:8px; display:block; }
+
+.toggle-row{ display:flex; align-items:center; justify-content:space-between; padding:11px 2px; border-bottom:1px solid var(--parch-line); gap:10px; }
+.toggle-row:last-child{ border-bottom:none; }
+.toggle-row .lbl{ font-size:13.5px; color: var(--parch-ink); }
+.toggle-row .lbl small{ display:block; color: var(--parch-ink-soft); font-size:11px; margin-top:1px; }
+.switch{ position:relative; width:38px; height:38px; flex-shrink:0; }
+.switch input{ opacity:0; width:0; height:0; position:absolute; }
+.switch .slider{
+  position:absolute; inset:0; border-radius:9px;
+  background: radial-gradient(circle at 35% 28%, #4a3418, #1c1006 75%);
+  border:2px solid rgba(74,52,24,.7);
+  cursor:pointer; transition:.25s;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: inset 0 2px 5px rgba(0,0,0,.55);
+}
+.switch .slider::before{
+  content:"🔥"; font-size:15px;
+  filter: grayscale(1) brightness(.55); opacity:.55;
+  transition: filter .25s ease, opacity .25s ease;
+}
+.switch input:checked + .slider{
+  background: radial-gradient(circle at 35% 28%, #ffdc8f, #b9821f 75%);
+  border-color: var(--frame-gold-bright);
+  box-shadow: inset 0 1px 3px rgba(255,255,255,.5), 0 0 14px rgba(240,180,80,.55);
+}
+.switch input:checked + .slider::before{ filter:none; opacity:1; }
+
+.stat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:18px; }
+.stat-card{ background: rgba(255,255,255,.35); border:1px solid var(--parch-line); border-radius:12px; padding:10px 12px; }
+.stat-card .v{ font-family: var(--font-mono); font-size:19px; font-weight:700; color: var(--parch-accent); }
+.stat-card .l{ font-size:11px; color: var(--parch-ink-soft); margin-top:2px; }
+
+.record-row{ display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--parch-line); font-size:13.5px; }
+.record-row:last-child{ border-bottom:none; }
+.record-row b{ font-family:var(--font-mono); color: var(--parch-accent); }
+
+.ach-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.ach{ background: rgba(255,255,255,.35); border:1px solid var(--parch-line); border-radius:12px; padding:12px; text-align:center; transition:.2s; }
+.ach.locked{ opacity:.42; filter:grayscale(1); }
+.ach .ico{ font-size:26px; display:block; margin-bottom:6px; }
+.ach .t{ font-size:11.5px; font-weight:700; color: var(--parch-ink); }
+.ach .d{ font-size:10px; color: var(--parch-ink-soft); margin-top:3px; line-height:1.3; }
+
+/* Fin de partida */
+.go-emoji{ font-size:52px; text-align:center; margin-bottom:6px; filter: drop-shadow(0 4px 14px rgba(0,0,0,.3)); }
+.go-title{ font-family: var(--font-display); font-size:26px; text-align:center; margin:0 0 4px; color: var(--parch-ink); }
+.go-score{ text-align:center; font-family: var(--font-mono); font-size:38px; font-weight:700; color: var(--parch-accent); margin: 6px 0 2px; }
+.go-record{ text-align:center; font-size:12px; color: var(--ember); font-weight:700; letter-spacing:.5px; margin-bottom:14px; display:none; }
+.go-record.show{ display:block; animation: comboPop .4s ease; }
+.go-stats{ display:flex; justify-content:center; gap:18px; margin: 8px 0 20px; flex-wrap:wrap; }
+.go-stats div{ text-align:center; }
+.go-stats .v{ font-family: var(--font-mono); font-weight:700; font-size:16px; color: var(--parch-ink); }
+.go-stats .l{ font-size:10.5px; color: var(--parch-ink-soft); }
+.go-buttons{ display:flex; flex-direction:column; gap:10px; }
+
+/* Cómo jugar */
+.htp-section{ margin-bottom:16px; }
+.htp-section h3{ font-family: var(--font-head); font-size:13.5px; color: var(--parch-accent); margin:0 0 6px; text-transform:uppercase; letter-spacing:.5px; }
+.htp-section p{ font-size:13.5px; line-height:1.55; color: var(--parch-ink); margin:0; }
+.htp-list{ margin:0; padding-left:18px; font-size:13.5px; line-height:1.6; color: var(--parch-ink); }
+.htp-list li{ margin-bottom:5px; }
+
+.footer-note{ text-align:center; font-size:10.5px; color: var(--text-faint); padding: 0 16px 6px; }
+
+/* Pausa (al cambiar de pestaña) */
+.pause-overlay{ position:fixed; inset:0; background: rgba(6,3,1,.85); backdrop-filter: blur(4px); z-index:300; display:none; align-items:center; justify-content:center; flex-direction:column; gap:8px; }
+.pause-overlay.show{ display:flex; }
+.pause-overlay .ico{ font-size:44px; }
+.pause-overlay .lbl{ font-family: var(--font-display); font-size:22px; color: var(--frame-gold-bright); }
+</style>
+<style>
+.dialog-rotar {
+  display: none;
+}
+
+/* Solo se activa si: es táctil (móvil/tablet) Y está en landscape */
+@media (hover: none) and (pointer: coarse) and (orientation: landscape) {
+  .dialog-rotar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.9);
+    color: #fff;
+    z-index: 9999;
+    text-align: center;
+    padding: 24px;
+  }
+}
+</style>
+</head>
+<body>
+  
+<div class="dialog-rotar">
+  <div class="dialog-rotar__contenido">
+    <p>📱➡️🔄 Please rotate your device to portrait mode to continue viewing this page.</p>
+  </div>
+</div>
+<div id="app">
+  <div class="ambient"></div>
+
+  <!-- ==================== PANTALLA DE CARGA ==================== -->
+  <div class="loading-screen" id="loading-screen">
+    <div class="menu-crest">🃏</div>
+    <h1 class="menu-title">Solitaire<span>RPG</span></h1>
+    <div class="loading-spinner" id="loading-spinner"></div>
+    <p class="loading-label" id="loading-label" data-i18n="loading.label">Loading…</p>
+    <button class="btn btn-primary" id="loading-continue-btn" style="display:none;" data-i18n="loading.continue">▶️ Continue</button>
+  </div>
+
+  <!-- ==================== PANTALLA DE MENÚ ==================== -->
+  <div class="menu-screen" id="menu-screen">
+    <button class="icon-btn menu-stats-btn" id="menu-stats-btn" title="Stats">📊</button>
+    <div class="menu-crest">🃏</div>
+    <h1 class="menu-title">Solitaire<span>RPG</span></h1>
+    <p class="menu-tagline" data-i18n="menu.tagline">A roguelike solitaire dungeon crawl, one deck of cards at a time.</p>
+
+    <div class="menu-buttons">
+      <button class="menu-btn" id="menu-classic">
+        <span class="mb-icon">🗡️</span>
+        <span class="mb-text">
+          <span class="mb-title" data-i18n="menu.classic">Classic Mode</span>
+          <span class="mb-desc" data-i18n="menu.classicDesc">One dungeon, 44 cards. Prove your skill.</span>
+        </span>
+      </button>
+      <button class="menu-btn" id="menu-infinite">
+        <span class="mb-icon">♾️</span>
+        <span class="mb-text">
+          <span class="mb-title" data-i18n="menu.infinite">Infinite Mode</span>
+          <span class="mb-desc" data-i18n="menu.infiniteDesc">Descend forever. Events, combos & achievements.</span>
+        </span>
+      </button>
+      <button class="menu-btn menu-btn--continue" id="menu-continue" style="display:none;">
+        <span class="mb-icon">💾</span>
+        <span class="mb-text">
+          <span class="mb-title" data-i18n="menu.continue">Continue Run</span>
+          <span class="mb-desc" id="menu-continue-desc">—</span>
+        </span>
+      </button>
+    </div>
+
+    <div class="menu-footer-row">
+      <button class="menu-link" id="menu-howto"><span>📖</span><span data-i18n="menu.howToPlay">How to Play</span></button>
+      <div class="menu-lang" id="menu-lang">
+        <button class="lang-btn" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="es">ES</button>
+      </div>
+    </div>
+
+    <div class="menu-banner-slot"><div id="menu-banner-container" style="width:320px; height:50px;"></div></div>
+  </div>
+
+  <!-- ==================== CABECERA DE PARTIDA ==================== -->
+  <header class="topbar">
+    <div class="brand" id="brand-home"><span>Solitaire RPG</span><small id="brand-sub" data-i18n="brand.sub">dungeon of cards</small></div>
+    <div class="icon-btns">
+      <button class="icon-btn" id="stats-btn" title="Stats">📊</button>
+      <button class="icon-btn" id="settings-btn" title="Settings">⚙️</button>
+    </div>
+  </header>
+
+  <!-- ==================== HUD ==================== -->
+  <div class="hud">
+    <div class="hud-item health" id="health-widget"><span class="ico">❤️</span><span id="health">20</span></div>
+    <div class="hud-item deck" id="deck-widget"><span class="ico">🂠</span><span id="card-counter">44</span></div>
+    <div class="hud-item bonus" id="bonus-widget"><span class="ico">⭐</span><span id="bonus-count">0</span></div>
+    <div class="hud-item combo" id="combo-widget"><span class="ico">🔥</span>x<span id="combo-count">0</span></div>
+    <div class="hud-item mode" id="mode-widget"><span class="ico">🏰</span><span id="mode-label">Classic</span></div>
+    <div class="hud-item depth" id="depth-widget"><span class="ico">🕳️</span><span id="depth-label">Lv.</span> <span id="depth-count">1</span></div>
+  </div>
+
+  <p id="prompt" style="margin:0 16px 4px; font-size:12px; color:var(--text-muted);">—</p>
+
+  <main class="table">
+    <section class="weapon-zone">
+      <div class="weapon-slot" id="weapon-slot"><span>🗡️</span></div>
+      <div class="divider" id="divider"></div>
+      <div class="weapon-chain" id="weapon-chain"></div>
+    </section>
+    <section class="room" id="room"></section>
+  </main>
+
+  <footer class="action-bar">
+    <button class="btn btn-ghost" id="restart-button">🔄 <span data-i18n="action.restart">Restart</span></button>
+    <button class="btn btn-primary" id="run-button">🏃 <span data-i18n="action.run">Run</span></button>
+  </footer>
+
+  <p class="footer-note" data-i18n="footer.note">Solitaire RPG — fan project, unaffiliated with the original Scoundrel card game.</p>
+
+  <!-- ==================== HOJA DE DETALLE DE CARTA ==================== -->
+  <div class="sheet-overlay" id="sheet-overlay"></div>
+  <div class="card-sheet" id="card-details">
+    <div class="sheet-handle"></div>
+    <div class="sheet-top">
+      <div><h3 id="card-name">—</h3><div id="card-type">—</div></div>
+      <button class="sheet-close" id="sheet-close">✕</button>
+    </div>
+    <p id="card-description">—</p>
+    <div class="sheet-actions">
+      <button class="btn action-orange" id="primary-action">Action</button>
+      <button class="btn action-green" id="secondary-action">Action</button>
+    </div>
+  </div>
+
+  <div class="fx-layer" id="fx-layer"></div>
+  <div class="slash-layer" id="slash-layer"></div>
+  <div class="damage-vignette" id="damage-vignette"></div>
+  <div class="toast-layer" id="toast-layer"></div>
+  <div class="pause-overlay" id="pause-overlay"><div class="ico">⏸️</div><div class="lbl" data-i18n="pause.label">Paused</div></div>
+
+  <!-- ==================== MODAL: CÓMO JUGAR ==================== -->
+  <div class="modal-overlay" id="howto-overlay">
+    <div class="modal">
+      <button class="modal-close" id="howto-close">✕</button>
+      <h2><span>📖</span><span data-i18n="htp.title">How to Play</span></h2>
+      <p class="sub" data-i18n="htp.subtitle">A single deck of cards is your dungeon.</p>
+
+      <div class="htp-section">
+        <h3 data-i18n="htp.goalTitle">Goal</h3>
+        <p data-i18n="htp.goalText">Clear the deck without dying. Any room card left unplayed is added back once the room refills to just one card.</p>
+      </div>
+      <div class="htp-section">
+        <h3 data-i18n="htp.suitsTitle">The Suits</h3>
+        <ul class="htp-list">
+          <li><b>♠️♣️ <span data-i18n="htp.suitMonster">Monsters</span></b> — <span data-i18n="htp.suitMonsterText">deal damage equal to their value if you fight them.</span></li>
+          <li><b>♦️ <span data-i18n="htp.suitWeapon">Weapons</span></b> — <span data-i18n="htp.suitWeaponText">equip to reduce monster damage; can only fight weaker monsters than the last one it defeated.</span></li>
+          <li><b>♥️ <span data-i18n="htp.suitPotion">Potions</span></b> — <span data-i18n="htp.suitPotionText">restore health, but only one works per room.</span></li>
+        </ul>
+      </div>
+      <div class="htp-section">
+        <h3 data-i18n="htp.rulesTitle">Rules</h3>
+        <ul class="htp-list">
+          <li data-i18n="htp.rule1">Each room has 4 cards. Play at least 3 of them (or run) to draw a new room.</li>
+          <li data-i18n="htp.rule2">You can run from a room instead of playing, but not twice in a row.</li>
+          <li data-i18n="htp.rule3">Fight monsters bare-handed (full damage) or with your equipped weapon.</li>
+          <li data-i18n="htp.rule4">Clear the whole deck and the last room to win.</li>
+        </ul>
+      </div>
+      <div class="htp-section">
+        <h3 data-i18n="htp.infiniteTitle">Infinite Mode</h3>
+        <p data-i18n="htp.infiniteText">Clear one dungeon and descend to the next, tougher one. Random events (chests, traps, mini-bosses, curses), combos, bonus score and achievements only appear here — Classic Mode stays pure.</p>
+      </div>
+      <button class="btn btn-primary btn-block" id="howto-got-it" data-i18n="htp.gotIt">Got it!</button>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: AJUSTES ==================== -->
+  <div class="modal-overlay" id="settings-overlay">
+    <div class="modal">
+      <button class="modal-close" id="settings-close">✕</button>
+      <h2>⚙️ <span data-i18n="settings.title">Settings</span></h2>
+      <p class="sub" data-i18n="settings.subtitle">Rule changes apply to your next game.</p>
+
+      <div class="field-group">
+        <span class="field-label" data-i18n="settings.rules">Rules</span>
+        <div class="toggle-row">
+          <div class="lbl" data-i18n="settings.easy">Easy Mode<small data-i18n="settings.easyDesc">Includes every potion and weapon (2–14)</small></div>
+          <label class="switch"><input type="checkbox" id="opt-easy"><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="lbl" data-i18n="settings.events">Random Events<small data-i18n="settings.eventsDesc">Chests, traps, mini-bosses & curses — Infinite Mode only</small></div>
+          <label class="switch"><input type="checkbox" id="opt-events" checked><span class="slider"></span></label>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <span class="field-label" data-i18n="settings.presentation">Presentation</span>
+        <div class="toggle-row">
+          <div class="lbl" data-i18n="settings.sound">Sound<small data-i18n="settings.soundDesc">Synthesised in-browser effects</small></div>
+          <label class="switch"><input type="checkbox" id="opt-sound" checked><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="lbl" data-i18n="settings.music">Music<small data-i18n="settings.musicDesc">Menu and battle background music</small></div>
+          <label class="switch"><input type="checkbox" id="opt-music" checked><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="lbl" data-i18n="settings.vibration">Vibration<small data-i18n="settings.vibrationDesc">Supported devices only</small></div>
+          <label class="switch"><input type="checkbox" id="opt-vibration" checked><span class="slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="lbl" data-i18n="settings.blood">Blood Effects<small data-i18n="settings.bloodDesc">Particles when you take damage</small></div>
+          <label class="switch"><input type="checkbox" id="opt-blood" checked><span class="slider"></span></label>
+        </div>
+      </div>
+
+      <div class="go-buttons">
+        <button class="btn btn-primary btn-block" id="new-game-btn" data-i18n="settings.newGame">🆕 New Game</button>
+        <button class="btn btn-scroll btn-block" id="main-menu-btn" data-i18n="settings.mainMenu">🏠 Main Menu</button>
+        <button class="btn btn-danger btn-block btn-sm" id="reset-progress-btn" data-i18n="settings.resetProgress">⚠️ Erase All Progress</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: ESTADÍSTICAS ==================== -->
+  <div class="modal-overlay" id="stats-overlay">
+    <div class="modal">
+      <button class="modal-close" id="stats-close">✕</button>
+      <h2>📊 <span data-i18n="stats.title">Stats</span></h2>
+      <p class="sub" data-i18n="stats.subtitle">Your cumulative history in Solitaire RPG.</p>
+
+      <div class="stat-grid">
+        <div class="stat-card"><div class="v" id="statMonsters">0</div><div class="l" data-i18n="stats.monsters">👹 Monsters defeated</div></div>
+        <div class="stat-card"><div class="v" id="statDamageDealt">0</div><div class="l" data-i18n="stats.damageDealt">⚔️ Damage dealt</div></div>
+        <div class="stat-card"><div class="v" id="statDamageTaken">0</div><div class="l" data-i18n="stats.damageTaken">🩸 Damage taken</div></div>
+        <div class="stat-card"><div class="v" id="statBestWeapon">0</div><div class="l" data-i18n="stats.bestWeapon">🗡️ Best weapon</div></div>
+        <div class="stat-card"><div class="v" id="statPlaytime">0m</div><div class="l" data-i18n="stats.playtime">⏱️ Time played</div></div>
+        <div class="stat-card"><div class="v" id="statGames">0</div><div class="l" data-i18n="stats.games">🎮 Games played</div></div>
+        <div class="stat-card"><div class="v" id="statDungeons">0</div><div class="l" data-i18n="stats.dungeons">🏰 Dungeons cleared</div></div>
+        <div class="stat-card"><div class="v" id="statChests">0</div><div class="l" data-i18n="stats.chests">💰 Chests opened</div></div>
+      </div>
+
+      <div class="field-group">
+        <span class="field-label" data-i18n="stats.records">Records</span>
+        <div class="record-row"><span data-i18n="stats.recordClassic">🗡️ Best score (Classic)</span><b id="recordNormal">—</b></div>
+        <div class="record-row"><span data-i18n="stats.recordInfinite">♾️ Best score (Infinite)</span><b id="recordInfinite">—</b></div>
+        <div class="record-row"><span data-i18n="stats.recordStreak">🔗 Best dungeon streak</span><b id="recordStreak">0</b></div>
+        <div class="record-row"><span data-i18n="stats.recordDepth">🕳️ Deepest level reached</span><b id="recordDepth">1</b></div>
+      </div>
+
+      <div class="field-group">
+        <span class="field-label" data-i18n="stats.achievements">Achievements</span>
+        <div class="ach-grid" id="ach-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: FIN DE PARTIDA ==================== -->
+  <div class="modal-overlay" id="gameover-overlay">
+    <div class="modal">
+      <div class="go-emoji" id="go-emoji">💀</div>
+      <div class="go-title" id="go-title">You died</div>
+      <div class="go-score" id="go-score">0</div>
+      <div class="go-record" id="go-record" data-i18n="go.newRecord">🎉 New record!</div>
+      <div class="go-stats">
+        <div><div class="v" id="go-monsters">0</div><div class="l" data-i18n="go.monsters">👹 defeated</div></div>
+        <div><div class="v" id="go-depth">1</div><div class="l" data-i18n="go.level">🕳️ level</div></div>
+        <div><div class="v" id="go-combo">0</div><div class="l" data-i18n="go.combo">🔥 best combo</div></div>
+      </div>
+      <div class="go-buttons">
+        <button class="btn btn-primary btn-block" id="go-again" data-i18n="go.playAgain">🔄 Play Again</button>
+        <button class="btn btn-scroll btn-block" id="go-menu-btn" data-i18n="go.mainMenu">🏠 Main Menu</button>
+        <button class="btn btn-scroll btn-block" id="go-stats-btn" data-i18n="go.viewStats">📊 View Stats</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+// ⚠️ TESTING: true = trazas detalladas en consola de todo el ciclo
+// init→pausa→anuncio/banner→reanuda música. Poner a false antes de
+// publicar de verdad.
+const TESTING = true;
+function cgTrace(...args){
+  if (!TESTING) return;
+  const ts = new Date().toISOString().substr(11, 12);
+  console.log(`[TESTING ${ts}]`, ...args);
+}
+
+/* ============================================================
+   SDK DE CRAZYGAMES — envoltorio defensivo
+   Solo se usan los módulos `ad` (midgame) y `banner` (banner
+   estático en el menú). No hay reward ads.
+
+   CG.available solo pasa a true si window.CrazyGames.SDK.init()
+   resuelve correctamente, así que el resto del código puede
+   comprobar CG.available sin preocuparse de si el SDK cargó, si
+   estamos fuera de CrazyGames, o si el dominio está deshabilitado.
+   ============================================================ */
+const CG = {
+  available: false,
+  ready: null, // promesa que SIEMPRE resuelve (nunca rechaza), útil para esperar el arranque
+  init(){
+    if (!window.CrazyGames || !window.CrazyGames.SDK){
+      cgTrace("CrazyGames SDK no encontrado (script no cargado)");
+      this.ready = Promise.resolve();
+      return this.ready;
+    }
+    this.ready = window.CrazyGames.SDK.init()
+      .then(() => { this.available = true; cgTrace("CrazyGames SDK inicializado correctamente"); })
+      .catch((e) => { cgTrace("CrazyGames SDK init() falló:", e); });
+    return this.ready;
+  },
+  /* Anuncio midgame ("Se puede lanzar cuando el usuario ha muerto, ha
+     completado un nivel, etc." según la documentación). La música y el
+     cronómetro solo se pausan cuando el anuncio REALMENTE empieza
+     (callback adStarted), nunca antes: si el SDK no está disponible,
+     si no hay anuncio relleno (unfilled), si hay adblock o si estamos
+     en cooldown (CrazyGames impone ~3 min entre midgame ads), el
+     callback adError salta sin que nada se haya llegado a pausar.
+
+     onDone (opcional): si se pasa, se ejecuta SIEMPRE al terminar (haya
+     habido anuncio o no) y es quien decide qué música arrancar después
+     — imprescindible cuando el punto de llamada va a cambiar de pista
+     justo después (p.ej. entrar en partida o volver al menú), porque
+     así esa nueva música no arranca hasta que el anuncio ha terminado
+     de verdad. Si no se pasa onDone, se reanuda automáticamente la
+     misma pista que sonaba antes (comportamiento por defecto, para las
+     llamadas que no cambian de pista). */
+  midgame(onDone){
+    cgTrace("CG.midgame() llamado. available=" + this.available);
+    if (!this.available){
+      cgTrace("→ ignorado: CrazyGames SDK no disponible");
+      if (onDone) onDone();
+      return;
+    }
+    let paused = false;
+    let wasTimerRunning = false;
+    let wasMusicPlaying = false;
+    const finish = () => {
+      if (!paused){ if (onDone) onDone(); return; }
+      paused = false;
+      if (wasTimerRunning && !state.isGameOver) startPlayTimer();
+      if (onDone) onDone();
+      else if (wasMusicPlaying) playBgMusic();
+    };
+    try{
+      window.CrazyGames.SDK.ad.requestAd("midgame", {
+        adStarted: () => {
+          paused = true;
+          wasTimerRunning = !!timerInterval;
+          wasMusicPlaying = isMusicPlaying();
+          cgTrace(`→ adStarted: pausando cronómetro (${wasTimerRunning}) y música (sonaba=${wasMusicPlaying})`);
+          if (wasTimerRunning) stopPlayTimer();
+          pauseBgMusic();
+        },
+        adFinished: () => { cgTrace("→ adFinished"); finish(); },
+        adError: (error) => { cgTrace("→ adError:", error); finish(); },
+      });
+    }catch(e){ cgTrace("→ requestAd('midgame') lanzó excepción síncrona:", e); if (onDone) onDone(); }
+  },
+};
+
+/* ============================================================
+   BANNER ESTÁTICO DE CRAZYGAMES — solo en la pantalla de menú
+   Tamaño "Mobile" (320x50), pensado para no invadir el resto del
+   layout. Se solicita al mostrar el menú y se limpia al ocultarlo
+   (por ejemplo, al empezar una partida), ya que los banners no
+   pueden refrescarse ni renderizarse mientras se reproduce un
+   anuncio de vídeo.
+   ============================================================ */
+const MENU_BANNER_ID = "menu-banner-container";
+function showMenuBanner(){
+  if (!CG.available || !window.CrazyGames.SDK.banner) return;
+  window.CrazyGames.SDK.banner
+    .requestBanner({ id: MENU_BANNER_ID, width: 320, height: 50 })
+    .catch((e)=> cgTrace("Banner del menú: error al solicitarlo", e));
+}
+function clearMenuBanner(){
+  if (!CG.available || !window.CrazyGames.SDK.banner) return;
+  try{ window.CrazyGames.SDK.banner.clearBanner(MENU_BANNER_ID); }
+  catch(e){ cgTrace("Banner del menú: error al limpiarlo", e); }
+}
+
+/* ============================================================
+   ALMACENAMIENTO PERSISTENTE
+   localStorage del navegador, con memoria como fallback.
+   (No se usa almacenamiento de CrazyGames: integración limitada a
+   monetización, ver cabecera del archivo.)
+   ============================================================ */
+const Storage = (function(){
+  let backend = "memory";
+  try{ localStorage.setItem("__test__","1"); localStorage.removeItem("__test__"); backend = "local"; }
+  catch(e){ backend = "memory"; }
+  const memory = {};
+  return {
+    backend,
+    get(key, fallback){
+      try{
+        if (backend === "local"){ const raw = localStorage.getItem(key); return raw!==null ? JSON.parse(raw) : fallback; }
+        return key in memory ? memory[key] : fallback;
+      }catch(e){ return fallback; }
+    },
+    set(key, value){
+      try{
+        if (backend === "local"){ localStorage.setItem(key, JSON.stringify(value)); return; }
+        memory[key] = value;
+      }catch(e){ memory[key] = value; }
+    }
+  };
+})();
+
+/* ============================================================
+   INTERNACIONALIZACIÓN (EN por defecto, ES disponible)
+   ============================================================ */
+const STR = {
+en: {
+  "brand.sub":"dungeon of cards",
+  "loading.label":"Loading…", "loading.continue":"▶️ Continue",
+  "menu.tagline":"A roguelike solitaire dungeon crawl, one deck of cards at a time.",
+  "menu.classic":"Classic Mode", "menu.classicDesc":"One dungeon, 44 cards. Prove your skill.",
+  "menu.infinite":"Infinite Mode", "menu.infiniteDesc":"Descend forever. Events, combos & achievements.",
+  "menu.continue":"Continue Run",
+  "menu.howToPlay":"How to Play",
+  "action.restart":"Restart", "action.run":"Run",
+  "footer.note":"Solitaire RPG — fan project, unaffiliated with the original Scoundrel card game.",
+  "pause.label":"Paused",
+  "htp.title":"How to Play", "htp.subtitle":"A single deck of cards is your dungeon.",
+  "htp.goalTitle":"Goal", "htp.goalText":"Clear the deck without dying. Any room card left unplayed is carried into the next room once only one card remains.",
+  "htp.suitsTitle":"The Suits",
+  "htp.suitMonster":"Monsters","htp.suitMonsterText":"deal damage equal to their value if you fight them.",
+  "htp.suitWeapon":"Weapons","htp.suitWeaponText":"equip to reduce monster damage; can only fight weaker monsters than the last one it defeated.",
+  "htp.suitPotion":"Potions","htp.suitPotionText":"restore health, but only one works per room.",
+  "htp.rulesTitle":"Rules",
+  "htp.rule1":"Each room has 4 cards. Play at least 3 of them (or run) to draw a new room.",
+  "htp.rule2":"You can run from a room instead of playing, but not twice in a row.",
+  "htp.rule3":"Fight monsters bare-handed (full damage) or with your equipped weapon.",
+  "htp.rule4":"Clear the whole deck and the last room to win.",
+  "htp.infiniteTitle":"Infinite Mode",
+  "htp.infiniteText":"Clear one dungeon and descend to the next, tougher one. Random events (chests, traps, mini-bosses, curses), combos, bonus score and achievements only appear here — Classic Mode stays pure.",
+  "htp.gotIt":"Got it!",
+  "settings.title":"Settings", "settings.subtitle":"Rule changes apply to your next game.",
+  "settings.rules":"Rules",
+  "settings.easy":"Easy Mode", "settings.easyDesc":"Includes every potion and weapon (2–14)",
+  "settings.events":"Random Events", "settings.eventsDesc":"Chests, traps, mini-bosses & curses — Infinite Mode only",
+  "settings.presentation":"Presentation",
+  "settings.sound":"Sound", "settings.soundDesc":"Synthesised in-browser effects",
+  "settings.music":"Music", "settings.musicDesc":"Menu and battle background music",
+  "settings.vibration":"Vibration", "settings.vibrationDesc":"Supported devices only",
+  "settings.blood":"Blood Effects", "settings.bloodDesc":"Particles when you take damage",
+  "settings.newGame":"🆕 New Game", "settings.mainMenu":"🏠 Main Menu", "settings.resetProgress":"⚠️ Erase All Progress",
+  "stats.title":"Stats", "stats.subtitle":"Your cumulative history in Solitaire RPG.",
+  "stats.monsters":"👹 Monsters defeated", "stats.damageDealt":"⚔️ Damage dealt", "stats.damageTaken":"🩸 Damage taken",
+  "stats.bestWeapon":"🗡️ Best weapon", "stats.playtime":"⏱️ Time played", "stats.games":"🎮 Games played",
+  "stats.dungeons":"🏰 Dungeons cleared", "stats.chests":"💰 Chests opened",
+  "stats.records":"Records", "stats.recordClassic":"🗡️ Best score (Classic)", "stats.recordInfinite":"♾️ Best score (Infinite)",
+  "stats.recordStreak":"🔗 Best dungeon streak", "stats.recordDepth":"🕳️ Deepest level reached",
+  "stats.achievements":"Achievements",
+  "go.newRecord":"🎉 New record!", "go.monsters":"👹 defeated", "go.level":"🕳️ level", "go.combo":"🔥 best combo",
+  "go.playAgain":"🔄 Play Again", "go.mainMenu":"🏠 Main Menu", "go.viewStats":"📊 View Stats",
+  "go.won":"Dungeon Cleared!", "go.died":"You Died",
+  "sheet.monster":"Monster", "sheet.weapon":"Weapon", "sheet.potion":"Potion", "sheet.deadMonster":"Fallen Trophy",
+  "sheet.bareHands":"👊 Bare Hands", "sheet.withWeapon":"⚔️ With Weapon", "sheet.equip":"🛡️ Equip",
+  "sheet.drink":"🧪 Drink", "sheet.drinkNoEffect":"🧪 Drink (no effect)",
+  "mode.classic":"Classic", "mode.infinite":"Infinite", "depth.label":"Lv.",
+  "confirm.restart":"Restart the current game?",
+  "confirm.mainMenu":"Return to the main menu? Unsaved Classic Mode progress will be lost.",
+  "confirm.reset":"This will erase stats, records, achievements and your saved game. Continue?",
+  "prompt.default":"Interact with the room's cards or run. Tap a card to inspect it.",
+},
+es: {
+  "brand.sub":"mazmorra de cartas",
+  "loading.label":"Cargando…", "loading.continue":"▶️ Continuar",
+  "menu.tagline":"Un roguelike de cartas en solitario: una mazmorra por baraja.",
+  "menu.classic":"Modo Clásico", "menu.classicDesc":"Una mazmorra, 44 cartas. Demuestra tu destreza.",
+  "menu.infinite":"Modo Infinito", "menu.infiniteDesc":"Desciende sin fin. Eventos, combos y logros.",
+  "menu.continue":"Continuar Partida",
+  "menu.howToPlay":"Cómo Jugar",
+  "action.restart":"Reiniciar", "action.run":"Huir",
+  "footer.note":"Solitaire RPG — proyecto fan, sin conexión con el juego original de cartas Scoundrel.",
+  "pause.label":"Pausado",
+  "htp.title":"Cómo Jugar", "htp.subtitle":"Una sola baraja de cartas es tu mazmorra.",
+  "htp.goalTitle":"Objetivo", "htp.goalText":"Vacía la baraja sin morir. Una carta de la sala que no juegues se arrastra a la siguiente sala cuando solo quede una.",
+  "htp.suitsTitle":"Los Palos",
+  "htp.suitMonster":"Monstruos","htp.suitMonsterText":"infligen daño igual a su valor si los enfrentas.",
+  "htp.suitWeapon":"Armas","htp.suitWeaponText":"equípalas para reducir el daño; solo pueden enfrentar monstruos más débiles que el último que derrotaron.",
+  "htp.suitPotion":"Pociones","htp.suitPotionText":"restauran vida, pero solo una funciona por sala.",
+  "htp.rulesTitle":"Reglas",
+  "htp.rule1":"Cada sala tiene 4 cartas. Juega al menos 3 (o huye) para robar una sala nueva.",
+  "htp.rule2":"Puedes huir de una sala en vez de jugar, pero no dos veces seguidas.",
+  "htp.rule3":"Lucha contra los monstruos a puño limpio (daño completo) o con tu arma equipada.",
+  "htp.rule4":"Vacía toda la baraja y la última sala para ganar.",
+  "htp.infiniteTitle":"Modo Infinito",
+  "htp.infiniteText":"Supera una mazmorra y desciende a la siguiente, más dura. Los eventos aleatorios (cofres, trampas, mini-jefes, maldiciones), combos, puntos de bonificación y logros solo aparecen aquí — el Modo Clásico se mantiene puro.",
+  "htp.gotIt":"¡Entendido!",
+  "settings.title":"Ajustes", "settings.subtitle":"Los cambios de reglas se aplican en la próxima partida.",
+  "settings.rules":"Reglas",
+  "settings.easy":"Modo Fácil", "settings.easyDesc":"Incluye todas las pociones y armas (2–14)",
+  "settings.events":"Eventos Aleatorios", "settings.eventsDesc":"Cofres, trampas, mini-jefes y maldiciones — solo en Modo Infinito",
+  "settings.presentation":"Presentación",
+  "settings.sound":"Sonido", "settings.soundDesc":"Efectos sintetizados en el navegador",
+  "settings.music":"Música", "settings.musicDesc":"Música de fondo del menú y de la batalla",
+  "settings.vibration":"Vibración", "settings.vibrationDesc":"Solo en dispositivos compatibles",
+  "settings.blood":"Efectos de Sangre", "settings.bloodDesc":"Partículas al recibir daño",
+  "settings.newGame":"🆕 Nueva Partida", "settings.mainMenu":"🏠 Menú Principal", "settings.resetProgress":"⚠️ Borrar Todo el Progreso",
+  "stats.title":"Estadísticas", "stats.subtitle":"Tu historial acumulado en Solitaire RPG.",
+  "stats.monsters":"👹 Monstruos derrotados", "stats.damageDealt":"⚔️ Daño infligido", "stats.damageTaken":"🩸 Daño recibido",
+  "stats.bestWeapon":"🗡️ Mejor arma", "stats.playtime":"⏱️ Tiempo jugado", "stats.games":"🎮 Partidas jugadas",
+  "stats.dungeons":"🏰 Mazmorras superadas", "stats.chests":"💰 Cofres abiertos",
+  "stats.records":"Récords", "stats.recordClassic":"🗡️ Mejor puntuación (Clásico)", "stats.recordInfinite":"♾️ Mejor puntuación (Infinito)",
+  "stats.recordStreak":"🔗 Mejor racha de mazmorras", "stats.recordDepth":"🕳️ Mayor profundidad alcanzada",
+  "stats.achievements":"Logros",
+  "go.newRecord":"🎉 ¡Nuevo récord!", "go.monsters":"👹 derrotados", "go.level":"🕳️ nivel", "go.combo":"🔥 mejor combo",
+  "go.playAgain":"🔄 Jugar de Nuevo", "go.mainMenu":"🏠 Menú Principal", "go.viewStats":"📊 Ver Estadísticas",
+  "go.won":"¡Mazmorra Superada!", "go.died":"Has Muerto",
+  "sheet.monster":"Monstruo", "sheet.weapon":"Arma", "sheet.potion":"Poción", "sheet.deadMonster":"Trofeo Caído",
+  "sheet.bareHands":"👊 Puño Limpio", "sheet.withWeapon":"⚔️ Con Arma", "sheet.equip":"🛡️ Equipar",
+  "sheet.drink":"🧪 Beber", "sheet.drinkNoEffect":"🧪 Beber (sin efecto)",
+  "mode.classic":"Clásico", "mode.infinite":"Infinito", "depth.label":"Nv.",
+  "confirm.restart":"¿Reiniciar la partida actual?",
+  "confirm.mainMenu":"¿Volver al menú principal? El progreso no guardado del Modo Clásico se perderá.",
+  "confirm.reset":"Esto borrará estadísticas, récords, logros y la partida guardada. ¿Continuar?",
+  "prompt.default":"Interactúa con las cartas de la sala o huye. Toca una carta para inspeccionarla.",
+}
+};
+
+const MSG = {
+en: {
+  equip:(t)=>`🛡️ You equip ${t}.`,
+  drink:(t,r)=>`🧪 You drink ${t}, restoring ${r} HP.`,
+  drinkNoEffect:(t)=>`🧪 You drink ${t}, but it has no effect (already drank this room).`,
+  fightBareWin:(t,d)=>`👊 You defeat ${t} bare-handed, taking ${d} damage.`,
+  fightBareLose:(t)=>`💀 You fought ${t} bare-handed and did not survive.`,
+  fightWeaponClean:(t)=>`⚔️ You defeat ${t} without taking damage.`,
+  fightWeaponExcess:(t,e)=>`⚔️ You defeat ${t}, taking ${e} excess damage.`,
+  fightWeaponLose:(t)=>`💀 You fought ${t} but did not survive.`,
+  noWeapon:"⚠️ Equip a weapon first.",
+  notEnoughDurability:"⚠️ Not enough durability!",
+  cantFight:"⚠️ You can't fight that.",
+  cantEquip:"⚠️ You can't equip that.",
+  cantDrink:"⚠️ You can't drink that.",
+  cantRunTwice:"⚠️ You can't run twice in a row or after playing a card.",
+  ranAway:"🏃 You flee the room; the cards return to the bottom of the deck.",
+  dungeonCleared:"🏆 You cleared the entire dungeon! You win!",
+  dungeonAdvance:(d,h)=>`🏆 Dungeon cleared! You descend to level ${d} (+${h} HP).`,
+  dungeonToast:(d)=>`🕳️ Level ${d}: the darkness deepens.`,
+  comboToast:(c)=>`🔥 Combo x${c}! Your skill heals 1 HP.`,
+  chestHeal:(h)=>`💰 Treasure chest: you recover ${h} HP.`,
+  chestWeapon:"💰 Treasure chest: your weapon's durability is fully restored.",
+  chestBonus:"💰 Treasure chest: +10 bonus points.",
+  chestLog:"💰 You found a hidden treasure chest in the room.",
+  trapToast:(d)=>`🪤 Hidden trap! You lose ${d} HP.`,
+  trapLog:(d)=>`🪤 You triggered a hidden trap and lost ${d} HP.`,
+  curseNoPotionToast:"☠️ Curse: you won't be able to drink potions in this room.",
+  curseNoPotionLog:"☠️ A curse seals your potions in this room.",
+  curseWeaponToast:"☠️ Curse: your weapon loses 2 durability.",
+  curseWeaponLog:"☠️ A curse corrodes your weapon's edge (-2 durability).",
+  curseDoubleToast:"☠️ Curse: the next hit you take will be devastating.",
+  curseDoubleLog:"☠️ You sense a malicious presence lurking in the shadows.",
+  curseActivated:(d)=>`☠️ The curse strikes! Damage doubled: ${d}.`,
+  bossToast:"👑 A mini-boss lurks among the room's monsters!",
+  bossLog:"👑 One of the room's monsters has become a mini-boss.",
+  bossDefeated:"👑 Mini-boss defeated! +15 bonus points.",
+  achievementUnlocked:(t)=>`🎖️ Achievement unlocked: ${t}`,
+  resumeLog:"🕯️ You resume your exploration where you left off.",
+  startClassic:"🏰 You enter the dungeon. Good luck, scoundrel.",
+  startInfinite:"♾️ Your infinite descent begins. Survive as long as you can!",
+  continueDesc:(d,h)=>`Level ${d} · ${h} HP`,
+},
+es: {
+  equip:(t)=>`🛡️ Equipaste ${t}.`,
+  drink:(t,r)=>`🧪 Bebiste ${t}, restauraste ${r} HP.`,
+  drinkNoEffect:(t)=>`🧪 Bebiste ${t}, pero no tuvo efecto (ya bebiste en esta sala).`,
+  fightBareWin:(t,d)=>`👊 Derrotaste a ${t} a puño limpio y recibiste ${d} de daño.`,
+  fightBareLose:(t)=>`💀 Luchaste contra ${t} a puño limpio y no sobreviviste.`,
+  fightWeaponClean:(t)=>`⚔️ Derrotaste a ${t} sin recibir daño.`,
+  fightWeaponExcess:(t,e)=>`⚔️ Derrotaste a ${t}, con ${e} de daño en exceso.`,
+  fightWeaponLose:(t)=>`💀 Luchaste contra ${t} pero no sobreviviste.`,
+  noWeapon:"⚠️ Antes debes equipar un arma.",
+  notEnoughDurability:"⚠️ ¡Durabilidad insuficiente!",
+  cantFight:"⚠️ No puedes luchar contra eso.",
+  cantEquip:"⚠️ No puedes equipar eso.",
+  cantDrink:"⚠️ No puedes beber eso.",
+  cantRunTwice:"⚠️ No puedes huir dos veces seguidas ni tras jugar una carta.",
+  ranAway:"🏃 Huiste de la sala, las cartas vuelven al fondo del mazo.",
+  dungeonCleared:"🏆 ¡Has limpiado toda la mazmorra! ¡Ganaste!",
+  dungeonAdvance:(d,h)=>`🏆 ¡Mazmorra superada! Desciendes al nivel ${d} (+${h} HP).`,
+  dungeonToast:(d)=>`🕳️ Nivel ${d}: la oscuridad se hace más densa.`,
+  comboToast:(c)=>`🔥 ¡Racha x${c}! Tu destreza te cura 1 HP.`,
+  chestHeal:(h)=>`💰 Cofre del tesoro: recuperas ${h} HP.`,
+  chestWeapon:"💰 Cofre del tesoro: tu arma recupera toda su durabilidad.",
+  chestBonus:"💰 Cofre del tesoro: +10 puntos de bonificación.",
+  chestLog:"💰 Encontraste un cofre del tesoro escondido en la sala.",
+  trapToast:(d)=>`🪤 ¡Trampa oculta! Pierdes ${d} HP.`,
+  trapLog:(d)=>`🪤 Pisaste una trampa oculta y perdiste ${d} HP.`,
+  curseNoPotionToast:"☠️ Maldición: no podrás beber pociones en esta sala.",
+  curseNoPotionLog:"☠️ Una maldición sella tus pociones en esta sala.",
+  curseWeaponToast:"☠️ Maldición: tu arma pierde 2 de durabilidad.",
+  curseWeaponLog:"☠️ Una maldición corroe el filo de tu arma (-2 durabilidad).",
+  curseDoubleToast:"☠️ Maldición: el próximo golpe que recibas será devastador.",
+  curseDoubleLog:"☠️ Sientes una presencia maligna acechando en la sombra.",
+  curseActivated:(d)=>`☠️ ¡La maldición se activa! Daño duplicado: ${d}.`,
+  bossToast:"👑 ¡Un mini-jefe acecha entre los monstruos de la sala!",
+  bossLog:"👑 Uno de los monstruos de la sala se ha convertido en un mini-jefe.",
+  bossDefeated:"👑 ¡Mini-jefe derrotado! +15 puntos de bonificación.",
+  achievementUnlocked:(t)=>`🎖️ Logro desbloqueado: ${t}`,
+  resumeLog:"🕯️ Retomas la exploración donde la dejaste.",
+  startClassic:"🏰 Entras en la mazmorra. Buena suerte, forastero.",
+  startInfinite:"♾️ Comienza tu descenso infinito. ¡Sobrevive el mayor tiempo posible!",
+  continueDesc:(d,h)=>`Nivel ${d} · ${h} HP`,
+}
+};
+
+const CARD = {
+en: {
+  rankName:{2:"Two",3:"Three",4:"Four",5:"Five",6:"Six",7:"Seven",8:"Eight",9:"Nine",10:"Ten",11:"Jack",12:"Queen",13:"King",14:"Ace"},
+  suitPlural:{spade:"Spades", club:"Clubs", heart:"Hearts", diamond:"Diamonds"},
+  bossPrefix:"Boss: ", deadSuffix:" (fallen)",
+  descMonsterWithWeapon:(v)=>`Deals ${v} damage. Your weapon needs more than ${v} durability to be used here; defeating it will set durability to ${v}.`,
+  descMonsterNoWeapon:(v)=>`Deals ${v} damage if you face it.`,
+  descWeapon:(v)=>`Weapon with ${v} attack. Reduces the damage of monsters you fight with it.`,
+  descPotion:(v)=>`Restores up to ${v} HP. You can only drink one potion per room.`,
+  descBossSuffix:" 👑 This is a mini-boss! Defeating it grants +15 bonus points.",
+  descDead:"This monster has already been defeated. It's part of your trophy chain and no longer a threat.",
+  equippedDesc:(v,d)=>`Equipped weapon with ${v} attack. Current durability: ${d}. Can only face monsters with value equal to or below its durability.`,
+  healthName:"d20 of Health", healthType:"Vitality", healthDesc:(m)=>`Your current health points. Maximum ${m}.`,
+  deckName:"Dungeon Deck", deckType:"Dungeon", deckDesc:"Cards are dealt in rooms of 4. Empty the deck and the room to win.",
+  emptyWeaponName:"Empty Weapon Slot", emptyWeaponType:"Equipment", emptyWeaponDesc:"Equip a Diamond card to fight more effectively.",
+},
+es: {
+  rankName:{2:"Dos",3:"Tres",4:"Cuatro",5:"Cinco",6:"Seis",7:"Siete",8:"Ocho",9:"Nueve",10:"Diez",11:"Jota",12:"Reina",13:"Rey",14:"As"},
+  suitPlural:{spade:"Picas", club:"Tréboles", heart:"Corazones", diamond:"Diamantes"},
+  bossPrefix:"Jefe: ", deadSuffix:" (caído)",
+  descMonsterWithWeapon:(v)=>`Inflige ${v} de daño. Tu arma necesita más de ${v} de durabilidad para usarse aquí; al derrotarlo, su durabilidad pasará a ${v}.`,
+  descMonsterNoWeapon:(v)=>`Inflige ${v} de daño si lo enfrentas.`,
+  descWeapon:(v)=>`Arma con ${v} de ataque. Reduce el daño de los monstruos que enfrentes con ella.`,
+  descPotion:(v)=>`Restaura hasta ${v} de vida. Solo puedes beber una poción por sala.`,
+  descBossSuffix:" 👑 ¡Es un mini-jefe! Otorga +15 puntos de bonificación al derrotarlo.",
+  descDead:"Este monstruo ya ha sido derrotado. Forma parte de tu cadena de trofeos y ya no supone amenaza.",
+  equippedDesc:(v,d)=>`Arma equipada con ${v} de ataque. Durabilidad actual: ${d}. Solo puede enfrentar monstruos de valor igual o menor a su durabilidad.`,
+  healthName:"d20 de vida", healthType:"Vitalidad", healthDesc:(m)=>`Tus puntos de vida actuales. Máximo ${m}.`,
+  deckName:"Mazo de la mazmorra", deckType:"Mazmorra", deckDesc:"Las cartas se reparten en salas de 4. Vacía el mazo y la sala para ganar.",
+  emptyWeaponName:"Ranura de arma vacía", emptyWeaponType:"Equipo", emptyWeaponDesc:"Equipa una carta de Diamantes para luchar con más eficacia.",
+}
+};
+
+const ACHIEVEMENT_META = {
+en: {
+  hunter100:     { icon:"🗡️", title:"Relentless Hunter", desc:"Defeat 100 monsters in total." },
+  edgeOfAbyss:   { icon:"💀", title:"Edge of the Abyss", desc:"Survive a fight with 1 HP." },
+  dungeonMaster5:{ icon:"🏰", title:"Dungeon Master", desc:"Clear 5 dungeons in a row in Infinite Mode." },
+  collector10:   { icon:"💰", title:"Collector", desc:"Open 10 treasure chests." },
+  infinite10:    { icon:"♾️", title:"Endless Descent", desc:"Reach level 10 in Infinite Mode." },
+},
+es: {
+  hunter100:     { icon:"🗡️", title:"Cazador Incansable", desc:"Derrota 100 monstruos en total." },
+  edgeOfAbyss:   { icon:"💀", title:"Al Borde del Abismo", desc:"Sobrevive un combate con 1 HP." },
+  dungeonMaster5:{ icon:"🏰", title:"Maestro de Mazmorras", desc:"Completa 5 mazmorras seguidas en Modo Infinito." },
+  collector10:   { icon:"💰", title:"Coleccionista", desc:"Abre 10 cofres del tesoro." },
+  infinite10:    { icon:"♾️", title:"Descenso Eterno", desc:"Alcanza el nivel 10 en Modo Infinito." },
+}
+};
+
+let currentLang = "en";
+function t(key){ return (STR[currentLang] && STR[currentLang][key]) || (STR.en[key]) || key; }
+function M(key, ...args){ const fn = (MSG[currentLang] && MSG[currentLang][key]) || MSG.en[key]; return typeof fn==="function" ? fn(...args) : fn; }
+function applyTranslations(){
+  document.documentElement.lang = currentLang;
+  document.querySelectorAll("[data-i18n]").forEach(el=>{
+    const key = el.getAttribute("data-i18n");
+    el.textContent = t(key);
+  });
+  document.querySelectorAll("#menu-lang .lang-btn").forEach(b=>{
+    b.classList.toggle("active", b.dataset.lang === currentLang);
+  });
+}
+function setLanguage(lang){
+  currentLang = (lang==="es") ? "es" : "en";
+  settings.lang = currentLang;
+  persistSettings();
+  applyTranslations();
+  refreshContinueAvailability();
+  if (!state.isGameOver) promptEl.textContent = t("prompt.default");
+  modeLabelEl.textContent = t(state.mode==="infinite" ? "mode.infinite" : "mode.classic");
+  depthLabelEl.textContent = t("depth.label");
+}
+
+/* ============================================================
+   CONSTANTES DEL JUEGO
+   ============================================================ */
+const SUITS = ["spade","club","heart","diamond"];
+const SUIT_ICON = { spade:"♠️", club:"♣️", heart:"♥️", diamond:"♦️" };
+const FACE_SHORT = { 11:"J", 12:"Q", 13:"K", 14:"A" };
+const MAX_WEAPON_DURABILITY = 15;
+const MAX_HEALTH = 20;
+const OVERLAP_MARGIN_MAP = [1,1,1,-1,-24,-36,-43,-48,-52,-55,-57,-59];
+const MAX_OVERLAP_MARGIN = -60;
+const SAVE_KEY = "solitairerpg_save";
+
+/* ============================================================
+   CLASES DE CARTA
+   ============================================================ */
+class Card{
+  constructor(suit, value){ this.suit = suit; this.value = value; this.isBoss = false; }
+  getType(){
+    switch(this.suit){ case "spade": case "club": return "monster"; case "diamond": return "weapon"; case "heart": return "potion"; }
+  }
+  getRank(){ return FACE_SHORT[this.value] || String(this.value); }
+  getTitle(){
+    const dict = CARD[currentLang];
+    const base = `${dict.rankName[this.value]} ${currentLang==="es" ? "de" : "of"} ${dict.suitPlural[this.suit]}`;
+    return this.isBoss ? `${dict.bossPrefix}${base}` : base;
+  }
+  getDescription(){
+    const dict = CARD[currentLang];
+    let base;
+    switch(this.suit){
+      case "spade": case "club":
+        base = state.weapon ? dict.descMonsterWithWeapon(this.value) : dict.descMonsterNoWeapon(this.value);
+        break;
+      case "diamond": base = dict.descWeapon(this.value); break;
+      case "heart": base = dict.descPotion(this.value); break;
+    }
+    if (this.isBoss) base += dict.descBossSuffix;
+    return base;
+  }
+}
+class Weapon extends Card{
+  constructor(suit, value){ super(suit, value); this.durability = MAX_WEAPON_DURABILITY; }
+  getDescription(){ return CARD[currentLang].equippedDesc(this.value, this.durability); }
+}
+class DeadMonster extends Card{
+  getType(){ return "dead-monster"; }
+  getTitle(){ const dict = CARD[currentLang]; return `${dict.rankName[this.value]} ${dict.suitPlural[this.suit]}${dict.deadSuffix}`; }
+  getDescription(){ return CARD[currentLang].descDead; }
+}
+
+/* ============================================================
+   GESTOR DE ESTADO REACTIVO (Proxy + pub/sub)
+   ============================================================ */
+function createState(initial={}){
+  const listeners = new Map();
+  const notify = (key, value) => { if (listeners.has(key)) listeners.get(key).forEach(fn => fn(value)); };
+  const proxy = new Proxy({ ...initial }, {
+    get(target, key){ return target[key]; },
+    set(target, key, value){ target[key] = value; notify(key, value); return true; }
+  });
+  proxy.subscribe = function(key, cb){
+    if (!listeners.has(key)) listeners.set(key, new Set());
+    listeners.get(key).add(cb);
+    return () => listeners.get(key).delete(cb);
+  };
+  return proxy;
+}
+
+const state = createState({
+  health: MAX_HEALTH, deck: [], currentRoom: [], weapon: null, weaponChain: [],
+  logs: "", canRun: true, isGameOver: false, didWin: null, selectedObject: null,
+  mode: "normal", dungeonDepth: 1, dungeonStreak: 0, combo: 0, maxCombo: 0,
+  bonusScore: 0, cursedDoubleDamage: false,
+});
+
+/* ============================================================
+   PERSISTENCIA: ajustes, estadísticas, récords, logros
+   ============================================================ */
+const defaultSettings = () => ({ easyMode:false, sound:true, music:true, vibration:true, blood:true, events:true, lang:null });
+const defaultStats = () => ({ monstersKilled:0, totalDamageDealt:0, totalDamageTaken:0, bestWeapon:0, playTimeSeconds:0, gamesPlayed:0, dungeonsCleared:0, chestsOpened:0 });
+const defaultRecords = () => ({ bestScoreNormal:null, bestScoreInfinite:null, bestStreak:0, bestDepth:1 });
+const defaultAchievements = () => ({ hunter100:false, edgeOfAbyss:false, dungeonMaster5:false, collector10:false, infinite10:false });
+
+let settings = Object.assign(defaultSettings(), Storage.get("solitairerpg_settings", {}));
+let stats = Object.assign(defaultStats(), Storage.get("solitairerpg_stats", {}));
+let records = Object.assign(defaultRecords(), Storage.get("solitairerpg_records", {}));
+let achievements = Object.assign(defaultAchievements(), Storage.get("solitairerpg_achievements", {}));
+
+function persistSettings(){ Storage.set("solitairerpg_settings", settings); }
+function persistStats(){ Storage.set("solitairerpg_stats", stats); }
+function persistRecords(){ Storage.set("solitairerpg_records", records); }
+function persistAchievements(){ Storage.set("solitairerpg_achievements", achievements); }
+
+/* Variables de la partida en curso (no reactivas) */
+let canDrinkPotion = true;
+let lastCardPlayed = null;
+let lastPotionHadNoEffect = false;
+let pendingDealAnimation = false;
+let roomCardElements = new Map();
+let runStats = { monstersKilled:0, damageDealt:0, damageTaken:0 };
+let sessionSeconds = 0;
+let timerInterval = null;
+
+/* ============================================================
+   ELEMENTOS DEL DOM
+   ============================================================ */
+const $ = (id) => document.getElementById(id);
+const appEl = $("app");
+const menuScreen = $("menu-screen");
+const promptEl = $("prompt");
+const healthEl = $("health");
+const healthWidgetEl = $("health-widget");
+const cardCounterEl = $("card-counter");
+const deckWidgetEl = $("deck-widget");
+const bonusWidgetEl = $("bonus-widget");
+const bonusCountEl = $("bonus-count");
+const comboWidgetEl = $("combo-widget");
+const comboCountEl = $("combo-count");
+const modeLabelEl = $("mode-label");
+const depthWidgetEl = $("depth-widget");
+const depthLabelEl = $("depth-label");
+const depthCountEl = $("depth-count");
+
+const weaponSlotEl = $("weapon-slot");
+const dividerEl = $("divider");
+const weaponChainEl = $("weapon-chain");
+const roomEl = $("room");
+const runBtn = $("run-button");
+const restartBtn = $("restart-button");
+
+const sheetOverlay = $("sheet-overlay");
+const cardDetails = $("card-details");
+const cardNameEl = $("card-name");
+const cardTypeEl = $("card-type");
+const cardDescriptionEl = $("card-description");
+const primaryActionEl = $("primary-action");
+const secondaryActionEl = $("secondary-action");
+const sheetCloseBtn = $("sheet-close");
+
+const fxLayer = $("fx-layer");
+const slashLayerEl = $("slash-layer");
+const damageVignetteEl = $("damage-vignette");
+const toastLayer = $("toast-layer");
+const pauseOverlay = $("pause-overlay");
+
+/* ============================================================
+   UTILIDADES
+   ============================================================ */
+function shuffle(array){ for (let i=array.length-1; i>0; i--){ const j = Math.floor(Math.random()*(i+1)); [array[i],array[j]]=[array[j],array[i]]; } return array; }
+function clamp(n,min,max){ return Math.max(min, Math.min(max,n)); }
+function formatDuration(totalSeconds){
+  const h = Math.floor(totalSeconds/3600), m = Math.floor((totalSeconds%3600)/60), s = totalSeconds%60;
+  if (h>0) return `${h}h ${m}m`;
+  if (m>0) return `${m}m`;
+  return `${s}s`;
+}
+function elCenter(el){ const r = el.getBoundingClientRect(); return { x:r.left+r.width/2, y:r.top+r.height/2 }; }
+
+/* ============================================================
+   SONIDO (sintetizado, sin ficheros externos)
+   ============================================================ */
+let audioCtx = null;
+let noiseBuffer = null;
+let masterBus = null, reverbSend = null, reverbNode = null, warmthFilter = null, compressor = null;
+
+/** Genera una respuesta al impulso sintética (sin ficheros) para dar una pizca de espacio/cola a los sonidos */
+function buildImpulseResponse(ctx, duration=1.1, decay=2.4){
+  const rate = ctx.sampleRate;
+  const len = Math.max(1, Math.floor(rate*duration));
+  const impulse = ctx.createBuffer(2, len, rate);
+  for (let ch=0; ch<2; ch++){
+    const data = impulse.getChannelData(ch);
+    for (let i=0;i<len;i++){
+      data[i] = (Math.random()*2-1) * Math.pow(1 - i/len, decay);
+    }
+  }
+  return impulse;
+}
+
+function getAudioCtx(){
+  if (!audioCtx){
+    const AC = window.AudioContext||window.webkitAudioContext;
+    if (!AC) return null;
+    audioCtx = new AC();
+    try{
+      // cadena maestra: calienta un poco el agudo, comprime con suavidad y añade una cola de reverb corta
+      warmthFilter = audioCtx.createBiquadFilter();
+      warmthFilter.type = "lowpass";
+      warmthFilter.frequency.value = 8600;
+      compressor = audioCtx.createDynamicsCompressor();
+      compressor.threshold.value = -20; compressor.knee.value = 26;
+      compressor.ratio.value = 3.4; compressor.attack.value = 0.004; compressor.release.value = 0.2;
+      masterBus = audioCtx.createGain();
+      masterBus.gain.value = 0.95;
+      masterBus.connect(warmthFilter).connect(compressor).connect(audioCtx.destination);
+
+      reverbNode = audioCtx.createConvolver();
+      reverbNode.buffer = buildImpulseResponse(audioCtx, 1.15, 2.3);
+      reverbSend = audioCtx.createGain();
+      reverbSend.gain.value = 0.4;
+      reverbSend.connect(reverbNode).connect(masterBus);
+    }catch(e){ /* si algo falla, seguimos sin bus maestro (fallback más abajo) */ }
+  }
+  return audioCtx;
+}
+/** Ruido coloreado suave (entre blanco y marrón): menos silbido áspero que el ruido blanco puro */
+function getNoiseBuffer(ctx){
+  if (!noiseBuffer || noiseBuffer.sampleRate !== ctx.sampleRate){
+    const len = Math.floor(ctx.sampleRate * 0.5);
+    noiseBuffer = ctx.createBuffer(1, len, ctx.sampleRate);
+    const data = noiseBuffer.getChannelData(0);
+    let last = 0;
+    for (let i=0;i<len;i++){
+      const white = Math.random()*2-1;
+      last = (last + 0.045*white) / 1.045;
+      data[i] = last * 3.4;
+    }
+  }
+  return noiseBuffer;
+}
+/** Envía una voz ya mezclada (gain final) al bus maestro, con una pizca opcional de reverb */
+function routeVoice(gainNode, ctx, wet=0.12){
+  if (masterBus){
+    gainNode.connect(masterBus);
+    if (wet > 0 && reverbSend){
+      const send = ctx.createGain();
+      send.gain.value = wet;
+      gainNode.connect(send).connect(reverbSend);
+    }
+  } else {
+    gainNode.connect(ctx.destination); // sin bus maestro disponible: ruta directa de emergencia
+  }
+}
+/* Tono con timbre suave (sine/triangle), barrido de frecuencia opcional (f -> f2) y unísono ligero para dar cuerpo */
+function playToneStep(ctx, t, step){
+  const gain = ctx.createGain();
+  const peak = step.gain!=null ? step.gain : 0.12;
+  gain.gain.setValueAtTime(0.0001, t);
+  gain.gain.exponentialRampToValueAtTime(peak, t+Math.min(0.035, step.dur*0.35));
+  gain.gain.exponentialRampToValueAtTime(0.0001, t+step.dur);
+
+  const voices = step.unison ? [0, 6] : [0]; // segunda voz desafinada unos pocos cents para dar calidez
+  voices.forEach(cents=>{
+    const osc = ctx.createOscillator();
+    osc.type = step.type || "sine";
+    osc.detune.value = cents;
+    osc.frequency.setValueAtTime(step.f, t);
+    if (step.f2) osc.frequency.exponentialRampToValueAtTime(Math.max(step.f2,1), t+step.dur);
+    osc.connect(gain);
+    osc.start(t); osc.stop(t+step.dur+0.03);
+  });
+  routeVoice(gain, ctx, step.wet!=null ? step.wet : 0.14);
+}
+/* Ráfaga de ruido filtrado: impactos, roce de tela, silbido de espada... suena a "golpe", no a "pitido" */
+function playNoiseStep(ctx, t, step){
+  const src = ctx.createBufferSource();
+  src.buffer = getNoiseBuffer(ctx);
+  const filter = ctx.createBiquadFilter();
+  filter.type = step.filterType || "bandpass";
+  filter.frequency.value = step.filterFreq || 700;
+  filter.Q.value = step.q!=null ? step.q : 0.9;
+  const gain = ctx.createGain();
+  const peak = step.gain!=null ? step.gain : 0.18;
+  gain.gain.setValueAtTime(0.0001, t);
+  gain.gain.exponentialRampToValueAtTime(peak, t+0.008);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t+step.dur);
+  src.connect(filter).connect(gain);
+  routeVoice(gain, ctx, step.wet!=null ? step.wet : 0.05);
+  src.start(t); src.stop(t+step.dur+0.02);
+}
+const SOUND_PATTERNS = {
+  select:      [{f:660,dur:.05,type:"sine",gain:.07,wet:.06}],
+  hit:         [
+    {noise:true,dur:.14,filterType:"lowpass",filterFreq:380,q:.7,gain:.22,wet:.04},
+    {noise:true,dur:.05,filterType:"highpass",filterFreq:3200,q:.5,gain:.08,wet:.02},
+    {f:165,f2:55,dur:.17,type:"sine",gain:.13,wet:.08},
+  ],
+  hitMonster:  [{noise:true,dur:.09,filterType:"bandpass",filterFreq:1000,gain:.15,wet:.05},{f:250,f2:110,dur:.11,type:"triangle",gain:.09,wet:.08}],
+  slash:       [{noise:true,dur:.11,filterType:"highpass",filterFreq:2700,q:.6,gain:.15,wet:.1},{f:950,f2:280,dur:.1,type:"sine",gain:.05,wet:.08}],
+  heal:        [{f:520,f2:760,dur:.22,type:"sine",gain:.09,wet:.28,unison:true},{f:760,dur:.2,type:"sine",gain:.07,delay:.11,wet:.28,unison:true}],
+  equip:       [{noise:true,dur:.05,filterType:"highpass",filterFreq:2200,gain:.09,wet:.06},{f:420,f2:640,dur:.13,type:"triangle",gain:.08,wet:.1},{f:1800,dur:.06,type:"sine",gain:.03,delay:.03,wet:.15}],
+  run:         [{noise:true,dur:.26,filterType:"bandpass",filterFreq:550,q:.8,gain:.13,wet:.08}],
+  chest:       [{f:523,dur:.11,type:"sine",gain:.08,wet:.3,unison:true},{f:659,dur:.11,type:"sine",gain:.08,delay:.09,wet:.3,unison:true},{f:880,dur:.2,type:"sine",gain:.09,delay:.19,wet:.32,unison:true}],
+  trap:        [{noise:true,dur:.2,filterType:"lowpass",filterFreq:360,q:.7,gain:.22,wet:.05},{f:145,f2:52,dur:.25,type:"sine",gain:.11,wet:.1}],
+  curse:       [{f:140,f2:75,dur:.36,type:"sine",gain:.1,wet:.24}],
+  miniboss:    [{f:150,f2:85,dur:.16,type:"triangle",gain:.11,wet:.14},{f:110,f2:65,dur:.22,type:"triangle",gain:.11,delay:.13,wet:.14}],
+  dungeonClear:[{f:440,dur:.14,type:"sine",gain:.08,wet:.3,unison:true},{f:554,dur:.14,type:"sine",gain:.08,delay:.12,wet:.3,unison:true},{f:659,dur:.14,type:"sine",gain:.08,delay:.24,wet:.3,unison:true},{f:880,dur:.3,type:"sine",gain:.1,delay:.36,wet:.34,unison:true}],
+  achievement: [{f:523,dur:.1,type:"triangle",gain:.09,wet:.2},{f:659,dur:.1,type:"triangle",gain:.09,delay:.1,wet:.2},{f:784,dur:.1,type:"triangle",gain:.09,delay:.2,wet:.22},{f:1046,dur:.24,type:"triangle",gain:.11,delay:.3,wet:.28,unison:true}],
+  win:         [{f:440,dur:.16,type:"sine",gain:.09,wet:.3,unison:true},{f:554,dur:.16,type:"sine",gain:.09,delay:.14,wet:.3,unison:true},{f:659,dur:.16,type:"sine",gain:.09,delay:.28,wet:.32,unison:true},{f:880,dur:.34,type:"sine",gain:.11,delay:.42,wet:.36,unison:true}],
+  lose:        [{f:220,f2:150,dur:.25,type:"sine",gain:.09,wet:.2},{f:164,f2:100,dur:.25,type:"sine",gain:.09,delay:.22,wet:.2},{f:110,f2:65,dur:.44,type:"sine",gain:.1,delay:.44,wet:.24}],
+  combo:       [{f:600,f2:820,dur:.08,type:"triangle",gain:.07,wet:.12}],
+};
+function playSound(name){
+  if (!settings.sound) return;
+  const ctx = getAudioCtx(); if (!ctx) return;
+  try{
+    if (ctx.state==="suspended") ctx.resume();
+    const t0 = ctx.currentTime;
+    (SOUND_PATTERNS[name]||SOUND_PATTERNS.select).forEach(step=>{
+      const t = t0 + (step.delay||0);
+      if (step.noise) playNoiseStep(ctx, t, step); else playToneStep(ctx, t, step);
+    });
+  }catch(e){ /* audio no disponible: se ignora */ }
+}
+function vibrate(pattern){ if (settings.vibration && navigator.vibrate){ try{ navigator.vibrate(pattern); }catch(e){} } }
+
+/* ============================================================
+   MÚSICA DE FONDO — dos pistas
+   "menu": rpgsolitairemenu.mp3   → suena en la pantalla de menú
+   "game": rpgsolitairemusic.mp3  → suena durante la partida
+   Ambas en la misma carpeta que el juego, en bucle.
+
+   Los navegadores bloquean el audio con sonido hasta un gesto real
+   del usuario. Ese gesto es, siempre, el botón "Continuar" de la
+   pantalla de carga (ver boot()): hasta que no se pulsa, no se llama
+   a play() en ningún audio, así que nunca puede sonar música (ni
+   lanzarse un anuncio) antes de esa acción explícita.
+
+   setMusicTrack("menu"|"game") pausa la pista anterior y activa
+   la nueva. Se pausan ambas junto con el interruptor de "Sonido"
+   de Ajustes, durante los anuncios de CrazyGames y al cambiar de
+   pestaña.
+   ============================================================ */
+const MENU_MUSIC_SRC = "./rpgsolitairemenu.mp3";
+const GAME_MUSIC_SRC = "./rpgsolitairemusic.mp3";
+let menuMusic = null;
+let gameMusic = null;
+let activeMusicKey = "menu"; // "menu" | "game"
+
+function initBgMusic(){
+  if (!menuMusic){
+    menuMusic = new Audio(MENU_MUSIC_SRC);
+    menuMusic.loop = true; menuMusic.volume = 0.35; menuMusic.preload = "auto";
+  }
+  if (!gameMusic){
+    gameMusic = new Audio(GAME_MUSIC_SRC);
+    gameMusic.loop = true; gameMusic.volume = 0.35; gameMusic.preload = "auto";
+  }
+}
+function trackFor(key){ return key === "game" ? gameMusic : menuMusic; }
+function isMusicPlaying(){ return !!((menuMusic && !menuMusic.paused) || (gameMusic && !gameMusic.paused)); }
+
+function playBgMusic(){
+  if (!settings.music){ cgTrace("playBgMusic() → ignorado: settings.music=false"); return; }
+  initBgMusic();
+  const track = trackFor(activeMusicKey);
+  track.muted = false;
+  cgTrace(`playBgMusic() → track="${activeMusicKey}" .play() (paused antes=${track.paused}, currentTime=${track.currentTime.toFixed(2)})`);
+  const p = track.play();
+  if (p && p.then) p.then(()=> cgTrace(`playBgMusic() → track="${activeMusicKey}" .play() resuelto OK`));
+  if (p && p.catch) p.catch((err)=> cgTrace(`playBgMusic() → track="${activeMusicKey}" .play() BLOQUEADO/rechazado:`, err));
+}
+function pauseBgMusic(){
+  cgTrace(`pauseBgMusic() → menu.paused=${menuMusic ? menuMusic.paused : "n/a"}, game.paused=${gameMusic ? gameMusic.paused : "n/a"}`);
+  if (menuMusic) menuMusic.pause();
+  if (gameMusic) gameMusic.pause();
+}
+function setMusicTrack(key){
+  cgTrace(`setMusicTrack("${key}") ← activa antes="${activeMusicKey}"`);
+  initBgMusic();
+  if (activeMusicKey !== key){
+    trackFor(activeMusicKey).pause();
+    activeMusicKey = key;
+  }
+  if (settings.music) playBgMusic();
+}
+
+/* ============================================================
+   EFECTOS VISUALES
+   ============================================================ */
+function spawnEmojiBurst(emoji, originEl, count=10, opts={}){
+  const c = elCenter(originEl);
+  for (let i=0;i<count;i++){
+    const p = document.createElement("span"); p.className="fx-emoji"; p.textContent=emoji;
+    const angle = Math.random()*Math.PI*2, dist=(opts.dist||70)+Math.random()*40, upward=opts.upward?-60:0;
+    p.style.left=c.x+"px"; p.style.top=c.y+"px";
+    p.style.setProperty("--dx", `${Math.cos(angle)*dist}px`);
+    p.style.setProperty("--dy", `${Math.sin(angle)*dist+upward}px`);
+    p.style.fontSize = `${13+Math.random()*13}px`;
+    fxLayer.appendChild(p); setTimeout(()=>p.remove(), 1050);
+  }
+}
+function spawnBlood(originEl, count=14, intensity=0.5){
+  if (!settings.blood) return;
+  const m = clamp(intensity, 0, 1);
+  const c = elCenter(originEl);
+  for (let i=0;i<count;i++){
+    const p = document.createElement("div"); p.className="fx-blood";
+    const sizeBase = 4 + m*10;
+    const size = sizeBase + Math.random()*sizeBase; p.style.width=p.style.height=size+"px";
+    p.style.left=c.x+"px"; p.style.top=c.y+"px";
+    const angle=Math.random()*Math.PI*2, dist=(18+m*55)+Math.random()*(50+m*70);
+    p.style.setProperty("--dx", `${Math.cos(angle)*dist}px`);
+    p.style.setProperty("--dy", `${Math.sin(angle)*dist + 35+m*40}px`);
+    fxLayer.appendChild(p); setTimeout(()=>p.remove(), 950);
+  }
+}
+function spawnSparks(originEl, count=10){
+  const c = elCenter(originEl);
+  for (let i=0;i<count;i++){
+    const p = document.createElement("div"); p.className="fx-spark";
+    p.style.left=c.x+"px"; p.style.top=c.y+"px";
+    const angle=Math.random()*Math.PI*2, dist=24+Math.random()*46;
+    p.style.setProperty("--dx", `${Math.cos(angle)*dist}px`);
+    p.style.setProperty("--dy", `${Math.sin(angle)*dist}px`);
+    p.style.setProperty("--rot", `${Math.random()*360}deg`);
+    fxLayer.appendChild(p); setTimeout(()=>p.remove(), 550);
+  }
+}
+/**
+ * Nubla la vista de sangre a pantalla completa al recibir daño,
+ * como el indicador de daño típico de un shooter en primera persona.
+ * La intensidad crece con el daño real recibido: un golpe pequeño
+ * apenas mancha los bordes, uno grande casi tiñe toda la pantalla
+ * con un doble latido.
+ */
+function flashDamageVignette(dmg){
+  if (!settings.blood) return;
+  const intensity = clamp(dmg / 13, 0.22, 1);
+  damageVignetteEl.classList.remove("flash","flash-heavy");
+  damageVignetteEl.style.setProperty("--intensity", intensity.toFixed(2));
+  void damageVignetteEl.offsetWidth; // reinicia la animación
+  damageVignetteEl.classList.add(dmg>=9 ? "flash-heavy" : "flash");
+}
+/**
+ * Lanza espadazos estilo anime que cruzan toda la pantalla.
+ * kind: "sword" (arma, tajo en X) | "punch" (puño, golpe único y corto)
+ * magnitude 0..1: a mayor valor del monstruo golpeado, tajos más
+ * gruesos, brillantes y numerosos (y más chispas/sacudida en el impacto).
+ */
+function screenSlash(kind, magnitude=0.5){
+  const m = clamp(magnitude, 0, 1);
+  const big = m > 0.62;
+  const configs = kind==="punch"
+    ? [{ angle:-6+Math.random()*12, delay:0, punch:true }]
+    : [
+        { angle:-28+Math.random()*8, delay:0 },
+        { angle:14+Math.random()*10, delay:60 },
+        ...(big ? [{ angle:-4+Math.random()*8, delay:120 }] : []),
+      ];
+  configs.forEach(cfg=>{
+    setTimeout(()=>{
+      const el = document.createElement("div");
+      el.className = "slash-line" + (cfg.punch ? " slash-line--punch" : "");
+      el.style.setProperty("--angle", cfg.angle+"deg");
+      el.style.setProperty("--mag", m.toFixed(2));
+      slashLayerEl.appendChild(el);
+      requestAnimationFrame(()=> el.classList.add("anim"));
+      setTimeout(()=>el.remove(), 550);
+    }, cfg.delay);
+  });
+  if (big) shakeScreen("hard");
+}
+function shakeScreen(strength="soft"){
+  const cls = strength==="hard" ? "shake-hard" : "shake-soft";
+  appEl.classList.remove("shake-soft","shake-hard"); void appEl.offsetWidth;
+  appEl.classList.add(cls); setTimeout(()=>appEl.classList.remove(cls), 460);
+}
+function showToast(type, message, duration=3200){
+  const el = document.createElement("div"); el.className = `toast toast-${type}`; el.textContent = message;
+  toastLayer.appendChild(el);
+  requestAnimationFrame(()=> el.classList.add("show"));
+  setTimeout(()=>{ el.classList.remove("show"); setTimeout(()=>el.remove(), 350); }, duration);
+}
+
+/* ============================================================
+   ACCIONES DEL JUGADOR
+   ============================================================ */
+function selectObject(obj){ if (!obj || state.isGameOver) return; state.selectedObject = obj; }
+function closeSheet(){ state.selectedObject = null; }
+
+function takeDamage(amount, opts={}){
+  let dmg = amount;
+  if (state.cursedDoubleDamage){
+    dmg = amount*2; state.cursedDoubleDamage = false;
+    showToast("curse", M("curseActivated", dmg));
+  }
+  stats.totalDamageTaken += dmg; runStats.damageTaken += dmg;
+  state.health = Math.max(0, state.health - dmg);
+
+  spawnBlood(healthWidgetEl, Math.min(28, 10+dmg*2), clamp(dmg/12, 0.25, 1));
+  flashDamageVignette(dmg);
+  healthWidgetEl.classList.remove("shake-hard"); void healthWidgetEl.offsetWidth;
+  healthWidgetEl.classList.add(dmg>=6?"shake-hard":"shake-soft");
+  setTimeout(()=>healthWidgetEl.classList.remove("shake-soft","shake-hard"), 460);
+  if (dmg>=5) shakeScreen(dmg>=9?"hard":"soft");
+  playSound("hit"); vibrate(dmg>=6 ? [40,30,90] : [50]);
+
+  if (state.mode==="infinite") resetCombo();
+
+  if (state.health === 1) unlockAchievement("edgeOfAbyss");
+  persistStats();
+  if (state.health === 0){
+    endGame(false);
+    return false;
+  }
+  saveGame();
+  return true;
+}
+
+function incrementCombo(){
+  if (state.mode !== "infinite") return;
+  state.combo = (state.combo||0) + 1;
+  if (state.combo > state.maxCombo) state.maxCombo = state.combo;
+  if (state.combo>0 && state.combo % 5 === 0){
+    const heal = Math.min(1, MAX_HEALTH-state.health);
+    if (heal>0) state.health += heal;
+    showToast("combo", M("comboToast", state.combo));
+    playSound("combo");
+  }
+}
+function resetCombo(){ state.combo = 0; }
+
+function fightMonster(card, isBarehanded){
+  if (state.isGameOver || !card) return;
+  if (card.getType() !== "monster"){ log(M("cantFight")); return; }
+
+  closeSheet();
+  const magnitude = clamp((card.value - 2) / 12, 0.15, 1);
+  const monsterEl = roomCardElements.get(card);
+  if (monsterEl){
+    monsterEl.classList.add("card--slash");
+    spawnSparks(monsterEl, Math.round(6 + magnitude*16));
+    setTimeout(()=>monsterEl && monsterEl.classList.remove("card--slash"), 400);
+  }
+  screenSlash(isBarehanded ? "punch" : "sword", magnitude);
+  playSound(isBarehanded ? "hitMonster" : "slash");
+
+  if (isBarehanded){
+    const survived = takeDamage(card.value);
+    if (!survived){ log(M("fightBareLose", card.getTitle())); return; }
+    log(M("fightBareWin", card.getTitle(), card.value));
+  } else {
+    if (!state.weapon){ log(M("noWeapon")); return; }
+    if (state.weapon.durability <= card.value){ log(M("notEnoughDurability")); return; }
+    const excess = card.value - state.weapon.value;
+    if (excess > 0){
+      const survived = takeDamage(excess);
+      if (!survived){ log(M("fightWeaponLose", card.getTitle())); return; }
+      log(M("fightWeaponExcess", card.getTitle(), excess));
+    } else {
+      log(M("fightWeaponClean", card.getTitle()));
+      incrementCombo();
+    }
+    state.weapon.durability = card.value;
+    state.weaponChain = [...state.weaponChain, new DeadMonster(card.suit, card.value)];
+  }
+
+  stats.monstersKilled++; runStats.monstersKilled++;
+  stats.totalDamageDealt += card.value; runStats.damageDealt += card.value;
+  if (card.isBoss){
+    state.bonusScore = (state.bonusScore||0) + 15;
+    showToast("miniboss", M("bossDefeated"));
+  }
+  checkAchievements();
+  persistStats();
+  playCard(card);
+}
+
+function equipWeapon(card){
+  if (state.isGameOver || !card) return;
+  if (card.getType() !== "weapon"){ log(M("cantEquip")); return; }
+  closeSheet();
+  state.weapon = new Weapon(card.suit, card.value);
+  state.weaponChain = [];
+  if (card.value > stats.bestWeapon){ stats.bestWeapon = card.value; persistStats(); }
+  spawnSparks(weaponSlotEl, 12);
+  playSound("equip");
+  log(M("equip", card.getTitle()));
+  playCard(card);
+}
+
+function drinkPotion(card){
+  if (state.isGameOver || !card) return;
+  if (card.getType() !== "potion"){ log(M("cantDrink")); return; }
+  closeSheet();
+
+  if (!canDrinkPotion){
+    log(M("drinkNoEffect", card.getTitle()));
+    playSound("select");
+    playCard(card);
+    return;
+  }
+
+  const restored = Math.min(card.value, MAX_HEALTH-state.health);
+  lastPotionHadNoEffect = restored === 0;
+  state.health = Math.min(MAX_HEALTH, state.health + card.value);
+  canDrinkPotion = false;
+
+  spawnEmojiBurst("💗", healthWidgetEl, 8, { upward:true, dist:40 });
+  playSound("heal"); vibrate([30,20,30]);
+
+  log(M("drink", card.getTitle(), restored));
+  playCard(card);
+}
+
+function playCard(card){
+  if (state.isGameOver || !card) return;
+  lastCardPlayed = card;
+  roomCardElements.delete(card);
+  state.currentRoom = state.currentRoom.filter(c => c !== card);
+  state.canRun = false;
+  checkIfRoomFinished();
+}
+
+function runAway(){
+  if (!state.canRun){ log(M("cantRunTwice")); return; }
+  state.deck = [...state.deck, ...state.currentRoom];
+  state.canRun = false; state.selectedObject = null;
+  playSound("run");
+  drawRoom();
+  canDrinkPotion = true; // sala nueva: las pociones vuelven a funcionar
+  log(M("ranAway"));
+  saveGame();
+  CG.midgame(); // huida: oportunidad de anuncio midgame
+}
+
+/* ============================================================
+   CONSTRUCCIÓN DEL MAZO Y SALAS
+   ============================================================ */
+function buildDeck(){
+  let deck = [];
+  for (let i=2;i<=14;i++){
+    for (const suit of SUITS){
+      if (suit==="heart" && (i<=10 || settings.easyMode)) deck.push(new Card(suit,i));
+      else if (suit==="diamond" && (i<=10 || settings.easyMode)) deck.push(new Card(suit,i));
+      else if (suit==="spade" || suit==="club") deck.push(new Card(suit,i));
+    }
+  }
+  if (state.mode === "infinite" && state.dungeonDepth > 1){
+    const extra = Math.min(state.dungeonDepth-1, 10);
+    for (let n=0;n<extra;n++){
+      const suit = Math.random()<0.5 ? "spade" : "club";
+      const value = 9 + Math.floor(Math.random()*6);
+      deck.push(new Card(suit,value));
+    }
+  }
+  state.deck = shuffle(deck);
+}
+function drawRoom(){
+  pendingDealAnimation = true;
+  const nextRoom = state.deck.slice(0,4);
+  const nextDeck = state.deck.slice(4);
+  state.currentRoom = nextRoom;
+  state.deck = nextDeck;
+  maybeTriggerEvent();
+}
+
+/* ============================================================
+   EVENTOS ALEATORIOS — solo en Modo Infinito
+   ============================================================ */
+function maybeTriggerEvent(){
+  if (state.mode !== "infinite") return;
+  if (!settings.events || state.isGameOver) return;
+  const chance = clamp(0.12 + (state.dungeonDepth-1)*0.015, 0, 0.35);
+  if (Math.random() > chance) return;
+  const roll = Math.random();
+  let type;
+  if (roll < 0.35) type = "chest";
+  else if (roll < 0.65) type = "trap";
+  else if (roll < 0.85) type = "curse";
+  else type = "miniboss";
+  resolveEvent(type);
+}
+function resolveEvent(type){
+  switch(type){
+    case "chest": {
+      stats.chestsOpened++;
+      const sub = Math.floor(Math.random()*3);
+      if (sub===0){
+        const heal = Math.min(6, MAX_HEALTH-state.health);
+        state.health = Math.min(MAX_HEALTH, state.health+6);
+        showToast("chest", M("chestHeal", heal));
+      } else if (sub===1 && state.weapon){
+        state.weapon.durability = MAX_WEAPON_DURABILITY;
+        showToast("chest", M("chestWeapon"));
+      } else {
+        state.bonusScore = (state.bonusScore||0) + 10;
+        showToast("chest", M("chestBonus"));
+      }
+      log(M("chestLog"));
+      playSound("chest");
+      spawnEmojiBurst("🪙", roomEl, 12, { upward:true, dist:50 });
+      checkAchievements(); persistStats();
+      break;
+    }
+    case "trap": {
+      const dmg = 1 + Math.floor(Math.random()*4);
+      showToast("trap", M("trapToast", dmg));
+      log(M("trapLog", dmg));
+      spawnEmojiBurst("💥", roomEl, 8);
+      takeDamage(dmg, { fromEvent:true });
+      break;
+    }
+    case "curse": {
+      let options = ["noPotion","weakWeapon","doubleDamage"];
+      if (!state.weapon) options = options.filter(o=>o!=="weakWeapon");
+      const c = options[Math.floor(Math.random()*options.length)];
+      if (c==="noPotion"){ canDrinkPotion=false; showToast("curse", M("curseNoPotionToast")); log(M("curseNoPotionLog")); }
+      else if (c==="weakWeapon"){ state.weapon.durability = Math.max(0, state.weapon.durability-2); showToast("curse", M("curseWeaponToast")); log(M("curseWeaponLog")); }
+      else { state.cursedDoubleDamage = true; showToast("curse", M("curseDoubleToast")); log(M("curseDoubleLog")); }
+      playSound("curse"); spawnEmojiBurst("💀", roomEl, 6);
+      break;
+    }
+    case "miniboss": {
+      const monsters = state.currentRoom.filter(c => c.getType()==="monster");
+      if (monsters.length===0){ resolveEvent("chest"); return; }
+      const target = monsters[Math.floor(Math.random()*monsters.length)];
+      target.value = Math.min(14, target.value+3);
+      target.isBoss = true;
+      showToast("miniboss", M("bossToast"));
+      log(M("bossLog"));
+      playSound("miniboss"); vibrate([60,40,60]);
+      spawnEmojiBurst("👑", roomEl, 6);
+      state.currentRoom = [...state.currentRoom];
+      break;
+    }
+  }
+  saveGame();
+}
+
+/* ============================================================
+   FLUJO DE SALAS Y PUNTUACIÓN
+   ============================================================ */
+function checkIfRoomFinished(){
+  if (state.currentRoom.length===0 && state.deck.length===0){
+    stats.dungeonsCleared++;
+    if (state.mode === "infinite"){
+      state.dungeonStreak = (state.dungeonStreak||0) + 1;
+      if (state.dungeonStreak >= 5) unlockAchievement("dungeonMaster5");
+      if (state.dungeonStreak > records.bestStreak){ records.bestStreak = state.dungeonStreak; persistRecords(); }
+      state.dungeonDepth = (state.dungeonDepth||1) + 1;
+      if (state.dungeonDepth > records.bestDepth){ records.bestDepth = state.dungeonDepth; persistRecords(); }
+      if (state.dungeonDepth >= 10) unlockAchievement("infinite10");
+
+      const heal = Math.min(5, MAX_HEALTH-state.health);
+      state.health = Math.min(MAX_HEALTH, state.health+5);
+      log(M("dungeonAdvance", state.dungeonDepth, heal));
+      showToast("dungeon", M("dungeonToast", state.dungeonDepth));
+      playSound("dungeonClear"); vibrate([60,40,60,40,120]);
+      CG.midgame(); // mazmorra superada: oportunidad de anuncio midgame
+
+      buildDeck(); drawRoom(); canDrinkPotion = true;
+      persistStats(); saveGame();
+      return;
+    } else {
+      log(M("dungeonCleared"));
+      endGame(true);
+      return;
+    }
+  }
+  if (state.currentRoom.length===1){
+    const lastCard = state.currentRoom[0];
+    state.deck = [lastCard, ...state.deck];
+    state.canRun = true;
+    drawRoom();
+    canDrinkPotion = true;
+    CG.midgame(); // sala completada: oportunidad de anuncio midgame
+  }
+  saveGame();
+}
+
+function calculateScore(){
+  let base;
+  if (!state.didWin){
+    const remaining = [...state.deck, ...state.currentRoom].filter(c => c.getType()==="monster").reduce((s,c) => s+c.value, 0);
+    base = state.health - remaining;
+  } else {
+    base = (lastPotionHadNoEffect && lastCardPlayed && lastCardPlayed.getType()==="potion")
+      ? state.health + lastCardPlayed.value : state.health;
+  }
+  const bonus = state.bonusScore || 0;
+  const depthBonus = state.mode==="infinite" ? (state.dungeonDepth-1)*20 : 0;
+  return base + bonus + depthBonus;
+}
+
+function endGame(didWin){
+  state.canRun = false; state.isGameOver = true; state.selectedObject = null; state.didWin = didWin;
+  stopPlayTimer();
+  stats.gamesPlayed++;
+  if (state.mode === "infinite") state.dungeonStreak = 0;
+
+  const finalScore = calculateScore();
+  const key = state.mode==="infinite" ? "bestScoreInfinite" : "bestScoreNormal";
+  const isNewRecord = records[key]===null || finalScore > records[key];
+  if (isNewRecord) records[key] = finalScore;
+
+  persistStats(); persistRecords(); persistAchievements();
+  clearSavedGame();
+
+  playSound(didWin?"win":"lose");
+  vibrate(didWin ? [80,50,80,50,220] : [320]);
+  CG.midgame(); // fin de partida: oportunidad de anuncio midgame
+
+  showGameOverModal(didWin, finalScore, isNewRecord);
+}
+
+function log(message){ state.logs = `${message}\n${state.logs}`; }
+
+/* ============================================================
+   LOGROS
+   ============================================================ */
+function unlockAchievement(id){
+  if (achievements[id]) return;
+  achievements[id] = true;
+  persistAchievements();
+  const meta = ACHIEVEMENT_META[currentLang][id];
+  showToast("achievement", M("achievementUnlocked", meta.title), 4200);
+  playSound("achievement"); vibrate([50,50,50,50,160]);
+  renderAchievements();
+}
+function checkAchievements(){
+  if (stats.monstersKilled >= 100) unlockAchievement("hunter100");
+  if (stats.chestsOpened >= 10) unlockAchievement("collector10");
+}
+
+/* ============================================================
+   GUARDADO AUTOMÁTICO — solo en Modo Infinito
+   ============================================================ */
+function serializeCard(c){
+  return { suit:c.suit, value:c.value, isBoss:!!c.isBoss,
+    kind: c instanceof Weapon ? "weapon" : c instanceof DeadMonster ? "dead" : "card",
+    durability: c instanceof Weapon ? c.durability : undefined };
+}
+function deserializeCard(o){
+  if (o.kind==="weapon"){ const w = new Weapon(o.suit,o.value); w.durability = o.durability; return w; }
+  if (o.kind==="dead"){ return new DeadMonster(o.suit,o.value); }
+  const c = new Card(o.suit,o.value); c.isBoss = !!o.isBoss; return c;
+}
+function saveGame(){
+  if (state.mode !== "infinite" || state.isGameOver) return;
+  Storage.set(SAVE_KEY, {
+    health: state.health,
+    deck: state.deck.map(serializeCard),
+    currentRoom: state.currentRoom.map(serializeCard),
+    weapon: state.weapon ? serializeCard(state.weapon) : null,
+    weaponChain: state.weaponChain.map(serializeCard),
+    mode: state.mode, dungeonDepth: state.dungeonDepth, dungeonStreak: state.dungeonStreak,
+    combo: state.combo, maxCombo: state.maxCombo, bonusScore: state.bonusScore,
+    cursedDoubleDamage: state.cursedDoubleDamage, canRun: state.canRun, canDrinkPotion, runStats,
+    timestamp: Date.now(),
+  });
+}
+function clearSavedGame(){ Storage.set(SAVE_KEY, null); }
+function loadGame(snap){
+  state.mode = snap.mode || "infinite";
+  state.dungeonDepth = snap.dungeonDepth || 1;
+  state.dungeonStreak = snap.dungeonStreak || 0;
+  state.combo = snap.combo || 0;
+  state.maxCombo = snap.maxCombo || 0;
+  state.bonusScore = snap.bonusScore || 0;
+  state.cursedDoubleDamage = !!snap.cursedDoubleDamage;
+  state.deck = (snap.deck||[]).map(deserializeCard);
+  state.currentRoom = (snap.currentRoom||[]).map(deserializeCard);
+  state.weapon = snap.weapon ? deserializeCard(snap.weapon) : null;
+  state.weaponChain = (snap.weaponChain||[]).map(deserializeCard);
+  state.canRun = !!snap.canRun;
+  canDrinkPotion = snap.canDrinkPotion !== false;
+  runStats = snap.runStats || { monstersKilled:0, damageDealt:0, damageTaken:0 };
+  state.health = snap.health;
+  state.isGameOver = false; state.didWin = null; state.selectedObject = null;
+  log(M("resumeLog"));
+}
+
+/* ============================================================
+   TEMPORIZADOR DE PARTIDA
+   ============================================================ */
+function startPlayTimer(){
+  if (timerInterval) return;
+  timerInterval = setInterval(()=>{ sessionSeconds++; stats.playTimeSeconds++; if (sessionSeconds%15===0) persistStats(); }, 1000);
+}
+function stopPlayTimer(){ if (timerInterval){ clearInterval(timerInterval); timerInterval=null; persistStats(); } }
+
+/* ============================================================
+   PAUSA AL CAMBIAR DE PESTAÑA (document.visibilitychange)
+   ============================================================ */
+let wasPlayingBeforePause = false;
+function pauseForPlatform(){
+  wasPlayingBeforePause = !!timerInterval;
+  stopPlayTimer();
+  if (audioCtx && audioCtx.state==="running"){ try{ audioCtx.suspend(); }catch(e){} }
+  pauseBgMusic();
+  pauseOverlay.classList.add("show");
+}
+function resumeForPlatform(){
+  pauseOverlay.classList.remove("show");
+  if (audioCtx && audioCtx.state==="suspended"){ try{ audioCtx.resume(); }catch(e){} }
+  playBgMusic();
+  if (wasPlayingBeforePause && !state.isGameOver && menuScreen.classList.contains("hidden")) startPlayTimer();
+}
+
+/* ============================================================
+   RENDERIZADO — CARTAS
+   ============================================================ */
+function createCardElement(card){
+  const el = document.createElement("button");
+  el.type = "button";
+  el.className = `card card--${card.suit}`;
+  if (card.isBoss) el.classList.add("card--boss");
+  if (card instanceof DeadMonster) el.classList.add("card--dead");
+
+  const rank = card.getRank ? card.getRank() : (FACE_SHORT[card.value]||card.value);
+  el.innerHTML = `
+    <span class="card__corner card__corner--tl">${rank}<br>${SUIT_ICON[card.suit]}</span>
+    <span class="card__center">${SUIT_ICON[card.suit]}</span>
+    <span class="card__corner card__corner--br">${rank}<br>${SUIT_ICON[card.suit]}</span>
+    ${card.isBoss ? '<span class="card__crown">👑</span>' : ""}
+    ${card instanceof Weapon ? `<span class="card__durability">🛡️ ${card.durability}</span>` : ""}
+  `;
+
+  if (!(card instanceof DeadMonster)){
+    el.addEventListener("click", ()=>{ playSound("select"); selectObject(card); });
+    attachTilt(el);
+  } else {
+    el.addEventListener("click", ()=> selectObject(card));
+  }
+  if (state.selectedObject === card) el.classList.add("card--selected");
+  return el;
+}
+function createEmptyCardElement(){ const el = document.createElement("div"); el.className = "card card--empty"; return el; }
+function attachTilt(el){
+  if (window.matchMedia && window.matchMedia("(hover: none)").matches) return;
+  el.addEventListener("mousemove", (e)=>{
+    const r = el.getBoundingClientRect();
+    const px = (e.clientX-r.left)/r.width-0.5, py = (e.clientY-r.top)/r.height-0.5;
+    el.style.transform = `translateY(-6px) rotateX(${py*-12}deg) rotateY(${px*14}deg)`;
+  });
+  el.addEventListener("mouseleave", ()=>{ el.style.transform = ""; });
+}
+
+function renderRoom(){
+  roomEl.innerHTML = "";
+  roomCardElements = new Map();
+  state.currentRoom.forEach((card, idx) => {
+    const el = createCardElement(card);
+    if (pendingDealAnimation){ el.classList.add("card--deal"); el.style.animationDelay = `${idx*70}ms`; }
+    roomEl.appendChild(el);
+    roomCardElements.set(card, el);
+  });
+  for (let i=state.currentRoom.length; i<4; i++) roomEl.appendChild(createEmptyCardElement());
+  pendingDealAnimation = false;
+}
+function renderWeaponChain(){
+  weaponChainEl.innerHTML = "";
+  const chain = state.weaponChain;
+  if (chain.length > 0){
+    weaponChainEl.classList.add("show"); dividerEl.classList.add("show");
+    chain.forEach((monster, index) => {
+      const el = createCardElement(monster);
+      let overlap = 0;
+      if (index !== 0) overlap = OVERLAP_MARGIN_MAP[chain.length] ?? MAX_OVERLAP_MARGIN;
+      el.style.marginLeft = `${overlap}px`;
+      weaponChainEl.appendChild(el);
+    });
+  } else {
+    weaponChainEl.classList.remove("show");
+    if (!state.weapon) dividerEl.classList.remove("show");
+  }
+}
+function renderWeapon(){
+  weaponSlotEl.innerHTML = "";
+  if (state.weapon){ weaponSlotEl.appendChild(createCardElement(state.weapon)); dividerEl.classList.add("show"); }
+  else { weaponSlotEl.innerHTML = "<span>🗡️</span>"; if (state.weaponChain.length===0) dividerEl.classList.remove("show"); }
+}
+
+/* ============================================================
+   RENDERIZADO — HOJA DE DETALLE
+   ============================================================ */
+function renderSheet(){
+  const obj = state.selectedObject;
+  if (!obj){ sheetOverlay.classList.remove("show"); cardDetails.classList.remove("show"); return; }
+  sheetOverlay.classList.add("show"); cardDetails.classList.add("show");
+
+  if (obj instanceof Card){
+    const type = obj.getType();
+    primaryActionEl.style.display = "flex"; secondaryActionEl.style.display = "flex";
+    primaryActionEl.className = "btn"; secondaryActionEl.className = "btn";
+
+    cardNameEl.textContent = obj.getTitle();
+    cardTypeEl.textContent = ({monster:t("sheet.monster"), weapon:t("sheet.weapon"), potion:t("sheet.potion"), "dead-monster":t("sheet.deadMonster")})[type];
+    cardDescriptionEl.textContent = obj.getDescription();
+
+    if (type === "monster"){
+      primaryActionEl.textContent = t("sheet.bareHands");
+      primaryActionEl.classList.add("action-orange");
+      primaryActionEl.onclick = () => fightMonster(obj, true);
+      secondaryActionEl.textContent = t("sheet.withWeapon");
+      secondaryActionEl.classList.add("action-green");
+      secondaryActionEl.onclick = () => fightMonster(obj, false);
+      if (!state.weapon || state.weapon.durability <= obj.value) secondaryActionEl.style.display = "none";
+    } else if (type === "dead-monster"){
+      primaryActionEl.style.display = "none"; secondaryActionEl.style.display = "none";
+    } else if (type === "weapon"){
+      const isEquipped = obj === state.weapon;
+      if (isEquipped){
+        primaryActionEl.style.display = "none";
+        secondaryActionEl.style.display = "none";
+      } else {
+        primaryActionEl.textContent = t("sheet.equip");
+        primaryActionEl.classList.add("action-green");
+        primaryActionEl.onclick = () => equipWeapon(obj);
+        secondaryActionEl.style.display = "none";
+      }
+    } else if (type === "potion"){
+      primaryActionEl.textContent = canDrinkPotion ? t("sheet.drink") : t("sheet.drinkNoEffect");
+      primaryActionEl.classList.add(canDrinkPotion ? "action-green" : "action-red");
+      primaryActionEl.onclick = () => drinkPotion(obj);
+      secondaryActionEl.style.display = "none";
+    }
+  } else {
+    primaryActionEl.style.display = "none"; secondaryActionEl.style.display = "none";
+    const dict = CARD[currentLang];
+    switch(obj){
+      case "health":
+        cardNameEl.textContent = dict.healthName; cardTypeEl.textContent = dict.healthType; cardDescriptionEl.textContent = dict.healthDesc(MAX_HEALTH);
+        break;
+      case "deck": cardNameEl.textContent = dict.deckName; cardTypeEl.textContent = dict.deckType; cardDescriptionEl.textContent = dict.deckDesc; break;
+      case "empty-weapon": cardNameEl.textContent = dict.emptyWeaponName; cardTypeEl.textContent = dict.emptyWeaponType; cardDescriptionEl.textContent = dict.emptyWeaponDesc; break;
+    }
+  }
+}
+
+/* ============================================================
+   SUSCRIPCIONES DE ESTADO → UI
+   ============================================================ */
+state.subscribe("health", (newHealth) => {
+  let current = parseInt(healthEl.textContent) || 0;
+  const diff = newHealth - current;
+  if (diff === 0){ healthEl.textContent = newHealth; }
+  else {
+    const step = diff > 0 ? 1 : -1, duration = 500, delay = Math.max(16, duration/Math.abs(diff));
+    const iv = setInterval(()=>{ if (current !== newHealth){ current += step; healthEl.textContent = current; } else clearInterval(iv); }, delay);
+  }
+  healthWidgetEl.classList.toggle("low", newHealth <= 6);
+});
+state.subscribe("deck", (newDeck) => {
+  cardCounterEl.textContent = newDeck.length;
+  deckWidgetEl.style.opacity = newDeck.length===0 ? .5 : 1;
+});
+state.subscribe("currentRoom", renderRoom);
+state.subscribe("weapon", renderWeapon);
+state.subscribe("weaponChain", renderWeaponChain);
+state.subscribe("selectedObject", () => { renderRoom(); renderWeapon(); renderWeaponChain(); renderSheet(); });
+state.subscribe("canRun", (canRun) => { runBtn.disabled = !canRun; });
+state.subscribe("combo", (combo) => { comboWidgetEl.classList.toggle("show", state.mode==="infinite" && combo > 0); comboCountEl.textContent = combo; });
+state.subscribe("bonusScore", (bonus) => { bonusWidgetEl.classList.toggle("show", state.mode==="infinite" && (bonus||0) > 0); bonusCountEl.textContent = bonus||0; });
+state.subscribe("mode", (mode) => {
+  modeLabelEl.textContent = t(mode==="infinite" ? "mode.infinite" : "mode.classic");
+  depthWidgetEl.classList.toggle("show", mode==="infinite");
+});
+state.subscribe("dungeonDepth", (depth) => { depthCountEl.textContent = depth; });
+state.subscribe("didWin", () => { if (!state.isGameOver) promptEl.textContent = t("prompt.default"); });
+
+/* ============================================================
+   MODALES
+   ============================================================ */
+function openModal(id){ $(id).classList.add("show"); }
+function closeModal(id){ $(id).classList.remove("show"); }
+
+sheetOverlay.addEventListener("click", closeSheet);
+sheetCloseBtn.addEventListener("click", closeSheet);
+
+/* ---- Cómo jugar ---- */
+$("menu-howto").addEventListener("click", ()=>openModal("howto-overlay"));
+$("howto-close").addEventListener("click", ()=>closeModal("howto-overlay"));
+$("howto-got-it").addEventListener("click", ()=>closeModal("howto-overlay"));
+$("howto-overlay").addEventListener("click", (e)=>{ if (e.target.id==="howto-overlay") closeModal("howto-overlay"); });
+
+/* ---- Ajustes ---- */
+$("settings-btn").addEventListener("click", ()=>{ syncSettingsUI(); openModal("settings-overlay"); });
+$("settings-close").addEventListener("click", ()=>closeModal("settings-overlay"));
+$("settings-overlay").addEventListener("click", (e)=>{ if (e.target.id==="settings-overlay") closeModal("settings-overlay"); });
+
+function syncSettingsUI(){
+  $("opt-easy").checked = settings.easyMode;
+  $("opt-events").checked = settings.events;
+  $("opt-sound").checked = settings.sound;
+  $("opt-music").checked = settings.music;
+  $("opt-vibration").checked = settings.vibration;
+  $("opt-blood").checked = settings.blood;
+}
+$("opt-easy").addEventListener("change", e=>{ settings.easyMode = e.target.checked; persistSettings(); });
+$("opt-events").addEventListener("change", e=>{ settings.events = e.target.checked; persistSettings(); });
+$("opt-sound").addEventListener("change", e=>{ settings.sound = e.target.checked; persistSettings(); });
+$("opt-music").addEventListener("change", e=>{
+  settings.music = e.target.checked; persistSettings();
+  if (settings.music) playBgMusic(); else pauseBgMusic();
+});
+$("opt-vibration").addEventListener("change", e=>{ settings.vibration = e.target.checked; persistSettings(); });
+$("opt-blood").addEventListener("change", e=>{ settings.blood = e.target.checked; persistSettings(); });
+
+$("new-game-btn").addEventListener("click", ()=>{ closeModal("settings-overlay"); startNewGame(state.mode); });
+$("main-menu-btn").addEventListener("click", ()=>{
+  if (!confirmLeaveIfNeeded()) return;
+  closeModal("settings-overlay"); goToMainMenu();
+});
+$("reset-progress-btn").addEventListener("click", ()=>{
+  if (!confirm(t("confirm.reset"))) return;
+  stats = defaultStats(); records = defaultRecords(); achievements = defaultAchievements();
+  persistStats(); persistRecords(); persistAchievements(); clearSavedGame();
+  renderStatsModal(); renderAchievements();
+  closeModal("settings-overlay");
+  goToMainMenu();
+});
+
+/* ---- Estadísticas ---- */
+function openStats(){ renderStatsModal(); renderAchievements(); openModal("stats-overlay"); }
+$("stats-btn").addEventListener("click", openStats);
+$("menu-stats-btn").addEventListener("click", openStats);
+$("stats-close").addEventListener("click", ()=>closeModal("stats-overlay"));
+$("stats-overlay").addEventListener("click", (e)=>{ if (e.target.id==="stats-overlay") closeModal("stats-overlay"); });
+
+function renderStatsModal(){
+  $("statMonsters").textContent = stats.monstersKilled;
+  $("statDamageDealt").textContent = stats.totalDamageDealt;
+  $("statDamageTaken").textContent = stats.totalDamageTaken;
+  $("statBestWeapon").textContent = stats.bestWeapon;
+  $("statPlaytime").textContent = formatDuration(stats.playTimeSeconds);
+  $("statGames").textContent = stats.gamesPlayed;
+  $("statDungeons").textContent = stats.dungeonsCleared;
+  $("statChests").textContent = stats.chestsOpened;
+  $("recordNormal").textContent = records.bestScoreNormal===null ? "—" : records.bestScoreNormal;
+  $("recordInfinite").textContent = records.bestScoreInfinite===null ? "—" : records.bestScoreInfinite;
+  $("recordStreak").textContent = records.bestStreak;
+  $("recordDepth").textContent = records.bestDepth;
+}
+function renderAchievements(){
+  const grid = $("ach-grid"); grid.innerHTML = "";
+  const dict = ACHIEVEMENT_META[currentLang];
+  Object.entries(dict).forEach(([id,meta])=>{
+    const unlocked = !!achievements[id];
+    const el = document.createElement("div");
+    el.className = "ach" + (unlocked ? "" : " locked");
+    el.innerHTML = `<span class="ico">${meta.icon}</span><div class="t">${meta.title}</div><div class="d">${meta.desc}</div>`;
+    grid.appendChild(el);
+  });
+}
+
+/* ---- Fin de partida ---- */
+function showGameOverModal(didWin, finalScore, isNewRecord){
+  $("go-emoji").textContent = didWin ? "🏆" : "💀";
+  $("go-title").textContent = didWin ? t("go.won") : t("go.died");
+  $("go-score").textContent = finalScore;
+  $("go-record").classList.toggle("show", isNewRecord);
+  $("go-monsters").textContent = runStats.monstersKilled;
+  $("go-depth").textContent = state.dungeonDepth;
+  $("go-combo").textContent = state.maxCombo;
+  openModal("gameover-overlay");
+}
+
+$("go-again").addEventListener("click", ()=>{ closeModal("gameover-overlay"); startNewGame(state.mode); });
+$("go-menu-btn").addEventListener("click", ()=>{ closeModal("gameover-overlay"); goToMainMenu(); });
+$("go-stats-btn").addEventListener("click", ()=>{ renderStatsModal(); renderAchievements(); closeModal("gameover-overlay"); openModal("stats-overlay"); });
+
+/* ============================================================
+   MENÚ PRINCIPAL
+   ============================================================ */
+function refreshContinueAvailability(){
+  const saved = Storage.get(SAVE_KEY, null);
+  const continueBtn = $("menu-continue");
+  if (saved && saved.mode === "infinite" && saved.currentRoom){
+    continueBtn.style.display = "flex";
+    $("menu-continue-desc").textContent = M("continueDesc", saved.dungeonDepth||1, saved.health);
+  } else {
+    continueBtn.style.display = "none";
+  }
+}
+function showMenu(){
+  refreshContinueAvailability();
+  menuScreen.classList.remove("hidden");
+  showMenuBanner();
+}
+function hideMenu(){ menuScreen.classList.add("hidden"); clearMenuBanner(); }
+function goToMainMenu(){
+  if (state.mode==="infinite" && !state.isGameOver) saveGame();
+  stopPlayTimer();
+  state.selectedObject = null;
+  CG.midgame(() => { setMusicTrack("menu"); showMenu(); });
+}
+function confirmLeaveIfNeeded(){
+  // Solo pide confirmación si hay una partida CLÁSICA en curso (esa nunca se guarda);
+  // el modo infinito ya se autoguarda, así que no hace falta interrumpir con un aviso.
+  const inGame = menuScreen.classList.contains("hidden");
+  if (inGame && !state.isGameOver && state.mode !== "infinite"){
+    return confirm(t("confirm.mainMenu"));
+  }
+  return true;
+}
+
+$("menu-classic").addEventListener("click", ()=>{ startNewGame("normal"); });
+$("menu-infinite").addEventListener("click", ()=>{ startNewGame("infinite"); });
+$("menu-continue").addEventListener("click", ()=>{
+  const saved = Storage.get(SAVE_KEY, null);
+  if (saved && saved.currentRoom){
+    CG.midgame(() => { hideMenu(); setMusicTrack("game"); loadGame(saved); startPlayTimer(); });
+  } else {
+    startNewGame("infinite");
+  }
+});
+$("brand-home").addEventListener("click", ()=>{ if (confirmLeaveIfNeeded()) goToMainMenu(); });
+document.querySelectorAll("#menu-lang .lang-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>setLanguage(btn.dataset.lang));
+});
+
+healthWidgetEl.addEventListener("click", ()=>selectObject("health"));
+deckWidgetEl.addEventListener("click", ()=>selectObject("deck"));
+weaponSlotEl.addEventListener("click", ()=>selectObject(state.weapon || "empty-weapon"));
+
+/* ============================================================
+   INICIALIZACIÓN DE PARTIDA
+   ============================================================ */
+function initializeGame(mode){
+  state.mode = mode;
+  state.health = MAX_HEALTH;
+  state.deck = []; state.currentRoom = []; state.weapon = null; state.weaponChain = [];
+  state.logs = ""; state.canRun = true; state.isGameOver = false; state.didWin = null; state.selectedObject = null;
+  state.dungeonDepth = 1; state.dungeonStreak = 0; state.combo = 0; state.maxCombo = 0;
+  state.bonusScore = 0; state.cursedDoubleDamage = false;
+
+  canDrinkPotion = true; lastCardPlayed = null; lastPotionHadNoEffect = false;
+  runStats = { monstersKilled:0, damageDealt:0, damageTaken:0 };
+  sessionSeconds = 0;
+
+  buildDeck(); drawRoom();
+  log(mode==="infinite" ? M("startInfinite") : M("startClassic"));
+  if (mode==="infinite") saveGame(); else clearSavedGame();
+}
+function startNewGame(mode){
+  CG.midgame(() => {
+    hideMenu();
+    setMusicTrack("game");
+    initializeGame(mode || "normal");
+    startPlayTimer();
+  });
+}
+
+runBtn.addEventListener("click", runAway);
+restartBtn.addEventListener("click", ()=>{
+  if (!state.isGameOver && !confirm(t("confirm.restart"))) return;
+  startNewGame(state.mode);
+});
+
+/* ============================================================
+   ARRANQUE
+   ============================================================ */
+/* ============================================================
+   MARCO DE LOS DIÁLOGOS: separa el contenido con scroll del
+   marco fijo, para que las esquinas ornamentales y el botón de
+   cerrar no se muevan al hacer scroll dentro del diálogo.
+   ============================================================ */
+function setupModalFrames(){
+  document.querySelectorAll(".modal").forEach(modal=>{
+    const closeBtn = modal.querySelector(".modal-close");
+    const scroll = document.createElement("div");
+    scroll.className = "modal-scroll";
+    Array.from(modal.childNodes).forEach(node=>{
+      if (node !== closeBtn) scroll.appendChild(node);
+    });
+    modal.appendChild(scroll);
+    if (closeBtn) modal.appendChild(closeBtn);
+    const corners = closeBtn ? ["tl","bl","br"] : ["tl","tr","bl","br"];
+    corners.forEach(pos=>{
+      const c = document.createElement("span");
+      c.className = "modal-corner modal-corner--"+pos;
+      modal.appendChild(c);
+    });
+  });
+  const sheet = $("card-details");
+  if (sheet){
+    ["tl","tr"].forEach(pos=>{
+      const c = document.createElement("span");
+      c.className = "modal-corner modal-corner--"+pos;
+      sheet.appendChild(c);
+    });
+  }
+}
+
+function boot(){
+  CG.init(); // dispara la inicialización; CG.ready se espera más abajo antes de habilitar "Continuar"
+  setupModalFrames();
+
+  // idioma inicial: por defecto inglés, o español si el navegador lo indica
+  const savedLang = settings.lang;
+  if (savedLang === "en" || savedLang === "es"){
+    currentLang = savedLang;
+  } else {
+    currentLang = (navigator.language||"").toLowerCase().startsWith("es") ? "es" : "en";
+  }
+  applyTranslations();
+
+  syncSettingsUI();
+  promptEl.textContent = t("prompt.default");
+  modeLabelEl.textContent = t("mode.classic");
+  depthLabelEl.textContent = t("depth.label");
+
+  initBgMusic(); // prepara los audios, sin reproducir nada todavía
+
+  // Pantalla de carga → botón "Continuar": ese click es el único gesto
+  // real de usuario que dispara audio en toda la app. Hasta que no se
+  // pulsa no se llama a play() en ningún sitio ni puede lanzarse ningún
+  // anuncio (los anuncios solo llegan por acciones dentro de la
+  // partida), así que anuncio y música nunca pueden solaparse.
+  const MIN_LOADING_MS = 900;
+  const loadingStart = Date.now();
+  const revealContinueBtn = () => {
+    const wait = Math.max(0, MIN_LOADING_MS - (Date.now() - loadingStart));
+    setTimeout(()=>{
+      $("loading-spinner").style.display = "none";
+      $("loading-label").style.display = "none";
+      $("loading-continue-btn").style.display = "flex";
+    }, wait);
+  };
+  const fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready.catch(()=>{}) : Promise.resolve();
+  Promise.all([fontsReady, CG.ready]).then(revealContinueBtn).catch(revealContinueBtn);
+
+  $("loading-continue-btn").addEventListener("click", ()=>{
+    $("loading-screen").classList.add("hidden");
+    setMusicTrack("menu");
+    showMenu();
+  }, { once:true });
+
+  document.addEventListener("visibilitychange", ()=>{
+    if (document.hidden){ persistStats(); saveGame(); pauseForPlatform(); }
+    else { resumeForPlatform(); }
+  });
+  window.addEventListener("beforeunload", ()=>{ persistStats(); saveGame(); });
+}
+boot();
+
+})();
+</script>
+</body>
+</html>
