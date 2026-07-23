@@ -1017,16 +1017,44 @@ const CG = {
    ============================================================ */
 const MENU_BANNER_ID = "menu-banner-container";
 function showMenuBanner(){
-  if (!CG.available || !window.CrazyGames.SDK.banner) return;
-  window.CrazyGames.SDK.banner
-    .requestBanner({ id: MENU_BANNER_ID, width: 320, height: 50 })
-    .catch((e)=> cgTrace("Banner del menú: error al solicitarlo", e));
+  if (!CG.available) return;
+  try{
+    const bannerModule = window.CrazyGames.SDK.banner; // el propio getter puede lanzar, por eso va dentro del try
+    if (!bannerModule) return;
+    const result = bannerModule.requestBanner({ id: MENU_BANNER_ID, width: 320, height: 50 });
+    if (result && typeof result.catch === "function"){
+      result.catch((e)=> cgTrace("Banner del menú: error al solicitarlo", e));
+    }
+  }catch(e){ cgTrace("Banner del menú: excepción al solicitarlo", e); }
 }
 function clearMenuBanner(){
-  if (!CG.available || !window.CrazyGames.SDK.banner) return;
-  try{ window.CrazyGames.SDK.banner.clearBanner(MENU_BANNER_ID); }
-  catch(e){ cgTrace("Banner del menú: error al limpiarlo", e); }
+  if (!CG.available) return;
+  try{
+    const bannerModule = window.CrazyGames.SDK.banner; // idem: leer la propiedad ya puede lanzar
+    if (!bannerModule) return;
+    bannerModule.clearBanner(MENU_BANNER_ID);
+  }catch(e){ cgTrace("Banner del menú: excepción al limpiarlo", e); }
 }
+
+/* Red de seguridad: cualquier error o promesa rechazada que escape del
+   propio script del SDK de CrazyGames (crazygames-sdk-v3.js) se
+   silencia aquí en vez de dejar que se propague como "Uncaught" y
+   corte la ejecución del resto del juego. El resto de nuestras
+   llamadas al SDK ya van protegidas con try/catch, esto es solo un
+   último cinturón de seguridad ante fallos internos del propio SDK. */
+window.addEventListener("error", (e)=>{
+  if (e && typeof e.filename === "string" && e.filename.includes("crazygames-sdk")){
+    cgTrace("Error atrapado desde crazygames-sdk-v3.js (ignorado):", e.error || e.message);
+    e.preventDefault();
+  }
+});
+window.addEventListener("unhandledrejection", (e)=>{
+  const msg = e && e.reason ? String(e.reason.stack || e.reason.message || e.reason) : "";
+  if (msg.includes("crazygames-sdk") || msg.includes("CrazyGames")){
+    cgTrace("Promesa rechazada sin capturar desde CrazyGames (ignorada):", e.reason);
+    e.preventDefault();
+  }
+});
 
 /* ============================================================
    ALMACENAMIENTO PERSISTENTE
