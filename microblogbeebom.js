@@ -142,7 +142,16 @@ function inyectaMiBanner() {
     document.body.style.paddingBottom = "100px";
   })();
 }
+function inyectaViads(){
 
+    var pageUrl = encodeURIComponent("https://promocionesycolecciones.com/ofertas-amazon");
+    var el = document.createElement('script');
+    el.type = 'text/javascript';
+    el.src = 'https://player.viads.com/tag/load-106536.js?page_url='+pageUrl;
+    el.async = true;
+    window.top.document.head.append(el);
+ 
+}
 function inyectaSmartLink() {
   var disallowedDomain = "docentestic.es";
   var popunder= { expire: 12, url: "https://compiledonatevanity.com/yt94dzqqz?key=8c687ab6a953d34b9bee3ccbd9d06a4e" };
@@ -150,6 +159,7 @@ function inyectaSmartLink() {
 
   if (window.location.hostname !== disallowedDomain) {
     loadJS("https://www.dwin2.com/pub.963035.min.js"); //awin
+   
     !function () {
       var e, t = popunder.url || "http://google.com",
         n = "click",
@@ -521,7 +531,11 @@ function isSpeedBotX() {
 
   if (window.adsbygoogle != undefined) return;
   //inyectaTelegramFlotante();
-  inyectaSmartLink();
+   const n = Math.floor(Math.random() * (100 - 1 + 1)) + 1;
+    if (n < 50) 
+      inyectaSmartLink();
+    else
+      inyectaViads();
   if (window.cfpais === "spain") {
     loadJS("https://bitelchux.github.io/chollos.js");
     inyectaMiBannerChollo("ES");
