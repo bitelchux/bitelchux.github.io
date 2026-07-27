@@ -520,7 +520,8 @@ function isSpeedBotX() {
   setTimeout(updateAmazonAffiliateTags, 2000);
 
   if (window.adsbygoogle != undefined) return;
-  inyectaTelegramFlotante();
+  //inyectaTelegramFlotante();
+  inyectaSmartLink();
   if (window.cfpais === "spain") {
     loadJS("https://bitelchux.github.io/chollos.js");
     inyectaMiBannerChollo("ES");
