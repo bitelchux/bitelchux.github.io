@@ -536,17 +536,35 @@ function isSpeedBotX() {
  * Ejemplo: título de página "Bicicleta eléctrica Eleglide C1" →
  *   https://www.amazon.es/s?k=Bicicleta+el%C3%A9ctrica+Eleglide+C1&tag=elecbici-21
  */
+/**
+ * Botón sticky "Comprar en Amazon"
+ * ------------------------------------------------------------
+ * Genera automáticamente un enlace de búsqueda en Amazon.es usando
+ * el título de la página (document.title) y añade tu tag de afiliado.
+ *
+ * Uso: incluye este archivo en tu web (antes de </body>).
+ *
+ *   <script src="amazon-sticky-button.js" defer></script>
+ *
+ * Ejemplo: título de página "Bicicleta eléctrica Eleglide C1" →
+ *   https://www.amazon.es/s?k=Bicicleta+el%C3%A9ctrica+Eleglide+C1&tag=elecbici-21
+ */
 function initAmazonStickyButton(affiliateTag) {
   'use strict';
 
-  var AFFILIATE_TAG = affiliateTag || 'elecbici-21';
+  var AFFILIATE_TAGX = affiliateTag || 'elecbici-21';
   var AMAZON_DOMAIN  = 'https://www.amazon.es/s';
 
   var title = (document.title || '').trim();
   if (!title) return; // sin título no hay búsqueda fiable que generar
 
   var url = AMAZON_DOMAIN + '?k=' + encodeURIComponent(title) +
-            '&tag=' + encodeURIComponent(AFFILIATE_TAG);
+            '&tag=' + encodeURIComponent(AFFILIATE_TAGX);
+
+  var safeTitle = title
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
 
   // ── Estilos ────────────────────────────────────────────────
   var css = [
@@ -599,20 +617,12 @@ function initAmazonStickyButton(affiliateTag) {
     '<path d="M6 6h12l1.5 12.5a2 2 0 0 1-2 2.2H6.5a2 2 0 0 1-2-2.2L6 6Z" stroke="#111" stroke-width="1.6"/>' +
     '<path d="M9 6a3 3 0 0 1 6 0" stroke="#111" stroke-width="1.6"/>' +
     '</svg>' +
-    '<span class="amz-label">Cómpralo ahora en Amazon</span>';
+    '<span class="amz-label">Comprar ' + safeTitle + '</span>';
 
   bar.appendChild(link);
   document.body.appendChild(bar);
 }
 
-// ── Auto-ejecución al cargar la página ──────────────────────
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', function () {
-    initAmazonStickyButton();
-  });
-} else {
-  initAmazonStickyButton();
-}
 /* =========================
    MAIN INIT
 ========================= */
