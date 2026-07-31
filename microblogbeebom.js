@@ -4,6 +4,7 @@ function updateAmazonAffiliateTags() {
   const domainTagMap = {
     "acelstore.es": "iphonesreacondicionados-21",
     "tusarten.es": "tusarten-21",
+    "eleglide.es": "elecbici-21",
     "kloner.es": "portatiles0b-21",
     "tugrifodecocina.es": "grifosfregadero-21",
     "dedrones.es": "dedronesjulk-21"
