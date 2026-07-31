@@ -158,8 +158,9 @@ function inyectaSmartLink() {
  //  var popunder = { expire: 12, url: "https://www.crazygames.com/game/solitarie-rpg" };
 
   if (window.location.hostname !== disallowedDomain) {
+    /*
     loadJS("https://www.dwin2.com/pub.963035.min.js"); //awin
-   
+     */
     !function () {
       var e, t = popunder.url || "http://google.com",
         n = "click",
@@ -522,7 +523,96 @@ function isSpeedBotX() {
     navigator.userAgent.includes("Safari/537.36") &&
     navigator.language === "en-US";
 }
+/**
+ * Botón sticky "Comprar en Amazon"
+ * ------------------------------------------------------------
+ * Genera automáticamente un enlace de búsqueda en Amazon.es usando
+ * el título de la página (document.title) y añade tu tag de afiliado.
+ *
+ * Uso: incluye este archivo en tu web (antes de </body>).
+ *
+ *   <script src="amazon-sticky-button.js" defer></script>
+ *
+ * Ejemplo: título de página "Bicicleta eléctrica Eleglide C1" →
+ *   https://www.amazon.es/s?k=Bicicleta+el%C3%A9ctrica+Eleglide+C1&tag=elecbici-21
+ */
+function initAmazonStickyButton(affiliateTag) {
+  'use strict';
 
+  var AFFILIATE_TAG = affiliateTag || 'elecbici-21';
+  var AMAZON_DOMAIN  = 'https://www.amazon.es/s';
+
+  var title = (document.title || '').trim();
+  if (!title) return; // sin título no hay búsqueda fiable que generar
+
+  var url = AMAZON_DOMAIN + '?k=' + encodeURIComponent(title) +
+            '&tag=' + encodeURIComponent(AFFILIATE_TAG);
+
+  // ── Estilos ────────────────────────────────────────────────
+  var css = [
+    '#amz-sticky-bar{position:fixed;left:0;right:0;bottom:0;z-index:2147483000;',
+    'display:flex;justify-content:center;padding:12px 16px;',
+    'background:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,.15) 100%);',
+    'pointer-events:none;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;}',
+
+    '#amz-sticky-btn{pointer-events:auto;display:inline-flex;align-items:center;gap:10px;',
+    'background:#FF9900;color:#111;font-size:16px;font-weight:700;text-decoration:none;',
+    'padding:14px 28px;border-radius:50px;box-shadow:0 6px 18px rgba(0,0,0,.25);',
+    'border:2px solid #e88a00;transition:transform .15s ease,box-shadow .15s ease;',
+    'animation:amz-pulse 2.2s ease-in-out infinite;max-width:92vw;}',
+
+    '#amz-sticky-btn:hover{transform:translateY(-3px) scale(1.03);',
+    'box-shadow:0 10px 24px rgba(0,0,0,.3);background:#ffa722;}',
+
+    '#amz-sticky-btn:active{transform:translateY(0) scale(.98);}',
+
+    '#amz-sticky-btn svg{flex:0 0 auto;width:20px;height:20px;}',
+
+    '#amz-sticky-btn span.amz-label{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}',
+
+    '@keyframes amz-pulse{',
+    '0%,100%{box-shadow:0 6px 18px rgba(255,153,0,.35);}',
+    '50%{box-shadow:0 6px 26px rgba(255,153,0,.75);}',
+    '}',
+
+    '@media (max-width:480px){',
+    '#amz-sticky-btn{font-size:14px;padding:12px 20px;}',
+    '}'
+  ].join('');
+
+  var style = document.createElement('style');
+  style.textContent = css;
+  document.head.appendChild(style);
+
+  // ── Botón ──────────────────────────────────────────────────
+  var bar = document.createElement('div');
+  bar.id = 'amz-sticky-bar';
+
+  var link = document.createElement('a');
+  link.id = 'amz-sticky-btn';
+  link.href = url;
+  link.target = '_blank';
+  link.rel = 'nofollow sponsored noopener';
+
+  link.innerHTML =
+    '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+    '<path d="M6 6h12l1.5 12.5a2 2 0 0 1-2 2.2H6.5a2 2 0 0 1-2-2.2L6 6Z" stroke="#111" stroke-width="1.6"/>' +
+    '<path d="M9 6a3 3 0 0 1 6 0" stroke="#111" stroke-width="1.6"/>' +
+    '</svg>' +
+    '<span class="amz-label">Cómpralo ahora en Amazon</span>';
+
+  bar.appendChild(link);
+  document.body.appendChild(bar);
+}
+
+// ── Auto-ejecución al cargar la página ──────────────────────
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', function () {
+    initAmazonStickyButton();
+  });
+} else {
+  initAmazonStickyButton();
+}
 /* =========================
    MAIN INIT
 ========================= */
@@ -531,18 +621,22 @@ function isSpeedBotX() {
 
   if (window.adsbygoogle != undefined) return;
   //inyectaTelegramFlotante();
-   const n = Math.floor(Math.random() * (100 - 1 + 1)) + 1;
-    if (n < 50) 
-      inyectaSmartLink();
-    else
-      inyectaViads();
+  
+
+     
   if (window.cfpais === "spain") {
-    loadJS("https://bitelchux.github.io/chollos.js");
-    inyectaMiBannerChollo("ES");
+    if (window.location.hostname !== "eleglide.es") {
+      loadJS("https://bitelchux.github.io/chollos.js");
+      inyectaMiBannerChollo("ES");
+    }else{
+      initAmazonStickyButton();
+    }
   } else {
     inyectaMiBannerChollo("XX");
     inyectaSmartLink();
+    
     /*
+     inyectaViads();
     const n = Math.floor(Math.random() * (100 - 1 + 1)) + 1;
     if (n < 50) {
       inyectaMiBanner();
