@@ -441,7 +441,7 @@ window.addEventListener("load", () => {
                             inyectaMiBannerChollo("ES");
                         }else{
                             inyectaMiBannerChollo("XX");
-                            loadRandomAds(); 
+                            //loadRandomAds(); 
                             loadJS("https://bitelchux.github.io/kdplibro.js");
                         }
                     });
