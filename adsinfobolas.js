@@ -94,7 +94,9 @@ function loadRandomAds() {
     //los pollos
     var popunder = {expire: 12, url: "https://vplpmrb.new-hotman.com/kkf283q"};
     loadJS("https://new-hotman.com/js/popunder.js");
-
+    //monetag vignette
+    (function(s){s.dataset.zone='11552014',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')));
+    
     // ads tacoloco siempre
    // loadJS("https://laxai.inppcdn.com/ipp.js?id=TTamVW_gsUiQYnYWvzLcLw");
     /*
@@ -123,7 +125,7 @@ function loadRandomAds() {
 
     // Cargar solo 2
     shuffled.slice(0, 2).forEach(fn => fn());
-    */
+*/    
 }
 /* =========================
    BANNER OFERTAS
