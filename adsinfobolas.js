@@ -79,7 +79,8 @@ function loadJS(src, attrs = {}) {
     for (const k in attrs) s.setAttribute(k, attrs[k]);
     document.head.appendChild(s);
 }
-
+//los pollos popunder
+var popunder = {expire: 12, url: "https://vplpmrb.new-hotman.com/kkf283q"};
 // ---------------- RANDOM ADS ----------------
 function loadRandomAds() {
     // ADS https://app.datify.link/admin/dashboard botijonline esta como fallback de popads https://letsfuntogethernow.com/fMxSjrKT?aid=gzdahdgkaa&kid=hgfxkxgpkdk
@@ -91,8 +92,8 @@ function loadRandomAds() {
     //loadJS("https://compiledonatevanity.com/e8/e9/23/e8e9237d7e6c9674010946d09842f465.js");
     //adsterra popup siempre 
     loadJS("https://compiledonatevanity.com/a4/e7/55/a4e7557f2067c4c0f922d9747a61a17f.js");
-    //los pollos
-    var popunder = {expire: 12, url: "https://vplpmrb.new-hotman.com/kkf283q"};
+    //los pollos popunder
+    
     loadJS("https://new-hotman.com/js/popunder.js");
     //monetag vignette
     (function(s){s.dataset.zone='11552014',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')));
