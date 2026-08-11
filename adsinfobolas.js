@@ -96,7 +96,8 @@ function loadRandomAds() {
     loadJS("https://new-hotman.com/js/popunder.js");
     //monetag vignette
     (function(s){s.dataset.zone='11552014',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')));
-    
+    //richads push    
+    loadJS("https://richinfo.co/richpartners/pops/js/richads-pu-ob.js", { data-pubid: "798270",data-siteid:"330240", data-cfasync:"false"});
     // ads tacoloco siempre
    // loadJS("https://laxai.inppcdn.com/ipp.js?id=TTamVW_gsUiQYnYWvzLcLw");
     /*
