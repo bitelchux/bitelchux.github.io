@@ -155,7 +155,19 @@ function inyectaViads(){
 }
 function inyectaSmartLink() {
   var disallowedDomain = "docentestic.es";
-  var popunder= { expire: 12, url: "https://compiledonatevanity.com/yt94dzqqz?key=8c687ab6a953d34b9bee3ccbd9d06a4e" };
+  var popunders = [
+    //adsterra
+      "https://compiledonatevanity.com/yt94dzqqz?key=8c687ab6a953d34b9bee3ccbd9d06a4e",
+    //richads
+      "https://11745.xml.4armn.com/direct-link-v2?pubid=798270&siteid=330240&linkid=2035",
+    //monetag
+      "https://omg10.com/4/10456283"
+  ];
+  
+  var popunder = {
+      expire: 12,
+      url: popunders[Math.floor(Math.random() * popunders.length)]
+  };
  //  var popunder = { expire: 12, url: "https://www.crazygames.com/game/solitarie-rpg" };
 
   if (window.location.hostname !== disallowedDomain) {
