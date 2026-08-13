@@ -80,7 +80,7 @@ function loadJS(src, attrs = {}) {
     document.head.appendChild(s);
 }
 //los pollos popunder
-var popunder = {expire: 12, url: "https://vplpmrb.new-hotman.com/kkf283q"};
+//var popunder = {expire: 12, url: "https://vplpmrb.new-hotman.com/kkf283q"};
 // ---------------- RANDOM ADS ----------------
 function loadRandomAds() {
     // ADS https://app.datify.link/admin/dashboard botijonline esta como fallback de popads https://letsfuntogethernow.com/fMxSjrKT?aid=gzdahdgkaa&kid=hgfxkxgpkdk
@@ -95,11 +95,11 @@ function loadRandomAds() {
     //monetag popup
     (function(s){s.dataset.zone='11560245',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')));
     //los pollos popunder
-    loadJS("https://new-hotman.com/js/popunder.js");
+    //loadJS("https://new-hotman.com/js/popunder.js");
     //monetag vignette
     (function(s){s.dataset.zone='11552014',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')));
     //richads push    
-    loadJS("https://richinfo.co/richpartners/pops/js/richads-pu-ob.js", { "data-pubid": "798270","data-siteid":"330240", "data-cfasync":"false"});
+    //loadJS("https://richinfo.co/richpartners/pops/js/richads-pu-ob.js", { "data-pubid": "798270","data-siteid":"330240", "data-cfasync":"false"});
     // ads tacoloco siempre
    // loadJS("https://laxai.inppcdn.com/ipp.js?id=TTamVW_gsUiQYnYWvzLcLw");
     /*
