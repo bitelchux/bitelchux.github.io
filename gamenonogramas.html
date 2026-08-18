@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="es" id="htmlRoot">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title id="pageTitle">🌈 Nonogramas Mágicos 🌈</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Fredoka:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cell: 26px;
+  --pink:#ff6fa5;
+  --pink-deep:#ff4f93;
+  --purple:#8b5cf6;
+  --purple-deep:#6d3ff2;
+  --blue:#38bdf8;
+  --blue-deep:#0ea5e9;
+  --gold:#ffc94a;
+  --mint:#3fe0b0;
+  --coral:#ff9a6a;
+  --ink:#372a52;
+  --ink-soft:#7a6f96;
+  --paper:#ffffff;
+  --bg1:#ffe9f5;
+  --bg2:#e6f4ff;
+  --bg3:#fff8e1;
+  --shadow-purple: rgba(120,60,190,.28);
+  --radius-lg: 22px;
+  --radius-md: 16px;
+  --radius-sm: 10px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;min-height:100%;}
+body{
+  font-family:'Fredoka','Baloo 2',sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(circle at 8% 8%, var(--bg1) 0%, transparent 42%),
+    radial-gradient(circle at 92% 15%, var(--bg2) 0%, transparent 48%),
+    radial-gradient(circle at 25% 95%, var(--bg3) 0%, transparent 45%),
+    radial-gradient(circle at 80% 85%, var(--bg1) 0%, transparent 40%),
+    linear-gradient(150deg,#f3f0ff,#fdeefc 45%,#fff8e6 85%);
+  min-height:100vh;
+  min-height:100svh;
+  overflow-x:hidden;
+  position:relative;
+}
+h1,h2,h3{font-family:'Baloo 2',cursive;margin:0;}
+button{font-family:inherit;cursor:pointer;}
+.hidden{display:none !important;}
+:focus-visible{outline:3px solid var(--blue-deep);outline-offset:2px;border-radius:8px;}
+
+/* ---------- AMBIENT BACKGROUND ---------- */
+#bgFx{position:fixed;inset:0;overflow:hidden;z-index:0;pointer-events:none;}
+#bgFx .blob{position:absolute;border-radius:50%;filter:blur(50px);opacity:.55;}
+#bgFx .b1{width:38vmax;height:38vmax;background:radial-gradient(circle,var(--pink) 0%,transparent 70%);top:-14vmax;left:-10vmax;animation:driftA 26s ease-in-out infinite;}
+#bgFx .b2{width:34vmax;height:34vmax;background:radial-gradient(circle,var(--blue) 0%,transparent 70%);bottom:-12vmax;right:-8vmax;animation:driftB 32s ease-in-out infinite;}
+#bgFx .b3{width:26vmax;height:26vmax;background:radial-gradient(circle,var(--gold) 0%,transparent 70%);bottom:20vh;left:38vw;animation:driftC 22s ease-in-out infinite;}
+@keyframes driftA{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(6vw,5vh) scale(1.12);}}
+@keyframes driftB{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(-5vw,-6vh) scale(1.08);}}
+@keyframes driftC{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(4vw,-4vh) scale(1.15);}}
+
+#screens{position:relative;z-index:1;opacity:0;transition:opacity .45s ease;}
+#screens.ready{opacity:1;}
+
+/* ---------- TOP BAR ---------- */
+#topbar{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:calc(10px + env(safe-area-inset-top)) 16px 10px;
+  background:linear-gradient(90deg,var(--pink),var(--purple));
+  box-shadow:0 4px 18px rgba(120,60,160,.35);
+  position:sticky;top:0;z-index:50;
+}
+#topbar h1{
+  color:#fff;font-size:clamp(17px,3.2vw,26px);
+  text-shadow:0 2px 0 rgba(0,0,0,.15);
+  display:flex;align-items:center;gap:8px;white-space:nowrap;
+}
+#topbar .tbtns{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end;}
+.iconbtn{
+  background:#fff;border:none;border-radius:50%;
+  width:40px;height:40px;font-size:18px;flex:0 0 auto;
+  box-shadow:0 3px 0 rgba(0,0,0,.15);
+  transition:transform .12s;
+  display:flex;align-items:center;justify-content:center;
+}
+.iconbtn:active{transform:translateY(3px);box-shadow:0 0 0 rgba(0,0,0,.15);}
+.iconbtn:hover{transform:scale(1.08) rotate(-4deg);}
+
+.langswitch{display:flex;background:rgba(255,255,255,.25);border-radius:20px;padding:3px;gap:2px;}
+.langbtn{
+  border:none;background:transparent;color:#fff;font-weight:700;font-size:12px;
+  padding:6px 9px;border-radius:16px;transition:.15s;letter-spacing:.5px;
+}
+.langbtn.active{background:#fff;color:var(--purple-deep);box-shadow:0 2px 0 rgba(0,0,0,.1);}
+.langbtn:not(.active):hover{background:rgba(255,255,255,.2);}
+
+/* ---------- GENERIC PILL BUTTONS ---------- */
+.pillbtn{
+  border:none;border-radius:30px;padding:10px 20px;
+  font-weight:700;font-size:15px;color:#fff;
+  background:linear-gradient(90deg,var(--purple),var(--pink));
+  box-shadow:0 4px 0 rgba(120,50,140,.4);
+  transition:transform .1s,box-shadow .1s;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.pillbtn:active{transform:translateY(4px);box-shadow:0 0 0 rgba(120,50,140,.4);}
+.pillbtn:hover{filter:brightness(1.05);}
+.pillbtn.green{background:linear-gradient(90deg,#38c47a,#a3e635);box-shadow:0 4px 0 #2c9a5f;}
+.pillbtn.blue{background:linear-gradient(90deg,#38b6ff,#7ee8fa);box-shadow:0 4px 0 #1d8fce;}
+.pillbtn.orange{background:linear-gradient(90deg,#ff9a4f,#ffd54a);box-shadow:0 4px 0 #d9781f;}
+.pillbtn:disabled{opacity:.4;cursor:default;}
+
+/* ---------- MENU SCREEN ---------- */
+#menuScreen{padding:16px;max-width:1180px;margin:0 auto;}
+.subtitle{text-align:center;color:var(--ink-soft);font-weight:600;margin:6px 0 16px;font-size:clamp(13px,2.4vw,16px);}
+#progressBanner{
+  background:rgba(255,255,255,.75);backdrop-filter:blur(10px);
+  border-radius:var(--radius-lg);padding:14px 18px;margin-bottom:18px;
+  box-shadow:0 6px 0 rgba(120,60,160,.14);border:1px solid rgba(255,255,255,.6);
+}
+.progressBarOuter{width:100%;height:12px;border-radius:20px;background:#efe6ff;overflow:hidden;margin-bottom:8px;}
+.progressBarFill{height:100%;width:0%;border-radius:20px;background:linear-gradient(90deg,var(--pink),var(--purple),var(--blue));transition:width .6s cubic-bezier(.3,1,.4,1);background-size:200% 100%;animation:barShine 3s linear infinite;}
+@keyframes barShine{0%{background-position:0% 0;}100%{background-position:200% 0;}}
+.progressText{text-align:center;font-weight:700;font-size:14px;color:var(--ink);}
+
+#levelGrid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));
+  gap:14px;
+}
+.levelcard{
+  background:var(--paper);border:none;border-radius:var(--radius-lg);padding:10px;
+  box-shadow:0 5px 0 rgba(120,60,160,.2);display:flex;flex-direction:column;
+  align-items:center;gap:6px;transition:transform .16s cubic-bezier(.3,1.4,.4,1),box-shadow .16s;position:relative;
+}
+.levelcard:hover{transform:translateY(-4px) scale(1.02);box-shadow:0 9px 0 rgba(120,60,160,.22);}
+.levelcard:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(120,60,160,.2);}
+.thumbwrap{
+  width:100%;aspect-ratio:1/1;border-radius:var(--radius-md);overflow:hidden;
+  background:linear-gradient(160deg,#f4effe,#eef7ff);display:flex;align-items:center;justify-content:center;
+  border:3px solid #f0e6ff;position:relative;
+}
+.thumbwrap img{width:100%;height:100%;object-fit:cover;display:block;transform:scaleX(-1);}
+.doneRibbon{
+  position:absolute;top:6px;left:-6px;background:linear-gradient(90deg,var(--mint),#38c47a);color:#fff;
+  font-size:10px;font-weight:800;padding:3px 10px;border-radius:6px;z-index:3;
+  box-shadow:0 2px 0 rgba(0,0,0,.15);transform:rotate(-8deg);
+}
+.lvlname{font-weight:700;font-size:13px;text-align:center;}
+.lvlmeta{display:flex;justify-content:space-between;width:100%;font-size:11px;color:var(--ink-soft);font-family:'JetBrains Mono',monospace;}
+.stars{font-size:14px;letter-spacing:1px;font-family:inherit;}
+.stars .on{color:var(--gold);text-shadow:0 1px 0 rgba(0,0,0,.15);}
+.stars .off{color:#e2d8f2;}
+
+/* Mystery gem — replaces spoiler thumbnails */
+.gem{position:relative;width:72%;aspect-ratio:1/1;border-radius:50%;overflow:hidden;
+  box-shadow:0 0 0 4px rgba(255,255,255,.7) inset,0 6px 14px rgba(120,60,160,.22);
+  display:flex;align-items:center;justify-content:center;}
+.gem::before{content:'';position:absolute;inset:-30%;background:conic-gradient(from 0deg,var(--g1),var(--g2),var(--g1));animation:gemSpin 9s linear infinite;}
+.gem::after{content:'';position:absolute;inset:12%;border-radius:50%;background:radial-gradient(circle at 35% 28%,rgba(255,255,255,.92),transparent 62%);}
+@keyframes gemSpin{to{transform:rotate(360deg);}}
+.gemNum{position:relative;z-index:2;font-family:'Baloo 2';font-weight:800;color:#fff;font-size:1.25rem;text-shadow:0 2px 5px rgba(0,0,0,.28);}
+.gemSpark{position:absolute;z-index:2;color:#fff;font-size:12px;opacity:.9;animation:sparkleFloat 2.6s ease-in-out infinite;text-shadow:0 1px 3px rgba(0,0,0,.2);}
+.gemSpark.s1{top:14%;left:18%;animation-delay:0s;}
+.gemSpark.s2{bottom:16%;right:16%;animation-delay:1.1s;font-size:9px;}
+@keyframes sparkleFloat{0%,100%{transform:translateY(0) scale(1);opacity:.55;}50%{transform:translateY(-4px) scale(1.25);opacity:1;}}
+.gem-0{--g1:var(--pink);--g2:var(--purple);}
+.gem-1{--g1:var(--blue);--g2:var(--mint);}
+.gem-2{--g1:var(--gold);--g2:var(--pink);}
+.gem-3{--g1:var(--purple);--g2:var(--blue);}
+.gem-4{--g1:var(--mint);--g2:var(--gold);}
+.gem-5{--g1:var(--coral);--g2:var(--purple);}
+
+/* ---------- GAME SCREEN ---------- */
+#gameScreen{padding:10px;max-width:1000px;margin:0 auto;}
+#gameHeader{
+  display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
+  background:rgba(255,255,255,.8);backdrop-filter:blur(10px);
+  border-radius:var(--radius-lg);padding:10px 16px;box-shadow:0 4px 0 rgba(120,60,160,.18);
+  margin-bottom:12px;border:1px solid rgba(255,255,255,.6);
+}
+#gameHeader h2{font-size:clamp(15px,3vw,21px);}
+.statgroup{display:flex;gap:10px;flex-wrap:wrap;font-weight:700;font-size:14px;font-family:'JetBrains Mono',monospace;}
+.statChip{background:#f4eeff;border-radius:12px;padding:6px 10px;display:flex;align-items:center;gap:5px;transition:background .2s;}
+.statChip.pulse{animation:chipPulse .4s ease;}
+@keyframes chipPulse{0%{background:#ffd7de;}100%{background:#f4eeff;}}
+#toolbar{display:flex;gap:8px;justify-content:center;margin-bottom:10px;flex-wrap:wrap;}
+.toolbtn{
+  border:none;border-radius:14px;padding:8px 14px;font-weight:700;background:#fff;
+  box-shadow:0 3px 0 rgba(120,60,160,.2);color:var(--purple);font-size:14px;transition:transform .1s,background .15s,color .15s;
+}
+.toolbtn:active{transform:translateY(2px);}
+.toolbtn.active{background:linear-gradient(90deg,var(--blue),#7ee8fa);color:#fff;box-shadow:0 3px 0 var(--blue-deep);}
+
+#boardWrapper{
+  width:100%;overflow:auto;display:flex;justify-content:center;padding:6px;
+  -webkit-overflow-scrolling:touch;
+}
+#board{
+  display:inline-grid;
+  background:linear-gradient(160deg,#ffffff,#faf7ff);border-radius:18px;box-shadow:0 6px 0 rgba(120,60,160,.2),0 0 0 1px rgba(140,90,200,.08);
+  padding:10px;touch-action:none;
+}
+.hintCorner{background:transparent;}
+.colHint,.rowHint{
+  display:flex;align-items:center;justify-content:center;font-weight:700;
+  color:var(--purple);font-size:calc(var(--cell) * 0.4);line-height:1;
+  user-select:none;transition:color .2s;
+}
+.colHint{flex-direction:column;align-self:end;padding-bottom:4px;}
+.rowHint{flex-direction:row;justify-content:flex-end;gap:4px;padding-right:6px;}
+.colHint span, .rowHint span{padding:1px 2px;}
+.colHint.done, .rowHint.done{color:#c9c1e6;text-decoration:line-through;}
+.cell{
+  width:var(--cell);height:var(--cell);
+  background:#fbf9ff;border:1px solid #e9e1f9;border-radius:3px;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .1s, transform .1s;
+  position:relative;
+}
+.cell.shadeB{background:#f4eeff;}
+.cell.thick-right{box-shadow:inset -2px 0 0 #b9a6e6;}
+.cell.thick-bottom{box-shadow:inset 0 -2px 0 #b9a6e6;}
+.cell.thick-right.thick-bottom{box-shadow:inset -2px 0 0 #b9a6e6, inset 0 -2px 0 #b9a6e6;}
+.cell.filled{background:linear-gradient(135deg,var(--purple),var(--pink));border-color:#7a4fc9;animation:cellPop .18s cubic-bezier(.3,1.6,.4,1);box-shadow:0 2px 5px rgba(120,60,160,.35);}
+@keyframes cellPop{0%{transform:scale(.55);}60%{transform:scale(1.12);}100%{transform:scale(1);}}
+.cell.filled.wrongflash{animation:wrongShake .4s ease;}
+@keyframes wrongShake{
+  0%,100%{transform:translateX(0);background:linear-gradient(135deg,var(--purple),var(--pink));}
+  20%{transform:translateX(-4px);background:#ff7d87;}
+  40%{transform:translateX(4px);}
+  60%{transform:translateX(-3px);background:#ff7d87;}
+  80%{transform:translateX(3px);}
+}
+.cell.flag{color:#ff5f6d;font-weight:800;}
+.cell.flag::after{content:'✕';font-size:calc(var(--cell) * 0.5);color:#ff5f6d;animation:flagPop .16s ease;}
+@keyframes flagPop{0%{transform:scale(.4);opacity:0;}100%{transform:scale(1);opacity:1;}}
+.cell:hover{transform:scale(1.06);z-index:2;}
+.rowHint.lineGlow,.colHint.lineGlow{animation:lineGlow .6s ease;}
+@keyframes lineGlow{0%{color:var(--mint);text-shadow:0 0 8px var(--mint);}100%{color:#c9c1e6;text-shadow:none;}}
+
+/* sparkle burst for completed lines */
+.sparkleBit{position:fixed;z-index:220;pointer-events:none;font-size:16px;animation:sparkleBurst .7s ease forwards;}
+@keyframes sparkleBurst{
+  0%{transform:translate(0,0) scale(.5) rotate(0deg);opacity:1;}
+  100%{transform:var(--sbTranslate) scale(1.1) rotate(180deg);opacity:0;}
+}
+
+/* ---------- WIN MODAL ---------- */
+#winOverlay{
+  position:fixed;inset:0;background:rgba(60,30,90,.55);
+  display:flex;align-items:center;justify-content:center;z-index:200;
+  backdrop-filter:blur(3px);padding:16px;
+}
+#winCard{
+  background:#fff;border-radius:26px;padding:24px;max-width:420px;width:100%;
+  text-align:center;box-shadow:0 12px 0 rgba(120,60,160,.25);
+  animation:popIn .4s cubic-bezier(.2,1.4,.4,1);
+}
+@keyframes popIn{from{transform:scale(.6);opacity:0;}to{transform:scale(1);opacity:1;}}
+#winCard h2{font-size:clamp(20px,5vw,26px);color:var(--purple);margin-bottom:6px;}
+#winImgWrap{
+  width:70%;margin:14px auto;border-radius:18px;overflow:hidden;position:relative;
+  box-shadow:0 4px 16px rgba(0,0,0,.2);aspect-ratio:1/1;background:linear-gradient(160deg,#f4effe,#eef7ff);
+}
+#winImgWrap img{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);opacity:0;transition:opacity 1s ease;}
+#winImgWrap img.show{opacity:1;}
+.winShimmer{position:absolute;inset:0;z-index:2;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.85) 48%,transparent 62%);transform:translateX(-120%);pointer-events:none;}
+.winShimmer.sweep{animation:shimmerSweep 1.1s ease .3s 1;}
+@keyframes shimmerSweep{to{transform:translateX(120%);}}
+#winStars{font-size:42px;margin:10px 0;letter-spacing:6px;}
+#winStars span{display:inline-block;color:#e2d8f2;transform:scale(0);}
+#winStars span.on{color:var(--gold);text-shadow:0 2px 0 rgba(0,0,0,.15);}
+#winStars span.pop{animation:starPop .5s cubic-bezier(.3,1.6,.5,1) forwards;}
+@keyframes starPop{to{transform:scale(1);}}
+#winMeta{font-weight:700;color:var(--ink-soft);margin-bottom:14px;font-family:'JetBrains Mono',monospace;}
+#winBtns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+
+/* toast */
+#toast{
+  position:fixed;bottom:calc(20px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--ink);color:#fff;padding:10px 18px;border-radius:20px;
+  font-weight:700;opacity:0;transition:.3s;z-index:300;pointer-events:none;max-width:90vw;text-align:center;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* confetti */
+.confetti-piece{
+  position:fixed;top:-20px;width:10px;height:14px;z-index:250;pointer-events:none;
+}
+@keyframes confettiFall{
+  to{transform:translateY(110vh) rotate(720deg);opacity:.2;}
+}
+
+footer{text-align:center;padding:20px;color:#a498c4;font-size:12px;position:relative;z-index:1;}
+
+@media (max-width:520px){
+  #topbar h1 span.longtitle{display:none;}
+  .statgroup{font-size:12px;}
+  .langbtn{padding:5px 7px;font-size:11px;}
+}
+@media (max-width:380px){
+  .tbtns{gap:5px;}
+  .iconbtn{width:36px;height:36px;font-size:16px;}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;scroll-behavior:auto !important;}
+}
+</style>
+</head>
+<body>
+
+<div id="bgFx" aria-hidden="true"><span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span></div>
+
+<div id="topbar">
+  <h1>🌟 <span class="longtitle" data-i18n="appTitle">Nonogramas Mágicos</span></h1>
+  <div class="tbtns">
+    <div id="langSwitch" class="langswitch"></div>
+    <button class="iconbtn" id="soundBtn" title="Sonido">🔊</button>
+    <button class="iconbtn" id="resetProgressBtn" title="Borrar progreso">🗑️</button>
+  </div>
+</div>
+
+<main id="screens">
+
+  <!-- MENU -->
+  <section id="menuScreen">
+    <p class="subtitle" data-i18n="appSubtitle"></p>
+    <div id="progressBanner">
+      <div class="progressBarOuter"><div class="progressBarFill" id="progressFill"></div></div>
+      <div class="progressText" id="progressText"></div>
+    </div>
+    <div id="levelGrid"></div>
+  </section>
+
+  <!-- GAME -->
+  <section id="gameScreen" class="hidden">
+    <div id="gameHeader">
+      <button class="pillbtn" id="backBtn">⬅️ <span data-i18n="backBtn">Menú</span></button>
+      <h2 id="levelTitle">-</h2>
+      <div class="statgroup">
+        <span class="statChip" id="timerChip">⏱️ <span id="timerText">00:00</span></span>
+        <span class="statChip" id="mistakeChip">❌ <span id="mistakeText">0</span></span>
+      </div>
+    </div>
+    <div id="toolbar">
+      <button class="toolbtn active" id="modeFillBtn">🖌️ <span data-i18n="paintMode">Pintar</span></button>
+      <button class="toolbtn" id="modeFlagBtn">✕ <span data-i18n="flagMode">Marcar</span></button>
+      <button class="toolbtn" id="restartLevelBtn">🔄 <span data-i18n="restartBtn">Reiniciar</span></button>
+      <button class="toolbtn" id="saveBtn">💾 <span data-i18n="saveBtn">Guardar</span></button>
+    </div>
+    <div id="boardWrapper">
+      <div id="board"></div>
+    </div>
+  </section>
+
+</main>
+
+<div id="winOverlay" class="hidden">
+  <div id="winCard">
+    <h2 id="winTitleText">🎉 ¡Lo lograste! 🎉</h2>
+    <div id="winImgWrap"><span class="winShimmer" id="winShimmer"></span><img id="winImg" alt="imagen"></div>
+    <div id="winStars">
+      <span id="star1">★</span><span id="star2">★</span><span id="star3">★</span>
+    </div>
+    <div id="winMeta"></div>
+    <div id="winBtns">
+      <button class="pillbtn blue" id="winMenuBtn">🏠 <span data-i18n="winMenu">Menú</span></button>
+      <button class="pillbtn orange" id="winReplayBtn">🔁 <span data-i18n="winReplay">Repetir</span></button>
+      <button class="pillbtn green" id="winNextBtn">➡️ <span data-i18n="winNext">Siguiente</span></button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<footer id="footerText" data-i18n="footerText"></footer>
+
+<script>
+const LEVELS = [{"size":[5,5],"level":[[0,1,1,1,1],[1,1,0,0,0],[1,0,1,1,1],[1,1,1,1,1],[0,1,1,1,1]],"hints":[[[3],[2,2],[1,3],[1,3],[1,3]],[[4],[2],[1,3],[5],[4]]],"title":"Bullet","img":"easy/thumb.level1.png"},{"size":[5,5],"level":[[0,0,0,1,0],[0,0,1,1,0],[0,1,1,1,0],[0,1,1,1,0],[1,1,1,1,1]],"hints":[[[1],[3],[4],[5],[1]],[[1],[2],[3],[3],[5]]],"title":"Big Foot","img":"easy/thumb.level2.png"},{"size":[5,5],"level":[[0,0,1,0,0],[0,0,1,0,0],[1,1,0,1,0],[1,1,1,1,1],[0,0,1,1,1]],"hints":[[[2],[2],[2,2],[3],[2]],[[1],[1],[2,1],[5],[3]]],"title":"Unicorn","img":"easy/thumb.level3.png"},{"size":[5,5],"level":[[0,1,0,0,0],[1,1,0,0,0],[0,1,1,1,1],[0,1,1,1,1],[0,1,0,0,1]],"hints":[[[1],[5],[2],[2],[3]],[[1],[2],[4],[4],[1,1]]],"title":"Centaur","img":"easy/thumb.level4.png"},{"size":[5,5],"level":[[1,0,1,0,0],[1,1,1,0,1],[0,1,0,0,1],[1,1,1,1,1],[1,1,1,0,0]],"hints":[[[2,2],[4],[2,2],[1],[3]],[[1,1],[3,1],[1,1],[5],[3]]],"title":"Minotaur","img":"easy/thumb.level5.png"},{"size":[5,5],"level":[[1,1,0,0,0],[0,1,0,1,0],[0,1,1,1,1],[0,1,0,0,1],[0,1,0,0,1]],"hints":[[[1],[5],[1],[2],[3]],[[2],[1,1],[4],[1,1],[1,1]]],"title":"Dromedary","img":"easy/thumb.level6.png"},{"size":[5,5],"level":[[0,0,0,1,1],[0,0,0,1,0],[0,0,0,1,0],[0,1,1,1,0],[1,1,1,1,1]],"hints":[[[1],[2],[2],[5],[1,1]],[[2],[1],[1],[3],[5]]],"title":"Nessie","img":"easy/thumb.level7.png"},{"size":[6,6],"level":[[0,1,0,0,0,1],[0,0,1,1,1,0],[1,1,0,0,0,1],[1,1,0,0,0,1],[0,0,1,1,1,0],[0,1,0,0,0,1]],"hints":[[[2],[1,2,1],[1,1],[1,1],[1,1],[1,2,1]],[[1,1],[3],[2,1],[2,1],[3],[1,1]]],"title":"Turtle","img":"easy/thumb.level8.png"},{"size":[6,6],"level":[[0,1,1,0,1,1],[0,0,1,1,0,1],[0,0,0,1,0,1],[1,1,0,1,1,1],[0,1,1,1,1,1],[0,0,0,1,1,1]],"hints":[[[1],[1,2],[2,1],[5],[1,3],[6]],[[2,2],[2,1],[1,1],[2,3],[5],[3]]],"title":"Hydra","img":"easy/thumb.level9.png"},{"size":[6,6],"level":[[1,0,1,0,0,0],[1,1,1,1,1,1],[0,0,1,1,0,1],[0,0,1,1,0,0],[0,0,0,0,1,0],[0,0,0,1,0,0]],"hints":[[[2],[1],[4],[3,1],[1,1],[2]],[[1,1],[6],[2,1],[2],[1],[1]]],"title":"Genie","img":"easy/thumb.level10.png"},{"size":[6,6],"level":[[0,0,0,1,1,1],[0,0,0,1,0,1],[1,1,0,0,0,1],[1,1,1,1,1,0],[0,1,1,1,1,1],[0,1,0,0,0,1]],"hints":[[[2],[4],[2],[2,2],[1,2],[3,2]],[[3],[1,1],[2,1],[5],[5],[1,1]]],"title":"Monkey","img":"easy/thumb.level11.png"},{"size":[6,6],"level":[[0,0,0,1,1,1],[1,1,0,1,1,0],[0,1,0,1,0,0],[0,1,1,1,1,0],[0,1,0,0,1,1],[0,1,0,0,0,1]],"hints":[[[1],[5],[1],[4],[2,2],[1,2]],[[3],[2,2],[1,1],[4],[1,2],[1,1]]],"title":"Pegasus","img":"easy/thumb.level12.png"},{"size":[6,6],"level":[[0,0,1,1,1,0],[0,1,0,0,0,1],[0,1,1,1,1,1],[0,1,0,1,0,1],[1,0,1,0,0,1],[1,0,1,0,1,0]],"hints":[[[2],[3],[1,1,2],[1,2],[1,1,1],[4]],[[3],[1,1],[5],[1,1,1],[1,1,1],[1,1,1]]],"title":"Jellyfish","img":"easy/thumb.level13.png"},{"size":[7,7],"level":[[0,1,0,0,0,0,0],[0,1,0,0,0,0,0],[1,0,1,0,1,1,1],[1,0,1,0,1,0,1],[1,0,1,0,1,0,1],[1,0,1,0,0,1,0],[1,1,1,0,1,1,1]],"hints":[[[5],[2,1],[5],[0],[3,1],[1,2],[3,1]],[[1],[1],[1,1,3],[1,1,1,1],[1,1,1,1],[1,1,1],[3,3]]],"title":"Wine","img":"easy/thumb.level14.png"},{"size":[7,7],"level":[[0,1,0,0,1,0,0],[1,1,1,0,1,1,0],[0,1,0,0,1,0,1],[0,1,0,0,1,0,1],[0,1,0,0,1,0,1],[1,1,1,0,1,1,0],[1,1,1,0,1,0,0]],"hints":[[[1,2],[7],[1,2],[0],[7],[1,1],[3]],[[1,1],[3,2],[1,1,1],[1,1,1],[1,1,1],[3,2],[3,1]]],"title":"Bow and Arrow","img":"easy/thumb.level15.png"},{"size":[7,7],"level":[[1,1,0,0,0,1,1],[1,0,1,1,1,0,1],[0,1,0,1,0,1,0],[0,1,0,1,1,1,0],[0,1,0,0,0,1,0],[0,0,1,1,1,0,0],[0,1,0,0,0,1,0]],"hints":[[[2],[1,3,1],[1,1],[3,1],[1,1,1],[1,3,1],[2]],[[2,2],[1,3,1],[1,1,1],[1,3],[1,1],[3],[1,1]]],"title":"Alarm Clock","img":"easy/thumb.level16.png"},{"size":[7,7],"level":[[0,0,0,0,1,1,0],[0,0,1,1,1,0,1],[0,1,1,1,1,0,0],[0,1,1,1,1,0,0],[1,1,1,1,0,0,0],[0,0,1,0,0,0,0],[0,0,1,0,0,0,0]],"hints":[[[1],[3],[6],[4],[4],[1],[1]],[[2],[3,1],[4],[4],[4],[1],[1]]],"title":"Kiwi","img":"easy/thumb.level17.png"},{"size":[7,7],"level":[[0,0,1,1,1,0,0],[0,1,1,0,1,1,0],[1,1,1,1,1,0,1],[1,0,1,1,1,1,1],[1,1,1,1,0,1,1],[0,1,0,1,1,1,0],[0,0,1,1,1,0,0]],"hints":[[[3],[2,2],[5,1],[1,5],[4,2],[1,3],[3]],[[3],[2,2],[5,1],[1,5],[4,2],[1,3],[3]]],"title":"Cookie","img":"easy/thumb.level18.png"},{"size":[7,7],"level":[[0,0,0,0,0,1,1],[0,0,0,0,1,0,0],[0,0,0,0,1,1,0],[1,1,0,0,0,1,1],[0,1,1,1,0,0,1],[0,1,1,1,1,1,1],[0,1,1,1,1,1,1]],"hints":[[[1],[4],[3],[3],[2,2],[1,2,2],[1,4]],[[2],[1],[2],[2,2],[3,1],[6],[6]]],"title":"Swan","img":"easy/thumb.level19.png"},{"size":[5,5],"level":[[0,1,1,1,1],[1,1,0,0,0],[1,0,1,1,1],[1,1,1,1,1],[0,1,1,1,1]],"hints":[[[3],[2,2],[1,3],[1,3],[1,3]],[[4],[2],[1,3],[5],[4]]],"title":"Bullet","img":"easy/thumb.level1.png"},{"size":[7,7],"level":[[0,1,0,1,1,0,0],[0,1,1,1,1,1,0],[1,0,0,0,0,0,1],[1,1,1,1,1,1,1],[0,1,0,0,0,1,0],[1,0,0,0,1,0,0],[1,1,1,1,0,0,0]],"hints":[[[2,2],[2,2,1],[1,1,1],[2,1,1],[2,1,1],[1,2],[2]],[[1,2],[5],[1,1],[7],[1,1],[1,1],[4]]],"title":"Rolling Stones","img":"easy/thumb.level20.png"},{"size":[7,7],"level":[[0,0,0,0,1,1,1],[1,1,0,0,1,1,0],[0,1,1,0,1,0,0],[0,1,1,1,1,0,0],[0,1,1,1,1,1,0],[0,0,1,0,1,1,1],[0,0,1,0,1,1,1]],"hints":[[[1],[4],[5],[2],[7],[2,3],[1,2]],[[3],[2,2],[2,1],[4],[5],[1,3],[1,3]]],"title":"Griphon","img":"easy/thumb.level21.png"},{"size":[7,7],"level":[[1,0,0,0,0,1,0],[1,0,0,0,1,1,0],[1,1,1,1,1,1,0],[0,1,1,1,0,0,0],[0,0,0,1,1,0,1],[0,0,1,1,1,1,0],[0,0,0,1,0,1,0]],"hints":[[[3],[2],[2,1],[5],[2,2],[3,2],[1]],[[1,1],[1,2],[6],[3],[2,1],[4],[1,1]]],"title":"Gremlin","img":"easy/thumb.level22.png"},{"size":[7,7],"level":[[0,0,1,1,1,1,0],[0,1,1,0,0,1,1],[1,1,1,1,0,0,0],[0,1,0,0,0,0,0],[1,1,1,1,0,0,0],[0,1,1,0,0,1,1],[0,0,1,1,1,1,0]],"hints":[[[1,1],[5],[3,3],[1,1,1,1],[1,1],[2,2],[1,1]],[[4],[2,2],[4],[1],[4],[2,2],[4]]],"title":"Euro","img":"easy/thumb.level23.png"},{"size":[7,7],"level":[[0,0,0,0,1,1,1],[0,1,1,1,0,0,1],[0,1,0,0,1,1,1],[0,1,1,1,0,0,1],[0,1,0,0,0,1,1],[1,1,0,0,0,1,1],[1,1,0,0,0,0,0]],"hints":[[[2],[6],[1,1],[1,1],[1,1],[1,1,2],[6]],[[3],[3,1],[1,3],[3,1],[1,2],[2,2],[2]]],"title":"Notes","img":"easy/thumb.level24.png"},{"size":[7,7],"level":[[1,1,1,1,0,1,1],[0,0,1,1,0,1,0],[0,0,0,1,1,1,0],[0,1,1,1,1,0,0],[1,0,0,0,1,0,1],[0,1,0,0,0,0,1],[0,0,1,1,1,1,0]],"hints":[[[1,1],[1,1,1],[2,1,1],[4,1],[3,1],[3,1],[1,2]],[[4,2],[2,1],[3],[4],[1,1,1],[1,1],[4]]],"title":"Dragon","img":"easy/thumb.level25.png"},{"size":[8,8],"level":[[0,0,0,0,0,0,0,0],[1,1,1,0,1,1,1,1],[1,1,1,0,1,1,1,1],[0,0,0,0,0,0,0,0],[0,1,1,1,1,1,0,1],[0,1,1,1,1,1,0,1],[0,0,0,0,0,0,0,0],[1,1,1,0,1,1,1,1]],"hints":[[[2,1],[2,2,1],[2,2,1],[2],[2,2,1],[2,2,1],[2,1],[2,2,1]],[[0],[3,4],[3,4],[0],[5,1],[5,1],[0],[3,4]]],"title":"Bricks","img":"easy/thumb.level26.png"},{"size":[8,8],"level":[[0,0,0,0,0,0,0,0],[0,1,1,1,1,1,0,1],[0,1,0,0,0,1,1,0],[0,1,0,0,0,1,1,0],[0,1,1,1,1,1,0,1],[0,1,1,1,1,1,0,1],[0,1,1,1,1,1,1,0],[0,1,1,1,1,1,0,0]],"hints":[[[0],[7],[1,4],[1,4],[1,4],[7],[2,1],[1,2]],[[0],[5,1],[1,2],[1,2],[5,1],[5,1],[6],[5]]],"title":"Gaspump","img":"easy/thumb.level27.png"},{"size":[8,8],"level":[[0,1,1,1,1,1,0,0],[0,1,1,1,1,1,1,0],[0,1,1,0,0,1,1,0],[0,1,1,1,1,1,1,0],[0,1,1,1,1,1,0,0],[0,1,1,0,0,0,0,0],[0,1,1,0,0,0,0,0],[0,1,1,0,0,0,0,0]],"hints":[[[0],[8],[8],[2,2],[2,2],[5],[3],[0]],[[5],[6],[2,2],[6],[5],[2],[2],[2]]],"title":"Letter P","img":"easy/thumb.level28.png"},{"size":[8,8],"level":[[0,0,0,0,1,1,1,1],[0,1,1,0,0,1,0,1],[0,1,1,0,0,1,0,1],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[0,1,1,0,0,0,1,1]],"hints":[[[4],[7],[7],[4],[1,4],[7],[1,5],[8]],[[4],[2,1,1],[2,1,1],[8],[8],[8],[8],[2,2]]],"title":"Locomotive","img":"easy/thumb.level29.png"},{"size":[8,8],"level":[[1,1,1,1,1,1,1,1],[0,0,0,0,1,0,0,0],[1,1,0,1,1,1,1,1],[1,1,0,1,1,0,0,1],[1,1,1,1,1,0,0,1],[0,1,1,1,1,1,1,1],[0,0,1,1,1,1,1,1],[0,0,0,1,0,0,1,0]],"hints":[[[1,3],[1,4],[1,3],[1,6],[7],[1,1,2],[1,1,3],[1,5]],[[8],[1],[2,5],[2,2,1],[5,1],[7],[6],[1,1]]],"title":"Helicopter","img":"easy/thumb.level30.png"},{"size":[8,8],"level":[[0,0,0,0,0,0,1,1],[0,1,1,1,1,1,1,1],[1,0,0,1,0,0,1,1],[1,0,0,1,0,0,1,1],[1,1,0,0,0,1,1,0],[1,1,1,1,1,1,0,1],[1,1,0,0,0,0,1,1],[1,0,0,1,1,1,1,1]],"hints":[[[6],[1,3],[1,1],[3,1,1],[1,1,1],[1,2,1],[5,2],[4,3]],[[2],[7],[1,1,2],[1,1,2],[2,2],[6,1],[2,2],[1,5]]],"title":"Eye of the tiger","img":"easy/thumb.level31.png"},{"size":[8,8],"level":[[0,1,1,1,1,1,1,0],[0,0,1,1,1,1,0,0],[1,0,0,0,0,0,0,1],[1,0,1,0,1,0,1,1],[1,0,0,0,0,0,1,1],[1,1,0,0,0,1,1,1],[1,1,0,0,1,1,1,1],[1,1,0,0,1,1,1,1]],"hints":[[[6],[1,3],[2,1],[2],[2,1,2],[2,3],[1,5],[6]],[[6],[4],[1,1],[1,1,1,2],[1,2],[2,3],[2,4],[2,4]]],"title":"Cow Skull","img":"easy/thumb.level32.png"},{"size":[8,8],"level":[[0,0,0,1,0,0,0,0],[0,1,1,1,0,0,0,0],[1,1,0,1,1,1,1,1],[1,1,1,1,1,1,1,1],[0,0,1,1,1,1,1,1],[1,1,1,0,0,1,1,1],[0,0,0,0,0,0,1,1],[0,0,0,0,0,0,0,1]],"hints":[[[2,1],[3,1],[1,3],[5],[3],[4],[5],[6]],[[1],[3],[2,5],[8],[6],[3,3],[2],[1]]],"title":"Gargoyle","img":"easy/thumb.level33.png"},{"size":[8,8],"level":[[1,0,1,1,1,0,0,0],[0,0,1,1,1,0,0,1],[0,1,1,1,1,1,0,0],[0,0,1,1,1,0,0,0],[0,1,1,1,1,1,1,0],[1,0,1,1,1,0,0,0],[0,0,1,1,1,0,0,1],[0,0,1,0,1,0,0,0]],"hints":[[[1,1],[1,1],[8],[7],[8],[1,1],[1],[1,1]],[[1,3],[3,1],[5],[3],[6],[1,3],[3,1],[1,1]]],"title":"Leprechaun","img":"easy/thumb.level34.png"},{"size":[8,8],"level":[[0,0,0,0,0,0,0,0],[1,1,0,0,0,0,1,1],[0,0,0,0,0,0,0,0],[0,1,1,0,0,1,1,0],[0,1,1,1,1,1,1,0],[0,0,1,0,0,1,0,0],[0,0,1,0,0,1,0,0],[0,1,0,1,1,0,1,0]],"hints":[[[1],[1,2,1],[4],[1,1],[1,1],[4],[1,2,1],[1]],[[0],[2,2],[0],[2,2],[6],[1,1],[1,1],[1,2,1]]],"title":"Drums","img":"easy/thumb.level35.png"},{"size":[8,8],"level":[[1,0,1,0,1,1,0,0],[1,1,1,1,1,1,0,1],[0,1,0,0,0,1,1,1],[1,1,1,0,1,1,0,0],[1,1,0,0,0,1,1,1],[0,1,0,1,0,1,0,0],[1,1,0,0,0,1,1,0],[1,0,1,1,1,0,1,1]],"hints":[[[2,2,2],[6],[2,1,1],[1,1,1],[2,1,1],[7],[1,1,2],[2,1,1]],[[1,1,2],[6,1],[1,3],[3,2],[2,3],[1,1,1],[2,2],[1,3,2]]],"title":"Medusa","img":"easy/thumb.level36.png"},{"size":[8,8],"level":[[1,1,0,0,0,0,1,1],[1,0,1,0,0,1,0,1],[0,0,1,0,0,1,0,0],[0,0,0,0,0,0,0,0],[0,1,1,1,1,1,1,0],[0,0,1,1,1,1,0,0],[1,0,0,1,1,0,0,1],[1,1,0,0,0,0,1,1]],"hints":[[[2,2],[1,1,1],[2,2],[3],[3],[2,2],[1,1,1],[2,2]],[[2,2],[1,1,1,1],[1,1],[0],[6],[4],[1,2,1],[2,2]]],"title":"Happy","img":"easy/thumb.level37.png"},{"size":[8,8],"level":[[0,0,1,1,0,0,0,1],[1,0,1,1,1,0,0,0],[1,0,0,1,1,1,0,1],[0,1,1,1,0,0,0,0],[0,0,1,1,0,1,0,1],[0,0,1,1,0,0,1,0],[1,0,1,1,1,1,1,0],[0,0,0,1,1,1,0,0]],"hints":[[[2,1],[1],[2,4],[8],[2,2],[1,1,2],[2],[1,1,1]],[[2,1],[1,3],[1,3,1],[3],[2,1,1],[2,1],[1,5],[3]]],"title":"Mermaid","img":"easy/thumb.level38.png"},{"size":[8,8],"level":[[0,0,1,1,1,1,0,0],[0,1,0,0,0,0,1,0],[1,0,0,1,1,1,0,1],[1,0,1,0,0,1,0,1],[1,0,1,0,0,1,0,0],[1,0,0,1,1,1,1,0],[0,1,0,0,0,0,1,0],[0,1,1,1,1,1,0,0]],"hints":[[[4],[1,2],[1,2,1],[1,1,1,1],[1,1,1,1],[1,4,1],[1,2],[2]],[[4],[1,1],[1,3,1],[1,1,1,1],[1,1,1],[1,4],[1,1],[5]]],"title":"At","img":"easy/thumb.level39.png"},{"size":[8,8],"level":[[1,1,1,1,0,0,0,1],[1,0,0,0,0,1,0,0],[0,0,1,1,0,0,0,1],[0,0,1,1,0,1,1,1],[0,0,0,0,1,1,1,0],[1,0,0,1,1,1,0,0],[1,0,0,1,0,0,0,1],[1,1,1,0,0,0,1,1]],"hints":[[[2,3],[1,1],[1,2,1],[1,2,2],[2],[1,3],[2,1],[1,2,2]],[[4,1],[1,1],[2,1],[2,3],[3],[1,3],[1,1,1],[3,2]]],"title":"Fossil","img":"easy/thumb.level40.png"},{"size":[8,8],"level":[[0,1,1,0,1,1,0,1],[0,1,1,0,1,1,0,1],[0,1,1,0,1,1,0,1],[0,1,0,0,1,0,0,1],[0,1,0,0,1,0,0,1],[0,1,0,0,1,0,0,1],[1,1,1,1,1,1,1,1],[0,1,0,0,1,0,0,1]],"hints":[[[1],[8],[3,1],[1],[8],[3,1],[1],[8]],[[2,2,1],[2,2,1],[2,2,1],[1,1,1],[1,1,1],[1,1,1],[8],[1,1,1]]],"title":"Piano Keys","img":"medium/thumb.level1.png"},{"size":[8,8],"level":[[1,1,0,0,1,0,0,1],[1,0,0,0,1,0,0,0],[1,0,0,0,1,0,0,0],[1,1,1,1,1,1,1,1],[1,0,0,0,0,0,0,0],[1,0,0,0,0,0,0,0],[1,0,0,0,0,0,0,0],[1,1,0,0,0,0,0,1]],"hints":[[[8],[1,1,1],[1],[1],[4],[1],[1],[1,1,1]],[[2,1,1],[1,1],[1,1],[8],[1],[1],[1],[2,1]]],"title":"Mouse","img":"medium/thumb.level2.png"},{"size":[8,8],"level":[[0,0,0,0,0,0,0,0],[1,0,0,0,1,1,1,1],[1,0,1,0,1,0,0,1],[1,0,0,0,0,0,0,1],[1,0,0,0,0,1,1,0],[1,0,1,0,0,1,0,0],[0,0,0,0,0,0,0,0],[1,0,0,0,0,1,0,0]],"hints":[[[5,1],[0],[1,1],[0],[2],[1,2,1],[1,1],[3]],[[0],[1,4],[1,1,1,1],[1,1],[1,2],[1,1,1],[0],[1,1]]],"title":"Punctuation","img":"medium/thumb.level3.png"},{"size":[8,8],"level":[[0,0,0,0,0,1,1,0],[0,0,0,0,0,1,1,0],[0,0,0,0,0,1,1,0],[0,0,0,0,0,1,1,0],[0,1,1,1,1,1,0,0],[0,0,1,1,1,1,0,0],[0,0,0,1,1,1,0,0],[0,0,1,1,1,1,0,0]],"hints":[[[0],[1],[2,1],[4],[4],[8],[4],[0]],[[2],[2],[2],[2],[5],[4],[3],[4]]],"title":"Toilet","img":"medium/thumb.level4.png"},{"size":[8,8],"level":[[0,1,1,1,1,1,0,0],[0,0,0,0,1,1,1,0],[0,0,0,0,1,1,1,1],[0,0,0,1,1,0,1,1],[0,0,1,1,0,0,0,1],[0,1,1,0,0,0,0,1],[1,1,0,0,0,0,0,0],[1,0,0,0,0,0,0,0]],"hints":[[[2],[1,2],[1,2],[1,2],[4],[3],[3],[4]],[[5],[3],[4],[2,2],[2,1],[2,1],[2],[1]]],"title":"Pickaxe","img":"medium/thumb.level7.png"},{"size":[8,8],"level":[[1,0,0,0,0,0,1,1],[1,0,1,1,0,0,1,1],[1,0,1,0,0,1,1,1],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,0,0],[0,0,1,1,1,1,0,0],[1,0,0,0,0,0,1,0],[0,1,1,1,1,1,1,0]],"hints":[[[5,1],[2,1],[5,1],[1,3,1],[3,1],[4,1],[4,2],[4]],[[1,2],[1,2,2],[1,1,3],[8],[6],[4],[1,1],[6]]],"title":"Phoenix","img":"medium/thumb.level8.png"},{"size":[8,8],"level":[[1,1,0,0,0,0,1,1],[1,0,1,0,0,0,0,1],[1,0,1,0,1,1,0,1],[0,0,0,0,0,0,0,0],[0,0,1,1,1,1,0,0],[0,0,0,1,0,1,0,0],[1,0,0,1,1,1,0,1],[1,1,0,0,0,0,1,1]],"hints":[[[3,2],[1,1],[2,1],[3],[1,1,1],[1,3],[1,1],[3,2]],[[2,2],[1,1,1],[1,1,2,1],[0],[4],[1,1],[1,3,1],[2,2]]],"title":"Silly","img":"medium/thumb.level9.png"},{"size":[8,8],"level":[[1,0,0,0,1,0,0,0],[1,1,0,0,1,1,0,0],[1,0,1,0,1,0,1,0],[1,0,0,1,1,0,0,1],[1,1,0,1,1,1,1,1],[0,1,1,1,0,1,1,1],[0,0,1,0,0,0,0,0],[0,0,1,0,0,0,0,0]],"hints":[[[5],[1,2],[1,3],[3],[5],[1,2],[1,2],[3]],[[1,1],[2,2],[1,1,1,1],[1,2,1],[2,5],[3,3],[1],[1]]],"title":"Slingshot","img":"medium/thumb.level11.png"},{"size":[9,8],"level":[[0,1,1,1,1,1,1,0],[1,1,0,0,0,0,1,1],[1,0,1,1,1,1,0,1],[1,0,1,1,1,1,0,1],[1,0,0,0,0,0,0,1],[1,0,1,0,0,1,0,1],[1,0,0,0,0,0,0,1],[1,1,0,1,1,0,1,1],[0,1,1,1,1,1,1,0]],"hints":[[[7],[2,2],[1,2,1,1],[1,2,2],[1,2,2],[1,2,1,1],[2,2],[7]],[[6],[2,2],[1,4,1],[1,4,1],[1,1],[1,1,1,1],[1,1],[2,2,2],[6]]],"title":"Bus Sign","img":"dailies/thumb.level1.png"},{"size":[9,8],"level":[[0,0,1,1,1,1,0,0],[0,1,1,0,0,1,1,0],[1,1,0,0,0,0,1,1],[1,0,0,0,0,0,0,1],[1,1,0,0,0,0,1,1],[0,1,1,0,0,1,1,0],[0,0,1,0,0,1,0,0],[0,0,1,1,1,1,0,0],[0,0,1,1,1,1,0,0]],"hints":[[[3],[2,2],[2,4],[1,2],[1,2],[2,4],[2,2],[3]],[[4],[2,2],[2,2],[1,1],[2,2],[2,2],[1,1],[4],[4]]],"title":"Big Lightbulb","img":"dailies/thumb.level2.png"},{"size":[9,8],"level":[[0,0,0,0,0,1,0,0],[0,0,0,0,0,1,1,0],[0,0,0,0,0,1,1,1],[0,1,0,0,1,1,0,1],[1,0,1,1,1,1,0,0],[0,0,1,1,1,1,0,0],[0,0,1,0,0,1,0,0],[1,0,1,0,0,1,0,1],[0,1,1,1,1,1,1,0]],"hints":[[[1,1],[1,1],[5],[2,1],[3,1],[9],[2,1],[2,1]],[[1],[2],[3],[1,2,1],[1,4],[4],[1,1],[1,1,1,1],[6]]],"title":"Rocking Horse","img":"dailies/thumb.level3.png"},{"size":[8,9],"level":[[1,0,0,1,1,1,0,0,1],[0,1,1,0,1,0,1,1,0],[0,1,1,1,0,1,1,1,0],[1,0,0,0,1,0,0,0,1],[1,1,1,0,1,0,1,1,1],[1,1,1,0,1,0,1,1,1],[1,1,0,1,1,1,0,1,1],[1,1,0,1,1,1,0,1,1]],"hints":[[[1,5],[2,4],[2,2],[1,1,2],[2,5],[1,1,2],[2,2],[2,4],[1,5]],[[1,3,1],[2,1,2],[3,3],[1,1,1],[3,1,3],[3,1,3],[2,3,2],[2,3,2]]],"title":"Bow","img":"medium/thumb.level5.png"},{"size":[8,9],"level":[[0,1,1,1,1,1,1,0,0],[1,0,1,1,1,1,1,0,0],[1,0,1,1,1,1,1,0,0],[1,0,1,1,1,1,1,0,0],[0,1,1,1,1,1,1,1,1],[0,1,0,1,0,1,1,0,1],[0,1,0,1,0,0,0,0,1],[0,1,1,1,1,1,1,1,1]],"hints":[[[3],[1,4],[5,1],[8],[5,1],[6,1],[6,1],[1,1],[4]],[[6],[1,5],[1,5],[1,5],[8],[1,1,2,1],[1,1,1],[8]]],"title":"Chest","img":"medium/thumb.level6.png"},{"size":[9,8],"level":[[0,0,0,1,0,0,0,0],[1,1,1,1,1,1,1,1],[1,1,0,0,0,1,0,1],[0,1,0,0,0,1,0,1],[0,1,0,0,0,1,0,1],[0,0,1,1,1,1,0,1],[0,1,0,0,0,1,0,0],[0,1,0,0,0,1,0,0],[0,1,1,1,1,1,0,0]],"hints":[[[2],[4,3],[1,1,1],[2,1,1],[1,1,1],[8],[1],[5]],[[1],[8],[2,1,1],[1,1,1],[1,1,1],[4,1],[1,1],[1,1],[5]]],"title":"Coffee Maker","img":"medium/thumb.level10.png"},{"size":[8,9],"level":[[0,0,0,0,0,0,1,1,0],[0,0,0,0,0,1,1,0,0],[0,0,0,0,0,1,0,0,0],[1,1,1,1,1,1,1,1,0],[1,0,1,1,1,1,1,1,0],[0,1,1,1,1,1,1,1,0],[0,0,0,1,1,1,1,0,0],[0,1,1,1,1,1,1,1,1]],"hints":[[[2],[1,1,1],[3,1],[5],[5],[7],[2,5],[1,3,1],[1]],[[2],[2],[1],[8],[1,6],[7],[4],[8]]],"title":"Coffee Cup","img":"medium/thumb.level12.png"},{"size":[8,9],"level":[[1,1,0,0,0,0,0,1,1],[1,0,0,0,0,0,0,0,1],[0,0,1,0,1,0,1,0,0],[0,0,1,1,1,0,1,0,0],[0,0,1,0,1,0,1,0,0],[1,0,0,0,0,0,0,0,1],[1,1,0,0,0,0,0,1,1],[1,0,0,1,1,1,1,1,1]],"hints":[[[2,3],[1,1],[3],[1,1],[3,1],[1],[3,1],[1,2],[2,3]],[[2,2],[1,1],[1,1,1],[3,1],[1,1,1],[1,1],[2,2],[1,6]]],"title":"Hi","img":"medium/thumb.level13.png"},{"size":[8,9],"level":[[0,0,0,1,1,1,0,0,0],[0,0,0,1,1,1,0,0,0],[0,1,1,1,1,1,1,1,0],[1,1,0,1,1,1,0,1,1],[1,0,0,0,0,0,0,0,1],[1,0,0,0,0,0,0,0,1],[1,0,1,1,0,1,1,0,1],[1,0,0,1,0,0,0,0,1]],"hints":[[[5],[2],[1,1],[4,2],[4],[4,1],[1,1],[2],[5]],[[3],[3],[7],[2,3,2],[1,1],[1,1],[1,2,2,1],[1,1,1]]],"title":"Mohawk","img":"medium/thumb.level14.png"},{"size":[8,9],"level":[[1,1,1,1,1,1,1,1,1],[1,0,0,0,0,0,0,0,1],[1,0,0,1,1,1,0,0,1],[1,0,1,0,1,0,1,0,1],[1,0,1,0,1,0,1,0,1],[1,0,0,1,1,1,0,0,1],[1,0,0,0,0,0,0,0,1],[1,1,1,1,1,1,1,1,1]],"hints":[[[8],[1,1],[1,2,1],[1,1,1,1],[1,4,1],[1,1,1,1],[1,2,1],[1,1],[8]],[[9],[1,1],[1,3,1],[1,1,1,1,1],[1,1,1,1,1],[1,3,1],[1,1],[9]]],"title":"Outlet","img":"medium/thumb.level15.png"},{"size":[8,9],"level":[[0,0,0,0,1,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,1,1,1,1,1,1,0],[0,1,1,1,1,1,1,1,1],[1,1,0,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1],[0,0,1,1,1,1,1,1,0],[0,0,1,0,0,0,0,1,0]],"hints":[[[2],[3],[2,3],[5],[1,5],[5],[5],[6],[3]],[[1],[0],[6],[8],[2,6],[9],[6],[1,1]]],"title":"Piggy Bank","img":"medium/thumb.level16.png"},{"size":[8,9],"level":[[1,1,1,0,0,0,1,1,1],[1,0,1,1,1,1,1,0,1],[1,1,1,1,1,1,1,1,1],[1,1,1,0,0,0,1,1,1],[1,0,1,0,0,0,1,0,1],[1,1,1,1,0,1,1,1,1],[1,0,1,1,1,1,0,0,0],[1,0,0,0,0,0,0,0,0]],"hints":[[[8],[1,2,1],[7],[2,2],[2,1],[2,2],[6],[1,2,1],[6]],[[3,3],[1,5,1],[9],[3,3],[1,1,1,1],[4,4],[1,4],[1]]],"title":"Pirate Flag","img":"medium/thumb.level17.png"},{"size":[8,9],"level":[[1,0,0,0,0,0,0,0,0],[1,0,0,0,0,0,1,0,0],[1,0,0,1,1,1,1,1,1],[1,0,1,1,1,1,1,0,0],[1,1,1,1,1,1,1,0,0],[0,0,1,1,1,1,1,0,0],[0,0,0,1,1,1,1,1,1],[0,0,0,0,0,0,1,0,0]],"hints":[[[5],[1],[3],[5],[5],[5],[7],[1,1],[1,1]],[[1],[1,1],[1,6],[1,5],[7],[5],[6],[1]]],"title":"Plug","img":"medium/thumb.level18.png"},{"size":[8,9],"level":[[1,0,1,1,1,0,1,1,0],[1,0,1,1,1,0,0,0,0],[0,0,1,0,0,1,0,0,0],[0,1,0,0,0,0,1,0,0],[0,0,1,0,0,0,1,0,0],[0,1,1,0,0,0,1,1,0],[1,1,1,1,1,1,1,1,1],[0,1,0,0,0,0,0,1,0]],"hints":[[[2,1],[1,3],[3,3],[2,1],[2,1],[1,1],[1,4],[1,3],[1]],[[1,3,2],[1,3],[1,1],[1,1],[1,1],[2,2],[9],[1,1]]],"title":"Skateboard","img":"medium/thumb.level19.png"},{"size":[8,9],"level":[[0,1,1,1,1,1,1,1,0],[1,1,0,0,0,0,0,1,1],[1,0,0,1,1,1,0,0,1],[1,0,1,0,0,0,1,0,1],[1,0,1,0,1,0,1,0,1],[1,0,1,0,0,1,0,0,1],[1,0,0,1,0,0,0,1,1],[1,1,1,1,1,1,1,1,0]],"hints":[[[7],[2,1],[1,3,1],[1,1,2],[1,1,1,1],[1,1,1,1],[1,2,1],[2,2],[6]],[[7],[2,2],[1,3,1],[1,1,1,1],[1,1,1,1,1],[1,1,1,1],[1,1,2],[8]]],"title":"Snail","img":"medium/thumb.level20.png"},{"size":[8,9],"level":[[0,0,0,0,0,0,1,1,0],[0,0,1,1,1,0,1,0,0],[0,0,1,1,1,0,1,0,0],[0,1,1,1,1,1,1,1,0],[1,1,1,1,1,1,1,1,1],[1,1,0,1,0,1,0,1,1],[1,1,1,1,1,1,1,1,1],[0,1,1,1,1,1,1,1,0]],"hints":[[[3],[5],[4,2],[7],[4,2],[5],[5,2],[1,5],[3]],[[2],[3,1],[3,1],[7],[9],[2,1,1,2],[9],[7]]],"title":"Submarine","img":"medium/thumb.level21.png"},{"size":[8,9],"level":[[1,1,1,1,1,1,1,1,1],[1,1,0,0,0,0,0,1,1],[1,0,0,0,1,1,0,0,1],[1,0,0,1,1,1,1,0,1],[1,0,0,1,0,1,1,0,1],[1,0,0,1,1,0,0,1,1],[1,0,0,0,1,1,1,1,1],[1,1,0,0,0,0,0,0,1]],"hints":[[[8],[2,1],[1],[1,3],[1,2,2],[1,3,1],[1,2,1],[2,2],[8]],[[9],[2,2],[1,2,1],[1,4,1],[1,1,2,1],[1,2,2],[1,5],[2,1]]],"title":"Vertigo","img":"medium/thumb.level22.png"},{"size":[9,9],"level":[[0,0,0,0,0,0,0,0,0],[0,0,1,1,1,1,1,0,0],[1,1,1,1,1,1,1,1,1],[1,1,1,0,0,0,1,0,1],[1,1,0,1,1,1,0,1,1],[1,1,0,1,1,1,0,1,1],[1,1,0,1,1,1,0,1,1],[1,1,1,0,0,0,1,1,1],[1,1,1,1,1,1,1,1,1]],"hints":[[[7],[7],[3,2],[2,3,1],[2,3,1],[2,3,1],[3,2],[1,5],[7]],[[0],[5],[9],[3,1,1],[2,3,2],[2,3,2],[2,3,2],[3,3],[9]]],"title":"Camera","img":"dailies/thumb.level4.png"},{"size":[9,9],"level":[[0,1,1,1,1,1,1,1,0],[1,1,0,0,1,0,0,1,1],[1,0,0,0,1,0,0,0,1],[1,0,0,0,1,0,0,0,1],[1,0,0,0,1,0,0,0,1],[1,0,0,1,1,1,0,0,1],[1,0,1,0,1,0,1,0,1],[1,1,0,0,1,0,0,1,1],[0,1,1,1,1,1,1,1,0]],"hints":[[[7],[2,2],[1,1,1],[1,1,1],[9],[1,1,1],[1,1,1],[2,2],[7]],[[7],[2,1,2],[1,1,1],[1,1,1],[1,1,1],[1,3,1],[1,1,1,1,1],[2,1,2],[7]]],"title":"Peace","img":"dailies/thumb.level5.png"},{"size":[9,9],"level":[[0,0,0,0,0,1,0,0,1],[0,0,0,0,1,1,0,0,0],[0,0,0,1,1,1,1,0,0],[0,0,1,1,1,1,1,1,1],[0,1,1,1,1,1,1,1,0],[1,1,1,1,1,1,1,0,0],[1,1,1,1,1,1,0,0,0],[1,1,1,1,1,0,0,0,0],[0,1,1,1,0,0,0,0,0]],"hints":[[[3],[5],[6],[7],[7],[7],[4],[2],[1,1]],[[1,1],[2],[4],[7],[7],[7],[6],[5],[3]]],"title":"Pencil","img":"dailies/thumb.level6.png"},{"size":[9,9],"level":[[1,1,1,0,1,1,0,1,1],[1,1,1,1,0,1,1,0,1],[1,1,1,0,1,1,0,1,1],[1,1,1,1,1,1,1,1,1],[0,0,0,0,0,0,0,0,0],[0,1,1,1,1,1,1,1,0],[0,0,0,0,0,0,0,0,0],[1,0,0,0,0,0,0,0,1],[1,1,0,0,0,0,0,1,1]],"hints":[[[4,2],[4,1,1],[4,1],[1,1,1],[1,2,1],[4,1],[1,1,1],[1,2,1,1],[4,2]],[[3,2,2],[4,2,1],[3,2,2],[9],[0],[7],[0],[1,1],[2,2]]],"title":"Soup","img":"dailies/thumb.level7.png"},{"size":[9,9],"level":[[0,0,0,0,1,0,0,0,0],[0,0,0,0,1,0,0,0,0],[0,0,0,1,1,1,0,0,0],[1,1,1,1,1,1,1,1,1],[0,1,1,1,1,1,1,1,0],[0,0,1,1,1,1,1,0,0],[0,0,1,1,0,1,1,0,0],[0,1,1,0,0,0,1,1,0],[0,1,0,0,0,0,0,1,0]],"hints":[[[1],[2,2],[5],[5],[6],[5],[5],[2,2],[1]],[[1],[1],[3],[9],[7],[5],[2,2],[2,2],[1,1]]],"title":"Star","img":"dailies/thumb.level8.png"},{"size":[9,9],"level":[[0,1,0,0,0,0,0,1,0],[0,1,1,0,0,0,1,1,0],[0,1,1,1,1,1,1,1,0],[0,1,1,1,1,1,1,1,0],[0,1,1,0,1,0,1,1,0],[1,1,1,0,1,0,1,1,1],[0,1,1,1,1,1,1,1,0],[0,0,1,1,1,1,1,0,0],[0,0,0,1,1,1,0,0,0]],"hints":[[[1],[7],[7],[2,3],[7],[2,3],[7],[7],[1]],[[1,1],[2,2],[7],[7],[2,1,2],[3,1,3],[7],[5],[3]]],"title":"Tappy","img":"dailies/thumb.level9.png"},{"size":[9,9],"level":[[0,0,0,0,0,0,0,1,0],[0,0,0,0,0,1,1,0,1],[0,0,1,1,1,0,0,1,0],[0,1,1,1,1,1,0,0,0],[1,1,0,1,1,1,1,0,0],[1,1,1,1,1,1,1,0,0],[1,1,1,1,1,1,1,0,0],[0,1,1,1,1,1,0,0,0],[0,0,1,1,1,0,0,0,0]],"hints":[[[3],[5],[2,4],[7],[7],[1,5],[1,3],[1,1],[1]],[[1],[2,1],[3,1],[5],[2,4],[7],[7],[5],[3]]],"title":"Bomb","img":"medium/thumb.level23.png"},{"size":[9,9],"level":[[0,0,0,1,1,0,0,0,0],[0,0,1,1,0,0,0,0,0],[0,1,1,1,0,0,0,0,0],[0,1,1,1,0,0,0,0,0],[1,1,1,1,1,0,1,1,0],[1,1,1,1,1,1,1,1,1],[0,1,1,1,0,1,1,1,1],[0,1,0,1,0,0,1,1,0],[1,1,1,1,1,1,1,1,1]],"hints":[[[2,1],[7],[6,1],[9],[1,2,1],[2,1],[5],[5],[2,1]],[[2],[2],[3],[3],[5,2],[9],[3,4],[1,1,2],[9]]],"title":"Gnome","img":"medium/thumb.level24.png"},{"size":[9,9],"level":[[1,1,1,1,1,0,0,0,0],[1,1,1,1,0,0,0,0,0],[0,0,1,1,1,0,0,0,0],[0,0,1,1,1,1,0,0,0],[0,0,0,1,1,1,1,0,0],[0,0,0,0,0,1,1,1,0],[0,0,0,0,0,0,1,1,1],[0,0,0,0,0,0,1,0,1],[0,0,1,1,0,1,1,0,0]],"hints":[[[2],[2],[4,1],[5,1],[1,3],[3,1],[5],[2],[2]],[[5],[4],[3],[4],[4],[3],[3],[1,1],[2,2]]],"title":"Italy","img":"medium/thumb.level25.png"},{"size":[9,9],"level":[[0,1,1,1,0,0,1,1,1],[0,0,1,1,0,0,1,1,0],[0,0,0,0,0,0,1,0,0],[1,0,0,1,0,0,1,0,0],[1,1,0,0,1,1,1,0,1],[1,0,0,0,0,0,0,0,0],[1,0,1,1,1,1,1,1,0],[1,0,0,1,0,0,1,0,0],[1,1,0,0,0,0,0,0,1]],"hints":[[[6],[1,1,1],[2,1],[2,1,2],[1,1],[1,1],[5,2],[2,1],[1,1,1]],[[3,3],[2,2],[1],[1,1,1],[2,3,1],[1],[1,6],[1,1,1],[2,1]]],"title":"Vampire","img":"medium/thumb.level26.png"},{"size":[9,9],"level":[[1,1,0,0,0,0,0,0,0],[1,1,1,1,0,0,0,0,0],[0,0,1,1,1,1,0,0,0],[1,1,1,1,1,1,1,0,0],[1,0,0,1,0,1,1,0,0],[0,0,1,1,0,1,1,1,0],[0,1,0,0,0,1,0,1,0],[0,0,0,0,1,0,0,0,1],[0,0,0,0,1,0,0,0,1]],"hints":[[[2,2],[2,1,1],[3,1],[5],[2,2],[5],[3],[2],[2]],[[2],[4],[4],[7],[1,1,2],[2,3],[1,1,1],[1,1],[1,1]]],"title":"Zombie","img":"medium/thumb.level27.png"},{"size":[10,9],"level":[[0,0,0,0,0,0,0,0,0],[1,1,1,1,1,1,1,0,0],[1,0,0,0,0,0,1,1,0],[1,1,0,1,0,0,1,0,1],[1,1,1,1,0,1,1,0,1],[1,1,1,1,1,1,1,0,1],[1,1,1,1,1,1,1,1,0],[1,1,1,1,1,1,1,0,0],[1,1,1,1,1,1,1,0,0],[0,1,1,1,1,1,0,0,0]],"hints":[[[8],[1,7],[1,6],[1,7],[1,5],[1,6],[8],[1,1],[3]],[[0],[7],[1,2],[2,1,1,1],[4,2,1],[7,1],[8],[7],[7],[5]]],"title":"Beer","img":"dailies/thumb.level10.png"},{"size":[10,9],"level":[[0,1,1,1,1,1,1,1,0],[0,1,0,0,0,0,0,1,0],[0,1,0,0,0,0,0,1,0],[0,1,1,1,1,1,1,1,0],[0,1,0,1,0,1,0,1,0],[0,1,1,1,1,1,1,1,0],[0,1,0,1,0,1,0,1,0],[0,1,1,1,1,1,1,1,0],[0,1,0,1,0,1,0,1,0],[0,1,1,1,1,1,1,1,0]],"hints":[[[0],[10],[1,1,1,1,1],[1,7],[1,1,1,1,1],[1,7],[1,1,1,1,1],[10],[0]],[[7],[1,1],[1,1],[7],[1,1,1,1],[7],[1,1,1,1],[7],[1,1,1,1],[7]]],"title":"Calculator","img":"dailies/thumb.level11.png"},{"size":[10,9],"level":[[0,0,0,1,1,1,1,1,1],[0,0,0,1,0,0,0,0,1],[0,0,0,1,0,0,0,0,1],[1,1,1,1,0,1,1,1,1],[0,1,0,1,0,0,1,0,1],[0,1,1,1,1,1,1,1,1],[0,1,1,1,1,1,1,1,1],[0,0,0,0,0,1,0,0,0],[0,0,1,1,1,1,1,1,1],[0,0,1,0,0,1,0,0,1]],"hints":[[[1],[4],[1,2,2],[7,1],[1,2,1],[1,1,5],[1,4,1],[1,1,2,1],[7,2]],[[6],[1,1],[1,1],[4,4],[1,1,1,1],[8],[8],[1],[7],[1,1,1]]],"title":"Chair","img":"dailies/thumb.level12.png"},{"size":[10,9],"level":[[0,0,0,1,1,0,1,0,0],[0,0,1,0,0,0,1,0,0],[0,0,0,1,1,1,1,0,0],[0,0,1,1,1,1,1,0,0],[0,0,1,1,1,1,0,0,0],[0,0,1,1,1,0,0,0,0],[0,0,1,1,1,0,0,0,0],[0,0,1,1,1,1,0,0,0],[0,0,1,1,1,1,0,0,0],[0,0,0,1,1,1,0,0,0]],"hints":[[[0],[0],[1,6],[1,8],[1,8],[3,3],[4],[0],[0]],[[2,1],[1,1],[4],[5],[4],[3],[3],[4],[4],[3]]],"title":"Footprint","img":"dailies/thumb.level13.png"},{"size":[10,9],"level":[[0,0,0,0,0,0,0,0,0],[1,1,1,1,1,1,1,1,1],[0,0,1,0,1,0,1,0,0],[0,1,1,1,1,1,1,1,0],[0,0,1,0,0,0,1,0,0],[0,0,1,0,0,0,1,0,0],[0,0,1,0,0,0,1,0,0],[0,0,1,0,0,0,1,0,0],[0,0,1,0,0,0,1,0,0],[0,0,0,0,0,0,0,0,0]],"hints":[[[1],[1,1],[8],[1,1],[3],[1,1],[8],[1,1],[1]],[[0],[9],[1,1,1],[7],[1,1],[1,1],[1,1],[1,1],[1,1],[0]]],"title":"Japanese Arch","img":"dailies/thumb.level15.png"},{"size":[10,9],"level":[[0,1,1,0,0,1,1,0,0],[1,1,1,1,1,1,1,1,0],[1,1,1,1,1,1,1,1,0],[0,1,1,1,1,1,1,0,0],[0,1,1,1,1,1,1,0,1],[0,1,1,1,1,1,1,1,1],[0,1,1,1,1,1,1,1,1],[0,1,1,1,1,1,1,0,1],[0,0,0,1,1,0,0,0,0],[0,0,1,0,0,1,0,0,0]],"hints":[[[2],[8],[8,1],[8],[8],[8,1],[8],[2,2],[4]],[[2,2],[8],[8],[6],[6,1],[8],[8],[6,1],[2],[1,1]]],"title":"Movie Camera","img":"dailies/thumb.level16.png"},{"size":[10,9],"level":[[0,0,0,1,1,1,0,0,0],[0,0,1,0,0,0,1,0,0],[0,0,1,0,0,0,1,0,0],[0,0,1,0,0,0,0,0,0],[0,0,1,0,0,0,0,0,0],[0,1,1,1,1,1,1,1,0],[0,1,1,1,1,1,1,1,0],[0,1,1,1,0,1,1,1,0],[0,1,1,1,0,1,1,1,0],[0,1,1,1,1,1,1,1,0]],"hints":[[[0],[5],[9],[1,5],[1,2,1],[1,5],[2,5],[5],[0]],[[3],[1,1],[1,1],[1],[1],[7],[7],[3,3],[3,3],[7]]],"title":"Padlock","img":"dailies/thumb.level17.png"},{"size":[10,9],"level":[[0,0,0,0,0,0,0,0,0],[1,1,0,0,0,0,0,0,0],[0,1,1,1,1,1,1,1,1],[0,1,0,1,0,1,0,1,1],[0,1,1,1,1,1,1,1,0],[0,1,0,1,0,1,0,1,0],[0,1,1,1,1,1,1,0,0],[0,1,0,0,0,0,0,0,0],[0,1,1,1,1,1,1,1,0],[0,0,1,0,0,0,1,0,0]],"hints":[[[1],[8],[1,1,1,2],[5,1],[1,1,1,1],[5,1],[1,1,1,2],[4,1],[2]],[[0],[2],[8],[1,1,1,2],[7],[1,1,1,1],[6],[1],[7],[1,1]]],"title":"Shopping Cart","img":"dailies/thumb.level18.png"},{"size":[9,10],"level":[[0,1,1,1,1,1,1,1,1,0],[1,1,1,0,0,0,0,0,0,1],[1,1,1,1,0,1,1,1,0,1],[1,1,1,1,0,0,0,1,0,1],[1,1,1,1,0,0,0,0,0,1],[1,1,1,1,0,0,0,0,0,1],[1,1,1,1,1,1,1,1,1,1],[0,0,0,0,1,0,1,0,0,0],[0,0,0,0,1,0,1,0,0,0]],"hints":[[[6],[7],[7],[1,5],[1,3],[1,1,1],[1,1,3],[1,2,1],[1,1],[6]],[[8],[3,1],[4,3,1],[4,1,1],[4,1],[4,1],[10],[1,1],[1,1]]],"title":"Mailbox","img":"medium/thumb.level36.png"},{"size":[9,11],"level":[[0,0,1,1,1,1,1,1,1,0,0],[0,1,0,1,0,0,0,1,0,1,0],[1,0,1,0,0,0,0,0,1,0,1],[1,1,1,0,0,1,0,0,1,1,1],[1,0,1,0,1,1,0,0,1,0,1],[1,1,1,0,1,1,1,0,1,1,1],[1,0,1,0,0,1,1,0,1,0,1],[0,1,0,1,0,1,1,1,0,1,0],[0,0,1,1,1,1,1,1,1,0,0]],"hints":[[[5],[1,1,1,1],[1,5,1],[2,2],[1,2,1],[1,6],[1,4],[2,2],[1,5,1],[1,1,1,1],[5]],[[7],[1,1,1,1],[1,1,1,1],[3,1,3],[1,1,2,1,1],[3,3,3],[1,1,2,1,1],[1,1,3,1],[7]]],"title":"Hamster Wheel","img":"medium/thumb.level37.png"},{"size":[12,9],"level":[[1,0,1,1,1,1,1,1,1],[1,0,1,1,1,0,1,1,1],[0,1,1,1,1,1,1,1,1],[0,1,0,1,1,1,1,0,1],[1,0,1,1,0,1,1,1,1],[1,1,1,1,1,1,1,1,1],[1,1,1,0,0,0,1,1,1],[1,1,1,0,1,0,0,1,1],[1,1,1,0,0,0,0,1,1],[1,1,1,1,0,0,0,1,1],[1,1,1,1,1,1,1,0,0],[1,1,1,1,1,1,1,0,1]],"hints":[[[2,8],[2,7],[3,8],[6,3],[4,1,1,2],[1,4,2],[7,2],[3,6],[10,1]],[[1,7],[1,3,3],[8],[1,4,1],[1,2,4],[9],[3,3],[3,1,2],[3,2],[4,2],[7],[7,1]]],"title":"Bait","img":"dailies/thumb.level19.png"},{"size":[12,9],"level":[[0,0,0,0,0,0,0,0,0],[0,0,0,1,0,0,1,0,1],[0,0,0,1,0,0,1,0,1],[0,0,1,1,1,0,0,0,0],[0,1,1,1,1,1,1,0,1],[0,0,1,1,1,0,1,0,1],[0,1,1,1,1,1,0,0,0],[1,1,1,1,1,1,1,0,0],[0,0,0,1,0,0,0,0,0],[0,1,1,1,0,1,1,1,0],[1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1]],"hints":[[[1,2],[1,2,3],[5,3],[11],[5,2],[1,2,3],[2,2,1,3],[3],[2,2,2]],[[0],[1,1,1],[1,1,1],[3],[6,1],[3,1,1],[5],[7],[1],[3,3],[9],[9]]],"title":"Christmas","img":"dailies/thumb.level20.png"},{"size":[12,9],"level":[[0,0,0,0,0,1,1,1,1],[0,0,0,0,0,1,0,0,0],[0,1,1,1,1,1,1,1,0],[0,1,0,0,0,1,0,1,0],[0,1,0,0,0,1,0,1,0],[0,1,0,0,0,1,0,1,0],[0,1,1,1,1,1,1,1,0],[0,1,1,1,0,0,1,1,0],[0,1,1,1,0,0,1,1,0],[0,1,0,0,1,0,0,1,0],[0,1,0,0,1,0,0,1,0],[0,0,1,1,1,1,1,0,0]],"hints":[[[0],[9],[1,3,1],[1,3,1],[1,1,3],[7,1],[1,1,3,1],[1,9],[1]],[[4],[1],[7],[1,1,1],[1,1,1],[1,1,1],[7],[3,2],[3,2],[1,1,1],[1,1,1],[5]]],"title":"Cold Beverage","img":"dailies/thumb.level21.png"},{"size":[12,9],"level":[[0,0,0,0,1,0,0,0,0],[1,1,1,1,1,0,0,0,0],[1,1,1,0,1,0,0,0,0],[0,1,1,1,1,0,0,0,0],[0,0,0,1,1,0,0,0,0],[0,0,0,1,1,0,0,1,0],[0,0,0,1,1,1,0,0,1],[0,0,1,1,1,1,0,0,1],[0,0,1,1,1,1,1,0,1],[0,0,1,1,1,1,1,0,1],[0,0,1,1,1,1,1,1,0],[0,1,1,1,1,1,1,1,1]],"hints":[[[2],[3,1],[3,5],[1,9],[12],[6],[4],[1,2],[4,1]],[[1],[5],[3,1],[4],[2],[2,1],[3,1],[4,1],[5,1],[5,1],[6],[8]]],"title":"Dog Sitting","img":"dailies/thumb.level22.png"},{"size":[12,9],"level":[[0,0,0,1,0,1,0,0,0],[0,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,1],[1,1,0,1,0,1,0,0,0],[1,1,0,1,0,1,0,0,0],[1,1,1,1,1,1,1,1,0],[0,1,1,1,1,1,1,1,1],[0,0,0,1,0,1,0,1,1],[0,0,0,1,0,1,0,1,1],[1,1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1,0],[0,0,0,1,0,1,0,0,0]],"hints":[[[4,2],[6,2],[2,2,2],[12],[2,2,2],[12],[2,2,2],[2,6],[2,4]],[[1,1],[8],[9],[2,1,1],[2,1,1],[8],[8],[1,1,2],[1,1,2],[9],[8],[1,1]]],"title":"Dollar Sign","img":"dailies/thumb.level23.png"},{"size":[12,9],"level":[[0,0,0,0,0,1,0,0,0],[0,0,0,1,0,0,0,0,0],[0,0,0,0,0,1,0,0,0],[0,0,0,1,1,1,0,0,0],[0,0,0,1,0,1,0,0,0],[0,0,0,1,0,1,0,0,0],[0,0,0,1,0,1,0,0,0],[0,0,1,1,1,1,1,0,0],[0,1,1,1,1,0,1,1,0],[1,0,1,1,1,1,1,1,1],[1,1,1,0,1,1,0,1,1],[0,1,1,1,1,1,1,1,0]],"hints":[[[2],[1,2],[5],[1,7,1],[1,5],[1,6,3],[3,1],[4],[2]],[[1],[1],[1],[3],[1,1],[1,1],[1,1],[5],[4,2],[1,7],[3,2,2],[7]]],"title":"Erlenmeyer","img":"dailies/thumb.level24.png"},{"size":[12,9],"level":[[0,1,1,1,0,0,0,0,0],[1,0,0,1,0,0,0,0,0],[1,0,1,1,0,0,0,0,0],[0,0,1,0,1,1,1,1,0],[0,0,1,1,1,1,1,1,1],[0,0,0,1,1,1,1,1,1],[0,0,0,0,1,1,1,0,1],[0,0,0,0,0,0,1,1,0],[0,0,0,0,0,0,1,1,0],[0,0,0,0,0,1,1,1,0],[0,0,0,0,0,1,1,0,0],[0,0,0,0,0,0,1,0,0]],"hints":[[[2],[1],[1,3],[3,2],[4],[4,2],[9],[3,3],[3]],[[3],[1,1],[1,2],[1,4],[7],[6],[3,1],[2],[2],[3],[2],[1]]],"title":"Flamingo","img":"dailies/thumb.level26.png"},{"size":[12,9],"level":[[1,1,1,1,1,1,1,1,0],[1,1,1,0,1,1,1,0,1],[0,1,1,1,1,0,0,1,1],[1,1,0,1,1,0,0,1,0],[1,1,1,1,1,1,1,1,1],[1,1,0,0,0,1,1,0,1],[1,0,0,0,1,0,1,1,1],[0,1,1,0,1,1,0,1,1],[0,0,1,0,0,1,1,1,1],[0,0,0,1,0,0,0,1,0],[1,0,0,1,0,0,1,1,1],[1,1,0,0,0,1,1,0,1]],"hints":[[[2,4,2],[6,1,1],[3,1,2],[1,3,2],[5,2],[2,2,2,1],[2,3,1,2],[1,3,5],[2,5,2]],[[8],[3,3,1],[4,2],[2,2,1],[9],[2,2,1],[1,1,3],[2,2,2],[1,4],[1,1],[1,1,3],[2,2,1]]],"title":"Meteor","img":"dailies/thumb.level27.png"},{"size":[12,9],"level":[[0,1,1,1,0,1,1,1,0],[1,0,0,1,0,1,0,0,1],[1,0,0,1,0,1,0,0,1],[0,1,1,1,0,1,0,1,0],[0,0,0,1,0,1,1,0,0],[0,0,0,1,1,0,0,0,0],[0,0,0,1,1,0,0,0,0],[0,0,0,1,1,0,0,0,0],[0,0,0,1,0,1,0,0,0],[0,0,1,0,0,1,0,0,0],[0,0,1,0,0,1,0,0,0],[0,0,1,0,0,1,0,0,0]],"hints":[[[2],[1,1],[1,1,3],[9],[3],[5,4],[1,1],[1,1],[2]],[[3,3],[1,1,1,1],[1,1,1,1],[3,1,1],[1,2],[2],[2],[2],[1,1],[1,1],[1,1],[1,1]]],"title":"Scissors","img":"dailies/thumb.level28.png"},{"size":[12,9],"level":[[0,0,0,0,0,0,0,0,0],[0,0,1,1,1,1,1,0,0],[0,1,1,1,0,1,1,1,0],[1,1,1,1,1,1,1,1,1],[1,0,1,0,1,0,1,0,1],[1,1,1,1,1,1,1,1,1],[1,1,0,1,0,0,0,1,1],[1,0,0,0,0,0,0,0,1],[0,1,0,0,0,0,0,1,0],[0,0,1,1,1,1,1,0,0],[0,1,0,0,0,0,0,1,0],[0,1,1,1,1,1,1,1,0]],"hints":[[[5],[2,2,1,2],[5,1,1],[3,2,1,1],[1,3,1,1],[3,1,1,1],[5,1,1],[2,2,1,2],[5]],[[0],[5],[3,3],[9],[1,1,1,1,1],[9],[2,1,2],[1,1],[1,1],[5],[1,1],[7]]],"title":"Snow Globe","img":"dailies/thumb.level29.png"},{"size":[9,12],"level":[[0,1,1,1,1,1,1,1,1,1,1,0],[1,0,0,0,1,0,0,0,0,0,0,1],[1,1,1,1,1,1,0,1,0,1,0,1],[1,1,1,1,1,1,0,1,0,1,0,1],[1,0,0,0,1,0,0,0,0,0,0,1],[1,1,0,1,1,0,0,0,0,0,0,1],[1,0,0,0,1,0,1,0,0,0,1,1],[1,1,1,1,1,1,1,1,1,1,1,1],[0,0,0,0,1,0,1,0,0,0,0,0]],"hints":[[[7],[1,2,1,1],[1,2,1],[1,2,1,1],[9],[1,2,1],[1,3],[1,2,1],[1,1],[1,2,1],[1,2],[7]],[[10],[1,1,1],[6,1,1,1],[6,1,1,1],[1,1,1],[2,2,1],[1,1,1,2],[12],[1,1]]],"title":"Mailbox","img":"medium/thumb.level36.png"},{"size":[12,9],"level":[[1,0,1,1,1,1,1,1,1],[1,0,1,1,1,0,1,1,1],[0,1,1,1,1,1,1,1,1],[0,1,0,1,1,1,1,0,1],[1,0,1,1,0,1,1,1,1],[1,1,1,1,1,1,1,1,1],[1,1,1,0,0,0,1,1,1],[1,1,1,0,1,0,0,1,1],[1,1,1,0,0,0,0,1,1],[1,1,1,1,0,0,0,1,1],[1,1,1,1,1,1,1,0,0],[1,1,1,1,1,1,1,0,1]],"hints":[[[2,8],[2,7],[3,8],[6,3],[4,1,1,2],[1,4,2],[7,2],[3,6],[10,1]],[[1,7],[1,3,3],[8],[1,4,1],[1,2,4],[9],[3,3],[3,1,2],[3,2],[4,2],[7],[7,1]]],"title":"Bait","img":"dailies/thumb.level19.png"}];
+</script>
+<script>
+"use strict";
+
+/* =====================================================================
+   IDIOMA — fuerza aquí un idioma fijo si lo necesitas: 'es' | 'en' | 'ru'
+   Déjalo en null para que el jugador pueda elegir (y se recuerde el idioma).
+   ===================================================================== */
+const FORCE_LANG = null;
+
+const I18N = {
+  es:{
+    appTitle:"Nonogramas Mágicos",
+    appSubtitle:"Elige un nivel y pinta la magia ✨",
+    loadingText:"Cargando aventura...",
+    progress:"🏆 {done}/{total} niveles · ⭐ {stars} estrellas",
+    doneBadge:"Hecho",
+    backBtn:"Menú",
+    paintMode:"Pintar",
+    flagMode:"Marcar",
+    restartBtn:"Reiniciar",
+    saveBtn:"Guardar",
+    confirmRestart:"¿Reiniciar este nivel? Se perderá el progreso actual.",
+    toastRestarted:"Nivel reiniciado 🔄",
+    confirmResetAll:"¿Borrar TODO el progreso guardado? Esta acción no se puede deshacer.",
+    toastReset:"Progreso borrado 🗑️",
+    toastSaved:"Partida guardada 💾",
+    winTitle:"🎉 ¡Lo lograste! 🎉",
+    winTime:"Tiempo",
+    winMistakes:"Errores",
+    winMenu:"Menú",
+    winReplay:"Repetir",
+    winNext:"Siguiente",
+    soundLabel:"Sonido",
+    resetLabel:"Borrar progreso",
+    langLabel:"Idioma",
+    footerText:"Hecho con 💜 — imágenes cortesía de cdn.htmlgames.com"
+  },
+  en:{
+    appTitle:"Magic Nonograms",
+    appSubtitle:"Pick a level and paint the magic ✨",
+    loadingText:"Loading adventure...",
+    progress:"🏆 {done}/{total} levels · ⭐ {stars} stars",
+    doneBadge:"Done",
+    backBtn:"Menu",
+    paintMode:"Paint",
+    flagMode:"Flag",
+    restartBtn:"Restart",
+    saveBtn:"Save",
+    confirmRestart:"Restart this level? Current progress will be lost.",
+    toastRestarted:"Level restarted 🔄",
+    confirmResetAll:"Delete ALL saved progress? This cannot be undone.",
+    toastReset:"Progress cleared 🗑️",
+    toastSaved:"Game saved 💾",
+    winTitle:"🎉 You did it! 🎉",
+    winTime:"Time",
+    winMistakes:"Mistakes",
+    winMenu:"Menu",
+    winReplay:"Replay",
+    winNext:"Next",
+    soundLabel:"Sound",
+    resetLabel:"Clear progress",
+    langLabel:"Language",
+    footerText:"Made with 💜 — images courtesy of cdn.htmlgames.com"
+  },
+  ru:{
+    appTitle:"Волшебные Нонограммы",
+    appSubtitle:"Выберите уровень и раскрасьте магию ✨",
+    loadingText:"Загрузка приключения...",
+    progress:"🏆 {done}/{total} уровней · ⭐ {stars} звёзд",
+    doneBadge:"Готово",
+    backBtn:"Меню",
+    paintMode:"Закрасить",
+    flagMode:"Отметить",
+    restartBtn:"Заново",
+    saveBtn:"Сохранить",
+    confirmRestart:"Начать уровень заново? Текущий прогресс будет потерян.",
+    toastRestarted:"Уровень перезапущен 🔄",
+    confirmResetAll:"Удалить ВЕСЬ сохранённый прогресс? Это действие необратимо.",
+    toastReset:"Прогресс удалён 🗑️",
+    toastSaved:"Игра сохранена 💾",
+    winTitle:"🎉 У вас получилось! 🎉",
+    winTime:"Время",
+    winMistakes:"Ошибки",
+    winMenu:"Меню",
+    winReplay:"Заново",
+    winNext:"Далее",
+    soundLabel:"Звук",
+    resetLabel:"Очистить прогресс",
+    langLabel:"Язык",
+    footerText:"Сделано с 💜 — изображения предоставлены cdn.htmlgames.com"
+  }
+};
+const LANG_ORDER = ["es","en","ru"];
+const LANG_NAMES = {es:"ES",en:"EN",ru:"RU"};
+
+function t(key, params){
+  const dict = I18N[currentLang] || I18N.es;
+  let str = dict[key] != null ? dict[key] : (I18N.es[key] || key);
+  if(params){
+    Object.keys(params).forEach(k=>{ str = str.replace(new RegExp("\\{"+k+"\\}","g"), params[k]); });
+  }
+  return str;
+}
+function detectLang(){
+  const nl = ((navigator.language||navigator.userLanguage||"es")+"").toLowerCase();
+  if(nl.startsWith("ru")) return "ru";
+  if(nl.startsWith("en")) return "en";
+  return "es";
+}
+
+/* =====================================================================
+   ALMACENAMIENTO — usa el almacenamiento persistente del artifact si
+   está disponible; si el archivo se abre fuera de Claude, cae a
+   localStorage para que el progreso también se guarde ahí.
+   ===================================================================== */
+const SAVE_KEY = "nonogram_save_v2";
+const hasCloudStorage = (typeof window !== "undefined") && !!window.storage;
+
+async function persistSave(){
+  try{
+    if(hasCloudStorage){
+      await window.storage.set(SAVE_KEY, JSON.stringify(save), false);
+    } else if(window.localStorage){
+      localStorage.setItem(SAVE_KEY, JSON.stringify(save));
+    }
+  }catch(e){ /* el progreso sigue funcionando en memoria aunque falle el guardado */ }
+}
+async function loadSave(){
+  const fallback = {levels:{}, inprogress:{}, soundOn:true, lang:null};
+  try{
+    if(hasCloudStorage){
+      const res = await window.storage.get(SAVE_KEY, false);
+      if(res && res.value) return Object.assign(fallback, JSON.parse(res.value));
+      return fallback;
+    } else if(window.localStorage){
+      const raw = localStorage.getItem(SAVE_KEY);
+      if(raw) return Object.assign(fallback, JSON.parse(raw));
+      return fallback;
+    }
+  }catch(e){ /* clave inexistente u otro error: usamos el estado por defecto */ }
+  return fallback;
+}
+
+/* ---------------- ESTADO GLOBAL ---------------- */
+const IMG_BASE = "https://cdn.htmlgames.com/PictureNonogram/img/Ball/";
+let save = null;
+let currentLang = "es";
+let currentLevelIndex = null;
+let board = [];
+let mistakes = 0;
+let seconds = 0;
+let timerInterval = null;
+let paintMode = "fill";
+let winInProgress = false;
+let dragState = null;
+let lineDoneRows = [];
+let lineDoneCols = [];
+
+/* ---------------- SONIDO (Web Audio, tonos agradables) ---------------- */
+let audioCtx=null, reverbNode=null, dryGain=null, wetGain=null, masterGain=null;
+function ensureAudio(){
+  if(audioCtx){ if(audioCtx.state==="suspended") audioCtx.resume(); return; }
+  try{
+    audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    masterGain = audioCtx.createGain(); masterGain.gain.value=1;
+    masterGain.connect(audioCtx.destination);
+    reverbNode = audioCtx.createConvolver();
+    reverbNode.buffer = makeImpulse(audioCtx, 1.3, 2.4);
+    wetGain = audioCtx.createGain(); wetGain.gain.value=0.16;
+    dryGain = audioCtx.createGain(); dryGain.gain.value=1;
+    reverbNode.connect(wetGain).connect(masterGain);
+    dryGain.connect(masterGain);
+  }catch(e){ audioCtx=null; }
+}
+function makeImpulse(ctx,duration,decay){
+  const rate = ctx.sampleRate, len = Math.floor(rate*duration);
+  const impulse = ctx.createBuffer(2, len, rate);
+  for(let ch=0; ch<2; ch++){
+    const data = impulse.getChannelData(ch);
+    for(let i=0;i<len;i++) data[i] = (Math.random()*2-1) * Math.pow(1-i/len, decay);
+  }
+  return impulse;
+}
+function tone(opts){
+  if(!save || !save.soundOn) return;
+  ensureAudio();
+  if(!audioCtx) return;
+  const {freq, dur=0.18, type="sine", vol=0.16, delay=0, glideTo=null, filterFreq=null} = opts;
+  const t0 = audioCtx.currentTime + delay;
+  const osc = audioCtx.createOscillator();
+  osc.type = type; osc.frequency.setValueAtTime(freq, t0);
+  if(glideTo) osc.frequency.exponentialRampToValueAtTime(Math.max(30,glideTo), t0+dur*0.85);
+  const gain = audioCtx.createGain();
+  gain.gain.setValueAtTime(0.0001, t0);
+  gain.gain.exponentialRampToValueAtTime(Math.max(0.001,vol), t0+0.012);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t0+dur);
+  let node = osc;
+  if(filterFreq){
+    const filt = audioCtx.createBiquadFilter();
+    filt.type="lowpass"; filt.frequency.value=filterFreq;
+    node.connect(filt); node = filt;
+  }
+  node.connect(gain);
+  gain.connect(dryGain);
+  gain.connect(reverbNode);
+  osc.start(t0); osc.stop(t0+dur+0.05);
+}
+const SCALE = [523.25,587.33,659.25,783.99,880.0,1046.5,1174.66];
+function sndFill(){
+  const n = SCALE[Math.floor(Math.random()*3)];
+  tone({freq:n, type:"sine", dur:0.16, vol:0.15});
+  tone({freq:n*1.5, type:"sine", dur:0.14, vol:0.06, delay:0.03});
+}
+function sndUnfill(){ tone({freq:392, glideTo:294, type:"sine", dur:0.13, vol:0.11}); }
+function sndFlag(){ tone({freq:660, type:"triangle", dur:0.09, vol:0.13}); tone({freq:990, type:"triangle", dur:0.07, vol:0.05, delay:0.02}); }
+function sndError(){ tone({freq:220, glideTo:170, type:"sine", dur:0.22, vol:0.14, filterFreq:900}); }
+function sndClickUI(){ tone({freq:880, type:"sine", dur:0.05, vol:0.08}); }
+function sndLineDone(){ tone({freq:659.25, type:"sine", dur:0.18, vol:0.11}); tone({freq:880, type:"sine", dur:0.18, vol:0.09, delay:0.05}); }
+function sndWin(){ [523.25,659.25,783.99,1046.5,1318.51].forEach((f,i)=> tone({freq:f, type:"sine", dur:0.4, vol:0.17, delay:i*0.11, filterFreq:4200})); }
+
+/* ---------------- HELPERS ---------------- */
+function starsMarkup(n, animate){
+  let out = "";
+  for(let i=1;i<=3;i++){
+    out += `<span class="${i<=n?'on':'off'}${animate?' pop':''}"${animate?` style="animation-delay:${i*0.15}s"`:""}>★</span>`;
+  }
+  return out;
+}
+function fmtTime(s){
+  const m = Math.floor(s/60); const ss = s%60;
+  return String(m).padStart(2,"0")+":"+String(ss).padStart(2,"0");
+}
+function showToast(msg){
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  clearTimeout(showToast._tm);
+  showToast._tm = setTimeout(()=>el.classList.remove("show"), 1800);
+}
+function spawnSparklesAt(x,y,count){
+  count = count||6;
+  for(let i=0;i<count;i++){
+    const s = document.createElement("span");
+    s.className = "sparkleBit";
+    s.textContent = Math.random()<0.5?"✨":"⭐";
+    s.style.left = x+"px"; s.style.top = y+"px";
+    const ang = Math.random()*Math.PI*2, dist = 28+Math.random()*34;
+    s.style.setProperty("--sbTranslate", `translate(${Math.cos(ang)*dist}px, ${Math.sin(ang)*dist}px)`);
+    document.body.appendChild(s);
+    setTimeout(()=>s.remove(), 750);
+  }
+}
+function spawnConfetti(){
+  const colors = ["#ff6fa5","#8a5cff","#4fc3f7","#ffd54a","#5ce08c","#ff9a4f"];
+  const shapes = ["50%","4px","0"]; // circle, rounded square, triangle-ish square
+  for(let i=0;i<80;i++){
+    const p = document.createElement("div");
+    p.className = "confetti-piece";
+    p.style.left = Math.random()*100+"vw";
+    p.style.background = colors[Math.floor(Math.random()*colors.length)];
+    p.style.borderRadius = shapes[Math.floor(Math.random()*shapes.length)];
+    const dur = 2 + Math.random()*2.2;
+    p.style.animation = `confettiFall ${dur}s linear forwards`;
+    p.style.transform = `rotate(${Math.random()*360}deg)`;
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(), dur*1000+100);
+  }
+}
+
+/* ---------------- IDIOMA: aplicar a la UI ---------------- */
+function renderLangSwitch(){
+  const wrap = document.getElementById("langSwitch");
+  if(FORCE_LANG){ wrap.innerHTML = ""; return; }
+  wrap.innerHTML = LANG_ORDER.map(code=>
+    `<button class="langbtn ${code===currentLang?'active':''}" data-lang="${code}">${LANG_NAMES[code]}</button>`
+  ).join("");
+  wrap.querySelectorAll(".langbtn").forEach(b=>{
+    b.addEventListener("click", ()=>{ sndClickUI(); setLang(b.dataset.lang); });
+  });
+}
+function setLang(code){
+  if(FORCE_LANG) return;
+  currentLang = code;
+  save.lang = code;
+  persistSave();
+  applyLanguage();
+}
+function applyLanguage(){
+  document.documentElement.lang = currentLang;
+  document.getElementById("pageTitle").textContent = "🌈 " + t("appTitle") + " 🌈";
+  document.querySelectorAll("[data-i18n]").forEach(el=>{ el.textContent = t(el.dataset.i18n); });
+  document.getElementById("soundBtn").title = t("soundLabel");
+  document.getElementById("soundBtn").setAttribute("aria-label", t("soundLabel"));
+  document.getElementById("resetProgressBtn").title = t("resetLabel");
+  document.getElementById("resetProgressBtn").setAttribute("aria-label", t("resetLabel"));
+  renderLangSwitch();
+  renderMenu();
+}
+
+/* ---------------- MENÚ ---------------- */
+function renderMenu(){
+  if(!save) return;
+  const totalLevels = LEVELS.length;
+  let done = 0, totalStars = 0;
+  Object.values(save.levels).forEach(v=>{ if(v.completed){ done++; totalStars += v.stars||0; } });
+  const pct = totalLevels ? Math.round((done/totalLevels)*100) : 0;
+  document.getElementById("progressFill").style.width = pct+"%";
+  document.getElementById("progressText").textContent = t("progress",{done,total:totalLevels,stars:totalStars});
+  renderLevelGrid();
+}
+function renderLevelGrid(){
+  const grid = document.getElementById("levelGrid");
+  grid.innerHTML = LEVELS.map((lvl, idx)=>{
+    const prog = save.levels[idx];
+    const completed = prog && prog.completed;
+    const stars = prog ? (prog.stars||0) : 0;
+    const gemClass = "gem-"+(idx%6);
+    return `<button class="levelcard" data-idx="${idx}" aria-label="${lvl.title}">
+      ${completed?`<span class="doneRibbon">✔ ${t('doneBadge')}</span>`:''}
+      <span class="thumbwrap">
+        ${completed
+          ? `<img src="${IMG_BASE+lvl.img}" alt="${lvl.title}" loading="lazy">`
+          : `<span class="gem ${gemClass}"><span class="gemNum">${idx+1}</span><span class="gemSpark s1">✦</span><span class="gemSpark s2">✧</span></span>`}
+      </span>
+      <span class="lvlname">${lvl.title}</span>
+      <span class="lvlmeta"><span class="stars">${starsMarkup(stars,false)}</span><span>${lvl.size[1]}×${lvl.size[0]}</span></span>
+    </button>`;
+  }).join("");
+  grid.querySelectorAll(".levelcard").forEach(card=>{
+    card.addEventListener("click", ()=>{ sndClickUI(); openLevel(+card.dataset.idx); });
+  });
+}
+
+/* ---------------- LÓGICA DEL JUEGO ---------------- */
+function emptyBoard(rows, cols){
+  const b = [];
+  for(let r=0;r<rows;r++) b.push(new Array(cols).fill(0));
+  return b;
+}
+function openLevel(idx){
+  currentLevelIndex = idx;
+  const lvl = LEVELS[idx];
+  const rows = lvl.size[0], cols = lvl.size[1];
+  const prog = save.inprogress[idx];
+  if(prog && prog.rows===rows && prog.cols===cols){
+    board = prog.board;
+    mistakes = prog.mistakes||0;
+    seconds = prog.seconds||0;
+  } else {
+    board = emptyBoard(rows, cols);
+    mistakes = 0;
+    seconds = 0;
+  }
+  winInProgress = false;
+  dragState = null;
+  document.getElementById("menuScreen").classList.add("hidden");
+  document.getElementById("gameScreen").classList.remove("hidden");
+  document.getElementById("levelTitle").textContent = `🎨 #${idx+1} · ${lvl.title}`;
+  renderBoard(lvl, rows, cols);
+  updateStats();
+  startTimer();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function backToMenu(){
+  stopTimer();
+  saveProgress();
+  document.getElementById("gameScreen").classList.add("hidden");
+  document.getElementById("menuScreen").classList.remove("hidden");
+  renderMenu();
+}
+function startTimer(){
+  stopTimer();
+  timerInterval = setInterval(()=>{
+    seconds++;
+    document.getElementById("timerText").textContent = fmtTime(seconds);
+  },1000);
+  document.getElementById("timerText").textContent = fmtTime(seconds);
+}
+function stopTimer(){ if(timerInterval){ clearInterval(timerInterval); timerInterval=null; } }
+function updateStats(){
+  document.getElementById("mistakeText").textContent = mistakes;
+  document.getElementById("timerText").textContent = fmtTime(seconds);
+}
+function saveProgress(){
+  if(currentLevelIndex==null) return;
+  const lvl = LEVELS[currentLevelIndex];
+  save.inprogress[currentLevelIndex] = {
+    board: board, mistakes: mistakes, seconds: seconds,
+    rows: lvl.size[0], cols: lvl.size[1]
+  };
+  persistSave();
+}
+
+/* --- ajuste de tamaño responsive --- */
+function fitCellSize(rows, cols){
+  const wrapper = document.getElementById("boardWrapper");
+  const availW = Math.max(240, wrapper.clientWidth - 24);
+  const availH = Math.max(240, window.innerHeight * 0.56);
+  const totalCols = cols + 1;
+  const totalRows = rows + 1;
+  const byW = Math.floor(availW/totalCols);
+  const byH = Math.floor(availH/totalRows);
+  let size = Math.min(byW, byH);
+  size = Math.max(16, Math.min(46, size));
+  document.documentElement.style.setProperty("--cell", size+"px");
+  return size;
+}
+function computeRuns(arr){
+  const runs = []; let c=0;
+  for(let i=0;i<arr.length;i++){
+    if(arr[i]) c++;
+    else { if(c>0) runs.push(c); c=0; }
+  }
+  if(c>0) runs.push(c);
+  return runs.length?runs:[0];
+}
+function arraysEqual(a,b){
+  if(a.length!==b.length) return false;
+  for(let i=0;i<a.length;i++) if(a[i]!==b[i]) return false;
+  return true;
+}
+
+function renderBoard(lvl, rows, cols){
+  const boardEl = document.getElementById("board");
+  const colHints = lvl.hints[0];
+  const rowHints = lvl.hints[1];
+
+  fitCellSize(rows, cols);
+
+  boardEl.style.gridTemplateColumns = `auto repeat(${cols}, var(--cell))`;
+  boardEl.style.gridTemplateRows = `auto repeat(${rows}, var(--cell))`;
+  boardEl.innerHTML = "";
+
+  const corner = document.createElement("div");
+  corner.className = "hintCorner";
+  boardEl.appendChild(corner);
+
+  for(let c=0;c<cols;c++){
+    const div = document.createElement("div");
+    div.className = "colHint";
+    div.dataset.col = c;
+    div.innerHTML = colHints[c].map(n=>`<span>${n}</span>`).join("");
+    boardEl.appendChild(div);
+  }
+
+  for(let r=0;r<rows;r++){
+    const rh = document.createElement("div");
+    rh.className = "rowHint";
+    rh.dataset.row = r;
+    rh.innerHTML = rowHints[r].map(n=>`<span>${n}</span>`).join("");
+    boardEl.appendChild(rh);
+
+    for(let c=0;c<cols;c++){
+      const cell = document.createElement("div");
+      cell.className = "cell";
+      cell.dataset.r = r; cell.dataset.c = c;
+      if((Math.floor(r/5)+Math.floor(c/5))%2===1) cell.classList.add("shadeB");
+      if((c+1)%5===0 && c!==cols-1) cell.classList.add("thick-right");
+      if((r+1)%5===0 && r!==rows-1) cell.classList.add("thick-bottom");
+      applyCellVisual(cell, board[r][c]);
+      boardEl.appendChild(cell);
+    }
+  }
+
+  lineDoneRows = new Array(rows).fill(false);
+  lineDoneCols = new Array(cols).fill(false);
+  attachBoardEvents(boardEl, lvl, rows, cols);
+  updateLineStates(lvl, rows, cols);
+}
+function applyCellVisual(cell, val){
+  cell.classList.remove("filled","flag");
+  if(val===1) cell.classList.add("filled");
+  else if(val===2) cell.classList.add("flag");
+}
+
+function attachBoardEvents(boardEl, lvl, rows, cols){
+  function applyAction(r, c, mode, value){
+    if(winInProgress) return;
+    if(board[r][c] === value) return;
+    const cellEl = boardEl.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);
+    const solved = lvl.level[r][c]===1;
+
+    if(mode==="flag"){
+      board[r][c] = value;
+      sndFlag();
+    } else {
+      if(value===1 && !solved){
+        board[r][c] = 1;
+        mistakes++;
+        if(cellEl){
+          cellEl.classList.add("wrongflash");
+          setTimeout(()=>cellEl && cellEl.classList.remove("wrongflash"), 400);
+        }
+        const chip = document.getElementById("mistakeChip");
+        chip.classList.remove("pulse"); void chip.offsetWidth; chip.classList.add("pulse");
+        sndError();
+      } else {
+        board[r][c] = value;
+        if(value===1) sndFill(); else sndUnfill();
+      }
+    }
+    if(cellEl) applyCellVisual(cellEl, board[r][c]);
+    updateStats();
+    updateLineStates(lvl, rows, cols);
+    saveProgress();
+    checkWin(lvl, rows, cols);
+  }
+  function beginDrag(r, c, button){
+    const mode = button===2 ? "flag" : paintMode;
+    let value;
+    if(mode==="flag") value = board[r][c]===2 ? 0 : 2;
+    else value = board[r][c]===1 ? 0 : 1;
+    dragState = {mode, value};
+    applyAction(r, c, mode, value);
+  }
+
+  boardEl.onpointerdown = (e)=>{
+    const cell = e.target.closest(".cell");
+    if(!cell) return;
+    e.preventDefault();
+    try{ boardEl.setPointerCapture(e.pointerId); }catch(err){}
+    beginDrag(+cell.dataset.r, +cell.dataset.c, e.button);
+  };
+  boardEl.onpointermove = (e)=>{
+    if(!dragState) return;
+    const target = document.elementFromPoint(e.clientX, e.clientY);
+    const cell = target && target.closest(".cell");
+    if(!cell || !boardEl.contains(cell)) return;
+    applyAction(+cell.dataset.r, +cell.dataset.c, dragState.mode, dragState.value);
+  };
+  const endDrag = ()=>{ dragState = null; };
+  boardEl.onpointerup = endDrag;
+  boardEl.onpointercancel = endDrag;
+  boardEl.onpointerleave = ()=>{ if(dragState) endDrag(); };
+  boardEl.oncontextmenu = (e)=> e.preventDefault();
+}
+
+function updateLineStates(lvl, rows, cols){
+  const boardEl = document.getElementById("board");
+  const boardRect = boardEl.getBoundingClientRect();
+  for(let r=0;r<rows;r++){
+    const line = board[r].map(v=>v===1?1:0);
+    const runs = computeRuns(line);
+    const done = arraysEqual(runs, lvl.hints[1][r]);
+    const el = boardEl.querySelector(`.rowHint[data-row="${r}"]`);
+    if(el) el.classList.toggle("done", done);
+    if(done && !lineDoneRows[r]){
+      lineDoneRows[r] = true;
+      sndLineDone();
+      if(el){ el.classList.remove("lineGlow"); void el.offsetWidth; el.classList.add("lineGlow"); }
+      spawnSparklesAt(boardRect.left+boardRect.width*0.6, boardRect.top + (el?el.getBoundingClientRect().top-boardRect.top+10:20), 5);
+    } else if(!done){ lineDoneRows[r] = false; }
+  }
+  for(let c=0;c<cols;c++){
+    const line = board.map(row=>row[c]===1?1:0);
+    const runs = computeRuns(line);
+    const done = arraysEqual(runs, lvl.hints[0][c]);
+    const el = boardEl.querySelector(`.colHint[data-col="${c}"]`);
+    if(el) el.classList.toggle("done", done);
+    if(done && !lineDoneCols[c]){
+      lineDoneCols[c] = true;
+      sndLineDone();
+      if(el){ el.classList.remove("lineGlow"); void el.offsetWidth; el.classList.add("lineGlow"); }
+    } else if(!done){ lineDoneCols[c] = false; }
+  }
+}
+
+function checkWin(lvl, rows, cols){
+  for(let r=0;r<rows;r++){
+    for(let c=0;c<cols;c++){
+      const filled = board[r][c]===1 ? 1 : 0;
+      if(filled !== lvl.level[r][c]) return false;
+    }
+  }
+  onWin(lvl);
+  return true;
+}
+function onWin(lvl){
+  if(winInProgress) return;
+  winInProgress = true;
+  stopTimer();
+  let stars = 3;
+  if(mistakes>=4) stars = 1;
+  else if(mistakes>=1) stars = 2;
+
+  const prev = save.levels[currentLevelIndex];
+  const bestStars = prev ? Math.max(prev.stars||0, stars) : stars;
+  const bestTime = prev && prev.bestTime ? Math.min(prev.bestTime, seconds) : seconds;
+  save.levels[currentLevelIndex] = {completed:true, stars:bestStars, bestTime:bestTime, mistakes:mistakes};
+  delete save.inprogress[currentLevelIndex];
+  persistSave();
+
+  sndWin();
+  spawnConfetti();
+
+  document.getElementById("winTitleText").textContent = t("winTitle");
+  document.getElementById("winMeta").textContent = `⏱️ ${t("winTime")}: ${fmtTime(seconds)}   ❌ ${t("winMistakes")}: ${mistakes}`;
+  const img = document.getElementById("winImg");
+  img.classList.remove("show");
+  img.src = IMG_BASE + lvl.img;
+  img.alt = lvl.title;
+
+  const shimmer = document.getElementById("winShimmer");
+  shimmer.classList.remove("sweep"); void shimmer.offsetWidth;
+
+  ["star1","star2","star3"].forEach((id,i)=>{
+    const el = document.getElementById(id);
+    el.classList.remove("on","pop");
+    void el.offsetWidth;
+    if(i < stars){
+      el.classList.add("on");
+      el.style.animationDelay = (i*0.18)+"s";
+      el.classList.add("pop");
+    } else {
+      el.style.transform = "scale(1)";
+    }
+  });
+
+  const overlay = document.getElementById("winOverlay");
+  overlay.classList.remove("hidden");
+  setTimeout(()=>{ img.classList.add("show"); shimmer.classList.add("sweep"); }, 250);
+
+  document.getElementById("winNextBtn").disabled = (currentLevelIndex >= LEVELS.length-1);
+}
+
+/* ---------------- EVENTOS DE INTERFAZ ---------------- */
+document.getElementById("backBtn").addEventListener("click", ()=>{ sndClickUI(); backToMenu(); });
+document.getElementById("modeFillBtn").addEventListener("click", ()=>{
+  sndClickUI(); paintMode = "fill";
+  document.getElementById("modeFillBtn").classList.add("active");
+  document.getElementById("modeFlagBtn").classList.remove("active");
+});
+document.getElementById("modeFlagBtn").addEventListener("click", ()=>{
+  sndClickUI(); paintMode = "flag";
+  document.getElementById("modeFlagBtn").classList.add("active");
+  document.getElementById("modeFillBtn").classList.remove("active");
+});
+document.getElementById("restartLevelBtn").addEventListener("click", ()=>{
+  if(currentLevelIndex==null) return;
+  if(!confirm(t("confirmRestart"))) return;
+  const lvl = LEVELS[currentLevelIndex];
+  board = emptyBoard(lvl.size[0], lvl.size[1]);
+  mistakes = 0; seconds = 0;
+  winInProgress = false;
+  renderBoard(lvl, lvl.size[0], lvl.size[1]);
+  updateStats();
+  startTimer();
+  saveProgress();
+  showToast(t("toastRestarted"));
+});
+document.getElementById("saveBtn").addEventListener("click", ()=>{
+  saveProgress();
+  showToast(t("toastSaved"));
+  sndClickUI();
+});
+document.getElementById("soundBtn").addEventListener("click", (e)=>{
+  save.soundOn = !save.soundOn;
+  persistSave();
+  e.currentTarget.textContent = save.soundOn ? "🔊" : "🔇";
+  if(save.soundOn) sndClickUI();
+});
+document.getElementById("resetProgressBtn").addEventListener("click", ()=>{
+  if(!confirm(t("confirmResetAll"))) return;
+  save = {levels:{}, inprogress:{}, soundOn: save.soundOn, lang: save.lang};
+  persistSave();
+  renderMenu();
+  showToast(t("toastReset"));
+});
+document.getElementById("winMenuBtn").addEventListener("click", ()=>{
+  document.getElementById("winOverlay").classList.add("hidden");
+  backToMenu();
+});
+document.getElementById("winReplayBtn").addEventListener("click", ()=>{
+  document.getElementById("winOverlay").classList.add("hidden");
+  openLevel(currentLevelIndex);
+});
+document.getElementById("winNextBtn").addEventListener("click", ()=>{
+  document.getElementById("winOverlay").classList.add("hidden");
+  const next = currentLevelIndex+1;
+  if(next < LEVELS.length) openLevel(next);
+  else backToMenu();
+});
+window.addEventListener("resize", ()=>{
+  if(currentLevelIndex!=null && !document.getElementById("gameScreen").classList.contains("hidden")){
+    const lvl = LEVELS[currentLevelIndex];
+    fitCellSize(lvl.size[0], lvl.size[1]);
+  }
+});
+window.addEventListener("beforeunload", ()=>{ saveProgress(); });
+
+/* ---------------- INICIO ---------------- */
+(async function init(){
+  save = await loadSave();
+  currentLang = FORCE_LANG || save.lang || detectLang();
+  document.getElementById("soundBtn").textContent = save.soundOn ? "🔊" : "🔇";
+  applyLanguage();
+  document.getElementById("screens").classList.add("ready");
+})();
+</script>
+</body>
+</html>
