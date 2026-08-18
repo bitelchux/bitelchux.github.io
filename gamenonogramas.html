@@ -1079,5 +1079,157 @@ window.addEventListener("beforeunload", ()=>{ saveProgress(); });
   document.getElementById("screens").classList.add("ready");
 })();
 </script>
+
+<!-- =====================================================================
+     Y8.COM — SDK de monetización (anuncios)
+     Todo el código de esta sección es nuevo y no modifica nada de lo
+     anterior: solo añade el script del SDK y "envuelve" (wrap) un par de
+     funciones del juego ya existentes para insertar anuncios en momentos
+     naturales, sin tocar su código fuente.
+     Documentación oficial: https://github.com/Y8Games/y8-afp-ads-sdk-javascript
+     ===================================================================== -->
+<script src="https://cdn.y8.com/minimal-sdk/2-0/y8.min.js" async></script>
+<script>
+"use strict";
+(function(){
+
+  /* ---------------------------------------------------------------------
+     CONFIGURACIÓN — sustituye estos valores por los tuyos antes de publicar.
+     - appId  : lo obtienes al registrar la aplicación en
+                https://account.y8.com/applications/
+     - gameId : te lo asigna el equipo de Y8 cuando aprueban el juego
+     - test   : ponlo en false solo cuando el juego esté ya publicado en Y8
+     --------------------------------------------------------------------- */
+  const Y8_APP_ID  = "YOUR_APP_ID";
+  const Y8_GAME_ID = "YOUR_GAME_ID";
+  const Y8_TEST_MODE = true;
+
+  // No mostrar más de un anuncio cada X ms, para no saturar al jugador
+  const AD_MIN_INTERVAL_MS = 90 * 1000;
+
+  let y8Sdk = null;
+  let lastAdTime = 0;
+  let startAdShown = false;
+
+  function canShowAd(){
+    return !!y8Sdk && (Date.now() - lastAdTime) >= AD_MIN_INTERVAL_MS;
+  }
+
+  // Pausa/reanuda el cronómetro del nivel actual mientras se ve el anuncio
+  function pauseGameForAd(){
+    if(typeof window.currentLevelIndex !== "undefined" && window.currentLevelIndex != null
+       && typeof window.stopTimer === "function"){
+      window.stopTimer();
+    }
+  }
+  function resumeGameAfterAd(){
+    const gameScreen = document.getElementById("gameScreen");
+    if(typeof window.currentLevelIndex !== "undefined" && window.currentLevelIndex != null
+       && gameScreen && !gameScreen.classList.contains("hidden")
+       && typeof window.startTimer === "function"){
+      window.startTimer();
+    }
+  }
+
+  function showInterstitial(placementName){
+    if(!canShowAd()) return;
+    lastAdTime = Date.now();
+    y8Sdk.showAd({
+      type: "next",
+      name: placementName,
+      beforeAd: pauseGameForAd,
+      afterAd: resumeGameAfterAd,
+      adDismissed: resumeGameAfterAd,
+      adBreakDone: function(info){ /* console.log("Y8 adBreakDone", info); */ }
+    }).catch(function(e){ console.log("Y8 ads: no se pudo mostrar el intersticial", e); });
+  }
+
+  // Anuncio de arranque, se muestra una única vez al iniciar el juego
+  function showStartAd(){
+    if(startAdShown || !y8Sdk) return;
+    startAdShown = true;
+    lastAdTime = Date.now();
+    y8Sdk.showAd({
+      type: "start",
+      name: "game-start",
+      adBreakDone: function(info){ /* console.log("Y8 start ad done", info); */ }
+    }).catch(function(e){ console.log("Y8 ads: no se pudo mostrar el anuncio de inicio", e); });
+  }
+
+  /* -----------------------------------------------------------------
+     Enganchamos anuncios a dos momentos naturales del juego, sin tocar
+     su código: al terminar un nivel y al volver al menú. El límite de
+     AD_MIN_INTERVAL_MS evita que se acumulen si el jugador encadena
+     niveles rápido con "Siguiente".
+     ----------------------------------------------------------------- */
+  function hookGameFunctions(){
+    if(typeof window.onWin === "function"){
+      const _origOnWin = window.onWin;
+      window.onWin = function(lvl){
+        _origOnWin(lvl);
+        showInterstitial("level-complete");
+      };
+    }
+    if(typeof window.backToMenu === "function"){
+      const _origBackToMenu = window.backToMenu;
+      window.backToMenu = function(){
+        _origBackToMenu();
+        showInterstitial("back-to-menu");
+      };
+    }
+  }
+
+  /* -----------------------------------------------------------------
+     Utilidad opcional para el futuro: anuncio recompensado. No se usa
+     todavía en ningún botón (no toca el HTML existente), pero queda
+     lista por si algún día quieres, por ejemplo, "ver un anuncio para
+     desbloquear una pista". Uso: y8ShowRewardedAd(function(){ ...dar
+     recompensa... }, function(){ ...el jugador lo canceló... });
+     ----------------------------------------------------------------- */
+  window.y8ShowRewardedAd = function(onReward, onSkip){
+    if(!y8Sdk){ if(onSkip) onSkip(); return; }
+    pauseGameForAd();
+    y8Sdk.showAd({
+      type: "reward",
+      name: "reward-ad",
+      beforeReward: function(showAdFn){ showAdFn(); },
+      adViewed: function(){ resumeGameAfterAd(); if(onReward) onReward(); },
+      adDismissed: function(){ resumeGameAfterAd(); if(onSkip) onSkip(); }
+    }).catch(function(e){
+      console.log("Y8 ads: no se pudo mostrar el anuncio recompensado", e);
+      resumeGameAfterAd();
+      if(onSkip) onSkip();
+    });
+  };
+
+  window.addEventListener("y8sdk.ready", function(){
+    y8Sdk = y8.sdk();
+
+    const appConfig = {
+      appId: Y8_APP_ID,
+      autoLogin: true
+    };
+    const adConfig = {
+      gameId: Y8_GAME_ID,
+      test: Y8_TEST_MODE,
+      preloadAdBreaks: "auto",
+      sound: "on",
+      onReady: function(){
+        hookGameFunctions();
+        setTimeout(showStartAd, 1500);
+      }
+    };
+
+    y8Sdk.init(appConfig, adConfig);
+  }, {once:true});
+
+  // Si el SDK ya había terminado de cargar antes de registrar el listener
+  // (puede pasar por ser "async"), esto reemite el evento de forma segura.
+  if(window.y8 && window.y8.emitReadyEvent){
+    window.y8.emitReadyEvent();
+  }
+
+})();
+</script>
 </body>
 </html>
