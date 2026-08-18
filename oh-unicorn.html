@@ -383,7 +383,7 @@ const LANGS = {
     h1t:'🎯 Objetivo', h1b:'Rodea cada nube ☁️ caminando por sus <b>4 lados</b> completos. ¡Cuando la rodees entera aparece un arcoíris!',
     h2t:'🕹️ Controles', h2b:'⌨️ Flechas o WASD para moverte.<br>📱 Botones en pantalla o desliza con el dedo.',
     h3t:'⚡ Power-ups', h3b:'❄️ Congela enemigos &nbsp;•&nbsp; 🐢 Los ralentiza<br>⭐ Eres invulnerable &nbsp;•&nbsp; 💣 ¡Bomba!',
-    h4t:'😈 Enemigos', h4b:'Los demonios te persiguen. ¡No los toques! Rodea las nubes sin que te atrapen.',
+    h4t:'😈 Enemigos', h4b:'Demonios, escorpiones 🦂, serpientes 🐍 y calaveras 💀 te persiguen: cuanto más avanzas, más rápidos son. Si te ven de frente, ¡aceleran! Las calaveras y los fantasmas 👻 (niveles finales) se teletransportan, y los fantasmas además atraviesan las nubes.',
     back:'↩ Volver', chooseLvl:'🌈 Elige nivel', noScores:'Aún no hay puntuaciones 🦄',
     lvlLabel:'Nivel', lvlHud:'LVL', scoreHud:'🌈', timeHud:'⏱',
     pause:'⏸️ Pausa', resume:'▶️ Continuar', menu:'🏠 Menú',
@@ -400,7 +400,7 @@ const LANGS = {
     h1t:'🎯 Goal', h1b:'Walk all <b>4 sides</b> of each cloud ☁️ to reveal a rainbow!',
     h2t:'🕹️ Controls', h2b:'⌨️ Arrow keys or WASD to move.<br>📱 On-screen buttons or swipe.',
     h3t:'⚡ Power-ups', h3b:'❄️ Freeze enemies &nbsp;•&nbsp; 🐢 Slow them down<br>⭐ Invincible &nbsp;•&nbsp; 💣 Bomb!',
-    h4t:'😈 Enemies', h4b:'Demons chase you. Don\'t let them catch you! Surround clouds to win.',
+    h4t:'😈 Enemies', h4b:'Demons, scorpions 🦂, snakes 🐍 and skulls 💀 chase you — the further you go, the faster they get. Spot them in your line of sight and they\'ll sprint! Skulls and ghosts 👻 (final levels) can teleport, and ghosts also phase through clouds.',
     back:'↩ Back', chooseLvl:'🌈 Choose level', noScores:'No scores yet 🦄',
     lvlLabel:'Level', lvlHud:'LVL', scoreHud:'🌈', timeHud:'⏱',
     pause:'⏸️ Pause', resume:'▶️ Continue', menu:'🏠 Menu',
@@ -417,7 +417,7 @@ const LANGS = {
     h1t:'🎯 Objectif', h1b:'Marche sur les <b>4 côtés</b> de chaque nuage ☁️ pour révéler un arc-en-ciel !',
     h2t:'🕹️ Contrôles', h2b:'⌨️ Flèches ou WASD pour bouger.<br>📱 Boutons à l\'écran ou glisser.',
     h3t:'⚡ Power-ups', h3b:'❄️ Gèle les ennemis &nbsp;•&nbsp; 🐢 Les ralentit<br>⭐ Invulnérable &nbsp;•&nbsp; 💣 Bombe !',
-    h4t:'😈 Ennemis', h4b:'Les démons te poursuivent. Ne les laisse pas t\'attraper !',
+    h4t:'😈 Ennemis', h4b:'Démons, scorpions 🦂, serpents 🐍 et crânes 💀 te poursuivent : plus tu avances, plus ils sont rapides. S\'ils te voient, ils foncent ! Les crânes et les fantômes 👻 (derniers niveaux) se téléportent, et les fantômes traversent aussi les nuages.',
     back:'↩ Retour', chooseLvl:'🌈 Choisir niveau', noScores:'Pas encore de scores 🦄',
     lvlLabel:'Niveau', lvlHud:'NIV', scoreHud:'🌈', timeHud:'⏱',
     pause:'⏸️ Pause', resume:'▶️ Continuer', menu:'🏠 Menu',
@@ -480,7 +480,6 @@ if(DEBUG) sv.maxLevel = 100;
 
 // ── CONSTANTS ──
 const PLAYER_FACE = '🦄'; // single hero — unicorn!
-const EVIL_FACES   = ['😈','👿'];
 const PU_TYPES     = ['freeze','slow','invincible','bomb'];
 const PU = {
   freeze:    {emoji:'❄️', dur:5000, color:'#93c5fd'},
@@ -495,9 +494,94 @@ const TREASURES = [
   {e:'🌟',pts:50,c:'#fbbf24'},{e:'🦋',pts:40,c:'#34d399'},
 ];
 
+// ── TIPOS DE ENEMIGO ──
+// minLevel: nivel a partir del cual puede aparecer.
+// speedMul: multiplica la velocidad base del enemigo (cfg.mRatio).
+// chaseChance: probabilidad de moverse hacia el jugador en vez de al azar.
+// sight: si existe, el enemigo "ve" al jugador cuando está alineado en su
+//   misma fila/columna sin obstáculos y a `range` celdas o menos; mientras
+//   dura `boostDur` segundos tras verlo, corre `boost` veces más rápido.
+// teleport: si existe, cada X segundos (entre cooldownMin y cooldownMax)
+//   se teletransporta a una celda de pasillo al azar.
+// canPhase: puede atravesar el interior de las nubes (paredes).
+// alpha: opacidad de dibujado (fantasmas semitransparentes).
+const ENEMY_TYPES = {
+  imp: {
+    faces:['😈','👿'], minLevel:1, speedMul:1.0, chaseChance:0.70,
+    sight:null, teleport:null, canPhase:false, alpha:1,
+  },
+  scorpion: {
+    faces:['🦂'], minLevel:10, speedMul:1.15, chaseChance:0.82,
+    sight:{range:6, boost:1.5, boostDur:1.5}, teleport:null, canPhase:false, alpha:1,
+  },
+  snake: {
+    faces:['🐍'], minLevel:25, speedMul:1.25, chaseChance:0.78,
+    sight:{range:8, boost:1.35, boostDur:2}, teleport:null, canPhase:false, alpha:1,
+  },
+  skull: {
+    faces:['💀'], minLevel:45, speedMul:1.1, chaseChance:0.75,
+    sight:{range:7, boost:1.3, boostDur:1.5},
+    teleport:{cooldownMin:6, cooldownMax:10}, canPhase:false, alpha:1,
+  },
+  ghost: {
+    faces:['👻'], minLevel:65, speedMul:1.2, chaseChance:0.85,
+    sight:{range:9, boost:1.4, boostDur:2},
+    teleport:{cooldownMin:7, cooldownMax:12}, canPhase:true, alpha:0.68,
+  },
+};
+
+// Elige un tipo de enemigo disponible en `lvl`, dando más peso a los tipos
+// cuanto más se ha superado su nivel mínimo de aparición (así los tipos
+// nuevos empiezan siendo raros y se vuelven habituales más adelante).
+function pickEnemyType(lvl){
+  const pool=[];
+  for(const key in ENEMY_TYPES){
+    const t=ENEMY_TYPES[key];
+    if(lvl<t.minLevel) continue;
+    const w=Math.max(1, Math.round((lvl-t.minLevel)/8)+1);
+    for(let i=0;i<w;i++) pool.push(key);
+  }
+  return pool[Math.floor(Math.random()*pool.length)] || 'imp';
+}
+
+const rand=(a,b)=>a+Math.random()*(b-a);
+
 const DX = {UP:0,DOWN:0,LEFT:-1,RIGHT:1};
 const DY = {UP:-1,DOWN:1,LEFT:0,RIGHT:0};
 const OPP = {UP:'DOWN',DOWN:'UP',LEFT:'RIGHT',RIGHT:'LEFT'};
+
+// ── ORIENTACIÓN POR DEFECTO DE CADA SPRITE ──
+// Hacia dónde "mira" el emoji tal cual, sin transformar. Cámbialo aquí si
+// usas otros emojis: el resto del código calcula solo la transformación
+// (giro 90º o espejo) necesaria para que mire hacia donde se mueve.
+const DEFAULT_FACING = {
+  player:   'LEFT', // 🦄 mira a la derecha por defecto
+  imp:      'DOWN',  // 😈 👿
+  scorpion: 'DOWN',  // 🦂
+  snake:    'DOWN',  // 🐍
+  skull:    'DOWN',  // 💀
+  ghost:    'DOWN',  // 👻
+};
+
+// Ángulo horario (sentido de ctx.rotate) de cada dirección
+const DIR_ANGLE = {RIGHT:0, DOWN:90, LEFT:180, UP:270};
+
+// Calcula cómo transformar el emoji (rotación + espejo) para que pase de
+// mirar su dirección "de fábrica" (DEFAULT_FACING) a mirar `dir`.
+// - Si la dirección es la opuesta al defecto → se usa espejo (se ve más
+//   natural que girar 180º y quedar boca abajo).
+// - Si es perpendicular → se gira 90º/-90º.
+function getFacingTransform(dir, spriteKey){
+  if(!dir) return {rotate:0, flipH:false, flipV:false};
+  const def = DEFAULT_FACING[spriteKey] || 'RIGHT';
+  const diff = ((DIR_ANGLE[dir]-DIR_ANGLE[def])%360+360)%360;
+  if(diff===0) return {rotate:0, flipH:false, flipV:false};
+  if(diff===180){
+    const defHoriz = def==='RIGHT'||def==='LEFT';
+    return defHoriz ? {rotate:0,flipH:true,flipV:false} : {rotate:0,flipH:false,flipV:true};
+  }
+  return {rotate:(diff===90?1:-1)*Math.PI/2, flipH:false, flipV:false};
+}
 const KM = {ArrowUp:'UP',ArrowDown:'DOWN',ArrowLeft:'LEFT',ArrowRight:'RIGHT',
             w:'UP',s:'DOWN',a:'LEFT',d:'RIGHT',W:'UP',S:'DOWN',A:'LEFT',D:'RIGHT'};
 
@@ -578,6 +662,13 @@ const SFX = {
     glissando(200,60,0.3,0.22);
     playShimmer(800,10,0.08);
     [523,784,1047].forEach((f,i)=>playTone(f,'triangle',0.15,0.10,0.05+i*0.07));
+  },
+
+  // Teleport — silbido ascendente al desvanecerse, descendente al reaparecer
+  teleport(){
+    glissando(700,2200,0.16,0.14);
+    playShimmer(1600,6,0.06);
+    setTimeout(()=>{ glissando(2000,650,0.2,0.14); playShimmer(900,5,0.05); },130);
   },
 };
 
@@ -733,23 +824,32 @@ function startGame(lvl){
     const [scx,scy]=corners[i%corners.length];
     // ensure walkable start
     const cx=scx, cy=scy;
-    const face=EVIL_FACES[i%EVIL_FACES.length];
+    const typeKey=pickEnemyType(lvl);
+    const type=ENEMY_TYPES[typeKey];
+    const face=type.faces[Math.floor(Math.random()*type.faces.length)];
+    const baseDur=1/(cfg.playerSPS*cfg.mRatio*type.speedMul);
     return {
       cx,cy,
       px:(cx+0.5)*cs, py:(cy+0.5)*cs,
       tx:(cx+0.5)*cs, ty:(cy+0.5)*cs,
       ox:(cx+0.5)*cs, oy:(cy+0.5)*cs,
       moving:false, stepT:0,
-      stepDur: 1/(cfg.playerSPS*cfg.mRatio),
-      baseDur: 1/(cfg.playerSPS*cfg.mRatio),
-      dir:'UP', id:i, face,
+      stepDur: baseDur,
+      baseDur,
+      dir:'DOWN', id:i, face, type:typeKey,
       frozen:false, slow:false,
       dead:false, deathAnim:0,
+      teleTimer: type.teleport ? rand(type.teleport.cooldownMin,type.teleport.cooldownMax) : Infinity,
+      sightBoost:false, boostTimer:0,
     };
   });
 
+  // Celdas de pasillo transitables — se usan como destinos de teletransporte
+  const corridorCells=[];
+  for(let y=0;y<GH;y++) for(let x=0;x<GW;x++) if(walkable(x,y)) corridorCells.push([x,y]);
+
   G = {
-    cfg, lvl, cs, GW, GH, walkable, tombs,
+    cfg, lvl, cs, GW, GH, walkable, tombs, corridorCells,
     totalTombs:tombs.length, revealedTombs:0,
     player, mummies,
     lives:3, score:0, time:0,
@@ -807,7 +907,7 @@ function tickPU(){
     if(now>=end){
       delete G.powerups[type];
       if(type==='freeze') G.mummies.forEach(m=>{if(!m.dead)m.frozen=false;});
-      if(type==='slow')   G.mummies.forEach(m=>{if(!m.dead){m.slow=false;m.stepDur=m.baseDur;}});
+      if(type==='slow')   G.mummies.forEach(m=>{if(!m.dead){m.slow=false;m.stepDur=mummyStepDur(m);}});
       updatePUHUD();
     }
   }
@@ -842,8 +942,73 @@ function stepPlayer(dt){
   }
 }
 
-// ── MUMMIES ──
-function stepMummies(dt){ G.mummies.forEach(m=>stepMummy(m,dt)); }
+// ── MUMMIES / ENEMIGOS ──
+// Duración de paso real de un enemigo, combinando su velocidad base con
+// la ralentización (power-up 🐢) y el sprint al detectar al jugador.
+function mummyStepDur(m){
+  let dur=m.baseDur;
+  if(m.slow) dur*=3;
+  if(m.sightBoost){ const s=ENEMY_TYPES[m.type].sight; if(s) dur/=s.boost; }
+  return dur;
+}
+// ¿Puede el enemigo `m` pisar la celda (nx,ny)? Los fantasmas atraviesan
+// el interior de las nubes; el resto solo puede moverse por los pasillos.
+function mummyWalkable(m,nx,ny){
+  if(nx<0||nx>=G.GW||ny<0||ny>=G.GH) return false;
+  if(ENEMY_TYPES[m.type].canPhase) return true;
+  return G.walkable(nx,ny);
+}
+// ¿Ve el enemigo al jugador? Solo si están alineados en fila/columna,
+// dentro de su rango de visión y sin nada bloqueando el camino.
+function mummySeesPlayer(m){
+  const sight=ENEMY_TYPES[m.type].sight;
+  if(!sight) return false;
+  const P=G.player;
+  if(m.cx===P.cx&&m.cy!==P.cy){
+    if(Math.abs(m.cy-P.cy)>sight.range) return false;
+    const step=P.cy>m.cy?1:-1;
+    for(let y=m.cy+step;y!==P.cy;y+=step) if(!mummyWalkable(m,m.cx,y)) return false;
+    return true;
+  }
+  if(m.cy===P.cy&&m.cx!==P.cx){
+    if(Math.abs(m.cx-P.cx)>sight.range) return false;
+    const step=P.cx>m.cx?1:-1;
+    for(let x=m.cx+step;x!==P.cx;x+=step) if(!mummyWalkable(m,x,m.cy)) return false;
+    return true;
+  }
+  return false;
+}
+// Teletransporta al enemigo a una celda de pasillo al azar (no demasiado
+// cerca del jugador, para que siga siendo justo) — 💀 y 👻.
+function teleportMummy(m){
+  const cells=G.corridorCells; if(!cells||!cells.length) return;
+  const P=G.player;
+  let cell, tries=0;
+  do{ cell=cells[Math.floor(Math.random()*cells.length)]; tries++; }
+  while(tries<12 && Math.abs(cell[0]-P.cx)+Math.abs(cell[1]-P.cy)<4);
+  particles(m.px,m.py,'#a78bfa',10);
+  m.cx=cell[0]; m.cy=cell[1];
+  m.px=m.ox=m.tx=(m.cx+0.5)*G.cs;
+  m.py=m.oy=m.ty=(m.cy+0.5)*G.cs;
+  m.moving=false; m.stepT=0;
+  particles(m.px,m.py,'#a78bfa',10);
+  SFX.teleport();
+}
+// Actualiza visión/sprint y cuenta atrás de teletransporte, cada frame.
+function updateMummySpecials(m,dt){
+  if(m.dead) return;
+  const type=ENEMY_TYPES[m.type];
+  if(type.teleport && !m.frozen){
+    m.teleTimer-=dt;
+    if(m.teleTimer<=0){ teleportMummy(m); m.teleTimer=rand(type.teleport.cooldownMin,type.teleport.cooldownMax); }
+  }
+  if(type.sight){
+    if(!m.frozen && mummySeesPlayer(m)){ m.sightBoost=true; m.boostTimer=type.sight.boostDur; }
+    else if(m.boostTimer>0){ m.boostTimer=Math.max(0,m.boostTimer-dt); if(m.boostTimer<=0) m.sightBoost=false; }
+  }
+}
+
+function stepMummies(dt){ G.mummies.forEach(m=>{ updateMummySpecials(m,dt); stepMummy(m,dt); }); }
 function animMummies(dt){
   G.mummies.forEach(m=>{
     if(m.dead){ m.deathAnim=Math.min(1,m.deathAnim+dt*3); return; }
@@ -863,13 +1028,15 @@ function stepMummy(m,dt){
     if(m.stepT>=1){ m.px=m.tx; m.py=m.ty; m.moving=false; }
     return;
   }
+  const type=ENEMY_TYPES[m.type];
   const P=G.player, opp=OPP[m.dir];
   const dirs=['UP','DOWN','LEFT','RIGHT'];
-  let cands=dirs.filter(d=>d!==opp&&G.walkable(m.cx+DX[d],m.cy+DY[d]));
-  if(!cands.length) cands=dirs.filter(d=>G.walkable(m.cx+DX[d],m.cy+DY[d]));
+  let cands=dirs.filter(d=>d!==opp&&mummyWalkable(m,m.cx+DX[d],m.cy+DY[d]));
+  if(!cands.length) cands=dirs.filter(d=>mummyWalkable(m,m.cx+DX[d],m.cy+DY[d]));
   if(!cands.length) return;
   let chosen;
-  if(Math.random()<0.7){
+  const chase = m.sightBoost ? Math.min(0.97,type.chaseChance+0.2) : type.chaseChance;
+  if(Math.random()<chase){
     chosen=cands.reduce((b,d)=>{
       const dd=Math.abs(m.cx+DX[d]-P.cx)+Math.abs(m.cy+DY[d]-P.cy);
       const db=Math.abs(m.cx+DX[b]-P.cx)+Math.abs(m.cy+DY[b]-P.cy);
@@ -880,6 +1047,7 @@ function stepMummy(m,dt){
   m.cx+=DX[chosen]; m.cy+=DY[chosen];
   m.tx=(m.cx+0.5)*G.cs; m.ty=(m.cy+0.5)*G.cs;
   m.moving=true; m.stepT=0; m.dir=chosen;
+  m.stepDur=mummyStepDur(m);
 }
 
 // ── SIDE DETECTION ──
@@ -933,7 +1101,7 @@ function activatePU(type){
   } else {
     G.powerups[type]=Date.now()+PU[type].dur;
     if(type==='freeze'){ G.mummies.forEach(m=>{if(!m.dead)m.frozen=true;}); SFX.freeze(); }
-    if(type==='slow')  G.mummies.forEach(m=>{if(!m.dead){m.slow=true;m.stepDur=m.baseDur*3;}});
+    if(type==='slow')  G.mummies.forEach(m=>{if(!m.dead){m.slow=true;m.stepDur=mummyStepDur(m);}});
     if(type==='invincible'){ G.player.invincible=true; G.player.invTime=PU[type].dur/1000; }
     updatePUHUD();
   }
@@ -942,7 +1110,7 @@ function activatePU(type){
 function killMummy(m){
   m.dead=true; m.deathAnim=0;
   particles(m.px,m.py,'#f472b6',8);
-  G.score+=50; floatScore(m.px,m.py,'+50 😈','#f472b6');
+  G.score+=50; floatScore(m.px,m.py,`+50 ${m.face}`,'#f472b6');
 }
 
 // ── COLLISION ──
@@ -979,16 +1147,16 @@ function checkWin(){
 }
 
 // ── RENDER ──
-// Emoji offscreen cache — separate caches for normal and flipped
+// Emoji offscreen cache — un solo bitmap sin transformar por emoji+tamaño;
+// la rotación/espejo se aplica en el momento de dibujar (drawEmoji)
 const _ec=new Map();
-function getOfcEmoji(em, sz, flipH){
-  const key=em+'_'+sz+(flipH?'_f':'');
+function getOfcEmoji(em, sz){
+  const key=em+'_'+sz;
   let ofc=_ec.get(key);
   if(!ofc){
     ofc=document.createElement('canvas');
     ofc.width=ofc.height=sz*2; // padding
     const c=ofc.getContext('2d');
-    if(flipH){ c.translate(sz*2,0); c.scale(-1,1); }
     c.font=`${sz}px serif`; c.textAlign='center'; c.textBaseline='middle';
     c.fillText(em,sz,sz);
     _ec.set(key,ofc);
@@ -996,21 +1164,25 @@ function getOfcEmoji(em, sz, flipH){
   return ofc;
 }
 
-function drawEmoji(em,x,y,sz,flipH=false,alpha=1,glow=null){
+// `facing` es el objeto {rotate,flipH,flipV} que devuelve getFacingTransform,
+// o null/undefined si el emoji no debe orientarse (nubes, partículas, etc.)
+function drawEmoji(em,x,y,sz,facing,alpha=1,glow=null){
   const px=Math.max(8,Math.round(sz)); // no 2× upscale — use exact size
-  const ofc=getOfcEmoji(em,px,flipH);
+  const ofc=getOfcEmoji(em,px);
   const hw=ofc.width/2;
   ctx.save();
   ctx.globalAlpha=alpha;
   if(glow){ctx.shadowColor=glow;ctx.shadowBlur=12;}
   ctx.translate(x,y);
+  if(facing){
+    if(facing.rotate) ctx.rotate(facing.rotate);
+    const sx=facing.flipH?-1:1, sy=facing.flipV?-1:1;
+    if(sx!==1||sy!==1) ctx.scale(sx,sy);
+  }
   ctx.drawImage(ofc,-hw,-hw,ofc.width,ofc.height);
   ctx.restore();
   ctx.globalAlpha=1;ctx.shadowBlur=0;ctx.shadowColor='transparent';
 }
-
-// Face emojis are symmetric vertically (UP/DOWN look same) — only flip horizontally for LEFT
-function dirFlip(dir){ return dir==='LEFT'; }
 
 function render(){
   if(!G) return;
@@ -1103,19 +1275,22 @@ function render(){
     const blink=player.invincible&&Math.floor(now/120)%2===0;
     const flash=blink?RGLOW[Math.floor(now/120)%RGLOW.length]:null;
     const sz=cs*0.62*scale; // unicorn slightly bigger — it's the star!
-    drawEmoji(player.face,player.px,player.py,sz,false,alpha,flash);
+    const pFacing=getFacingTransform(player.dir,'player');
+    drawEmoji(player.face,player.px,player.py,sz,pFacing,alpha,flash);
   }
 
   // ── Mummies ──
   for(const m of G.mummies){
     if(m.dead&&m.deathAnim>=1) continue;
-    const alpha=m.dead?Math.max(0,1-m.deathAnim):1;
+    const type=ENEMY_TYPES[m.type];
+    const alpha=(m.dead?Math.max(0,1-m.deathAnim):1)*(type.alpha??1);
     const pulse=1+Math.sin(now*0.0022+m.id*1.3)*0.05;
     const scale=m.dead?1+m.deathAnim:pulse;
-    const glow=m.frozen?'#4fc3f7':m.slow?'#6bcb77':null;
+    const glow=m.frozen?'#4fc3f7':m.slow?'#6bcb77':m.sightBoost?'#f87171':null;
     const sz=cs*0.52*scale; // ← smaller: 52% of cell
-    drawEmoji(m.face,m.px,m.py,sz,dirFlip(m.dir),alpha,glow);
-    if(m.frozen&&cs>=14) drawEmoji('❄️',m.px+cs*0.26,m.py-cs*0.26,cs*0.24,false,alpha,null);
+    const mFacing=getFacingTransform(m.dir,m.type);
+    drawEmoji(m.face,m.px,m.py,sz,mFacing,alpha,glow);
+    if(m.frozen&&cs>=14) drawEmoji('❄️',m.px+cs*0.26,m.py-cs*0.26,cs*0.24,null,alpha,null);
   }
 
   // ── Particles ──
@@ -1162,7 +1337,7 @@ function drawTomb(t,cs,now){
     ctx.strokeStyle=CLOUD_BORD2[ci]; ctx.lineWidth=Math.max(2,cs*0.09);
     rrect(px+1,py+1,tw-3,th-3,r); ctx.stroke();
     // Cloud emoji
-    if(cs>=12) drawEmoji('☁️',cx,cy,cs*0.88,false,1,null);
+    if(cs>=12) drawEmoji('☁️',cx,cy,cs*0.88,null,1,null);
     // 4 side indicator dots
     const dr=Math.max(3,cs*0.14);
     [[cx,py+cs*0.15,'top'],[cx,py+th-cs*0.15,'bottom'],[px+cs*0.15,cy,'left'],[px+tw-cs*0.15,cy,'right']].forEach(([sx,sy,s])=>{
@@ -1200,7 +1375,7 @@ function drawTomb(t,cs,now){
       ctx.restore();
       // Treasure emoji below rainbow
       ctx.globalAlpha=age;
-      drawEmoji(content.emoji,cx,cy+th*0.25,cs*0.52,false,age,null);
+      drawEmoji(content.emoji,cx,cy+th*0.25,cs*0.52,null,age,null);
       ctx.globalAlpha=1;
     }
     // sparkle glitter on revealed cloud
@@ -1210,7 +1385,7 @@ function drawTomb(t,cs,now){
       sparkles.forEach(([fx,fy],i)=>{
         const a=0.4+Math.sin(t2+i*1.7)*0.35;
         ctx.globalAlpha=Math.max(0,a);
-        drawEmoji('✨',px+fx*tw,py+fy*th,cs*0.22,false,1,null);
+        drawEmoji('✨',px+fx*tw,py+fy*th,cs*0.22,null,1,null);
       });
       ctx.globalAlpha=1;
     }
