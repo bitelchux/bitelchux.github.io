@@ -143,6 +143,27 @@
     border-radius:999px; padding:6px 16px; font-size:14px;
   }
 
+  #powerupHud{
+    position:fixed; top:52px; left:50%; transform:translateX(-50%);
+    z-index:10; pointer-events:none;
+    color:var(--white); font-weight:700; font-size:13px;
+    text-shadow:0 2px 6px rgba(0,0,0,.4);
+    opacity:0; transition:opacity .25s ease;
+    display:flex; gap:10px;
+  }
+  #powerupHud.show{opacity:1;}
+
+  #enemyToast{
+    position:fixed; top:88px; left:50%; transform:translateX(-50%);
+    z-index:10; pointer-events:none; text-align:center;
+    color:var(--white); font-weight:700; font-size:13px;
+    text-shadow:0 2px 6px rgba(0,0,0,.4);
+    background:rgba(120,40,60,.5); border:2px solid rgba(255,255,255,.3);
+    border-radius:999px; padding:6px 16px;
+    opacity:0; transition:opacity .3s ease;
+  }
+  #enemyToast.show{opacity:1;}
+
   #saveNote{
     position:fixed; bottom:8px; left:50%; transform:translateX(-50%);
     z-index:10; pointer-events:none; font-size:11px; color:rgba(255,255,255,.55);
@@ -166,6 +187,8 @@
     <div class="chip" id="score">⭐ 0</div>
   </div>
   <div id="levelBadge">Level 1</div>
+  <div id="powerupHud"></div>
+  <div id="enemyToast"></div>
   <div id="saveNote">💾 Progress saved</div>
 
   <!-- Touch controls (also work with a mouse, handy for desktop testing) -->
@@ -182,11 +205,12 @@
   <div class="overlay" id="screenStart">
     <div class="panel">
       <h1>Rainbow Road</h1>
-      <p class="sub">Guide the unicorn to its golden stable 🏆</p>
+      <p class="sub">Guide the unicorn through 50 procedurally generated golden stables 🏆</p>
       <ul class="rules">
         <li>🦄 Move one step at a time with <b>arrow keys / WASD</b> (or the buttons below).</li>
-        <li>👹⚡🐉 Dodge the dark creatures and storms crossing the clouds.</li>
+        <li>👹👺🦇🐉👻🕷️🦂⚡ Dodge the monsters and storms crossing the clouds — each moves differently, and new ones join in as you level up.</li>
         <li>🍬 Hop across the candy platforms to cross the rainbow river without sinking.</li>
+        <li>🛡️❄️🐌 Grab power-ups on the ground: a shield, a freeze, or a slow-down for enemies.</li>
         <li>🥽 With a VR headset: push the controller stick to move step by step.</li>
       </ul>
       <button class="btn hidden" id="btnContinue">▶️ Continue</button>
@@ -201,6 +225,16 @@
       <h1>Golden Stable Reached! 🏆</h1>
       <p id="levelScoreText">Score: 0</p>
       <button class="btn" id="btnNextLevel">➡️ Next Level</button>
+    </div>
+  </div>
+
+  <!-- All 50 levels finished -->
+  <div class="overlay hidden" id="screenComplete">
+    <div class="panel">
+      <h1>Champion of the Rainbow! 👑🦄</h1>
+      <p>You guided the unicorn through all 50 golden stables.</p>
+      <p id="completeScoreText">Final score: 0</p>
+      <button class="btn" id="btnPlayAgain">🔄 Play Again</button>
     </div>
   </div>
 
@@ -237,9 +271,10 @@ const PLATFORM_RIDE_DIST = 1.05;      // max distance to be considered "on" a pl
 const COLLISION_DIST = 1.15;          // collision distance with obstacles
 const XR_MOVE_COOLDOWN = 260;         // ms between moves triggered by the VR stick
 const AUTOSAVE_INTERVAL = 5000;       // ms between automatic progress saves
+const MAX_LEVEL = 50;                 // the whole campaign: 50 procedurally generated levels
 
 const state = {
-  gameState: 'menu',   // menu | playing | levelComplete | gameOver
+  gameState: 'menu',   // menu | playing | levelComplete | gameComplete | gameOver
   level: 1,
   score: 0,
   bestScore: 0,
@@ -247,6 +282,9 @@ const state = {
   goalRow: 12,
   invulnerable: false,
   sinkTimer: 0,
+  shieldUntil: 0,   // timestamp (ms) until which the shield power-up is active
+  freezeUntil: 0,   // timestamp (ms) until which enemies are frozen
+  slowUntil: 0,     // timestamp (ms) until which enemies are slowed
 };
 
 /* ---------------------- Utilities ---------------------- */
@@ -381,16 +419,28 @@ function makeGoldSparkleTexture() {
   return tex;
 }
 
+// Swirled "peppermint" pattern painted on top of the candy platforms.
+function makeCandySwirlTexture(colorA, colorB) {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = colorA;
+  ctx.fillRect(0, 0, 128, 128);
+  ctx.strokeStyle = colorB;
+  ctx.lineWidth = 13;
+  for (let r = 8; r < 64; r += 22) {
+    ctx.beginPath();
+    ctx.arc(64, 64, r, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  return new THREE.CanvasTexture(canvas);
+}
+
 /* ---------------------- Idle animation ("wobble") ----------------------
    Instead of sliding around like rigid props, every emoji sprite gets a
    small personality: dark creatures take little steps, ghosts and bats
    float, and lightning bolts flicker. Purely cosmetic — runs on top of
    whatever position logic already moves the sprite. */
-function styleForEmoji(emoji) {
-  if (emoji === '⚡') return 'flicker';
-  if (emoji === '👻' || emoji === '🦇') return 'float';
-  return 'step'; // 👹 🐉 and anything else that "walks"
-}
 function attachWobble(sprite, style) {
   sprite.userData.wobble = {
     style,
@@ -461,6 +511,11 @@ function sfxSink() { playTone({ freq: 380, glideTo: 120, duration: 0.5, type: 's
 function sfxLevelComplete() { [NOTE.C5, NOTE.E5, NOTE.G5, NOTE.C6].forEach((n, i) => playTone({ freq: n, duration: 0.3, type: 'triangle', gain: 0.08, delay: i * 0.11 })); }
 function sfxGameOver() { [NOTE.A4, NOTE.F4, NOTE.D4].forEach((n, i) => playTone({ freq: n, duration: 0.4, type: 'sine', gain: 0.07, delay: i * 0.14 })); }
 function sfxUI() { playTone({ freq: NOTE.A5, duration: 0.1, type: 'triangle', gain: 0.05 }); }
+function sfxPowerup(type) {
+  if (type === 'shield') [NOTE.E5, NOTE.A5, NOTE.C6].forEach((n, i) => playTone({ freq: n, duration: 0.18, type: 'triangle', gain: 0.07, delay: i * 0.06 }));
+  else if (type === 'freeze') [NOTE.C6, NOTE.G5].forEach((n, i) => playTone({ freq: n, duration: 0.24, type: 'sine', gain: 0.07, delay: i * 0.06 }));
+  else [NOTE.D5, NOTE.C5].forEach((n, i) => playTone({ freq: n, duration: 0.22, type: 'triangle', gain: 0.06, delay: i * 0.06 }));
+}
 
 /* ---------------------- Auto-save (progress persistence) ----------------------
    Uses the artifact's window.storage when available (in-chat preview) and
@@ -533,6 +588,18 @@ const cottonCandyTexture = makeCottonCandyTexture();
 const cloudRoadTexture = makeCloudRoadTexture();
 const goldSparkleTexture = makeGoldSparkleTexture();
 
+// Soft dark oval used as a ground-contact shadow for everything that moves,
+// so it's easy to tell exactly which cell something is standing on.
+const SHADOW_Y = 0.025;
+const shadowTexture = makeGlowTexture('rgba(25,15,45,0.5)', 'rgba(25,15,45,0)');
+function makeShadowMesh(width, depth) {
+  const geo = new THREE.PlaneGeometry(width, depth);
+  const mat = new THREE.MeshBasicMaterial({ map: shadowTexture, transparent: true, depthWrite: false });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.rotation.x = -Math.PI / 2;
+  return mesh;
+}
+
 /* ---- Decoration: a sky full of drifting clouds + a soft sun glow ---- */
 const skyClouds = [];
 function buildSkyBackground() {
@@ -594,19 +661,84 @@ player.mesh.position.set(0, BASE_Y, 0);
 scene.add(player.mesh);
 attachWobble(player.mesh, 'step'); // small idle bounce while standing still
 
+const playerShadow = makeShadowMesh(1.5, 1.0);
+playerShadow.position.set(0, SHADOW_Y, 0);
+scene.add(playerShadow);
+
+// Glowing halo shown around the unicorn while the shield power-up is active.
+const shieldRing = new THREE.Sprite(new THREE.SpriteMaterial({
+  map: makeGlowTexture('rgba(255,255,255,0.9)', 'rgba(140,210,255,0)'),
+  transparent: true, depthWrite: false,
+}));
+shieldRing.scale.set(3.2, 3.2, 1);
+shieldRing.visible = false;
+scene.add(shieldRing);
+
 /* ---------------------- Lane system ---------------------- */
 let lanes = []; // index = row
 
-const OBSTACLE_EMOJIS = ['👹', '🦇', '⚡', '🐉', '👻'];
-const PLATFORM_EMOJIS = ['🍬', '🍭', '🧁'];
+// Actual steppable discs — not an emoji — so it's unmistakably something you
+// stand ON, not a decoration. Three color flavors, all built the same way.
+const PLATFORM_FLAVORS = [
+  { colorA: '#ffd9ec', colorB: '#ff6fb2' }, // bubblegum pink
+  { colorA: '#ffffff', colorB: '#ff5c5c' }, // peppermint red
+  { colorA: '#f1e2ff', colorB: '#b26bff' }, // grape purple
+];
+function buildCandyPlatformMesh() {
+  const flavor = choice(PLATFORM_FLAVORS);
+  const topTex = makeCandySwirlTexture(flavor.colorA, flavor.colorB);
+  const sideMat = new THREE.MeshBasicMaterial({ color: flavor.colorB });
+  const topMat = new THREE.MeshBasicMaterial({ map: topTex });
+  const geo = new THREE.CylinderGeometry(0.95, 1.0, 0.3, 26);
+  return new THREE.Mesh(geo, [sideMat, topMat, topMat]); // [side, top, bottom]
+}
+
+// Every enemy type moves differently, so encountering a bat doesn't feel
+// like encountering an ogre. `speed` is a [min,max] range in cells/second-ish
+// units, `pattern` decides how it actually moves each frame (see
+// updateObstacleMovement), `wobble` is its idle personality animation, and
+// `unlockLevel` is the first level it's allowed to show up in — early levels
+// only see a couple of simple threats, tougher ones join in over time.
+const ENEMY_PROFILES = {
+  '🦂': { speed: [0.5, 0.8], pattern: 'walk',       wobble: 'step',  unlockLevel: 1 }, // slow, steady crawl
+  '👹': { speed: [0.7, 1.0], pattern: 'walk-stop',  wobble: 'step',  unlockLevel: 1 }, // heavy ogre: walks, pauses, walks
+  '👺': { speed: [1.7, 2.3], pattern: 'walk',       wobble: 'step',  unlockLevel: 2 }, // quick, mischievous goblin
+  '👻': { speed: [0.6, 0.9], pattern: 'glide',      wobble: 'float', unlockLevel: 3 }, // slow, silent haunting drift
+  '🕷️': { speed: [1.2, 1.7], pattern: 'scuttle',    wobble: 'step',  unlockLevel: 4 }, // skittish bursts, then freezes
+  '🦇': { speed: [1.8, 2.4], pattern: 'flutter',    wobble: 'float', unlockLevel: 5 }, // fast, erratic flapping flight
+  '🐉': { speed: [1.9, 2.6], pattern: 'glide',      wobble: 'float', unlockLevel: 6 }, // fast, smooth dragon glide
+  '⚡': { speed: [0, 0],     pattern: 'teleport',   wobble: 'flicker', unlockLevel: 7 }, // strikes here, then there — never slides
+};
+// Which enemy emoji are in play for the current level.
+function getAvailableEnemies() {
+  return Object.keys(ENEMY_PROFILES).filter(e => ENEMY_PROFILES[e].unlockLevel <= state.level);
+}
+
+// Power-ups: clearly friendly pickups, never confused with the enemies above.
+const POWERUP_TYPES = ['shield', 'freeze', 'slow'];
+const POWERUP_EMOJI = { shield: '🛡️', freeze: '❄️', slow: '🐌' };
+const POWERUP_GLOW = {
+  shield: { inner: 'rgba(170,225,255,0.9)', outer: 'rgba(170,225,255,0)' },
+  freeze: { inner: 'rgba(200,245,255,0.9)', outer: 'rgba(200,245,255,0)' },
+  slow: { inner: 'rgba(190,255,190,0.9)', outer: 'rgba(190,255,190,0)' },
+};
+const POWERUP_DURATION = { shield: 6000, freeze: 5000, slow: 7000 };
 
 function laneZ(row) { return -row * CELL; }
 
+// A single 0→1 progress value across the whole 50-level campaign — every
+// difficulty knob (lane danger, enemy speed, pause length, river pace,
+// level length) is derived from this instead of an unbounded per-level
+// multiplier, so level 50 is a real challenge without becoming unplayable.
+function difficultyT(level = state.level) {
+  return clamp((level - 1) / (MAX_LEVEL - 1), 0, 1);
+}
+
 // As levels progress, hazard lanes gradually crowd out safe ones.
 function pickLaneType() {
-  const hazardBias = clamp(state.level * 0.02, 0, 0.18);
-  const safeChance = clamp(0.22 - hazardBias, 0.08, 0.22);
-  const roadChance = 0.4 + hazardBias * 0.6;
+  const t = difficultyT();
+  const safeChance = lerp(0.24, 0.08, t);
+  const roadChance = lerp(0.38, 0.5, t);
   const r = Math.random();
   if (r < safeChance) return 'safe';
   if (r < safeChance + roadChance) return 'road';
@@ -653,40 +785,89 @@ function buildGround(lane) {
 }
 
 function spawnRoadObstacles(lane) {
-  const emoji = choice(OBSTACLE_EMOJIS);
+  const emoji = choice(getAvailableEnemies());
+  const profile = ENEMY_PROFILES[emoji];
   const dir = Math.random() < 0.5 ? 1 : -1;
-  const speed = (1.1 + Math.random() * 0.9 + state.level * 0.14) * dir;
-  const count = 2 + Math.floor(Math.random() * 2) + Math.min(2, Math.floor(state.level / 3));
+  const t = difficultyT();
+  const levelBoost = lerp(1, 2.3, t);       // top speed roughly doubles by level 50
+  const aggro = lerp(1, 0.5, t);            // pauses/strike intervals shrink by half
+  const count = 2 + Math.floor(Math.random() * 2) + Math.round(t * 3);
   const totalWidth = COLS * CELL + CELL * 2;
   const spacing = totalWidth / count;
-  const style = styleForEmoji(emoji);
   for (let i = 0; i < count; i++) {
     const sprite = makeEmojiSprite(emoji);
     sprite.position.set(-totalWidth / 2 + i * spacing + rand(-0.5, 0.5), 0.95, laneZ(lane.row));
     lane.group.add(sprite);
-    attachWobble(sprite, style);
-    lane.obstacles.push({ mesh: sprite, speed });
+    attachWobble(sprite, profile.wobble);
+
+    const shadow = makeShadowMesh(1.3, 0.75);
+    shadow.position.set(sprite.position.x, SHADOW_Y, laneZ(lane.row));
+    lane.group.add(shadow);
+
+    lane.obstacles.push({
+      mesh: sprite,
+      shadow,
+      dir,
+      pattern: profile.pattern,
+      baseSpeed: rand(profile.speed[0], profile.speed[1]) * levelBoost,
+      aggro,
+      phase: Math.random() * Math.PI * 2,
+      pauseUntil: 0,
+      nextPause: 0,
+      nextJump: 0,
+    });
   }
 }
 
+// Places a floating power-up pickup on a static cell of the lane.
+function spawnPowerup(lane) {
+  const col = Math.round(rand(COL_MIN, COL_MAX));
+  const type = choice(POWERUP_TYPES);
+  const glowColors = POWERUP_GLOW[type];
+
+  const glow = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: makeGlowTexture(glowColors.inner, glowColors.outer),
+    transparent: true, depthWrite: false,
+  }));
+  glow.scale.set(2.4, 2.4, 1);
+  glow.position.set(col * CELL, 0.5, laneZ(lane.row));
+  lane.group.add(glow);
+
+  const sprite = makeEmojiSprite(POWERUP_EMOJI[type], 120);
+  sprite.scale.set(1.3, 1.3, 1.3);
+  sprite.position.set(col * CELL, 1.1, laneZ(lane.row));
+  lane.group.add(sprite);
+  attachWobble(sprite, 'float');
+
+  const shadow = makeShadowMesh(1.0, 0.6);
+  shadow.position.set(col * CELL, SHADOW_Y, laneZ(lane.row));
+  lane.group.add(shadow);
+
+  lane.powerups.push({ type, col, mesh: sprite, glow, shadow, collected: false });
+}
+
 function spawnRiverPlatforms(lane) {
-  const emoji = choice(PLATFORM_EMOJIS);
   const dir = Math.random() < 0.5 ? 1 : -1;
-  const speed = (0.8 + Math.random() * 0.5 + state.level * 0.06) * dir;
+  const speed = lerp(0.8, 1.9, difficultyT()) * rand(0.9, 1.15) * dir;
   const count = 3 + Math.floor(Math.random() * 2);
   const totalWidth = COLS * CELL + CELL * 2;
   const spacing = totalWidth / count;
   for (let i = 0; i < count; i++) {
-    const sprite = makeEmojiSprite(emoji, 110);
-    sprite.position.set(-totalWidth / 2 + i * spacing, 0.65, laneZ(lane.row));
-    lane.group.add(sprite);
-    attachWobble(sprite, 'hop'); // candy platforms bob gently on the river
-    lane.platforms.push({ mesh: sprite, speed });
+    const mesh = buildCandyPlatformMesh();
+    mesh.position.set(-totalWidth / 2 + i * spacing, 0.18, laneZ(lane.row));
+    lane.group.add(mesh);
+    attachWobble(mesh, 'hop'); // candy platforms bob gently on the river
+
+    const shadow = makeShadowMesh(1.6, 1.0);
+    shadow.position.set(mesh.position.x, SHADOW_Y, laneZ(lane.row));
+    lane.group.add(shadow);
+
+    lane.platforms.push({ mesh, shadow, speed });
   }
 }
 
 function createLane(row) {
-  const lane = { row, type: 'safe', group: new THREE.Group(), obstacles: [], platforms: [], decor: [] };
+  const lane = { row, type: 'safe', group: new THREE.Group(), obstacles: [], platforms: [], decor: [], powerups: [] };
 
   if (row === 0) lane.type = 'safe';
   else if (row === state.goalRow) lane.type = 'goal';
@@ -695,6 +876,11 @@ function createLane(row) {
   buildGround(lane);
   if (lane.type === 'road') spawnRoadObstacles(lane);
   if (lane.type === 'river') spawnRiverPlatforms(lane);
+  // Power-ups only show up on lanes you can stand still on — safe ground or
+  // the enemy highway, never mid-river where a static pickup would be unfair.
+  if (row > 0 && (lane.type === 'safe' || lane.type === 'road') && Math.random() < 0.16) {
+    spawnPowerup(lane);
+  }
 
   scene.add(lane.group);
   lanes[row] = lane;
@@ -706,14 +892,28 @@ function clearLevel() {
   lanes = [];
 }
 
-// Every level is generated fresh and at random, and gets a bit longer and
-// more crowded with hazards than the last (see pickLaneType / spawn speeds).
+// Every level is generated fresh and at random. Level length and hazard
+// density both ramp up smoothly across the full 50-level campaign (see
+// difficultyT / pickLaneType / spawn speeds).
 function initLevel(level) {
   clearLevel();
-  state.goalRow = Math.min(12 + (level - 1) * 2, 30);
+  state.goalRow = Math.round(lerp(12, 34, difficultyT(level)));
   for (let r = 0; r <= state.goalRow; r++) createLane(r);
   placePlayerAt(0, 0);
-  document.getElementById('levelBadge').textContent = `Level ${level}`;
+  document.getElementById('levelBadge').textContent = `Level ${level} / ${MAX_LEVEL}`;
+  announceNewEnemies(level);
+}
+
+// Flashes a short "new enemy" toast the first level a creature is unlocked.
+let enemyToastTimeout = null;
+function announceNewEnemies(level) {
+  const unlocked = Object.entries(ENEMY_PROFILES).filter(([, p]) => p.unlockLevel === level).map(([e]) => e);
+  if (!unlocked.length) return;
+  const el = document.getElementById('enemyToast');
+  el.textContent = `⚠️ New enemy: ${unlocked.join(' ')}`;
+  el.classList.add('show');
+  clearTimeout(enemyToastTimeout);
+  enemyToastTimeout = setTimeout(() => el.classList.remove('show'), 2600);
 }
 
 /* ---------------------- Player movement ---------------------- */
@@ -760,20 +960,102 @@ function updatePlayerMovementAnim(nowMs) {
 function onPlayerLanded() {
   const lane = lanes[player.row];
   if (!lane) return;
+  tryCollectPowerup(lane);
   if (lane.type === 'goal') { triggerLevelComplete(); return; }
   state.sinkTimer = 0;
 }
 
+// Picks up a power-up sitting on the cell the player just landed on, if any.
+function tryCollectPowerup(lane) {
+  for (const p of lane.powerups) {
+    if (!p.collected && p.col === player.col) {
+      p.collected = true;
+      lane.group.remove(p.mesh);
+      lane.group.remove(p.glow);
+      lane.group.remove(p.shadow);
+      applyPowerup(p.type);
+      break;
+    }
+  }
+}
+
+function applyPowerup(type) {
+  const now = performance.now();
+  const duration = POWERUP_DURATION[type];
+  if (type === 'shield') state.shieldUntil = Math.max(now, state.shieldUntil) + duration;
+  else if (type === 'freeze') state.freezeUntil = Math.max(now, state.freezeUntil) + duration;
+  else if (type === 'slow') state.slowUntil = Math.max(now, state.slowUntil) + duration;
+  sfxPowerup(type);
+}
+
 /* ---------------------- Collisions and the river ---------------------- */
+// Moves one obstacle according to its behaviour pattern. `speedMul` comes
+// from the freeze/slow power-ups (0 = frozen, <1 = slowed, 1 = normal).
+function updateObstacleMovement(o, nowMs, delta, speedMul) {
+  const halfWidth = (COLS * CELL) / 2 + CELL * 1.5;
+  const aggro = o.aggro || 1; // higher levels shorten pauses / strike faster
+  switch (o.pattern) {
+    case 'walk-stop': {
+      // Heavy footsteps: walks for a while, plants itself, walks again.
+      if (!o.nextPause) o.nextPause = nowMs + rand(1800, 3200) * aggro;
+      if (nowMs >= o.pauseUntil) {
+        o.mesh.position.x += o.baseSpeed * o.dir * delta * speedMul;
+        if (nowMs > o.nextPause) {
+          o.pauseUntil = nowMs + rand(500, 1100) * aggro;
+          o.nextPause = nowMs + rand(1800, 3200) * aggro;
+        }
+      }
+      break;
+    }
+    case 'scuttle': {
+      // Skittish little sprints followed by a freeze.
+      if (!o.nextPause) o.nextPause = nowMs + rand(500, 1000) * aggro;
+      if (nowMs >= o.pauseUntil) {
+        o.mesh.position.x += o.baseSpeed * 1.6 * o.dir * delta * speedMul;
+        if (nowMs > o.nextPause) {
+          o.pauseUntil = nowMs + rand(250, 600) * aggro;
+          o.nextPause = nowMs + rand(500, 1000) * aggro;
+        }
+      }
+      break;
+    }
+    case 'flutter': {
+      // Erratic flapping flight layered on top of the base direction.
+      const flutter = Math.sin(nowMs / 1000 * 6 + o.phase) * 0.4;
+      o.mesh.position.x += (o.baseSpeed * o.dir + flutter) * delta * speedMul;
+      break;
+    }
+    case 'teleport': {
+      // Lightning never slides — it strikes at one spot, then another.
+      if (speedMul > 0 && (!o.nextJump || nowMs > o.nextJump)) {
+        o.mesh.position.x = rand(-halfWidth + CELL, halfWidth - CELL);
+        o.nextJump = nowMs + rand(900, 1600) * aggro;
+      }
+      break;
+    }
+    case 'glide':
+    case 'walk':
+    default: {
+      o.mesh.position.x += o.baseSpeed * o.dir * delta * speedMul;
+    }
+  }
+  if (o.pattern !== 'teleport') {
+    if (o.mesh.position.x > halfWidth) o.mesh.position.x = -halfWidth;
+    if (o.mesh.position.x < -halfWidth) o.mesh.position.x = halfWidth;
+  }
+  o.shadow.position.x = o.mesh.position.x;
+}
+
 function updateLanes(nowMs, delta) {
   const halfWidth = (COLS * CELL) / 2 + CELL * 1.5;
+  // Freeze power-up fully stops enemies; slow halves their pace. Platforms
+  // are never affected — they're helpful, not hostile.
+  const speedMul = nowMs < state.freezeUntil ? 0 : (nowMs < state.slowUntil ? 0.4 : 1);
   lanes.forEach(lane => {
     if (!lane) return;
     if (lane.type === 'road') {
       lane.obstacles.forEach(o => {
-        o.mesh.position.x += o.speed * delta;
-        if (o.mesh.position.x > halfWidth) o.mesh.position.x = -halfWidth;
-        if (o.mesh.position.x < -halfWidth) o.mesh.position.x = halfWidth;
+        updateObstacleMovement(o, nowMs, delta, speedMul);
         updateWobble(o.mesh, nowMs);
       });
     } else if (lane.type === 'river') {
@@ -781,26 +1063,28 @@ function updateLanes(nowMs, delta) {
         p.mesh.position.x += p.speed * delta;
         if (p.mesh.position.x > halfWidth) p.mesh.position.x = -halfWidth;
         if (p.mesh.position.x < -halfWidth) p.mesh.position.x = halfWidth;
+        p.shadow.position.x = p.mesh.position.x;
         updateWobble(p.mesh, nowMs);
       });
     }
     lane.decor.forEach(d => updateWobble(d, nowMs));
+    lane.powerups.forEach(p => { if (!p.collected) updateWobble(p.mesh, nowMs); });
   });
 }
 
-function checkCollisions() {
-  if (state.invulnerable) return;
+function checkCollisions(nowMs) {
+  if (state.invulnerable || nowMs < state.shieldUntil) return;
   const lane = lanes[player.row];
   if (!lane || lane.type !== 'road') return;
   for (const o of lane.obstacles) {
     if (Math.abs(o.mesh.position.x - player.mesh.position.x) < COLLISION_DIST) {
-      onPlayerHit();
+      onPlayerHit(nowMs);
       return;
     }
   }
 }
 
-function checkRiver(deltaMs) {
+function checkRiver(nowMs, deltaMs) {
   const lane = lanes[player.row];
   if (!lane || lane.type !== 'river' || player.moving) { state.sinkTimer = 0; return; }
   let onPlatform = null;
@@ -810,18 +1094,19 @@ function checkRiver(deltaMs) {
   if (onPlatform) {
     state.sinkTimer = 0;
     player.mesh.position.x = onPlatform.mesh.position.x;
-  } else {
-    state.sinkTimer += deltaMs;
-    if (state.sinkTimer > SINK_LIMIT) {
-      state.sinkTimer = 0;
-      sfxSink();
-      onPlayerHit();
-    }
+    return;
+  }
+  if (state.invulnerable || nowMs < state.shieldUntil) { state.sinkTimer = 0; return; }
+  state.sinkTimer += deltaMs;
+  if (state.sinkTimer > SINK_LIMIT) {
+    state.sinkTimer = 0;
+    sfxSink();
+    onPlayerHit(nowMs);
   }
 }
 
-function onPlayerHit() {
-  if (state.invulnerable || state.gameState !== 'playing') return;
+function onPlayerHit(nowMs) {
+  if (state.invulnerable || (nowMs && nowMs < state.shieldUntil) || state.gameState !== 'playing') return;
   state.lives--;
   updateHUD();
   sfxHit();
@@ -848,16 +1133,34 @@ function updateHUD() {
   document.getElementById('score').textContent = `⭐ ${state.score}`;
 }
 
+// Small chips showing which power-ups are active and their remaining time.
+function updatePowerupHUD(nowMs) {
+  const el = document.getElementById('powerupHud');
+  const items = [];
+  if (nowMs < state.shieldUntil) items.push(`🛡️ ${Math.ceil((state.shieldUntil - nowMs) / 1000)}s`);
+  if (nowMs < state.freezeUntil) items.push(`❄️ ${Math.ceil((state.freezeUntil - nowMs) / 1000)}s`);
+  else if (nowMs < state.slowUntil) items.push(`🐌 ${Math.ceil((state.slowUntil - nowMs) / 1000)}s`);
+  el.textContent = items.join('   ');
+  el.classList.toggle('show', items.length > 0);
+
+  shieldRing.visible = nowMs < state.shieldUntil;
+  if (shieldRing.visible) {
+    shieldRing.position.set(player.mesh.position.x, player.mesh.position.y, player.mesh.position.z);
+    shieldRing.material.opacity = 0.6 + Math.sin(nowMs / 180) * 0.2;
+  }
+}
+
 function showOverlay(id) {
-  ['screenStart', 'screenLevel', 'screenOver'].forEach(k => {
+  ['screenStart', 'screenLevel', 'screenComplete', 'screenOver'].forEach(k => {
     document.getElementById(k).classList.toggle('hidden', k !== id);
   });
 }
 function hideOverlays() {
-  ['screenStart', 'screenLevel', 'screenOver'].forEach(k => document.getElementById(k).classList.add('hidden'));
+  ['screenStart', 'screenLevel', 'screenComplete', 'screenOver'].forEach(k => document.getElementById(k).classList.add('hidden'));
 }
 
 function triggerLevelComplete() {
+  if (state.level >= MAX_LEVEL) { triggerGameComplete(); return; }
   state.gameState = 'levelComplete';
   state.score += 100 * state.level;
   if (state.score > state.bestScore) state.bestScore = state.score;
@@ -865,6 +1168,18 @@ function triggerLevelComplete() {
   sfxLevelComplete();
   document.getElementById('levelScoreText').textContent = `Score: ${state.score}`;
   showOverlay('screenLevel');
+  saveProgress();
+}
+
+// Reached the golden stable of level 50 — the whole campaign is done.
+function triggerGameComplete() {
+  state.gameState = 'gameComplete';
+  state.score += 200 * state.level;
+  if (state.score > state.bestScore) state.bestScore = state.score;
+  updateHUD();
+  sfxLevelComplete();
+  document.getElementById('completeScoreText').textContent = `Final score: ${state.score}`;
+  showOverlay('screenComplete');
   saveProgress();
 }
 
@@ -879,6 +1194,7 @@ function triggerGameOver() {
 
 function startGame() {
   state.level = 1; state.score = 0; state.lives = 3; state.sinkTimer = 0;
+  state.shieldUntil = state.freezeUntil = state.slowUntil = 0;
   updateHUD();
   initLevel(1);
   hideOverlays();
@@ -889,11 +1205,12 @@ function startGame() {
 
 function continueGame() {
   if (!lastSavedProgress) { startGame(); return; }
-  state.level = lastSavedProgress.level || 1;
+  state.level = clamp(lastSavedProgress.level || 1, 1, MAX_LEVEL);
   state.score = lastSavedProgress.score || 0;
   state.bestScore = lastSavedProgress.bestScore || 0;
   state.lives = lastSavedProgress.lives > 0 ? lastSavedProgress.lives : 3;
   state.sinkTimer = 0;
+  state.shieldUntil = state.freezeUntil = state.slowUntil = 0;
   updateHUD();
   initLevel(state.level);
   hideOverlays();
@@ -902,7 +1219,8 @@ function continueGame() {
 }
 
 function nextLevel() {
-  state.level++;
+  state.level = Math.min(state.level + 1, MAX_LEVEL);
+  state.shieldUntil = state.freezeUntil = state.slowUntil = 0;
   initLevel(state.level);
   hideOverlays();
   state.gameState = 'playing';
@@ -933,6 +1251,7 @@ bindHold('dRight', () => tryMove(1, 0));
 document.getElementById('btnStart').addEventListener('click', startGame);
 document.getElementById('btnContinue').addEventListener('click', continueGame);
 document.getElementById('btnNextLevel').addEventListener('click', nextLevel);
+document.getElementById('btnPlayAgain').addEventListener('click', startGame);
 document.getElementById('btnRestart').addEventListener('click', startGame);
 
 /* ---------------------- WebXR: entry button and controller input ---------------------- */
@@ -1024,8 +1343,10 @@ function animate(nowMs) {
     updatePlayerMovementAnim(nowMs);
     updateLanes(nowMs, delta);
     if (!player.moving) updateWobble(player.mesh, nowMs); // idle bounce, only while standing still
-    checkCollisions();
-    checkRiver(delta * 1000);
+    playerShadow.position.set(player.mesh.position.x, SHADOW_Y, player.mesh.position.z);
+    checkCollisions(nowMs);
+    checkRiver(nowMs, delta * 1000);
+    updatePowerupHUD(nowMs);
 
     if (renderer.xr.isPresenting) {
       pollXRInput(nowMs);
@@ -1060,8 +1381,9 @@ setupVRButton();
   const continueBtn = document.getElementById('btnContinue');
   const startBtn = document.getElementById('btnStart');
   if (lastSavedProgress && lastSavedProgress.level > 1) {
+    const savedLevel = clamp(lastSavedProgress.level, 1, MAX_LEVEL);
     continueBtn.classList.remove('hidden');
-    continueBtn.textContent = `▶️ Continue — Level ${lastSavedProgress.level}`;
+    continueBtn.textContent = `▶️ Continue — Level ${savedLevel} / ${MAX_LEVEL}`;
     startBtn.textContent = '🔄 New Game';
     state.bestScore = lastSavedProgress.bestScore || 0;
   }
