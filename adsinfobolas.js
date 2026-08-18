@@ -1,5 +1,1017 @@
 // ---------------- CONFIG ----------------
 const LS_KEY = "age_18_confirmed";
+function addSpotifyRelax() {
+
+    if (document.getElementById('spotify-relax-dialog')) return;
+
+    /* =========================================================
+       CONFIGURACIÓN
+    ========================================================= */
+
+    const albumUrl =
+        'https://open.spotify.com/album/413ZRAjsrULjx1uiXi1qGn';
+
+    /*
+     * PON AQUÍ LAS URLS DE LAS CANCIONES DEL ÁLBUM.
+     *
+     * Ejemplo:
+     *
+     * const tracks = [
+     *     'https://open.spotify.com/track/XXXXXXXXXXXX',
+     *     'https://open.spotify.com/track/YYYYYYYYYYYY',
+     *     'https://open.spotify.com/track/ZZZZZZZZZZZZ'
+     * ];
+     *
+     * El orden debe ser el mismo que en el álbum.
+     */
+
+    const tracks = [
+
+        // 'https://open.spotify.com/track/XXXXXXXXXXXX',
+        // 'https://open.spotify.com/track/YYYYYYYYYYYY',
+        // 'https://open.spotify.com/track/ZZZZZZZZZZZZ',
+
+    ];
+
+
+    const messages = [
+        '🎧 Escucha música relajante mientras lees',
+        '🌿 Música tranquila para acompañar tu lectura',
+        '☕ Relájate y disfruta de esta música',
+        '📖 Música relajante para leer y concentrarte',
+        '🧘 Un poco de música para desconectar',
+        '🌙 Relájate mientras lees'
+    ];
+
+    const message =
+        messages[Math.floor(Math.random() * messages.length)];
+
+
+    /* =========================================================
+       ESTILOS
+    ========================================================= */
+
+    if (!document.getElementById('spotify-relax-styles')) {
+
+        const style = document.createElement('style');
+
+        style.id = 'spotify-relax-styles';
+
+        style.textContent = `
+
+        #spotify-relax-dialog {
+            position: fixed;
+            inset: 0;
+            z-index: 9999999999;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: rgba(0,0,0,.58);
+
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+
+            padding: 20px;
+            box-sizing: border-box;
+
+            animation: spotifyRelaxFade .25s ease;
+        }
+
+
+        .spotify-relax-box {
+            width: 100%;
+            max-width: 430px;
+
+            background: #fff;
+
+            border-radius: 22px;
+
+            padding: 32px 28px 27px;
+
+            box-sizing: border-box;
+
+            text-align: center;
+
+            box-shadow:
+                0 25px 70px rgba(0,0,0,.35);
+
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Arial,
+                sans-serif;
+
+            animation: spotifyRelaxPopup .3s ease;
+        }
+
+
+        .spotify-relax-icon {
+            font-size: 50px;
+            margin-bottom: 12px;
+        }
+
+
+        .spotify-relax-title {
+            font-size: 23px;
+            font-weight: 700;
+            color: #222;
+            margin-bottom: 10px;
+        }
+
+
+        .spotify-relax-description {
+            font-size: 16px;
+            line-height: 1.5;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+
+        .spotify-relax-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+
+        #spotify-relax-yes {
+            border: 0;
+
+            border-radius: 30px;
+
+            padding: 14px 20px;
+
+            background: #1DB954;
+            color: white;
+
+            font-size: 16px;
+            font-weight: 600;
+
+            cursor: pointer;
+
+            transition:
+                transform .15s ease,
+                background .15s ease;
+        }
+
+
+        #spotify-relax-yes:hover {
+            background: #1ed760;
+            transform: translateY(-1px);
+        }
+
+
+        #spotify-relax-no {
+            border: 0;
+
+            background: transparent;
+
+            color: #777;
+
+            font-size: 14px;
+
+            padding: 8px;
+
+            cursor: pointer;
+        }
+
+
+        #spotify-relax-no:hover {
+            color: #333;
+        }
+
+
+        /* =====================================================
+           BARRA
+        ===================================================== */
+
+        #spotify-relax-widget {
+
+            position: fixed;
+
+            top: 0;
+            left: 0;
+
+            width: 100%;
+            height: 64px;
+
+            z-index: 999999999;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #191414,
+                    #242424
+                );
+
+            box-shadow:
+                0 3px 15px rgba(0,0,0,.30);
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding:
+                0 45px
+                0 15px;
+
+            box-sizing: border-box;
+
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Arial,
+                sans-serif;
+
+            animation:
+                spotifyRelaxSlide .3s ease;
+        }
+
+
+        .spotify-relax-text {
+
+            color: #fff;
+
+            font-size: 15px;
+
+            font-weight: 500;
+
+            margin-right: 22px;
+
+            white-space: nowrap;
+        }
+
+
+        /* =====================================================
+           CONTROLES
+        ===================================================== */
+
+        .spotify-relax-controls {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 7px;
+        }
+
+
+        .spotify-relax-control {
+
+            width: 40px;
+            height: 40px;
+
+            border: 0;
+
+            border-radius: 50%;
+
+            background:
+                rgba(255,255,255,.10);
+
+            color: white;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            font-size: 17px;
+
+            cursor: pointer;
+
+            transition:
+                background .15s ease,
+                transform .15s ease;
+        }
+
+
+        .spotify-relax-control:hover {
+
+            background:
+                rgba(255,255,255,.20);
+
+            transform: scale(1.05);
+        }
+
+
+        .spotify-relax-control:disabled {
+
+            opacity: .3;
+
+            cursor: default;
+
+            transform: none;
+        }
+
+
+        .spotify-relax-play {
+
+            width: 44px;
+            height: 44px;
+
+            background: #1DB954;
+
+            font-size: 19px;
+        }
+
+
+        .spotify-relax-play:hover {
+
+            background: #1ed760;
+        }
+
+
+        /* =====================================================
+           CERRAR
+        ===================================================== */
+
+        .spotify-relax-close {
+
+            position: absolute;
+
+            right: 12px;
+
+            top: 50%;
+
+            transform:
+                translateY(-50%);
+
+            width: 32px;
+            height: 32px;
+
+            border: 0;
+
+            background: transparent;
+
+            color: #aaa;
+
+            font-size: 24px;
+
+            cursor: pointer;
+        }
+
+
+        .spotify-relax-close:hover {
+            color: #fff;
+        }
+
+
+        /* =====================================================
+           IFRAME SPOTIFY INVISIBLE
+        ===================================================== */
+
+        #spotify-relax-embed {
+
+            position: fixed;
+
+            width: 1px;
+            height: 1px;
+
+            left: -10000px;
+            top: -10000px;
+
+            opacity: 0;
+
+            pointer-events: none;
+        }
+
+
+        /* =====================================================
+           ANIMACIONES
+        ===================================================== */
+
+        @keyframes spotifyRelaxFade {
+
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+
+        @keyframes spotifyRelaxPopup {
+
+            from {
+                opacity: 0;
+
+                transform:
+                    scale(.92)
+                    translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+
+                transform:
+                    scale(1)
+                    translateY(0);
+            }
+        }
+
+
+        @keyframes spotifyRelaxSlide {
+
+            from {
+                opacity: 0;
+
+                transform:
+                    translateY(-100%);
+            }
+
+            to {
+                opacity: 1;
+
+                transform:
+                    translateY(0);
+            }
+        }
+
+
+        /* =====================================================
+           MÓVIL
+        ===================================================== */
+
+        @media (max-width: 600px) {
+
+            #spotify-relax-widget {
+
+                height: 60px;
+
+                padding:
+                    0 38px
+                    0 8px;
+            }
+
+
+            .spotify-relax-text {
+                display: none;
+            }
+
+
+            .spotify-relax-controls {
+                gap: 5px;
+            }
+
+
+            .spotify-relax-control {
+
+                width: 38px;
+                height: 38px;
+
+                font-size: 16px;
+            }
+
+
+            .spotify-relax-play {
+
+                width: 42px;
+                height: 42px;
+            }
+        }
+
+        `;
+
+        document.head.appendChild(style);
+    }
+
+
+    /* =========================================================
+       POPUP
+    ========================================================= */
+
+    const dialog =
+        document.createElement('div');
+
+    dialog.id =
+        'spotify-relax-dialog';
+
+    dialog.innerHTML = `
+
+        <div class="spotify-relax-box">
+
+            <div class="spotify-relax-icon">
+                🎧
+            </div>
+
+            <div class="spotify-relax-title">
+                ¿Te apetece escuchar música?
+            </div>
+
+            <div class="spotify-relax-description">
+                ${message}
+            </div>
+
+            <div class="spotify-relax-buttons">
+
+                <button id="spotify-relax-yes">
+                    🎵 Escuchar música
+                </button>
+
+                <button id="spotify-relax-no">
+                    Ahora no
+                </button>
+
+            </div>
+
+        </div>
+
+    `;
+
+    document.body.appendChild(dialog);
+
+
+    /* =========================================================
+       AHORA NO
+    ========================================================= */
+
+    document
+        .getElementById('spotify-relax-no')
+        .onclick = function () {
+
+            dialog.remove();
+
+        };
+
+
+    /* =========================================================
+       ESCUCHAR
+    ========================================================= */
+
+    document
+        .getElementById('spotify-relax-yes')
+        .onclick = function () {
+
+            dialog.remove();
+
+
+            /* =================================================
+               CREAR BARRA
+            ================================================= */
+
+            const widget =
+                document.createElement('div');
+
+            widget.id =
+                'spotify-relax-widget';
+
+            widget.innerHTML = `
+
+                <div class="spotify-relax-text">
+                    ${message}
+                </div>
+
+
+                <div class="spotify-relax-controls">
+
+                    <button
+                        class="spotify-relax-control"
+                        id="spotify-relax-prev"
+                        title="Canción anterior">
+                        ⏮
+                    </button>
+
+
+                    <button
+                        class="spotify-relax-control spotify-relax-play"
+                        id="spotify-relax-play"
+                        title="Reproducir">
+                        ▶
+                    </button>
+
+
+                    <button
+                        class="spotify-relax-control"
+                        id="spotify-relax-pause"
+                        title="Pausa">
+                        ⏸
+                    </button>
+
+
+                    <button
+                        class="spotify-relax-control"
+                        id="spotify-relax-next"
+                        title="Siguiente canción">
+                        ⏭
+                    </button>
+
+                </div>
+
+
+                <button
+                    class="spotify-relax-close"
+                    title="Cerrar">
+                    ×
+                </button>
+
+
+                <div id="spotify-relax-embed"></div>
+
+            `;
+
+            document.body.prepend(widget);
+
+
+            document.body.style.paddingTop =
+                '64px';
+
+
+            /* =================================================
+               VARIABLES
+            ================================================= */
+
+            let controller = null;
+
+            let currentTrack = 0;
+
+            let playerReady = false;
+
+
+            /* =================================================
+               BOTONES
+            ================================================= */
+
+            const playButton =
+                document.getElementById(
+                    'spotify-relax-play'
+                );
+
+            const pauseButton =
+                document.getElementById(
+                    'spotify-relax-pause'
+                );
+
+            const prevButton =
+                document.getElementById(
+                    'spotify-relax-prev'
+                );
+
+            const nextButton =
+                document.getElementById(
+                    'spotify-relax-next'
+                );
+
+
+            /*
+             * Si no hemos puesto las pistas todavía,
+             * desactivamos anterior/siguiente.
+             */
+
+            if (!tracks.length) {
+
+                prevButton.disabled = true;
+                nextButton.disabled = true;
+
+            }
+
+
+            /* =================================================
+               PLAY
+            ================================================= */
+
+            playButton.onclick = function () {
+
+                if (!controller) return;
+
+                controller
+                    .resume()
+                    .catch(function (error) {
+
+                        console.log(
+                            'No se pudo reproducir:',
+                            error
+                        );
+
+                    });
+
+            };
+
+
+            /* =================================================
+               PAUSE
+            ================================================= */
+
+            pauseButton.onclick = function () {
+
+                if (!controller) return;
+
+                controller
+                    .pause()
+                    .catch(function (error) {
+
+                        console.log(
+                            'No se pudo pausar:',
+                            error
+                        );
+
+                    });
+
+            };
+
+
+            /* =================================================
+               SIGUIENTE
+            ================================================= */
+
+            nextButton.onclick = function () {
+
+                if (!controller) return;
+
+                if (!tracks.length) return;
+
+
+                currentTrack++;
+
+                if (
+                    currentTrack >=
+                    tracks.length
+                ) {
+
+                    currentTrack = 0;
+
+                }
+
+
+                controller
+                    .loadEntity(
+                        tracks[currentTrack]
+                    )
+                    .then(function () {
+
+                        return controller.play();
+
+                    })
+                    .catch(function (error) {
+
+                        console.log(
+                            'Error cargando siguiente canción:',
+                            error
+                        );
+
+                    });
+
+            };
+
+
+            /* =================================================
+               ANTERIOR
+            ================================================= */
+
+            prevButton.onclick = function () {
+
+                if (!controller) return;
+
+                if (!tracks.length) return;
+
+
+                currentTrack--;
+
+                if (currentTrack < 0) {
+
+                    currentTrack =
+                        tracks.length - 1;
+
+                }
+
+
+                controller
+                    .loadEntity(
+                        tracks[currentTrack]
+                    )
+                    .then(function () {
+
+                        return controller.play();
+
+                    })
+                    .catch(function (error) {
+
+                        console.log(
+                            'Error cargando canción anterior:',
+                            error
+                        );
+
+                    });
+
+            };
+
+
+            /* =================================================
+               CERRAR
+            ================================================= */
+
+            widget
+                .querySelector(
+                    '.spotify-relax-close'
+                )
+                .onclick = function () {
+
+                    if (controller) {
+
+                        try {
+
+                            controller.pause();
+
+                        } catch (e) {}
+
+                    }
+
+
+                    widget.remove();
+
+
+                    document.body.style.paddingTop =
+                        '';
+
+                };
+
+
+            /* =================================================
+               CREAR REPRODUCTOR
+            ================================================= */
+
+            function createPlayer(IFrameAPI) {
+
+                const element =
+                    document.getElementById(
+                        'spotify-relax-embed'
+                    );
+
+                if (!element) return;
+
+
+                /*
+                 * Si tenemos canciones, empezamos
+                 * directamente por la primera.
+                 *
+                 * Si no, cargamos el álbum.
+                 */
+
+                const firstEntity =
+                    tracks.length
+                        ? tracks[0]
+                        : albumUrl;
+
+
+                IFrameAPI.createController(
+
+                    element,
+
+                    {
+                        width: 1,
+                        height: 1,
+                        url: firstEntity
+                    },
+
+                    function (EmbedController) {
+
+                        controller =
+                            EmbedController;
+
+
+                        controller.addListener(
+                            'ready',
+                            function () {
+
+                                playerReady =
+                                    true;
+
+
+                                console.log(
+                                    'Spotify preparado'
+                                );
+
+
+                                /*
+                                 * Intentamos reproducir
+                                 * porque acabamos de recibir
+                                 * un clic del usuario.
+                                 */
+
+                                controller
+                                    .play()
+                                    .then(function () {
+
+                                        console.log(
+                                            '🎵 Música iniciada'
+                                        );
+
+                                    })
+                                    .catch(function (error) {
+
+                                        console.log(
+                                            'Spotify bloqueó el autoplay:',
+                                            error
+                                        );
+
+                                    });
+
+                            }
+                        );
+
+
+                        /*
+                         * Detectar qué pista está sonando.
+                         */
+
+                        controller.addListener(
+                            'playback_started',
+                            function (event) {
+
+                                console.log(
+                                    'Reproduciendo:',
+                                    event.data.playingURI
+                                );
+
+                            }
+                        );
+
+                    }
+                );
+
+            }
+
+
+            /* =================================================
+               API SPOTIFY
+            ================================================= */
+
+            if (window.SpotifyIframeApi) {
+
+                createPlayer(
+                    window.SpotifyIframeApi
+                );
+
+                return;
+            }
+
+
+            /* =================================================
+               API CARGÁNDOSE
+            ================================================= */
+
+            if (
+                document.getElementById(
+                    'spotify-iframe-api'
+                )
+            ) {
+
+                window.onSpotifyIframeApiReady =
+                    function (IFrameAPI) {
+
+                        window.SpotifyIframeApi =
+                            IFrameAPI;
+
+                        createPlayer(
+                            IFrameAPI
+                        );
+
+                    };
+
+                return;
+            }
+
+
+            /* =================================================
+               CARGAR API
+            ================================================= */
+
+            window.onSpotifyIframeApiReady =
+                function (IFrameAPI) {
+
+                    window.SpotifyIframeApi =
+                        IFrameAPI;
+
+                    createPlayer(
+                        IFrameAPI
+                    );
+
+                };
+
+
+            const script =
+                document.createElement('script');
+
+            script.id =
+                'spotify-iframe-api';
+
+            script.src =
+                'https://open.spotify.com/embed/iframe-api/v1';
+
+            script.async = true;
+
+            document.head.appendChild(script);
+
+        };
+
+}
 
 // ---------------- AGE POPUP ----------------
 function checkAge(callback) {
@@ -456,9 +1468,11 @@ window.addEventListener("load", () => {
                             loadJS("https://bitelchux.github.io/chollos.js");
                             inyectaMiBannerChollo("ES");
                         }else{
-                            inyectaMiBannerChollo("XX");
+                            //inyectaMiBannerChollo("XX");
+                       
                             loadRandomAds(); 
                             loadJS("https://bitelchux.github.io/kdplibro.js");
+                                 addSpotifyRelax();
                         }
                     });
             });
