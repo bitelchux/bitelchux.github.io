@@ -1,4 +1,179 @@
 console.log("github js cargado");
+function addSpotifyRelaxWidget() {
+
+    if (document.getElementById('spotify-relax-widget')) return;
+
+    const messages = [
+        '🎧 Escucha música relajante mientras lees',
+        '🌿 Música tranquila para acompañar tu lectura',
+        '☕ Relájate y disfruta de esta música',
+        '📖 Música relajante para leer y concentrarte',
+        '🧘 Un poco de música para desconectar',
+        '🌙 Relájate mientras lees'
+    ];
+
+    const message =
+        messages[Math.floor(Math.random() * messages.length)];
+
+    // FRANJA
+    const bar = document.createElement('div');
+    bar.id = 'spotify-relax-widget';
+
+    bar.innerHTML = `
+        <div class="spotify-relax-text">
+            ${message}
+        </div>
+
+        <div id="spotify-relax-embed"></div>
+
+        <button class="spotify-relax-close"
+                onclick="document.getElementById('spotify-relax-widget').remove();
+                         document.body.style.paddingTop='';">
+            ×
+        </button>
+    `;
+
+    // ESTILOS
+    const style = document.createElement('style');
+
+    style.textContent = `
+        #spotify-relax-widget {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 82px;
+            z-index: 999999;
+            background: #191414;
+            box-shadow: 0 2px 10px rgba(0,0,0,.30);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 0 45px 0 15px;
+            box-sizing: border-box;
+
+            font-family: Arial, sans-serif;
+        }
+
+        .spotify-relax-text {
+            color: #fff;
+            font-size: 15px;
+            font-weight: 500;
+            margin-right: 15px;
+            white-space: nowrap;
+        }
+
+        #spotify-relax-embed {
+            width: 380px;
+            max-width: 45vw;
+            height: 80px;
+        }
+
+        .spotify-relax-close {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+
+            border: 0;
+            background: transparent;
+            color: #aaa;
+
+            font-size: 25px;
+            line-height: 25px;
+
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .spotify-relax-close:hover {
+            color: #fff;
+        }
+
+        @media (max-width: 700px) {
+
+            #spotify-relax-widget {
+                height: 82px;
+                padding: 0 35px 0 10px;
+            }
+
+            .spotify-relax-text {
+                display: none;
+            }
+
+            #spotify-relax-embed {
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+    `;
+
+    document.head.appendChild(style);
+
+    document.body.prepend(bar);
+
+    // Reservar espacio para que no tape el contenido
+    document.body.style.paddingTop = '82px';
+
+    // Cargar API de Spotify
+    function createSpotifyPlayer() {
+
+        const element =
+            document.getElementById('spotify-relax-embed');
+
+        if (!element || !window.SpotifyIframeApi) return;
+
+        SpotifyIframeApi.createController(
+            element,
+            {
+                width: '100%',
+                height: 80,
+                url: 'https://open.spotify.com/album/413ZRAjsrULjx1uiXi1qGn'
+            },
+            function (EmbedController) {
+                console.log('Spotify Relax Widget listo');
+            }
+        );
+    }
+
+    // API ya cargada
+    if (window.SpotifyIframeApi) {
+        createSpotifyPlayer();
+        return;
+    }
+
+    // Evitar cargar el script varias veces
+    if (!document.getElementById('spotify-iframe-api')) {
+
+        window.onSpotifyIframeApiReady = function (IFrameAPI) {
+
+            window.SpotifyIframeApi = IFrameAPI;
+
+            createSpotifyPlayer();
+        };
+
+        const script = document.createElement('script');
+
+        script.id = 'spotify-iframe-api';
+        script.src =
+            'https://open.spotify.com/embed/iframe-api/v1';
+
+        script.async = true;
+
+        document.head.appendChild(script);
+
+    } else {
+
+        window.onSpotifyIframeApiReady = function (IFrameAPI) {
+
+            window.SpotifyIframeApi = IFrameAPI;
+
+            createSpotifyPlayer();
+        };
+    }
+}
 
 function updateAmazonAffiliateTags() {
   const domainTagMap = {
@@ -655,7 +830,8 @@ function initAmazonStickyButton(affiliateTag) {
       initAmazonStickyButton();
     }
   } else {
-    inyectaMiBannerChollo("XX");
+    addSpotifyRelaxWidget();
+    //inyectaMiBannerChollo("XX");
     inyectaSmartLink();
     
     /*
