@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Rainbow Road 🦄🌈</title>
+<style>
+  :root{
+    --lavender:#c9b6f5;
+    --sky:#a7d8ff;
+    --cotton-pink:#ffc2e2;
+    --mint:#b7f5d8;
+    --gold:#ffd166;
+    --ink:#3a2e5c;
+    --white:#fffaf5;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0; width:100%; height:100%; overflow:hidden;
+    font-family:'Baloo 2','Trebuchet MS',sans-serif;
+    background:#0d0620;
+    color:var(--ink);
+  }
+  @font-face{
+    /* Rounded, playful font that matches the unicorn/rainbow theme */
+    font-family:'Baloo 2';
+    src:local('Baloo 2');
+  }
+  #app{position:fixed; inset:0;}
+  canvas{display:block; touch-action:none;}
+
+  /* ---------- Top HUD ---------- */
+  #hud{
+    position:fixed; top:0; left:0; right:0;
+    display:flex; justify-content:space-between; align-items:center;
+    padding:12px 18px;
+    pointer-events:none;
+    z-index:10;
+    font-weight:700;
+    text-shadow:0 2px 6px rgba(0,0,0,.35);
+    color:var(--white);
+  }
+  #hud .chip{
+    background:rgba(58,46,92,.45);
+    backdrop-filter:blur(6px);
+    border:2px solid rgba(255,255,255,.35);
+    border-radius:999px;
+    padding:6px 14px;
+    display:flex; gap:8px; align-items:center;
+    font-size:16px;
+  }
+  #lives span{filter:drop-shadow(0 0 3px rgba(255,0,120,.6));}
+  #lives span.lost{opacity:.25; filter:none;}
+
+  /* ---------- Overlay screens ---------- */
+  .overlay{
+    position:fixed; inset:0; z-index:20;
+    display:flex; align-items:center; justify-content:center;
+    background:radial-gradient(ellipse at 50% 20%, rgba(120,80,180,.55), rgba(10,5,25,.85) 70%);
+    text-align:center;
+    padding:20px;
+  }
+  .overlay.hidden{display:none;}
+  .panel{
+    background:linear-gradient(160deg, rgba(255,255,255,.16), rgba(255,255,255,.05));
+    border:2px solid rgba(255,255,255,.35);
+    border-radius:28px;
+    padding:32px 28px;
+    max-width:440px;
+    width:100%;
+    backdrop-filter:blur(10px);
+    box-shadow:0 20px 60px rgba(0,0,0,.5);
+    color:var(--white);
+  }
+  .panel h1{
+    font-size:clamp(28px,7vw,40px);
+    margin:0 0 6px;
+    letter-spacing:.5px;
+    background:linear-gradient(90deg,#ff8fd8,#ffd166,#8fffc7,#8fd9ff,#c79bff);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    filter:drop-shadow(0 3px 6px rgba(0,0,0,.35));
+  }
+  .panel p{font-size:15px; line-height:1.5; opacity:.92;}
+  .panel .sub{font-size:13px; opacity:.75; margin-top:-4px;}
+  .btn{
+    appearance:none; border:none; cursor:pointer;
+    font-family:inherit; font-weight:700; font-size:17px;
+    padding:13px 26px; border-radius:999px;
+    background:linear-gradient(90deg,#ff9ad5,#ffd166);
+    color:#3a2e5c;
+    box-shadow:0 6px 0 #c97fae, 0 10px 20px rgba(0,0,0,.3);
+    margin:6px 4px; transition:transform .08s ease;
+  }
+  .btn:active{transform:translateY(4px); box-shadow:0 2px 0 #c97fae;}
+  .btn.secondary{
+    background:rgba(255,255,255,.15); color:var(--white);
+    box-shadow:0 6px 0 rgba(0,0,0,.25);
+    border:2px solid rgba(255,255,255,.4);
+  }
+  .btn.secondary:active{box-shadow:0 2px 0 rgba(0,0,0,.25);}
+  .btn:disabled{opacity:.4; cursor:not-allowed; box-shadow:none;}
+  .btn.hidden{display:none;}
+  #vrHint{font-size:12px; opacity:.7; margin-top:10px; line-height:1.5;}
+
+  .rules{
+    text-align:left; font-size:13.5px; margin:14px 0; padding:0; list-style:none;
+    display:flex; flex-direction:column; gap:6px;
+  }
+  .rules li{background:rgba(255,255,255,.08); border-radius:12px; padding:8px 10px;}
+
+  /* ---------- Touch controls ---------- */
+  #dpad{
+    position:fixed; right:18px; bottom:22px; z-index:10;
+    display:grid; grid-template-columns:repeat(3,54px); grid-template-rows:repeat(3,54px);
+    gap:6px; pointer-events:auto;
+  }
+  #dpad button{
+    border:2px solid rgba(255,255,255,.5);
+    background:rgba(58,46,92,.55);
+    color:#fff; font-size:22px; border-radius:16px;
+    backdrop-filter:blur(4px);
+    -webkit-tap-highlight-color:transparent;
+  }
+  #dpad button:active{background:rgba(255,154,213,.65);}
+  #dUp{grid-column:2; grid-row:1;}
+  #dLeft{grid-column:1; grid-row:2;}
+  #dRight{grid-column:3; grid-row:2;}
+  #dDown{grid-column:2; grid-row:3;}
+
+  #vrButtonWrap{position:fixed; left:0; right:0; bottom:18px; display:flex; justify-content:center; z-index:15; pointer-events:none;}
+  #vrButtonWrap button{pointer-events:auto;}
+
+  #flash{
+    position:fixed; inset:0; background:rgba(255,0,90,.35);
+    opacity:0; pointer-events:none; z-index:12; transition:opacity .12s ease;
+  }
+
+  #levelBadge{
+    position:fixed; top:12px; left:50%; transform:translateX(-50%);
+    z-index:10; pointer-events:none;
+    color:var(--white); font-weight:700; text-shadow:0 2px 6px rgba(0,0,0,.4);
+    background:rgba(58,46,92,.45); border:2px solid rgba(255,255,255,.3);
+    border-radius:999px; padding:6px 16px; font-size:14px;
+  }
+
+  #saveNote{
+    position:fixed; bottom:8px; left:50%; transform:translateX(-50%);
+    z-index:10; pointer-events:none; font-size:11px; color:rgba(255,255,255,.55);
+    opacity:0; transition:opacity .3s ease;
+  }
+  #saveNote.show{opacity:1;}
+
+  @media (max-width:480px){
+    .panel{padding:24px 18px;}
+    #dpad{transform:scale(.9); transform-origin:bottom right;}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="flash"></div>
+
+  <!-- HUD -->
+  <div id="hud">
+    <div class="chip" id="lives">❤️❤️❤️</div>
+    <div class="chip" id="score">⭐ 0</div>
+  </div>
+  <div id="levelBadge">Level 1</div>
+  <div id="saveNote">💾 Progress saved</div>
+
+  <!-- Touch controls (also work with a mouse, handy for desktop testing) -->
+  <div id="dpad">
+    <button id="dUp">⬆️</button>
+    <button id="dLeft">⬅️</button>
+    <button id="dRight">➡️</button>
+    <button id="dDown">⬇️</button>
+  </div>
+
+  <div id="vrButtonWrap"><button id="vrButton" class="btn secondary">🥽 Loading VR…</button></div>
+
+  <!-- Start screen -->
+  <div class="overlay" id="screenStart">
+    <div class="panel">
+      <h1>Rainbow Road</h1>
+      <p class="sub">Guide the unicorn to its golden stable 🏆</p>
+      <ul class="rules">
+        <li>🦄 Move one step at a time with <b>arrow keys / WASD</b> (or the buttons below).</li>
+        <li>👹⚡🐉 Dodge the dark creatures and storms crossing the clouds.</li>
+        <li>🍬 Hop across the candy platforms to cross the rainbow river without sinking.</li>
+        <li>🥽 With a VR headset: push the controller stick to move step by step.</li>
+      </ul>
+      <button class="btn hidden" id="btnContinue">▶️ Continue</button>
+      <button class="btn" id="btnStart">▶️ Play</button>
+      <div id="vrHint">No headset handy? No problem — the whole game works with a keyboard. To try VR mode without one, install the Chrome extension "Immersive Web Emulator".</div>
+    </div>
+  </div>
+
+  <!-- Level complete -->
+  <div class="overlay hidden" id="screenLevel">
+    <div class="panel">
+      <h1>Golden Stable Reached! 🏆</h1>
+      <p id="levelScoreText">Score: 0</p>
+      <button class="btn" id="btnNextLevel">➡️ Next Level</button>
+    </div>
+  </div>
+
+  <!-- Game over -->
+  <div class="overlay hidden" id="screenOver">
+    <div class="panel">
+      <h1>Oh no… 💫</h1>
+      <p id="overText">The unicorn needs a moment to rest.</p>
+      <p class="sub" id="bestText"></p>
+      <button class="btn" id="btnRestart">🔄 Try Again</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script>
+/* =========================================================================
+   RAINBOW ROAD — a Frogger-style WebXR game with unicorns and rainbows.
+   Single self-contained file. Works as a "desktop mode" (keyboard / touch
+   buttons) with no headset required, and enables real WebXR when the
+   browser and device support it.
+   ========================================================================= */
+
+/* ---------------------- General configuration ---------------------- */
+const COLS = 9;                       // number of columns on the path
+const CELL = 2;                       // size of each grid cell (three.js units)
+const COL_MIN = -Math.floor(COLS / 2);
+const COL_MAX = Math.floor(COLS / 2);
+const BASE_Y = 0.55;                  // resting height of the unicorn
+const HOP_HEIGHT = 0.6;               // height of the hop when moving
+const MOVE_DURATION = 190;            // ms a single grid-step move takes
+const SINK_LIMIT = 900;               // ms off a platform before sinking
+const PLATFORM_RIDE_DIST = 1.05;      // max distance to be considered "on" a platform
+const COLLISION_DIST = 1.15;          // collision distance with obstacles
+const XR_MOVE_COOLDOWN = 260;         // ms between moves triggered by the VR stick
+const AUTOSAVE_INTERVAL = 5000;       // ms between automatic progress saves
+
+const state = {
+  gameState: 'menu',   // menu | playing | levelComplete | gameOver
+  level: 1,
+  score: 0,
+  bestScore: 0,
+  lives: 3,
+  goalRow: 12,
+  invulnerable: false,
+  sinkTimer: 0,
+};
+
+/* ---------------------- Utilities ---------------------- */
+function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+function lerp(a, b, t) { return a + (b - a) * t; }
+function rand(min, max) { return min + Math.random() * (max - min); }
+function choice(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+// Builds a camera-facing sprite from an emoji.
+function makeEmojiSprite(emoji, size = 128) {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  ctx.font = `${size * 0.82}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(emoji, size / 2, size / 2 + size * 0.06);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.minFilter = THREE.LinearFilter;
+  const material = new THREE.SpriteMaterial({ map: texture, transparent: true });
+  const sprite = new THREE.Sprite(material);
+  sprite.scale.set(1.5, 1.5, 1.5);
+  return sprite;
+}
+
+// Rainbow gradient texture used for the liquid rivers.
+function makeRainbowTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 256; canvas.height = 64;
+  const ctx = canvas.getContext('2d');
+  const grad = ctx.createLinearGradient(0, 0, 256, 0);
+  ['#ff6b6b', '#ffa94d', '#ffe066', '#8ce99a', '#66d9e8', '#74a9ff', '#c08cff']
+    .forEach((c, i, arr) => grad.addColorStop(i / (arr.length - 1), c));
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 256, 64);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(4, 1);
+  return tex;
+}
+
+// Pastel gradient sky used as the scene background.
+function makeSkyTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 8; canvas.height = 256;
+  const ctx = canvas.getContext('2d');
+  const grad = ctx.createLinearGradient(0, 0, 0, 256);
+  grad.addColorStop(0, '#7d5fc9');
+  grad.addColorStop(0.45, '#b98fe0');
+  grad.addColorStop(0.75, '#ffc2e2');
+  grad.addColorStop(1, '#ffe6b3');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 8, 256);
+  return new THREE.CanvasTexture(canvas);
+}
+
+// Soft radial glow, used for the background sun.
+function makeGlowTexture(inner, outer) {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 256;
+  const ctx = canvas.getContext('2d');
+  const grad = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
+  grad.addColorStop(0, inner);
+  grad.addColorStop(1, outer);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 256, 256);
+  return new THREE.CanvasTexture(canvas);
+}
+
+// Cotton-candy ground for safe lanes: soft pink/lavender with little sparkle dots.
+function makeCottonCandyTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  const grad = ctx.createLinearGradient(0, 0, 128, 128);
+  grad.addColorStop(0, '#ffb3e3');
+  grad.addColorStop(1, '#d9b6ff');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 128, 128);
+  ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  for (let i = 0; i < 16; i++) {
+    ctx.beginPath();
+    ctx.arc(Math.random() * 128, Math.random() * 128, rand(2.5, 8), 0, Math.PI * 2);
+    ctx.fill();
+  }
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(5, 1);
+  return tex;
+}
+
+// Puffy-cloud ground for the road/highway lanes — reads as a "cloud highway"
+// instead of a flat pale, washed-out strip.
+function makeCloudRoadTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 256; canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#5fb0f0';
+  ctx.fillRect(0, 0, 256, 128);
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
+  const puff = (cx, cy, r) => { ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill(); };
+  for (let i = 0; i < 3; i++) {
+    const cx = 44 + i * 88, cy = 64 + rand(-12, 12);
+    puff(cx - 18, cy, 19); puff(cx + 16, cy, 23); puff(cx, cy - 13, 20); puff(cx, cy + 9, 24);
+  }
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(4, 1);
+  return tex;
+}
+
+// Warm gold ground with little sparkles for the golden-stable goal lane.
+function makeGoldSparkleTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  const grad = ctx.createLinearGradient(0, 0, 128, 128);
+  grad.addColorStop(0, '#ffd766');
+  grad.addColorStop(1, '#ffab2e');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 128, 128);
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
+  for (let i = 0; i < 12; i++) {
+    const x = Math.random() * 128, y = Math.random() * 128;
+    ctx.save(); ctx.translate(x, y); ctx.rotate(rand(0, Math.PI));
+    ctx.fillRect(-1.4, -6, 2.8, 12); ctx.fillRect(-6, -1.4, 12, 2.8);
+    ctx.restore();
+  }
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(4, 1);
+  return tex;
+}
+
+/* ---------------------- Idle animation ("wobble") ----------------------
+   Instead of sliding around like rigid props, every emoji sprite gets a
+   small personality: dark creatures take little steps, ghosts and bats
+   float, and lightning bolts flicker. Purely cosmetic — runs on top of
+   whatever position logic already moves the sprite. */
+function styleForEmoji(emoji) {
+  if (emoji === '⚡') return 'flicker';
+  if (emoji === '👻' || emoji === '🦇') return 'float';
+  return 'step'; // 👹 🐉 and anything else that "walks"
+}
+function attachWobble(sprite, style) {
+  sprite.userData.wobble = {
+    style,
+    phase: Math.random() * Math.PI * 2,
+    baseY: sprite.position.y,
+    baseScale: sprite.scale.x,
+  };
+}
+function updateWobble(sprite, nowMs) {
+  const w = sprite.userData.wobble;
+  if (!w) return;
+  const t = nowMs / 1000;
+  if (w.style === 'float') {
+    // Ghostly floating: slow vertical drift + gentle sway
+    sprite.position.y = w.baseY + Math.sin(t * 1.6 + w.phase) * 0.18;
+    sprite.rotation.z = Math.sin(t * 1.0 + w.phase) * 0.12;
+  } else if (w.style === 'hop') {
+    // Little bounces, used for the candy platforms floating on the river
+    const cycle = (t * 2.1 + w.phase) % (Math.PI * 2);
+    sprite.position.y = w.baseY + Math.abs(Math.sin(cycle)) * 0.22;
+    sprite.rotation.z = Math.sin(cycle) * 0.06;
+  } else if (w.style === 'flicker') {
+    // Electric flicker: pulsing size + opacity, no vertical movement
+    const pulse = Math.abs(Math.sin(t * 9 + w.phase));
+    sprite.scale.setScalar(w.baseScale * (0.92 + pulse * 0.16));
+    sprite.material.opacity = 0.6 + pulse * 0.4;
+  } else {
+    // "step" style: a little footstep-like rock, side to side
+    sprite.rotation.z = Math.sin(t * 5 + w.phase) * 0.16;
+    sprite.position.y = w.baseY + Math.abs(Math.sin(t * 5 + w.phase)) * 0.08;
+  }
+}
+
+/* ---------------------- Sound design (Web Audio, no audio files) ---------------------- */
+let audioCtx = null;
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+// Soft, rounded tone: gentle attack/release envelope + warm lowpass filter
+// so the synth beeps sound musical instead of harsh.
+function playTone({ freq = 440, duration = 0.25, type = 'sine', gain = 0.09, glideTo = null, delay = 0 }) {
+  try {
+    const ctx = getAudioCtx();
+    const startAt = ctx.currentTime + delay;
+    const osc = ctx.createOscillator();
+    const filter = ctx.createBiquadFilter();
+    const g = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, startAt);
+    if (glideTo) osc.frequency.exponentialRampToValueAtTime(glideTo, startAt + duration * 0.9);
+    filter.type = 'lowpass';
+    filter.frequency.value = 2600;
+    g.gain.setValueAtTime(0.0001, startAt);
+    g.gain.exponentialRampToValueAtTime(gain, startAt + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, startAt + duration);
+    osc.connect(filter); filter.connect(g); g.connect(ctx.destination);
+    osc.start(startAt);
+    osc.stop(startAt + duration + 0.05);
+  } catch (e) { /* audio not available, fail silently */ }
+}
+// A small pentatonic-ish palette keeps every effect sounding related.
+const NOTE = { C5: 523.25, D5: 587.33, E5: 659.25, G5: 783.99, A5: 880.0, C6: 1046.5, A4: 440.0, F4: 349.23, D4: 293.66 };
+function sfxMove() { playTone({ freq: choice([NOTE.C5, NOTE.D5, NOTE.E5]), duration: 0.12, type: 'triangle', gain: 0.05 }); }
+function sfxHit() { playTone({ freq: 260, glideTo: 90, duration: 0.35, type: 'sine', gain: 0.11 }); }
+function sfxSink() { playTone({ freq: 380, glideTo: 120, duration: 0.5, type: 'sine', gain: 0.08 }); }
+function sfxLevelComplete() { [NOTE.C5, NOTE.E5, NOTE.G5, NOTE.C6].forEach((n, i) => playTone({ freq: n, duration: 0.3, type: 'triangle', gain: 0.08, delay: i * 0.11 })); }
+function sfxGameOver() { [NOTE.A4, NOTE.F4, NOTE.D4].forEach((n, i) => playTone({ freq: n, duration: 0.4, type: 'sine', gain: 0.07, delay: i * 0.14 })); }
+function sfxUI() { playTone({ freq: NOTE.A5, duration: 0.1, type: 'triangle', gain: 0.05 }); }
+
+/* ---------------------- Auto-save (progress persistence) ----------------------
+   Uses the artifact's window.storage when available (in-chat preview) and
+   transparently falls back to localStorage when the file is opened on its
+   own outside Claude.ai — either way, progress survives a reload. */
+const STORAGE_KEY = 'rainbow-road-progress';
+async function saveProgress() {
+  const data = { level: state.level, score: state.score, bestScore: state.bestScore, lives: state.lives };
+  const json = JSON.stringify(data);
+  try {
+    if (window.storage && window.storage.set) {
+      await window.storage.set(STORAGE_KEY, json, false);
+      flashSaveNote();
+      return;
+    }
+  } catch (e) { /* fall through to localStorage */ }
+  try {
+    localStorage.setItem(STORAGE_KEY, json);
+    flashSaveNote();
+  } catch (e) { /* no storage available in this environment, that's fine */ }
+}
+async function loadProgress() {
+  try {
+    if (window.storage && window.storage.get) {
+      const res = await window.storage.get(STORAGE_KEY, false);
+      return (res && res.value) ? JSON.parse(res.value) : null;
+    }
+  } catch (e) { /* key missing or storage unavailable, fall through */ }
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) { return null; }
+}
+let saveNoteTimeout = null;
+function flashSaveNote() {
+  const el = document.getElementById('saveNote');
+  el.classList.add('show');
+  clearTimeout(saveNoteTimeout);
+  saveNoteTimeout = setTimeout(() => el.classList.remove('show'), 1400);
+}
+
+/* ---------------------- three.js scene ---------------------- */
+const canvasHost = document.getElementById('app');
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.xr.enabled = true;
+canvasHost.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = makeSkyTexture();
+scene.fog = new THREE.Fog(0xb98fe0, 18, 40);
+
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+camera.position.set(0, 6, 8);
+
+// "Dolly": a group that moves through the grid; in VR it carries the real
+// camera inside it, in desktop mode we drive `camera` directly instead.
+const dolly = new THREE.Group();
+dolly.add(camera);
+scene.add(dolly);
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0x6a4fae, 0.9));
+const sun = new THREE.DirectionalLight(0xffffff, 0.6);
+sun.position.set(4, 10, 6);
+scene.add(sun);
+
+const riverTexture = makeRainbowTexture();
+const cottonCandyTexture = makeCottonCandyTexture();
+const cloudRoadTexture = makeCloudRoadTexture();
+const goldSparkleTexture = makeGoldSparkleTexture();
+
+/* ---- Decoration: a sky full of drifting clouds + a soft sun glow ---- */
+const skyClouds = [];
+function buildSkyBackground() {
+  const group = new THREE.Group();
+  const CLOUD_COUNT = 46;
+  for (let i = 0; i < CLOUD_COUNT; i++) {
+    const cloud = makeEmojiSprite('☁️', 110);
+    const scale = rand(3, 6.5);
+    cloud.scale.set(scale, scale * 0.62, 1);
+    cloud.material.opacity = rand(0.55, 0.95);
+    cloud.position.set(rand(-42, 42), rand(9, 23), rand(-90, 25));
+    group.add(cloud);
+    skyClouds.push({ mesh: cloud, speed: rand(0.15, 0.5), phase: Math.random() * Math.PI * 2 });
+  }
+  scene.add(group);
+
+  const sun = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: makeGlowTexture('rgba(255,244,214,0.95)', 'rgba(255,244,214,0)'),
+    transparent: true, depthWrite: false,
+  }));
+  sun.scale.set(34, 34, 1);
+  sun.position.set(-16, 21, -35);
+  scene.add(sun);
+}
+buildSkyBackground();
+function updateSkyClouds(nowMs, delta) {
+  const t = nowMs / 1000;
+  skyClouds.forEach(c => {
+    c.mesh.position.x += c.speed * delta;
+    if (c.mesh.position.x > 46) c.mesh.position.x = -46;
+    c.mesh.position.y += Math.sin(t * 0.3 + c.phase) * 0.002; // barely-there bob
+  });
+}
+
+/* ---- Decoration: welcome rainbow arch ---- */
+(function buildRainbowArch() {
+  const arch = new THREE.Group();
+  const colors = [0xff5c8a, 0xff9d5c, 0xffe066, 0x8ce99a, 0x66d9e8, 0x8c8cff];
+  colors.forEach((c, i) => {
+    const geo = new THREE.TorusGeometry(6 - i * 0.35, 0.16, 8, 32, Math.PI);
+    const mat = new THREE.MeshBasicMaterial({ color: c });
+    const ring = new THREE.Mesh(geo, mat);
+    ring.rotation.z = Math.PI;
+    ring.position.set(0, 0.2, -4);
+    arch.add(ring);
+  });
+  scene.add(arch);
+})();
+
+/* ---------------------- Player (unicorn) ---------------------- */
+const player = {
+  col: 0, row: 0,
+  mesh: makeEmojiSprite('🦄', 160),
+  fromX: 0, fromZ: 0, targetX: 0, targetZ: 0,
+  moveStart: 0, moving: false,
+};
+player.mesh.scale.set(1.8, 1.8, 1.8);
+player.mesh.position.set(0, BASE_Y, 0);
+scene.add(player.mesh);
+attachWobble(player.mesh, 'step'); // small idle bounce while standing still
+
+/* ---------------------- Lane system ---------------------- */
+let lanes = []; // index = row
+
+const OBSTACLE_EMOJIS = ['👹', '🦇', '⚡', '🐉', '👻'];
+const PLATFORM_EMOJIS = ['🍬', '🍭', '🧁'];
+
+function laneZ(row) { return -row * CELL; }
+
+// As levels progress, hazard lanes gradually crowd out safe ones.
+function pickLaneType() {
+  const hazardBias = clamp(state.level * 0.02, 0, 0.18);
+  const safeChance = clamp(0.22 - hazardBias, 0.08, 0.22);
+  const roadChance = 0.4 + hazardBias * 0.6;
+  const r = Math.random();
+  if (r < safeChance) return 'safe';
+  if (r < safeChance + roadChance) return 'road';
+  return 'river';
+}
+
+function buildGround(lane) {
+  const width = COLS * CELL + CELL;
+  const geo = new THREE.PlaneGeometry(width, CELL * 0.98);
+
+  // Unlit, textured materials so every lane keeps its true, saturated color
+  // no matter the scene lighting — flat pastel + strong light was washing
+  // the safe/road lanes out to near-white.
+  let mat;
+  if (lane.type === 'river') mat = new THREE.MeshBasicMaterial({ map: riverTexture });
+  else if (lane.type === 'road') mat = new THREE.MeshBasicMaterial({ map: cloudRoadTexture });
+  else if (lane.type === 'goal') mat = new THREE.MeshBasicMaterial({ map: goldSparkleTexture });
+  else mat = new THREE.MeshBasicMaterial({ map: cottonCandyTexture });
+
+  const plane = new THREE.Mesh(geo, mat);
+  plane.rotation.x = -Math.PI / 2;
+  plane.position.set(0, 0, laneZ(lane.row));
+  lane.group.add(plane);
+
+  // decoration outside the playable columns
+  if (lane.type === 'road') {
+    [COL_MIN - 1.4, COL_MAX + 1.4].forEach(x => {
+      const cloud = makeEmojiSprite('☁️', 96);
+      cloud.position.set(x * CELL, 1.6, laneZ(lane.row));
+      lane.group.add(cloud);
+      attachWobble(cloud, 'float');
+      lane.decor.push(cloud);
+    });
+  }
+  if (lane.type === 'goal') {
+    [-2, 0, 2].forEach(x => {
+      const s = makeEmojiSprite(choice(['🏆', '✨']), 96);
+      s.position.set(x * CELL * 0.6, 1.3, laneZ(lane.row));
+      lane.group.add(s);
+      attachWobble(s, 'float');
+      lane.decor.push(s);
+    });
+  }
+}
+
+function spawnRoadObstacles(lane) {
+  const emoji = choice(OBSTACLE_EMOJIS);
+  const dir = Math.random() < 0.5 ? 1 : -1;
+  const speed = (1.1 + Math.random() * 0.9 + state.level * 0.14) * dir;
+  const count = 2 + Math.floor(Math.random() * 2) + Math.min(2, Math.floor(state.level / 3));
+  const totalWidth = COLS * CELL + CELL * 2;
+  const spacing = totalWidth / count;
+  const style = styleForEmoji(emoji);
+  for (let i = 0; i < count; i++) {
+    const sprite = makeEmojiSprite(emoji);
+    sprite.position.set(-totalWidth / 2 + i * spacing + rand(-0.5, 0.5), 0.95, laneZ(lane.row));
+    lane.group.add(sprite);
+    attachWobble(sprite, style);
+    lane.obstacles.push({ mesh: sprite, speed });
+  }
+}
+
+function spawnRiverPlatforms(lane) {
+  const emoji = choice(PLATFORM_EMOJIS);
+  const dir = Math.random() < 0.5 ? 1 : -1;
+  const speed = (0.8 + Math.random() * 0.5 + state.level * 0.06) * dir;
+  const count = 3 + Math.floor(Math.random() * 2);
+  const totalWidth = COLS * CELL + CELL * 2;
+  const spacing = totalWidth / count;
+  for (let i = 0; i < count; i++) {
+    const sprite = makeEmojiSprite(emoji, 110);
+    sprite.position.set(-totalWidth / 2 + i * spacing, 0.65, laneZ(lane.row));
+    lane.group.add(sprite);
+    attachWobble(sprite, 'hop'); // candy platforms bob gently on the river
+    lane.platforms.push({ mesh: sprite, speed });
+  }
+}
+
+function createLane(row) {
+  const lane = { row, type: 'safe', group: new THREE.Group(), obstacles: [], platforms: [], decor: [] };
+
+  if (row === 0) lane.type = 'safe';
+  else if (row === state.goalRow) lane.type = 'goal';
+  else lane.type = pickLaneType();
+
+  buildGround(lane);
+  if (lane.type === 'road') spawnRoadObstacles(lane);
+  if (lane.type === 'river') spawnRiverPlatforms(lane);
+
+  scene.add(lane.group);
+  lanes[row] = lane;
+  return lane;
+}
+
+function clearLevel() {
+  lanes.forEach(l => { if (l) scene.remove(l.group); });
+  lanes = [];
+}
+
+// Every level is generated fresh and at random, and gets a bit longer and
+// more crowded with hazards than the last (see pickLaneType / spawn speeds).
+function initLevel(level) {
+  clearLevel();
+  state.goalRow = Math.min(12 + (level - 1) * 2, 30);
+  for (let r = 0; r <= state.goalRow; r++) createLane(r);
+  placePlayerAt(0, 0);
+  document.getElementById('levelBadge').textContent = `Level ${level}`;
+}
+
+/* ---------------------- Player movement ---------------------- */
+function placePlayerAt(col, row) {
+  player.col = col; player.row = row;
+  player.fromX = player.targetX = col * CELL;
+  player.fromZ = player.targetZ = laneZ(row);
+  player.mesh.position.set(player.targetX, BASE_Y, player.targetZ);
+  player.moving = false;
+}
+
+function tryMove(dCol, dRow) {
+  if (state.gameState !== 'playing' || player.moving) return;
+  const newCol = clamp(player.col + dCol, COL_MIN, COL_MAX);
+  const newRow = Math.max(0, player.row + dRow);
+  if (newCol === player.col && newRow === player.row) return;
+
+  player.fromX = player.mesh.position.x;
+  player.fromZ = player.mesh.position.z;
+  player.col = newCol; player.row = newRow;
+  player.targetX = newCol * CELL;
+  player.targetZ = laneZ(newRow);
+  player.moveStart = performance.now();
+  player.moving = true;
+  sfxMove();
+
+  if (newRow > 0) state.score += 5;
+  updateHUD();
+}
+
+function updatePlayerMovementAnim(nowMs) {
+  if (!player.moving) return;
+  const t = clamp((nowMs - player.moveStart) / MOVE_DURATION, 0, 1);
+  player.mesh.position.x = lerp(player.fromX, player.targetX, t);
+  player.mesh.position.z = lerp(player.fromZ, player.targetZ, t);
+  player.mesh.position.y = BASE_Y + Math.sin(t * Math.PI) * HOP_HEIGHT;
+  if (t >= 1) {
+    player.moving = false;
+    player.mesh.position.set(player.targetX, BASE_Y, player.targetZ);
+    onPlayerLanded();
+  }
+}
+
+function onPlayerLanded() {
+  const lane = lanes[player.row];
+  if (!lane) return;
+  if (lane.type === 'goal') { triggerLevelComplete(); return; }
+  state.sinkTimer = 0;
+}
+
+/* ---------------------- Collisions and the river ---------------------- */
+function updateLanes(nowMs, delta) {
+  const halfWidth = (COLS * CELL) / 2 + CELL * 1.5;
+  lanes.forEach(lane => {
+    if (!lane) return;
+    if (lane.type === 'road') {
+      lane.obstacles.forEach(o => {
+        o.mesh.position.x += o.speed * delta;
+        if (o.mesh.position.x > halfWidth) o.mesh.position.x = -halfWidth;
+        if (o.mesh.position.x < -halfWidth) o.mesh.position.x = halfWidth;
+        updateWobble(o.mesh, nowMs);
+      });
+    } else if (lane.type === 'river') {
+      lane.platforms.forEach(p => {
+        p.mesh.position.x += p.speed * delta;
+        if (p.mesh.position.x > halfWidth) p.mesh.position.x = -halfWidth;
+        if (p.mesh.position.x < -halfWidth) p.mesh.position.x = halfWidth;
+        updateWobble(p.mesh, nowMs);
+      });
+    }
+    lane.decor.forEach(d => updateWobble(d, nowMs));
+  });
+}
+
+function checkCollisions() {
+  if (state.invulnerable) return;
+  const lane = lanes[player.row];
+  if (!lane || lane.type !== 'road') return;
+  for (const o of lane.obstacles) {
+    if (Math.abs(o.mesh.position.x - player.mesh.position.x) < COLLISION_DIST) {
+      onPlayerHit();
+      return;
+    }
+  }
+}
+
+function checkRiver(deltaMs) {
+  const lane = lanes[player.row];
+  if (!lane || lane.type !== 'river' || player.moving) { state.sinkTimer = 0; return; }
+  let onPlatform = null;
+  for (const p of lane.platforms) {
+    if (Math.abs(p.mesh.position.x - player.targetX) < PLATFORM_RIDE_DIST) { onPlatform = p; break; }
+  }
+  if (onPlatform) {
+    state.sinkTimer = 0;
+    player.mesh.position.x = onPlatform.mesh.position.x;
+  } else {
+    state.sinkTimer += deltaMs;
+    if (state.sinkTimer > SINK_LIMIT) {
+      state.sinkTimer = 0;
+      sfxSink();
+      onPlayerHit();
+    }
+  }
+}
+
+function onPlayerHit() {
+  if (state.invulnerable || state.gameState !== 'playing') return;
+  state.lives--;
+  updateHUD();
+  sfxHit();
+  flashDamage();
+  if (state.lives <= 0) {
+    triggerGameOver();
+  } else {
+    state.invulnerable = true;
+    placePlayerAt(0, 0);
+    setTimeout(() => { state.invulnerable = false; }, 1100);
+  }
+}
+
+function flashDamage() {
+  const el = document.getElementById('flash');
+  el.style.opacity = '1';
+  setTimeout(() => { el.style.opacity = '0'; }, 140);
+}
+
+/* ---------------------- HUD and screens ---------------------- */
+function updateHUD() {
+  document.getElementById('lives').innerHTML =
+    Array.from({ length: 3 }, (_, i) => `<span class="${i < state.lives ? '' : 'lost'}">❤️</span>`).join('');
+  document.getElementById('score').textContent = `⭐ ${state.score}`;
+}
+
+function showOverlay(id) {
+  ['screenStart', 'screenLevel', 'screenOver'].forEach(k => {
+    document.getElementById(k).classList.toggle('hidden', k !== id);
+  });
+}
+function hideOverlays() {
+  ['screenStart', 'screenLevel', 'screenOver'].forEach(k => document.getElementById(k).classList.add('hidden'));
+}
+
+function triggerLevelComplete() {
+  state.gameState = 'levelComplete';
+  state.score += 100 * state.level;
+  if (state.score > state.bestScore) state.bestScore = state.score;
+  updateHUD();
+  sfxLevelComplete();
+  document.getElementById('levelScoreText').textContent = `Score: ${state.score}`;
+  showOverlay('screenLevel');
+  saveProgress();
+}
+
+function triggerGameOver() {
+  state.gameState = 'gameOver';
+  if (state.score > state.bestScore) state.bestScore = state.score;
+  sfxGameOver();
+  document.getElementById('bestText').textContent = `All-time best score: ${state.bestScore}`;
+  showOverlay('screenOver');
+  saveProgress();
+}
+
+function startGame() {
+  state.level = 1; state.score = 0; state.lives = 3; state.sinkTimer = 0;
+  updateHUD();
+  initLevel(1);
+  hideOverlays();
+  state.gameState = 'playing';
+  sfxUI();
+  saveProgress();
+}
+
+function continueGame() {
+  if (!lastSavedProgress) { startGame(); return; }
+  state.level = lastSavedProgress.level || 1;
+  state.score = lastSavedProgress.score || 0;
+  state.bestScore = lastSavedProgress.bestScore || 0;
+  state.lives = lastSavedProgress.lives > 0 ? lastSavedProgress.lives : 3;
+  state.sinkTimer = 0;
+  updateHUD();
+  initLevel(state.level);
+  hideOverlays();
+  state.gameState = 'playing';
+  sfxUI();
+}
+
+function nextLevel() {
+  state.level++;
+  initLevel(state.level);
+  hideOverlays();
+  state.gameState = 'playing';
+  sfxUI();
+  saveProgress();
+}
+
+/* ---------------------- Input: keyboard and touch buttons ---------------------- */
+window.addEventListener('keydown', (e) => {
+  switch (e.key) {
+    case 'ArrowUp': case 'w': case 'W': tryMove(0, 1); break;
+    case 'ArrowDown': case 's': case 'S': tryMove(0, -1); break;
+    case 'ArrowLeft': case 'a': case 'A': tryMove(-1, 0); break;
+    case 'ArrowRight': case 'd': case 'D': tryMove(1, 0); break;
+  }
+});
+
+function bindHold(id, fn) {
+  const el = document.getElementById(id);
+  el.addEventListener('click', fn);
+  el.addEventListener('touchstart', (e) => { e.preventDefault(); fn(); }, { passive: false });
+}
+bindHold('dUp', () => tryMove(0, 1));
+bindHold('dDown', () => tryMove(0, -1));
+bindHold('dLeft', () => tryMove(-1, 0));
+bindHold('dRight', () => tryMove(1, 0));
+
+document.getElementById('btnStart').addEventListener('click', startGame);
+document.getElementById('btnContinue').addEventListener('click', continueGame);
+document.getElementById('btnNextLevel').addEventListener('click', nextLevel);
+document.getElementById('btnRestart').addEventListener('click', startGame);
+
+/* ---------------------- WebXR: entry button and controller input ---------------------- */
+let xrSession = null;
+let lastXRMove = 0;
+
+async function setupVRButton() {
+  const btn = document.getElementById('vrButton');
+  if (!('xr' in navigator)) {
+    btn.textContent = '🥽 VR not available in this browser';
+    btn.disabled = true;
+    return;
+  }
+  try {
+    const supported = await navigator.xr.isSessionSupported('immersive-vr');
+    if (!supported) {
+      btn.textContent = '🥽 VR not supported here (use desktop mode)';
+      btn.disabled = true;
+      return;
+    }
+    btn.textContent = '🥽 Enter VR';
+    btn.addEventListener('click', onVRButtonClick);
+  } catch (e) {
+    btn.textContent = '🥽 VR not available';
+    btn.disabled = true;
+  }
+}
+
+async function onVRButtonClick() {
+  const btn = document.getElementById('vrButton');
+  if (!xrSession) {
+    try {
+      const session = await navigator.xr.requestSession('immersive-vr', {
+        optionalFeatures: ['local-floor', 'bounded-floor'],
+      });
+      session.addEventListener('end', onXRSessionEnded);
+      await renderer.xr.setSession(session);
+      xrSession = session;
+      btn.textContent = '🥽 Exit VR';
+    } catch (e) {
+      btn.textContent = '🥽 Could not start VR';
+    }
+  } else {
+    xrSession.end();
+  }
+}
+function onXRSessionEnded() {
+  xrSession = null;
+  document.getElementById('vrButton').textContent = '🥽 Enter VR';
+}
+
+// Reads the controllers' thumbstick to move the player one cell at a time.
+function pollXRInput(nowMs) {
+  const session = renderer.xr.getSession();
+  if (!session) return;
+  for (const source of session.inputSources) {
+    if (!source.gamepad) continue;
+    const axes = source.gamepad.axes;
+    if (axes.length < 2) continue;
+    const x = axes[axes.length - 2] || 0;
+    const y = axes[axes.length - 1] || 0;
+    if (nowMs - lastXRMove < XR_MOVE_COOLDOWN) continue;
+    if (y < -0.6) { tryMove(0, 1); lastXRMove = nowMs; }
+    else if (y > 0.6) { tryMove(0, -1); lastXRMove = nowMs; }
+    else if (x < -0.6) { tryMove(-1, 0); lastXRMove = nowMs; }
+    else if (x > 0.6) { tryMove(1, 0); lastXRMove = nowMs; }
+  }
+}
+
+/* ---------------------- Camera (desktop mode) and dolly (VR) ---------------------- */
+function updateDesktopCamera() {
+  const desired = new THREE.Vector3(player.mesh.position.x * 0.35, 5.4, player.mesh.position.z + 6.5);
+  camera.position.lerp(desired, 0.08);
+  camera.lookAt(player.mesh.position.x * 0.35, 0.5, player.mesh.position.z - 2.5);
+}
+function updateXRDolly() {
+  const desired = new THREE.Vector3(player.mesh.position.x, 0, player.mesh.position.z + 2.2);
+  dolly.position.lerp(desired, 0.15);
+}
+
+/* ---------------------- Main loop ---------------------- */
+let lastAutosave = 0;
+function animate(nowMs) {
+  const delta = 1 / 60; // fixed step, plenty accurate for this game
+  riverTexture.offset.x += delta * 0.5;
+  updateSkyClouds(nowMs, delta);
+
+  if (state.gameState === 'playing') {
+    updatePlayerMovementAnim(nowMs);
+    updateLanes(nowMs, delta);
+    if (!player.moving) updateWobble(player.mesh, nowMs); // idle bounce, only while standing still
+    checkCollisions();
+    checkRiver(delta * 1000);
+
+    if (renderer.xr.isPresenting) {
+      pollXRInput(nowMs);
+      updateXRDolly();
+    } else {
+      updateDesktopCamera();
+    }
+
+    if (nowMs - lastAutosave > AUTOSAVE_INTERVAL) {
+      lastAutosave = nowMs;
+      saveProgress();
+    }
+  }
+  renderer.render(scene, camera);
+}
+renderer.setAnimationLoop(animate);
+
+/* ---------------------- Resize ---------------------- */
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+/* ---------------------- Startup ---------------------- */
+let lastSavedProgress = null;
+initLevel(1);
+state.gameState = 'menu';
+setupVRButton();
+(async function initApp() {
+  lastSavedProgress = await loadProgress();
+  const continueBtn = document.getElementById('btnContinue');
+  const startBtn = document.getElementById('btnStart');
+  if (lastSavedProgress && lastSavedProgress.level > 1) {
+    continueBtn.classList.remove('hidden');
+    continueBtn.textContent = `▶️ Continue — Level ${lastSavedProgress.level}`;
+    startBtn.textContent = '🔄 New Game';
+    state.bestScore = lastSavedProgress.bestScore || 0;
+  }
+})();
+</script>
+</body>
+</html>
