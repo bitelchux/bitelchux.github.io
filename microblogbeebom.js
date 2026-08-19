@@ -1174,7 +1174,7 @@ function inyectaSmartLink() {
     //richads "https://11745.xml.4armn.com/direct-link-v2?pubid=798270&siteid=330240&linkid=2035",
     //monetag "https://omg10.com/4/10456283"
     //hilltopads
-    "https://fluffy-machine.com/GZpJ18"
+    //"https://fluffy-machine.com/GZpJ18"
   ];
   
   var popunder = {
