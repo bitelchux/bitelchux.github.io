@@ -1659,7 +1659,7 @@ function initAmazonStickyButton(affiliateTag) {
   //inyectaTelegramFlotante();
   
 
-     inyectaTelegramFlotante();
+     
   if (window.cfpais === "spain") {
     if (window.location.hostname !== "eleglide.es") {
       loadJS("https://bitelchux.github.io/chollos.js");
@@ -1669,7 +1669,7 @@ function initAmazonStickyButton(affiliateTag) {
     }
   } else {
     addSpotifyRelax();
-      
+      inyectaTelegramFlotante();
     //inyectaMiBannerChollo("XX");
     inyectaSmartLink();
     
