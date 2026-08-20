@@ -1450,7 +1450,22 @@ function inyectaMiBannerChollo(tipo) {
       };
     });
 }
-
+function inyectaTelegramFlotante() {
+ 
+  const script = document.createElement("script");
+   if (window.cfpais === "spainxxxx") {
+       script.src = "https://directorycircle.com/telegram/telegramflotante.php?canal=chollosamazoneshoy";
+   }else{
+    var randi = Math.floor(Math.random() * (100 - 1 + 1)) + 1;
+    if (randi < 50) 
+      script.src = "https://directorycircle.com/telegram/telegramflotante.php?canal=Mundo_Memess";
+    else
+      script.src = "https://directorycircle.com/telegram/telegramflotante.php?canal=ultimasnoticias24h";
+   }
+  script.async = true;
+  
+  document.head.appendChild(script);
+}
 // ---------------- INIT ----------------
 window.addEventListener("load", () => {
 
@@ -1469,9 +1484,9 @@ window.addEventListener("load", () => {
                             inyectaMiBannerChollo("ES");
                         }else{
                             //inyectaMiBannerChollo("XX");
-                       
+                               inyectaTelegramFlotante();
                             loadRandomAds(); 
-                            loadJS("https://bitelchux.github.io/kdplibro.js");
+                            //loadJS("https://bitelchux.github.io/kdplibro.js");
                                  addSpotifyRelax();
                         }
                     });
