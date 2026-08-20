@@ -1,46 +1,5 @@
 
-function autoFixImages() {
-    // Servidor actual (equivalente a $_SERVER['SERVER_NAME'])
-    const serverName = window.location.hostname || 'localhost';
 
-    // Función que genera la URL de reemplazo de Zapier
-    const getFallbackUrl = (titulo) => {
-        const cleanTitle = encodeURIComponent(titulo || document.title || 'Imagen');
-        return `https://zapier.fromthesource.link/cdnimages/index.php?from=${encodeURIComponent(serverName)}&title=${cleanTitle}`;
-    };
-
-    // 1. Escuchar errores globales de carga en imágenes (evento en fase de captura)
-    document.addEventListener('error', function (event) {
-        const img = event.target;
-
-        // Verificar que sea una etiqueta <img> y que no sea ya una de Zapier
-        if (img.tagName === 'IMG' && !img.src.includes('zapier.fromthesource.link')) {
-            const titulo = img.alt || img.title || '';
-            img.src = getFallbackUrl(titulo);
-        }
-    }, true);
-
-    // 2. Revisar imágenes que ya estén en la página con 'src' vacío o roto
-    document.querySelectorAll('img').forEach(img => {
-        // Ignorar las que ya son de Zapier
-        if (img.src.includes('zapier.fromthesource.link')) return;
-
-        const src = (img.getAttribute('src') || '').trim();
-        const titulo = img.alt || img.title || '';
-
-        // Si el src está vacío directamente le asignamos el fallback
-        if (!src) {
-            img.src = getFallbackUrl(titulo);
-        }
-    });
-}
-
-// Ejecutar automáticamente al cargar el DOM
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', autoFixImages);
-} else {
-    autoFixImages();
-}
 function addSpotifyRelax() {
 
     if (document.getElementById('spotify-relax-dialog')) return;
