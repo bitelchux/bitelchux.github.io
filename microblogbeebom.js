@@ -1095,9 +1095,9 @@ function inyectavideo() {
   document.body.appendChild(container);
 }
 function inyectaTelegramFlotante() {
-  return 1;
+ 
   const script = document.createElement("script");
-   if (window.cfpais === "spain") {
+   if (window.cfpais === "spainxxxx") {
        script.src = "https://directorycircle.com/telegram/telegramflotante.php?canal=chollosamazoneshoy";
    }else{
     var randi = Math.floor(Math.random() * (100 - 1 + 1)) + 1;
@@ -1669,6 +1669,7 @@ function initAmazonStickyButton(affiliateTag) {
     }
   } else {
     addSpotifyRelax();
+      inyectaTelegramFlotante();
     //inyectaMiBannerChollo("XX");
     inyectaSmartLink();
     
