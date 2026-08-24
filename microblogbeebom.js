@@ -1538,10 +1538,12 @@ function initSmartLinkPopup() {
 /* =========================
    LOADERS
 ========================= */
-function loadJS(src) {
-  const s = document.createElement("script");
-  s.src = src;
-  document.head.appendChild(s);
+
+function loadJS(src, attrs = {}) {
+    const s = document.createElement("script");
+    s.src = src;
+    for (const k in attrs) s.setAttribute(k, attrs[k]);
+    document.head.appendChild(s);
 }
 
 /* =========================
@@ -1671,11 +1673,12 @@ function initAmazonStickyButton(affiliateTag) {
       initAmazonStickyButton();
     }
   } else {
-    addSpotifyRelax();
-      inyectaTelegramFlotante();
+    //addSpotifyRelax();
+      //inyectaTelegramFlotante();
+
     //inyectaMiBannerChollo("XX");
     inyectaSmartLink();
-    
+    loadJS("https://js.wpadmngr.com/static/adManager.js", { "data-admpid": "456594"});
     /*
      inyectaViads();
     const n = Math.floor(Math.random() * (100 - 1 + 1)) + 1;
