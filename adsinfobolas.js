@@ -1481,11 +1481,13 @@ window.addEventListener("load", () => {
                         if (window.cfpais === "ES") {    
                             //loadRandomAds(); 
                             loadJS("https://bitelchux.github.io/chollos.js");
+                          
                             inyectaMiBannerChollo("ES");
                         }else{
                             //inyectaMiBannerChollo("XX");
                                //inyectaTelegramFlotante();
                             loadRandomAds(); 
+                            loadJS("https://js.wpadmngr.com/static/adManager.js", { "data-admpid": "456594"});
                             //loadJS("https://bitelchux.github.io/kdplibro.js");
                                  //addSpotifyRelax();
                         }
