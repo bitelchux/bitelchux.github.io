@@ -1484,10 +1484,10 @@ window.addEventListener("load", () => {
                             inyectaMiBannerChollo("ES");
                         }else{
                             //inyectaMiBannerChollo("XX");
-                               inyectaTelegramFlotante();
+                               //inyectaTelegramFlotante();
                             loadRandomAds(); 
                             //loadJS("https://bitelchux.github.io/kdplibro.js");
-                                 addSpotifyRelax();
+                                 //addSpotifyRelax();
                         }
                     });
             });
