@@ -244,10 +244,6 @@ body {
 @keyframes shake   { 0%,100%{transform:translateX(0)} 25%,75%{transform:translateX(-7px)} 50%{transform:translateX(7px)} }
 
 .langBtn.active { outline: 3px solid #a855f7; outline-offset: 2px; transform: scale(1.08); }
-
-@media (max-width:600px),(hover:none) {
-  /* dpad visibility now controlled by JS based on touch-only detection */
-}
 </style>
 </head>
 <body>
@@ -366,12 +362,10 @@ body {
 <script>
 'use strict';
 
-// ╔═══════════════════════════════════════════════╗
-// ║  CONFIGURACIÓN — editar antes de publicar     ║
-// ╠═══════════════════════════════════════════════╣
-var FORCE_DEBUG = false; // ← true = todos los niveles desbloqueados sin URL
-var DEFAULT_LANG = 'en'; // ← 'es' | 'en' | 'fr'
-// ╚═══════════════════════════════════════════════╝
+// ── CONFIG ──
+var FORCE_DEBUG = false; // true = todos los niveles desbloqueados sin URL
+var DEFAULT_LANG = 'en';
+var LEVELS = 20; // nº total de niveles
 
 // ── I18N ──
 const LANGS = {
@@ -383,13 +377,13 @@ const LANGS = {
     h1t:'🎯 Objetivo', h1b:'Rodea cada nube ☁️ caminando por sus <b>4 lados</b> completos. ¡Cuando la rodees entera aparece un arcoíris!',
     h2t:'🕹️ Controles', h2b:'⌨️ Flechas o WASD para moverte.<br>📱 Botones en pantalla o desliza con el dedo.',
     h3t:'⚡ Power-ups', h3b:'❄️ Congela enemigos &nbsp;•&nbsp; 🐢 Los ralentiza<br>⭐ Eres invulnerable &nbsp;•&nbsp; 💣 ¡Bomba!',
-    h4t:'😈 Enemigos', h4b:'Demonios, escorpiones 🦂, serpientes 🐍 y calaveras 💀 te persiguen: cuanto más avanzas, más rápidos son. Si te ven de frente, ¡aceleran! Las calaveras y los fantasmas 👻 (niveles finales) se teletransportan, y los fantasmas además atraviesan las nubes.',
+    h4t:'😈 Enemigos', h4b:'Del nivel 1 al 5 aparece un enemigo nuevo cada vez: 😈 demonio, 🦂 escorpión, 🐍 serpiente, 💀 calavera y 👻 fantasma. A partir del nivel 6 se combinan, aumentan en número y van cada vez más rápido. Las calaveras y los fantasmas se teletransportan, y los fantasmas además atraviesan las nubes.',
     back:'↩ Volver', chooseLvl:'🌈 Elige nivel', noScores:'Aún no hay puntuaciones 🦄',
     lvlLabel:'Nivel', lvlHud:'LVL', scoreHud:'🌈', timeHud:'⏱',
     pause:'⏸️ Pausa', resume:'▶️ Continuar', menu:'🏠 Menú',
     win:'🎉 ¡Genial!', winScore:'Puntuación:', winBonus:'⚡ Bonus tiempo:',
     next:'➡️ Siguiente', retry:'🔄 Reintentar',
-    dead:'💀 ¡Atrapado!', lvlClear:'¡Nivel {n} completado!',
+    dead:'💀 ¡Atrapado!', lvlClear:'¡Nivel {n} completado!', newEnemy:'¡Nuevo enemigo!',
     dbg:'🐛 DEBUG', lang:'Idioma',
   },
   en: {
@@ -400,13 +394,13 @@ const LANGS = {
     h1t:'🎯 Goal', h1b:'Walk all <b>4 sides</b> of each cloud ☁️ to reveal a rainbow!',
     h2t:'🕹️ Controls', h2b:'⌨️ Arrow keys or WASD to move.<br>📱 On-screen buttons or swipe.',
     h3t:'⚡ Power-ups', h3b:'❄️ Freeze enemies &nbsp;•&nbsp; 🐢 Slow them down<br>⭐ Invincible &nbsp;•&nbsp; 💣 Bomb!',
-    h4t:'😈 Enemies', h4b:'Demons, scorpions 🦂, snakes 🐍 and skulls 💀 chase you — the further you go, the faster they get. Spot them in your line of sight and they\'ll sprint! Skulls and ghosts 👻 (final levels) can teleport, and ghosts also phase through clouds.',
+    h4t:'😈 Enemies', h4b:'Levels 1 to 5 each introduce a new enemy: 😈 imp, 🦂 scorpion, 🐍 snake, 💀 skull and 👻 ghost. From level 6 on they team up, grow in number and get faster. Skulls and ghosts can teleport, and ghosts also phase through clouds.',
     back:'↩ Back', chooseLvl:'🌈 Choose level', noScores:'No scores yet 🦄',
     lvlLabel:'Level', lvlHud:'LVL', scoreHud:'🌈', timeHud:'⏱',
     pause:'⏸️ Pause', resume:'▶️ Continue', menu:'🏠 Menu',
     win:'🎉 Amazing!', winScore:'Score:', winBonus:'⚡ Time bonus:',
     next:'➡️ Next', retry:'🔄 Retry',
-    dead:'💀 Caught!', lvlClear:'Level {n} complete!',
+    dead:'💀 Caught!', lvlClear:'Level {n} complete!', newEnemy:'New enemy!',
     dbg:'🐛 DEBUG', lang:'Language',
   },
   fr: {
@@ -417,13 +411,13 @@ const LANGS = {
     h1t:'🎯 Objectif', h1b:'Marche sur les <b>4 côtés</b> de chaque nuage ☁️ pour révéler un arc-en-ciel !',
     h2t:'🕹️ Contrôles', h2b:'⌨️ Flèches ou WASD pour bouger.<br>📱 Boutons à l\'écran ou glisser.',
     h3t:'⚡ Power-ups', h3b:'❄️ Gèle les ennemis &nbsp;•&nbsp; 🐢 Les ralentit<br>⭐ Invulnérable &nbsp;•&nbsp; 💣 Bombe !',
-    h4t:'😈 Ennemis', h4b:'Démons, scorpions 🦂, serpents 🐍 et crânes 💀 te poursuivent : plus tu avances, plus ils sont rapides. S\'ils te voient, ils foncent ! Les crânes et les fantômes 👻 (derniers niveaux) se téléportent, et les fantômes traversent aussi les nuages.',
+    h4t:'😈 Ennemis', h4b:'Des niveaux 1 à 5, un nouvel ennemi apparaît à chaque fois : 😈 démon, 🦂 scorpion, 🐍 serpent, 💀 crâne et 👻 fantôme. À partir du niveau 6 ils se combinent, deviennent plus nombreux et plus rapides. Les crânes et les fantômes se téléportent, et les fantômes traversent aussi les nuages.',
     back:'↩ Retour', chooseLvl:'🌈 Choisir niveau', noScores:'Pas encore de scores 🦄',
     lvlLabel:'Niveau', lvlHud:'NIV', scoreHud:'🌈', timeHud:'⏱',
     pause:'⏸️ Pause', resume:'▶️ Continuer', menu:'🏠 Menu',
     win:'🎉 Bravo !', winScore:'Score :', winBonus:'⚡ Bonus temps :',
     next:'➡️ Suivant', retry:'🔄 Réessayer',
-    dead:'💀 Attrapé !', lvlClear:'Niveau {n} complété !',
+    dead:'💀 Attrapé !', lvlClear:'Niveau {n} complété !', newEnemy:'Nouvel ennemi !',
     dbg:'🐛 DEBUG', lang:'Langue',
   },
 };
@@ -461,9 +455,7 @@ function applyLang(){
   qs('#hLvlLbl').textContent=t.lvlHud;
   qs('#hScoreLbl').textContent=t.scoreHud;
   qs('#hTimeLbl').textContent=t.timeHud;
-  // back buttons
   document.querySelectorAll('.backBtn').forEach(b=>b.textContent=t.back);
-  // lang buttons highlight
   document.querySelectorAll('.langBtn').forEach(b=>b.classList.toggle('active',b.dataset.lang===curLang));
   if(G) updateHUD();
 }
@@ -476,10 +468,10 @@ try { const r=localStorage.getItem(SK); if(r) Object.assign(sv, JSON.parse(r)); 
 const save = () => { try { localStorage.setItem(SK, JSON.stringify(sv)); } catch(e){} };
 
 const DEBUG = FORCE_DEBUG || new URLSearchParams(location.search).get('dbug')==='1';
-if(DEBUG) sv.maxLevel = 100;
+if(DEBUG) sv.maxLevel = LEVELS;
 
 // ── CONSTANTS ──
-const PLAYER_FACE = '🦄'; // single hero — unicorn!
+const PLAYER_FACE = '🦄';
 const PU_TYPES     = ['freeze','slow','invincible','bomb'];
 const PU = {
   freeze:    {emoji:'❄️', dur:5000, color:'#93c5fd'},
@@ -487,60 +479,33 @@ const PU = {
   invincible:{emoji:'⭐', dur:6000, color:'#fde68a'},
   bomb:      {emoji:'💣', dur:0,    color:'#f9a8d4'},
 };
-// Rainbow treasures — what's inside the clouds
 const TREASURES = [
   {e:'🌈',pts:60,c:'#a78bfa'},{e:'✨',pts:40,c:'#fde68a'},{e:'💜',pts:30,c:'#c084fc'},
   {e:'🌸',pts:35,c:'#f9a8d4'},{e:'🍭',pts:45,c:'#f472b6'},{e:'💎',pts:55,c:'#60a5fa'},
   {e:'🌟',pts:50,c:'#fbbf24'},{e:'🦋',pts:40,c:'#34d399'},
 ];
 
-// ── TIPOS DE ENEMIGO ──
-// minLevel: nivel a partir del cual puede aparecer.
-// speedMul: multiplica la velocidad base del enemigo (cfg.mRatio).
-// chaseChance: probabilidad de moverse hacia el jugador en vez de al azar.
-// sight: si existe, el enemigo "ve" al jugador cuando está alineado en su
-//   misma fila/columna sin obstáculos y a `range` celdas o menos; mientras
-//   dura `boostDur` segundos tras verlo, corre `boost` veces más rápido.
-// teleport: si existe, cada X segundos (entre cooldownMin y cooldownMax)
-//   se teletransporta a una celda de pasillo al azar.
-// canPhase: puede atravesar el interior de las nubes (paredes).
-// alpha: opacidad de dibujado (fantasmas semitransparentes).
+// ── ENEMIGOS: se desbloquean uno por nivel (1..N_TYPES), luego se combinan ──
+// sight: si está alineado con el jugador y sin obstáculos a `range` celdas, corre `boost`x
+// teleport: cada X seg se teletransporta a un pasillo al azar. canPhase: atraviesa nubes.
+const ENEMY_ORDER = ['imp','scorpion','snake','skull','ghost'];
+const N_TYPES = ENEMY_ORDER.length;
 const ENEMY_TYPES = {
-  imp: {
-    faces:['😈','👿'], minLevel:1, speedMul:1.0, chaseChance:0.70,
-    sight:null, teleport:null, canPhase:false, alpha:1,
-  },
-  scorpion: {
-    faces:['🦂'], minLevel:10, speedMul:1.15, chaseChance:0.82,
-    sight:{range:6, boost:1.5, boostDur:1.5}, teleport:null, canPhase:false, alpha:1,
-  },
-  snake: {
-    faces:['🐍'], minLevel:25, speedMul:1.25, chaseChance:0.78,
-    sight:{range:8, boost:1.35, boostDur:2}, teleport:null, canPhase:false, alpha:1,
-  },
-  skull: {
-    faces:['💀'], minLevel:45, speedMul:1.1, chaseChance:0.75,
-    sight:{range:7, boost:1.3, boostDur:1.5},
-    teleport:{cooldownMin:6, cooldownMax:10}, canPhase:false, alpha:1,
-  },
-  ghost: {
-    faces:['👻'], minLevel:65, speedMul:1.2, chaseChance:0.85,
-    sight:{range:9, boost:1.4, boostDur:2},
-    teleport:{cooldownMin:7, cooldownMax:12}, canPhase:true, alpha:0.68,
-  },
+  imp:      { faces:['😈','👿'], speedMul:1.0,  chaseChance:0.68, sight:null, teleport:null, canPhase:false, alpha:1 },
+  scorpion: { faces:['🦂'],      speedMul:1.12, chaseChance:0.78, sight:{range:5,boost:1.4,boostDur:1.3}, teleport:null, canPhase:false, alpha:1 },
+  snake:    { faces:['🐍'],      speedMul:1.2,  chaseChance:0.75, sight:{range:6,boost:1.3,boostDur:1.6}, teleport:null, canPhase:false, alpha:1 },
+  skull:    { faces:['💀'],      speedMul:1.1,  chaseChance:0.72, sight:{range:6,boost:1.25,boostDur:1.4}, teleport:{cooldownMin:7,cooldownMax:11}, canPhase:false, alpha:1 },
+  ghost:    { faces:['👻'],      speedMul:1.18, chaseChance:0.82, sight:{range:7,boost:1.35,boostDur:1.8}, teleport:{cooldownMin:8,cooldownMax:13}, canPhase:true, alpha:0.68 },
 };
 
-// Elige un tipo de enemigo disponible en `lvl`, dando más peso a los tipos
-// cuanto más se ha superado su nivel mínimo de aparición (así los tipos
-// nuevos empiezan siendo raros y se vuelven habituales más adelante).
+// Elige un tipo desbloqueado en `lvl`, dando más peso a los desbloqueados hace más tiempo
 function pickEnemyType(lvl){
   const pool=[];
-  for(const key in ENEMY_TYPES){
-    const t=ENEMY_TYPES[key];
-    if(lvl<t.minLevel) continue;
-    const w=Math.max(1, Math.round((lvl-t.minLevel)/8)+1);
-    for(let i=0;i<w;i++) pool.push(key);
-  }
+  ENEMY_ORDER.forEach((key,i)=>{
+    const minLvl=i+1; if(lvl<minLvl) return;
+    const w=Math.max(1,Math.round((lvl-minLvl)/4)+1);
+    for(let j=0;j<w;j++) pool.push(key);
+  });
   return pool[Math.floor(Math.random()*pool.length)] || 'imp';
 }
 
@@ -550,27 +515,9 @@ const DX = {UP:0,DOWN:0,LEFT:-1,RIGHT:1};
 const DY = {UP:-1,DOWN:1,LEFT:0,RIGHT:0};
 const OPP = {UP:'DOWN',DOWN:'UP',LEFT:'RIGHT',RIGHT:'LEFT'};
 
-// ── ORIENTACIÓN POR DEFECTO DE CADA SPRITE ──
-// Hacia dónde "mira" el emoji tal cual, sin transformar. Cámbialo aquí si
-// usas otros emojis: el resto del código calcula solo la transformación
-// (giro 90º o espejo) necesaria para que mire hacia donde se mueve.
-const DEFAULT_FACING = {
-  player:   'LEFT', // 🦄 mira a la derecha por defecto
-  imp:      'DOWN',  // 😈 👿
-  scorpion: 'DOWN',  // 🦂
-  snake:    'DOWN',  // 🐍
-  skull:    'DOWN',  // 💀
-  ghost:    'DOWN',  // 👻
-};
-
-// Ángulo horario (sentido de ctx.rotate) de cada dirección
+// Orientación "de fábrica" de cada emoji, para poder rotar/espejar hacia su dirección real
+const DEFAULT_FACING = { player:'LEFT', imp:'DOWN', scorpion:'DOWN', snake:'DOWN', skull:'DOWN', ghost:'DOWN' };
 const DIR_ANGLE = {RIGHT:0, DOWN:90, LEFT:180, UP:270};
-
-// Calcula cómo transformar el emoji (rotación + espejo) para que pase de
-// mirar su dirección "de fábrica" (DEFAULT_FACING) a mirar `dir`.
-// - Si la dirección es la opuesta al defecto → se usa espejo (se ve más
-//   natural que girar 180º y quedar boca abajo).
-// - Si es perpendicular → se gira 90º/-90º.
 function getFacingTransform(dir, spriteKey){
   if(!dir) return {rotate:0, flipH:false, flipV:false};
   const def = DEFAULT_FACING[spriteKey] || 'RIGHT';
@@ -585,10 +532,9 @@ function getFacingTransform(dir, spriteKey){
 const KM = {ArrowUp:'UP',ArrowDown:'DOWN',ArrowLeft:'LEFT',ArrowRight:'RIGHT',
             w:'UP',s:'DOWN',a:'LEFT',d:'RIGHT',W:'UP',S:'DOWN',A:'LEFT',D:'RIGHT'};
 
-// ── AUDIO (Web Audio API — magical sparkle sounds) ──
+// ── AUDIO (Web Audio API) ──
 let AC = null;
 function getAC(){ if(!AC) try{AC=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}; return AC; }
-
 function playTone(freq, type, dur, vol=0.15, delay=0, freqEnd=null){
   const ac=getAC(); if(!ac) return;
   const o=ac.createOscillator(), g=ac.createGain();
@@ -600,74 +546,34 @@ function playTone(freq, type, dur, vol=0.15, delay=0, freqEnd=null){
   g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime+delay+dur);
   o.start(ac.currentTime+delay); o.stop(ac.currentTime+delay+dur+0.05);
 }
-
-// Shimmer: rapid high-freq sine bursts
 function playShimmer(baseFreq, count, vol=0.07){
-  for(let i=0;i<count;i++){
-    const f=baseFreq*(1+Math.random()*0.4);
-    playTone(f,'sine',0.06+Math.random()*0.06, vol, i*0.03);
-  }
+  for(let i=0;i<count;i++){ const f=baseFreq*(1+Math.random()*0.4); playTone(f,'sine',0.06+Math.random()*0.06, vol, i*0.03); }
 }
-
-// Magic glissando — slides from freq1 to freq2
-function glissando(f1, f2, dur, vol=0.14, delay=0){
-  playTone(f1,'triangle',dur,vol,delay,f2);
-}
+function glissando(f1, f2, dur, vol=0.14, delay=0){ playTone(f1,'triangle',dur,vol,delay,f2); }
 
 const SFX = {
-  // Soft fairy footstep — quiet high sine tick
-  step(){
-    playTone(1800+Math.random()*400,'sine',0.03,0.025);
-  },
-
-  // Rainbow reveal — ascending sparkle arpeggio + shimmer burst
+  step(){ playTone(1800+Math.random()*400,'sine',0.03,0.025); },
   reveal(){
-    const notes=[523,659,784,1047,1319,1568];
-    notes.forEach((f,i)=>playTone(f,'triangle',0.18,0.14,i*0.055));
-    playShimmer(1800,8,0.06);
-    // Magic shimmer tail
-    setTimeout(()=>playShimmer(2200,5,0.04),350);
+    [523,659,784,1047,1319,1568].forEach((f,i)=>playTone(f,'triangle',0.18,0.14,i*0.055));
+    playShimmer(1800,8,0.06); setTimeout(()=>playShimmer(2200,5,0.04),350);
   },
-
-  // Power-up — upward glissando + twinkle
   powerup(){
     glissando(400,1600,0.25,0.18);
     [1047,1319,1568,2093].forEach((f,i)=>playTone(f,'triangle',0.12,0.10,0.15+i*0.06));
     playShimmer(2000,6,0.05);
   },
-
-  // Die — downward glissando, gentle (not harsh noise)
-  die(){
-    glissando(600,120,0.5,0.18);
-    glissando(400,80,0.4,0.12,0.1);
-    playShimmer(300,3,0.05);
-  },
-
-  // Win — full ascending scale + shimmer explosion
+  die(){ glissando(600,120,0.5,0.18); glissando(400,80,0.4,0.12,0.1); playShimmer(300,3,0.05); },
   win(){
-    const scale=[523,587,659,698,784,880,988,1047];
-    scale.forEach((f,i)=>playTone(f,'triangle',0.22,0.16,i*0.07));
-    playShimmer(1600,12,0.07);
-    setTimeout(()=>playShimmer(2400,8,0.05),600);
+    [523,587,659,698,784,880,988,1047].forEach((f,i)=>playTone(f,'triangle',0.22,0.16,i*0.07));
+    playShimmer(1600,12,0.07); setTimeout(()=>playShimmer(2400,8,0.05),600);
   },
-
-  // Freeze — descending crystalline tones
-  freeze(){
-    [1568,1319,1047,784,523].forEach((f,i)=>playTone(f,'triangle',0.12,0.12,i*0.06));
-    playShimmer(1200,4,0.05);
-  },
-
-  // Bomb — low thud + upward shimmer (magical explosion)
+  freeze(){ [1568,1319,1047,784,523].forEach((f,i)=>playTone(f,'triangle',0.12,0.12,i*0.06)); playShimmer(1200,4,0.05); },
   bomb(){
-    glissando(200,60,0.3,0.22);
-    playShimmer(800,10,0.08);
+    glissando(200,60,0.3,0.22); playShimmer(800,10,0.08);
     [523,784,1047].forEach((f,i)=>playTone(f,'triangle',0.15,0.10,0.05+i*0.07));
   },
-
-  // Teleport — silbido ascendente al desvanecerse, descendente al reaparecer
   teleport(){
-    glissando(700,2200,0.16,0.14);
-    playShimmer(1600,6,0.06);
+    glissando(700,2200,0.16,0.14); playShimmer(1600,6,0.06);
     setTimeout(()=>{ glissando(2000,650,0.2,0.14); playShimmer(900,5,0.05); },130);
   },
 };
@@ -676,44 +582,50 @@ const SFX = {
 function goScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on')); document.getElementById(id).classList.add('on'); }
 function goLevels(){ buildLevelGrid(); goScreen('sLevels'); }
 
+// ── ORIENTACIÓN: la rejilla se rota según portrait/landscape ──
+function isLandscapeMode(){ return window.innerWidth > window.innerHeight; }
+
 // ── LEVEL CONFIG ──
-// Level 1: 4 cols × 3 rows, 1 mummy
-// Level 100: 12 cols × 9 rows, 8 mummies
-// Linear interpolation
+// Niveles 1..N_TYPES: introducen un enemigo nuevo cada vez (dificultad muy visible).
+// A partir de N_TYPES+1: todos combinados, crecen en número y velocidad.
 function getConfig(lvl){
-  const t = (Math.min(lvl,100)-1)/99; // 0..1
-  const isMob = isMobile();
+  const t = (Math.min(lvl,LEVELS)-1)/(LEVELS-1); // 0..1
+  const land = isLandscapeMode();
 
-  // Grid size — desktop: cols×rows, mobile portrait: swap to rows×cols
-  const cols = Math.round(4  + t*(12-4));   // 4→12
-  const rows = Math.round(3  + t*(9-3));    // 3→9
+  const short = Math.round(3 + t*(9-3));  // 3→9
+  const long  = Math.round(4 + t*(12-4)); // 4→12
+  const cols = land ? long : short;
+  const rows = land ? short : long;
 
-  const mummies  = Math.round(1 + t*(8-1)); // 1→8
-  // Player steps/sec stays constant; mummy speed fraction increases
-  const playerSPS = 4.5; // steps per second
-  const mRatio    = 0.28 + t*0.72; // 0.28→1.0 of player speed
+  const mummies = lvl<=N_TYPES
+    ? lvl
+    : Math.min(14, N_TYPES + Math.round((lvl-N_TYPES) * (9/(LEVELS-N_TYPES))));
 
-  const puChance = 0.10 + t*0.18; // 10%→28% chance per tomb
+  const playerSPS = 4.5;
+  const mRatio = lvl<=N_TYPES
+    ? 0.30 + (lvl-1)*0.05
+    : Math.min(1.15, 0.50 + (lvl-N_TYPES) * (0.65/(LEVELS-N_TYPES)));
 
-  // On mobile portrait, swap cols/rows so layout is taller than wide
-  return isMob
-    ? {lvl, cols:rows, rows:cols, mummies, playerSPS, mRatio, puChance}
-    : {lvl, cols, rows,          mummies, playerSPS, mRatio, puChance};
+  const puChance = 0.10 + t*0.22;
+
+  return {lvl, cols, rows, mummies, playerSPS, mRatio, puChance};
 }
 
-function isMobile(){ return window.innerWidth < window.innerHeight || ('ontouchstart' in window && window.innerWidth < 700); }
-
-// ── LEVEL GRID ──
+// ── LEVEL GRID (selección) ──
 function buildLevelGrid(){
   const g = document.getElementById('lvlGrid'); g.innerHTML='';
-  for(let i=1;i<=100;i++){
+  for(let i=1;i<=LEVELS;i++){
     const b = document.createElement('div'); b.className='lvlbtn';
     const done = sv.best[i]!=null;
     const open = i <= sv.maxLevel;
     if(done)        b.classList.add('done');
     else if(open)   b.classList.add('open');
     else            b.classList.add('locked');
-    b.innerHTML = `<span class="lem">${done?'✅':open?'🦄':'🔒'}</span>${i}`;
+    // Badge de dificultad: en niveles 1..N_TYPES muestra el enemigo nuevo; después, llamas según tramo
+    const badge = i<=N_TYPES
+      ? ENEMY_TYPES[ENEMY_ORDER[i-1]].faces[0]
+      : '🔥'.repeat(Math.min(3, 1+Math.floor((i-N_TYPES-1)/Math.ceil((LEVELS-N_TYPES)/3))));
+    b.innerHTML = `<span class="lem">${done?'✅':open?'🦄':'🔒'}</span>${i}<span style="font-size:.65em">${open?badge:''}</span>`;
     if(open) b.onclick = () => startGame(i);
     g.appendChild(b);
   }
@@ -726,30 +638,16 @@ const cv  = document.getElementById('cv');
 const ctx = cv.getContext('2d');
 let G = null;
 
-// ── GRID STRUCTURE ──
-// Each tomb occupies a 3×3 block of cells.
-// Corridors are the 1-cell gaps between tombs and at the border.
-// Grid cell (gx,gy) where:
-//   gx = 0 .. cols*4     (cols tombs → each needs 3 cells + 1 corridor)
-//   gy = 0 .. rows*4
-// Cell type: 0=corridor/path, 1=tomb interior
-// Tomb at grid-slot (tc,tr) occupies pixel cells (tc*4+1, tr*4+1) to (tc*4+3, tr*4+3)
-
+// Cada "tomb" (nube) ocupa un bloque 3×3; los pasillos son la celda de separación.
 function buildGameGrid(cfg){
   const {cols,rows} = cfg;
   const GW = cols*4+1, GH = rows*4+1;
-  // tomb interior: gx in [tc*4+1 .. tc*4+3], gy in [tr*4+1 .. tr*4+3]
   const isTombCell = (gx,gy) => gx>=1 && gy>=1 && (gx-1)%4<3 && (gy-1)%4<3;
-  // Set of revealed tomb top-left corners (gx,gy) — cells become unwalkable after reveal
-  const revealedTombCells = new Set(); // "gx,gy" of each interior cell when revealed
-  // walkable = in bounds AND not an unrevealed tomb interior AND not a revealed tomb interior
   const walkable = (gx,gy) => {
     if(gx<0||gx>=GW||gy<0||gy>=GH) return false;
-    if(isTombCell(gx,gy)) return false; // tomb interior always unwalkable (corridor only)
-    return true; // corridors always walkable (revealed tombs don't open corridors)
+    return !isTombCell(gx,gy);
   };
 
-  // Build tomb list with contents
   const tombs = [];
   for(let tr=0;tr<rows;tr++){
     for(let tc=0;tc<cols;tc++){
@@ -762,18 +660,12 @@ function buildGameGrid(cfg){
         const t=TREASURES[Math.floor(Math.random()*TREASURES.length)];
         content={emoji:t.e,pts:t.pts,color:t.c,pu:null};
       }
-      tombs.push({
-        tc,tr,gx,gy,
-        sides:{top:false,bottom:false,left:false,right:false},
-        visited:new Set(),
-        revealed:false,content,revealT:0,
-      });
+      tombs.push({ tc,tr,gx,gy, sides:{top:false,bottom:false,left:false,right:false}, visited:new Set(), revealed:false, content, revealT:0 });
     }
   }
   return {GW,GH,walkable,tombs};
 }
 
-// corridors adjacent to a tomb side (3 cells each)
 function tombSideCells(t){
   const {gx,gy}=t;
   return {
@@ -784,10 +676,9 @@ function tombSideCells(t){
   };
 }
 
-// ── CALC CELL SIZE ──
 function calcCS(GW,GH){
   const aW = window.innerWidth;
-  const aH = window.innerHeight - 44; // just HUD
+  const aH = window.innerHeight - 44;
   return Math.max(10, Math.floor(Math.min(aW/GW, aH/GH)));
 }
 
@@ -799,21 +690,13 @@ function startGame(lvl){
   const cs = calcCS(GW,GH);
   cv.width=GW*cs; cv.height=GH*cs;
 
-  // Player start: top-left corridor (0,0)
   const player = {
-    cx:0, cy:0,
-    px:cs*0.5, py:cs*0.5,
-    tx:cs*0.5, ty:cs*0.5,
-    ox:cs*0.5, oy:cs*0.5,
-    moving:false, stepT:0,
-    stepDur: 1/cfg.playerSPS,
+    cx:0, cy:0, px:cs*0.5, py:cs*0.5, tx:cs*0.5, ty:cs*0.5, ox:cs*0.5, oy:cs*0.5,
+    moving:false, stepT:0, stepDur: 1/cfg.playerSPS,
     dir:null, activeDir:null, queueDir:null,
-    alive:true, deathAnim:0,
-    face:PLAYER_FACE,
-    invincible:false, invTime:0,
+    alive:true, deathAnim:0, face:PLAYER_FACE, invincible:false, invTime:0,
   };
 
-  // Mummies — start from various corners/edges
   const corners=[
     [GW-1,GH-1],[GW-1,0],[0,GH-1],
     [Math.floor(GW/2),GH-1],[GW-1,Math.floor(GH/2)],
@@ -822,29 +705,22 @@ function startGame(lvl){
   ];
   const mummies = Array.from({length:cfg.mummies},(_,i)=>{
     const [scx,scy]=corners[i%corners.length];
-    // ensure walkable start
     const cx=scx, cy=scy;
-    const typeKey=pickEnemyType(lvl);
+    // En niveles 1..N_TYPES el último enemigo del grupo es siempre el nuevo tipo (para que se note)
+    const forceNew = lvl<=N_TYPES && i===cfg.mummies-1;
+    const typeKey = forceNew ? ENEMY_ORDER[lvl-1] : pickEnemyType(lvl);
     const type=ENEMY_TYPES[typeKey];
     const face=type.faces[Math.floor(Math.random()*type.faces.length)];
     const baseDur=1/(cfg.playerSPS*cfg.mRatio*type.speedMul);
     return {
-      cx,cy,
-      px:(cx+0.5)*cs, py:(cy+0.5)*cs,
-      tx:(cx+0.5)*cs, ty:(cy+0.5)*cs,
-      ox:(cx+0.5)*cs, oy:(cy+0.5)*cs,
-      moving:false, stepT:0,
-      stepDur: baseDur,
-      baseDur,
-      dir:'DOWN', id:i, face, type:typeKey,
-      frozen:false, slow:false,
-      dead:false, deathAnim:0,
+      cx,cy, px:(cx+0.5)*cs, py:(cy+0.5)*cs, tx:(cx+0.5)*cs, ty:(cy+0.5)*cs, ox:(cx+0.5)*cs, oy:(cy+0.5)*cs,
+      moving:false, stepT:0, stepDur: baseDur, baseDur,
+      dir:'DOWN', id:i, face, type:typeKey, frozen:false, slow:false, dead:false, deathAnim:0,
       teleTimer: type.teleport ? rand(type.teleport.cooldownMin,type.teleport.cooldownMax) : Infinity,
       sightBoost:false, boostTimer:0,
     };
   });
 
-  // Celdas de pasillo transitables — se usan como destinos de teletransporte
   const corridorCells=[];
   for(let y=0;y<GH;y++) for(let x=0;x<GW;x++) if(walkable(x,y)) corridorCells.push([x,y]);
 
@@ -855,12 +731,15 @@ function startGame(lvl){
     lives:3, score:0, time:0,
     powerups:{}, particles:[],
     state:'playing', paused:false, lastTime:null,
-    inputDir:null,
+    inputDir:null, landscape:isLandscapeMode(),
   };
 
   updateHUD(); updateLivesHUD(); updatePUHUD();
   if(DEBUG) document.getElementById('dbgBadge').style.display='flex';
-  showPhase(`${T().lvlLabel} ${lvl}`, player.face, ()=>{
+  const introducing = lvl<=N_TYPES;
+  const phaseTxt = introducing ? T().newEnemy : `${T().lvlLabel} ${lvl}`;
+  const phaseFace = introducing ? ENEMY_TYPES[ENEMY_ORDER[lvl-1]].faces[0] : player.face;
+  showPhase(phaseTxt, phaseFace, ()=>{
     G.state='playing';
     requestAnimationFrame(loop);
   });
@@ -877,7 +756,6 @@ function loop(ts){
   if(G.state!=='gameover') requestAnimationFrame(loop);
 }
 
-// ── UPDATE ──
 function update(dt){
   if(G.state==='dying'){
     G.player.deathAnim+=dt*2.5;
@@ -889,9 +767,7 @@ function update(dt){
     animMummies(dt); return;
   }
   if(G.state!=='playing') return;
-
   G.time+=dt;
-
   tickPU();
   stepPlayer(dt);
   stepMummies(dt);
@@ -900,7 +776,6 @@ function update(dt){
   updateHUD();
 }
 
-// ── POWERUPS ──
 function tickPU(){
   const now=Date.now();
   for(const [type,end] of Object.entries(G.powerups)){
@@ -914,25 +789,20 @@ function tickPU(){
   if(G.player.invincible){ G.player.invTime-=0.016; if(G.player.invTime<=0) G.player.invincible=false; }
 }
 
-// ── PLAYER MOVEMENT (tile-based, input-driven) ──
 function stepPlayer(dt){
   const P=G.player;
   if(!P.alive) return;
   if(G.inputDir){ P.queueDir=G.inputDir; G.inputDir=null; }
-
   if(!P.moving){
     const want = P.queueDir || P.activeDir;
     if(!want) return;
     const nx=P.cx+DX[want], ny=P.cy+DY[want];
     if(G.walkable(nx,ny)){
-      P.ox=P.px; P.oy=P.py;
-      P.cx=nx; P.cy=ny;
+      P.ox=P.px; P.oy=P.py; P.cx=nx; P.cy=ny;
       P.tx=(nx+0.5)*G.cs; P.ty=(ny+0.5)*G.cs;
       P.moving=true; P.stepT=0; P.dir=want; P.queueDir=null;
       SFX.step();
-    } else {
-      P.queueDir=null;
-    }
+    } else { P.queueDir=null; }
   }
   if(P.moving){
     P.stepT=Math.min(1,P.stepT+dt/P.stepDur);
@@ -942,24 +812,17 @@ function stepPlayer(dt){
   }
 }
 
-// ── MUMMIES / ENEMIGOS ──
-// Duración de paso real de un enemigo, combinando su velocidad base con
-// la ralentización (power-up 🐢) y el sprint al detectar al jugador.
 function mummyStepDur(m){
   let dur=m.baseDur;
   if(m.slow) dur*=3;
   if(m.sightBoost){ const s=ENEMY_TYPES[m.type].sight; if(s) dur/=s.boost; }
   return dur;
 }
-// ¿Puede el enemigo `m` pisar la celda (nx,ny)? Los fantasmas atraviesan
-// el interior de las nubes; el resto solo puede moverse por los pasillos.
 function mummyWalkable(m,nx,ny){
   if(nx<0||nx>=G.GW||ny<0||ny>=G.GH) return false;
   if(ENEMY_TYPES[m.type].canPhase) return true;
   return G.walkable(nx,ny);
 }
-// ¿Ve el enemigo al jugador? Solo si están alineados en fila/columna,
-// dentro de su rango de visión y sin nada bloqueando el camino.
 function mummySeesPlayer(m){
   const sight=ENEMY_TYPES[m.type].sight;
   if(!sight) return false;
@@ -978,8 +841,6 @@ function mummySeesPlayer(m){
   }
   return false;
 }
-// Teletransporta al enemigo a una celda de pasillo al azar (no demasiado
-// cerca del jugador, para que siga siendo justo) — 💀 y 👻.
 function teleportMummy(m){
   const cells=G.corridorCells; if(!cells||!cells.length) return;
   const P=G.player;
@@ -994,7 +855,6 @@ function teleportMummy(m){
   particles(m.px,m.py,'#a78bfa',10);
   SFX.teleport();
 }
-// Actualiza visión/sprint y cuenta atrás de teletransporte, cada frame.
 function updateMummySpecials(m,dt){
   if(m.dead) return;
   const type=ENEMY_TYPES[m.type];
@@ -1050,7 +910,6 @@ function stepMummy(m,dt){
   m.stepDur=mummyStepDur(m);
 }
 
-// ── SIDE DETECTION ──
 function checkSides(){
   const P=G.player;
   const key=`${P.cx},${P.cy}`;
@@ -1084,7 +943,6 @@ function revealTomb(t){
   G.score+=pts;
   const wx=(t.gx+1.5)*G.cs, wy=(t.gy+1.5)*G.cs;
   floatScore(wx,wy,pts>0?`+${pts}`:`${pts}`,c.color);
-  // Rainbow burst particles
   const RCOLS=['#f472b6','#fb923c','#facc15','#4ade80','#60a5fa','#a78bfa'];
   for(let i=0;i<12;i++) particles(wx,wy,RCOLS[i%RCOLS.length],2);
   SFX.reveal();
@@ -1113,7 +971,6 @@ function killMummy(m){
   G.score+=50; floatScore(m.px,m.py,`+50 ${m.face}`,'#f472b6');
 }
 
-// ── COLLISION ──
 function checkHit(){
   if(!G.player.alive||G.player.invincible||G.state!=='playing') return;
   const P=G.player;
@@ -1147,15 +1004,13 @@ function checkWin(){
 }
 
 // ── RENDER ──
-// Emoji offscreen cache — un solo bitmap sin transformar por emoji+tamaño;
-// la rotación/espejo se aplica en el momento de dibujar (drawEmoji)
 const _ec=new Map();
 function getOfcEmoji(em, sz){
   const key=em+'_'+sz;
   let ofc=_ec.get(key);
   if(!ofc){
     ofc=document.createElement('canvas');
-    ofc.width=ofc.height=sz*2; // padding
+    ofc.width=ofc.height=sz*2;
     const c=ofc.getContext('2d');
     c.font=`${sz}px serif`; c.textAlign='center'; c.textBaseline='middle';
     c.fillText(em,sz,sz);
@@ -1163,11 +1018,8 @@ function getOfcEmoji(em, sz){
   }
   return ofc;
 }
-
-// `facing` es el objeto {rotate,flipH,flipV} que devuelve getFacingTransform,
-// o null/undefined si el emoji no debe orientarse (nubes, partículas, etc.)
 function drawEmoji(em,x,y,sz,facing,alpha=1,glow=null){
-  const px=Math.max(8,Math.round(sz)); // no 2× upscale — use exact size
+  const px=Math.max(8,Math.round(sz));
   const ofc=getOfcEmoji(em,px);
   const hw=ofc.width/2;
   ctx.save();
@@ -1190,48 +1042,34 @@ function render(){
   const now=Date.now();
   ctx.clearRect(0,0,cv.width,cv.height);
 
-  // ── Sky background — soft pastel checkerboard ──
   for(let y=0;y<GH;y++){
     for(let x=0;x<GW;x++){
       ctx.fillStyle=(x+y)%2===0?'#e0f2fe':'#f0f9ff';
       ctx.fillRect(x*cs,y*cs,cs,cs);
     }
   }
-  // Floating sparkle stars on bg (static, seeded by position)
   if(cs>=14){
     ctx.fillStyle='rgba(167,139,250,0.25)';
     for(let y=0;y<GH;y++) for(let x=0;x<GW;x++){
-      const h=((x*7+y*13)%17);
-      if(h===0){
-        ctx.beginPath();ctx.arc((x+0.5)*cs,(y+0.5)*cs,cs*0.07,0,Math.PI*2);ctx.fill();
-      }
+      if(((x*7+y*13)%17)===0){ ctx.beginPath();ctx.arc((x+0.5)*cs,(y+0.5)*cs,cs*0.07,0,Math.PI*2);ctx.fill(); }
     }
   }
 
-  // ── Tombs ──
   for(const t of tombs) drawTomb(t,cs,now);
 
-  // ── Walked corridors — full rainbow per cell ──
-  // Each cell gets its own hue from its grid position, cycling the full spectrum
-  // Hue formula: (cx * 37 + cy * 61) % 360  → every cell a unique rainbow color
+  // Pasillos recorridos: color arcoíris por celda (hue por posición)
   for(const t of tombs){
     const sides=tombSideCells(t);
     for(const [side,cells] of Object.entries(sides)){
       const sideDone = t.sides[side];
       for(const [cx,cy] of cells){
         if(!t.visited.has(`${cx},${cy}`)) continue;
-
-        // Unique hue per cell position
         const hue = (cx*37 + cy*61) % 360;
         const sat = t.revealed ? 55 : sideDone ? 88 : 78;
         const lit = t.revealed ? 75 : sideDone ? 62 : 68;
         const alpha = t.revealed ? 0.38 : sideDone ? 0.82 : 0.70;
-
-        // Solid fill
         ctx.fillStyle = `hsla(${hue},${sat}%,${lit}%,${alpha})`;
         ctx.fillRect(cx*cs+1, cy*cs+1, cs-2, cs-2);
-
-        // Sheen gradient overlay
         if(cs>=12){
           const grd=ctx.createLinearGradient(cx*cs,cy*cs,cx*cs,cy*cs+cs);
           grd.addColorStop(0,`hsla(${hue},100%,95%,0.45)`);
@@ -1239,15 +1077,9 @@ function render(){
           ctx.fillStyle=grd;
           ctx.fillRect(cx*cs+1,cy*cs+1,cs-2,cs-2);
         }
-
-        // Mark glyph
         if(cs>=14){
           const mark = t.revealed ? '✦' : sideDone ? '✓' : '·';
-          ctx.fillStyle = t.revealed
-            ? `hsla(${hue},60%,35%,0.7)`
-            : sideDone
-            ? `hsla(${hue},80%,25%,0.85)`
-            : `hsla(${hue},70%,30%,0.75)`;
+          ctx.fillStyle = t.revealed ? `hsla(${hue},60%,35%,0.7)` : sideDone ? `hsla(${hue},80%,25%,0.85)` : `hsla(${hue},70%,30%,0.75)`;
           ctx.font=`bold ${Math.max(7,cs*0.38)}px sans-serif`;
           ctx.textAlign='center'; ctx.textBaseline='middle';
           ctx.fillText(mark,(cx+0.5)*cs,(cy+0.5)*cs);
@@ -1256,7 +1088,6 @@ function render(){
     }
   }
 
-  // ── PU screen tints ──
   if(G.powerups.freeze){ctx.fillStyle='rgba(147,197,253,0.12)';ctx.fillRect(0,0,cv.width,cv.height);}
   if(G.powerups.invincible){
     const rb=['rgba(244,114,182,','rgba(251,146,60,','rgba(250,204,21,','rgba(74,222,128,','rgba(96,165,250,'];
@@ -1265,21 +1096,18 @@ function render(){
     ctx.fillRect(0,0,cv.width,cv.height);
   }
 
-  // ── Player ──
   if(player.alive||G.state==='dying'){
     const dead=G.state==='dying';
     const alpha=dead?Math.max(0,1-player.deathAnim):1;
     const scale=dead?1+player.deathAnim*1.8:1;
-    // Invincibility: rainbow glow cycling through colors
     const RGLOW=['#f472b6','#fb923c','#facc15','#4ade80','#60a5fa','#a78bfa'];
     const blink=player.invincible&&Math.floor(now/120)%2===0;
     const flash=blink?RGLOW[Math.floor(now/120)%RGLOW.length]:null;
-    const sz=cs*0.62*scale; // unicorn slightly bigger — it's the star!
+    const sz=cs*0.62*scale;
     const pFacing=getFacingTransform(player.dir,'player');
     drawEmoji(player.face,player.px,player.py,sz,pFacing,alpha,flash);
   }
 
-  // ── Mummies ──
   for(const m of G.mummies){
     if(m.dead&&m.deathAnim>=1) continue;
     const type=ENEMY_TYPES[m.type];
@@ -1287,13 +1115,12 @@ function render(){
     const pulse=1+Math.sin(now*0.0022+m.id*1.3)*0.05;
     const scale=m.dead?1+m.deathAnim:pulse;
     const glow=m.frozen?'#4fc3f7':m.slow?'#6bcb77':m.sightBoost?'#f87171':null;
-    const sz=cs*0.52*scale; // ← smaller: 52% of cell
+    const sz=cs*0.52*scale;
     const mFacing=getFacingTransform(m.dir,m.type);
     drawEmoji(m.face,m.px,m.py,sz,mFacing,alpha,glow);
     if(m.frozen&&cs>=14) drawEmoji('❄️',m.px+cs*0.26,m.py-cs*0.26,cs*0.24,null,alpha,null);
   }
 
-  // ── Particles ──
   for(let i=pts.length-1;i>=0;i--){
     const p=pts[i];
     p.x+=p.vx*0.016; p.y+=p.vy*0.016; p.life-=0.025;
@@ -1307,60 +1134,45 @@ function render(){
   document.getElementById('hTime').textContent=Math.floor(G.time)+'s';
 }
 
-// Cloud color palette — soft, airy pastels
 const CLOUD_COLS = ['#f0f9ff','#fdf4ff','#fefce8','#f0fdf4','#fff1f2','#eff6ff'];
-const CLOUD_BORD = ['#bae6fd','#e9d5ff','#fde68a','#bbf7d0','#fecdd3','#bfdbfe'];
 const CLOUD_BORD2= ['#7dd3fc','#c084fc','#fbbf24','#4ade80','#fb7185','#60a5fa'];
 
 function drawTomb(t,cs,now){
   const {gx,gy,revealed,sides,content,revealT}=t;
   const px=gx*cs,py=gy*cs,tw=3*cs,th=3*cs;
   const cx=px+tw/2, cy=py+th/2;
-  const r=cs*0.35; // rounder for cloud feel
+  const r=cs*0.35;
   const ci=(t.tc+t.tr*3)%CLOUD_COLS.length;
 
   if(!revealed){
-    // Soft drop shadow
     ctx.fillStyle='rgba(100,120,200,0.10)';
     rrect(px+4,py+5,tw-5,th-5,r); ctx.fill();
-    // Cloud body
     ctx.fillStyle=CLOUD_COLS[ci];
     rrect(px+1,py+1,tw-3,th-3,r); ctx.fill();
-    // Gradient sheen
     const sheen=ctx.createLinearGradient(px,py,px,py+th);
     sheen.addColorStop(0,'rgba(255,255,255,0.7)');
     sheen.addColorStop(0.5,'rgba(255,255,255,0.1)');
     sheen.addColorStop(1,'rgba(180,200,255,0.15)');
     ctx.fillStyle=sheen; rrect(px+1,py+1,tw-3,th-3,r); ctx.fill();
-    // Border — animated color shift
-    const phase=(now*0.001+t.tc*0.5+t.tr*0.7)%1;
     ctx.strokeStyle=CLOUD_BORD2[ci]; ctx.lineWidth=Math.max(2,cs*0.09);
     rrect(px+1,py+1,tw-3,th-3,r); ctx.stroke();
-    // Cloud emoji
     if(cs>=12) drawEmoji('☁️',cx,cy,cs*0.88,null,1,null);
-    // 4 side indicator dots
     const dr=Math.max(3,cs*0.14);
     [[cx,py+cs*0.15,'top'],[cx,py+th-cs*0.15,'bottom'],[px+cs*0.15,cy,'left'],[px+tw-cs*0.15,cy,'right']].forEach(([sx,sy,s])=>{
       ctx.beginPath();ctx.arc(sx,sy,dr,0,Math.PI*2);
       ctx.fillStyle=sides[s]?'#4ade80':'rgba(100,100,200,0.22)'; ctx.fill();
-      if(sides[s]){
-        ctx.strokeStyle='#15803d'; ctx.lineWidth=1.5; ctx.stroke();
-      }
+      if(sides[s]){ ctx.strokeStyle='#15803d'; ctx.lineWidth=1.5; ctx.stroke(); }
     });
   } else {
-    // ── RAINBOW REVEAL ──
     const age=Math.min(1,(now-revealT)/400);
-    // White fluffy cloud base
     ctx.fillStyle='rgba(255,255,255,0.18)';
     rrect(px+1,py+1,tw-3,th-3,r); ctx.fill();
-    // Rainbow arc drawn with canvas arcs
     if(cs>=12){
       const RW=tw*0.78, RH=th*0.55;
       const rcx=cx, rcy=cy+th*0.12;
       const RCOLS=['#f87171','#fb923c','#facc15','#4ade80','#60a5fa','#a78bfa','#f472b6'];
       ctx.save();
       ctx.globalAlpha=age*0.92;
-      // clip to cell
       rrect(px+2,py+2,tw-5,th-5,r); ctx.clip();
       for(let i=0;i<RCOLS.length;i++){
         const rr=RW/2-(i*RW*0.055);
@@ -1373,12 +1185,10 @@ function drawTomb(t,cs,now){
         ctx.stroke();
       }
       ctx.restore();
-      // Treasure emoji below rainbow
       ctx.globalAlpha=age;
       drawEmoji(content.emoji,cx,cy+th*0.25,cs*0.52,null,age,null);
       ctx.globalAlpha=1;
     }
-    // sparkle glitter on revealed cloud
     if(cs>=14&&age>=1){
       const t2=now*0.003;
       const sparkles=[[0.2,0.2],[0.8,0.15],[0.15,0.75],[0.85,0.8],[0.5,0.1]];
@@ -1401,7 +1211,6 @@ function rrect(x,y,w,h,r){
   ctx.closePath();
 }
 
-// ── PARTICLES ──
 function particles(x,y,color,n=8){
   for(let i=0;i<n;i++){
     const a=Math.PI*2*i/n+Math.random()*.5, sp=50+Math.random()*100;
@@ -1409,7 +1218,6 @@ function particles(x,y,color,n=8){
   }
 }
 
-// ── FLOAT SCORE ──
 function floatScore(x,y,txt,color){
   const el=document.createElement('div'); el.className='fscore';
   const rc=cv.getBoundingClientRect();
@@ -1417,7 +1225,6 @@ function floatScore(x,y,txt,color){
   el.textContent=txt; document.body.appendChild(el); setTimeout(()=>el.remove(),1100);
 }
 
-// ── HUD ──
 function updateHUD(){
   if(!G) return;
   document.getElementById('hLvl').textContent=G.lvl;
@@ -1437,20 +1244,19 @@ function updatePUHUD(){
   }
 }
 
-// ── WIN / LOSE ──
 function showWin(){
   SFX.win();
   const t=T();
   const bonus=Math.max(0,300-Math.floor(G.time)*2);
   G.score+=bonus;
-  if(G.lvl>=sv.maxLevel) sv.maxLevel=Math.min(100,G.lvl+1);
+  if(G.lvl>=sv.maxLevel) sv.maxLevel=Math.min(LEVELS,G.lvl+1);
   if(!sv.best[G.lvl]||G.score>sv.best[G.lvl]) sv.best[G.lvl]=G.score;
   sv.scores.push({level:G.lvl,score:G.score,date:new Date().toLocaleDateString()});
   if(sv.scores.length>50) sv.scores.shift();
   save();
   document.getElementById('ovWinScore').textContent=`${t.winScore} ${G.score.toLocaleString()}`;
   document.getElementById('ovWinBonus').textContent=bonus>0?`${t.winBonus} +${bonus}`:'';
-  document.getElementById('btnNext').style.display=G.lvl<100?'':'none';
+  document.getElementById('btnNext').style.display=G.lvl<LEVELS?'':'none';
   showPhase(t.lvlClear.replace('{n}',G.lvl),'🎉',()=>document.getElementById('ovWin').classList.add('on'));
 }
 function showDead(){
@@ -1477,7 +1283,6 @@ function retryLevel() { hideOvs(); startGame(G.lvl); }
 function quitGame()   { hideOvs(); G=null; goScreen('sTitle'); }
 function resumeGame() { hideOvs(); G.paused=false; G.lastTime=null; requestAnimationFrame(loop); }
 
-// ── PHASE OVERLAY ──
 function showPhase(txt,face,cb){
   const ov=document.getElementById('phaseOv');
   document.getElementById('phFace').textContent=face;
@@ -1491,7 +1296,7 @@ function showPhase(txt,face,cb){
   },1400);
 }
 
-// ── INPUT ──
+// ── INPUT (teclado: flechas o WASD) ──
 document.addEventListener('keydown',e=>{
   if(KM[e.key]){
     e.preventDefault();
@@ -1510,23 +1315,20 @@ function togglePause(){
   if(G.paused) document.getElementById('ovPause').classList.add('on');
   else resumeGame();
 }
-// ── TOUCH-ONLY DETECTION (no physical keyboard → show overlay dpads) ──
-// We detect absence of a real keyboard: pointer:coarse + no keyboard events yet
+
+// ── TOUCH-ONLY DETECTION (sin teclado físico → mostrar d-pad) ──
 let _hasKeyboard = false;
 document.addEventListener('keydown', ()=>{ _hasKeyboard=true; updateDpadVisibility(); }, {once:true});
-
 function hasTouchInput(){ return ('ontouchstart' in window) || navigator.maxTouchPoints>0; }
 function updateDpadVisibility(){
   const show = hasTouchInput() && !_hasKeyboard;
   document.getElementById('dpadL').style.display = show ? 'block' : 'none';
   document.getElementById('dpadR').style.display = show ? 'block' : 'none';
 }
-// Run on load + after a short delay to catch tablets that report touch
 updateDpadVisibility();
 setTimeout(updateDpadVisibility, 300);
 
-// ── DPAD BUTTON BINDINGS ──
-// Map: buttonId → direction
+// ── D-PAD ──
 const dpadMap = [
   ['bU','UP'],['bD','DOWN'],['bL','LEFT'],['bR','RIGHT'],
   ['bU2','UP'],['bD2','DOWN'],['bLR','RIGHT'],['bRL','LEFT'],
@@ -1534,16 +1336,8 @@ const dpadMap = [
 dpadMap.forEach(([id,d])=>{
   const btn=document.getElementById(id); if(!btn) return;
   const pad = btn.closest('#dpadL,#dpadR');
-  const press=e=>{
-    e.preventDefault();
-    if(pad) pad.classList.add('touched');
-    if(G?.state==='playing'){ G.player.activeDir=d; G.player.queueDir=d; }
-  };
-  const rel=e=>{
-    e.preventDefault();
-    if(pad) pad.classList.remove('touched');
-    if(G?.player&&G.player.activeDir===d) G.player.activeDir=null;
-  };
+  const press=e=>{ e.preventDefault(); if(pad) pad.classList.add('touched'); if(G?.state==='playing'){ G.player.activeDir=d; G.player.queueDir=d; } };
+  const rel=e=>{ e.preventDefault(); if(pad) pad.classList.remove('touched'); if(G?.player&&G.player.activeDir===d) G.player.activeDir=null; };
   btn.addEventListener('touchstart',press,{passive:false});
   btn.addEventListener('touchend',rel,{passive:false});
   btn.addEventListener('touchcancel',rel,{passive:false});
@@ -1561,10 +1355,12 @@ cv.addEventListener('touchend',e=>{
   swS=null;
 },{passive:true});
 
-// ── RESIZE ──
-window.addEventListener('resize',()=>{
+// ── RESIZE / ROTACIÓN: si cambia portrait↔landscape, se reconstruye el nivel con la rejilla rotada ──
+function onResize(){
   updateDpadVisibility();
   if(!G||G.state==='gameover') return;
+  const land=isLandscapeMode();
+  if(land!==G.landscape){ const lvl=G.lvl; hideOvs(); startGame(lvl); return; }
   const cs=calcCS(G.GW,G.GH);
   if(cs===G.cs) return;
   const sx=cs/G.cs; G.cs=cs;
@@ -1572,13 +1368,13 @@ window.addEventListener('resize',()=>{
   _ec.clear();
   const rs=o=>{ o.px*=sx;o.py*=sx;o.tx*=sx;o.ty*=sx;o.ox*=sx;o.oy*=sx; };
   rs(G.player); G.mummies.forEach(rs);
-});
+}
+window.addEventListener('resize',onResize);
+window.addEventListener('orientationchange',onResize);
 
-// ── HELPERS ──
 const lerp=(a,b,t)=>a+(b-a)*t;
 const eio=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
 
-// ── INIT — apply language on load ──
 applyLang();</script>
 </body>
 </html>
