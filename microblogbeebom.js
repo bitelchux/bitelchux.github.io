@@ -1663,7 +1663,7 @@ function initAmazonStickyButton(affiliateTag) {
   setTimeout(updateAmazonAffiliateTags, 2000);
 
   if (window.adsbygoogle != undefined) return;
-  //inyectaTelegramFlotante();
+  inyectaTelegramFlotante();
   
 
      
