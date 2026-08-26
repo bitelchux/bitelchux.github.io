@@ -1098,8 +1098,10 @@ function inyectavideo() {
 function inyectaTelegramFlotante() {
  
   const script = document.createElement("script");
-   if (window.cfpais === "spainxxxx") {
-       script.src = "https://directorycircle.com/telegram/telegramflotante.php?canal=chollosamazoneshoy";
+   if (window.cfpais === "spain") {
+       //script.src = "https://directorycircle.com/telegram/telegramflotante.php?canal=chollosamazoneshoy";
+        script.src = "https://directorycircle.com/telegram/telegramflotante.php?canal=alvisevoxayuso";
+      
    }else{
     var randi = Math.floor(Math.random() * (100 - 1 + 1)) + 1;
     if (randi < 50) 
