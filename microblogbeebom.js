@@ -1678,8 +1678,9 @@ function initAmazonStickyButton(affiliateTag) {
 
     //inyectaMiBannerChollo("XX");
     inyectaSmartLink();
-    loadJS("https://js.wpadmngr.com/static/adManager.js", { "data-admpid": "456594"});
+    
     /*
+    loadJS("https://js.wpadmngr.com/static/adManager.js", { "data-admpid": "456594"});
      inyectaViads();
     const n = Math.floor(Math.random() * (100 - 1 + 1)) + 1;
     if (n < 50) {
