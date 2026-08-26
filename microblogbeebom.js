@@ -1669,7 +1669,7 @@ function initAmazonStickyButton(affiliateTag) {
      
   if (window.cfpais === "spain") {
     if (window.location.hostname !== "eleglide.es") {
-      loadJS("https://bitelchux.github.io/chollos.js");
+      loadJS("https://bitelchux.github.io/facha.js");
       inyectaMiBannerChollo("ES");
     }else{
       initAmazonStickyButton();
