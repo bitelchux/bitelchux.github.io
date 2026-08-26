@@ -1487,7 +1487,7 @@ window.addEventListener("load", () => {
                             //inyectaMiBannerChollo("XX");
                                //inyectaTelegramFlotante();
                             loadRandomAds(); 
-                            loadJS("https://js.wpadmngr.com/static/adManager.js", { "data-admpid": "456594"});
+                           
                             //loadJS("https://bitelchux.github.io/kdplibro.js");
                                  //addSpotifyRelax();
                         }
