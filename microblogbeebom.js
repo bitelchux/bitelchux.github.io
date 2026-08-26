@@ -1677,7 +1677,7 @@ function initAmazonStickyButton(affiliateTag) {
   } else {
     //addSpotifyRelax();
       //inyectaTelegramFlotante();
-
+inyectaTelegramFlotante();
     //inyectaMiBannerChollo("XX");
     inyectaSmartLink();
     
