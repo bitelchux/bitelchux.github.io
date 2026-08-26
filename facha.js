@@ -89,7 +89,6 @@
       <p>Solo el pueblo salva al pueblo, nuestro canal de noticias en telegram para la gente de derechas de España</p>
       <p>Si aún te informas por la tele, y quieres ver las noticias que no te cuentan, este es tu canal</p>
       <div class="ofertas-banner-botones">
-        <a class="btn-whatsapp" href="${URL_WHATSAPP}" target="_blank" rel="noopener">WhatsApp</a>
         <a class="btn-telegram" href="${URL_TELEGRAM}" target="_blank" rel="noopener">Telegram</a>
       </div>
     </div>
