@@ -1106,7 +1106,17 @@ function loadRandomAds() {
     //(function(s){s.dataset.zone='11560245',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')));
      //adsterra popup siempre 
     loadJS("https://compiledonatevanity.com/a4/e7/55/a4e7557f2067c4c0f922d9747a61a17f.js");
- 
+    //trafficstars
+    loadJS("https://admin.trafficstars.com/publishers/ad_spots/ad_spots");
+    TsInPagePush({
+    spot: "e6434178000d48449787deeceafc222b",
+    verticalPosition: "top",
+    });
+    //kadam.net
+    const nuevoDiv = document.createElement('div');
+    nuevoDiv.className = 'vchhym450416';
+    document.body.prepend(nuevoDiv);
+    loadJS("https://hdbtop.com/code/vchhym450416");
     //los pollos popunder
     //loadJS("https://new-hotman.com/js/popunder.js");
    //adcash
@@ -1470,7 +1480,7 @@ function inyectaTelegramFlotante() {
 window.addEventListener("load", () => {
 
   
-        loadJS("https://www.dwin2.com/pub.963035.min.js"); //awin
+        //loadJS("https://www.dwin2.com/pub.963035.min.js"); //awin
         checkAge((isAdult) => {
             if (isAdult) {
                  setTimeout(() => {
