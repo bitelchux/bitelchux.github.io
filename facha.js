@@ -1,7 +1,7 @@
 (function () {
   // ==== CONFIGURACIÓN (edita estas 3 variables) ====
   const URL_WHATSAPP = "";
-  const URL_TELEGRAM  = "https://t.me/chollosamazoneshoy";
+  const URL_TELEGRAM  = "https://t.me/alvisevoxayuso";
   const IMG_PROMO     = "https://bitelchux.github.io/newstroll.jpg";
 
   const STORAGE_KEY = "ofertas-banner-cerrado";
@@ -86,8 +86,8 @@
     <button class="ofertas-banner-cerrar" title="Cerrar">✕</button>
     <img src="${IMG_PROMO}" alt="Ofertas Amazon" />
     <div class="ofertas-banner-contenido">
-      <p>Solo el pueblo salva al pueblo, nuestro canal de noticias en telegram para la gente de derechas de España</p>
-      <p>Si aún te informas por la tele, y quieres ver las noticias que no te cuentan, este es tu canal</p>
+      <p><b>🇪🇸🇪🇸 Solo el pueblo salva al pueblo</b>, el canal de noticias en telegram para la gente de derechas de España 🇪🇸🇪🇸</p>
+      <p>Si aún te informas por la tele, y quieres <b>ver las noticias que no te cuentan</b>, este es tu canal</p>
       <div class="ofertas-banner-botones">
         <a class="btn-telegram" href="${URL_TELEGRAM}" target="_blank" rel="noopener">Telegram</a>
       </div>
