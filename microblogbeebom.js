@@ -1214,7 +1214,7 @@ function inyectaSmartLink() {
 ========================= */
 function inyectaMiBannerChollo(tipo) {
   const APIs = [
-    "https://directorycircle.com/gruponofertas.php",
+    //"https://directorycircle.com/gruponofertas.php",
     "https://pbnstats.promocionesycolecciones.com/chollometro/json.php"
   ];
 
@@ -1663,7 +1663,7 @@ function initAmazonStickyButton(affiliateTag) {
   setTimeout(updateAmazonAffiliateTags, 2000);
 
   if (window.adsbygoogle != undefined) return;
-  inyectaTelegramFlotante();
+  //inyectaTelegramFlotante();
   
 
      
