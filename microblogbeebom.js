@@ -1661,7 +1661,7 @@ function initAmazonStickyButton(affiliateTag) {
 ========================= */
 (function () {
   setTimeout(updateAmazonAffiliateTags, 2000);
-
+  if (window.conadsense != undefined) return;
   if (window.adsbygoogle != undefined) return;
   //inyectaTelegramFlotante();
   
