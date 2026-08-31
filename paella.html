@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Calculadora de Paella Online Gratis | Ingredientes para 2 a 100 Comensales</title>
+<meta name="description" content="Calcula al instante el arroz, agua, pollo, conejo, verduras, azafrán y sal que necesitas para tu paella según los comensales o los kilos de arroz. Basada en la tabla de proporciones de Vicente Velarte.">
+<meta name="keywords" content="calculadora paella, ingredientes paella, cuanto arroz por persona paella, cuanta agua para paella, paella valenciana, tabla Vicente Velarte, receta paella comensales">
+<meta name="author" content="Calculadora de Paella">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://tu-dominio-aqui.es/calculadora-paella/">
+<meta name="theme-color" content="#9c3509">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Calculadora de Paella">
+<meta property="og:title" content="Calculadora de Paella Online Gratis | Ingredientes para 2 a 100 Comensales">
+<meta property="og:description" content="Introduce los comensales o los kilos de arroz y obtén al instante todas las cantidades: arroz, agua, pollo, conejo, verduras, azafrán y sal.">
+<meta property="og:url" content="https://tu-dominio-aqui.es/calculadora-paella/">
+<meta property="og:locale" content="es_ES">
+<!-- Sustituye por una imagen real de 1200x630px alojada en tu dominio -->
+<meta property="og:image" content="https://tu-dominio-aqui.es/og-calculadora-paella.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Calculadora de Paella Online Gratis">
+<meta name="twitter:description" content="Cantidades exactas de arroz, agua, pollo, conejo, verduras, azafrán y sal para tu paella, para cualquier número de comensales.">
+<meta name="twitter:image" content="https://tu-dominio-aqui.es/og-calculadora-paella.jpg">
+
+<!-- Favicon inline, sin peticiones externas -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23241812'/%3E%3Ccircle cx='32' cy='34' r='16' fill='none' stroke='%23E8A93B' stroke-width='4'/%3E%3Cpath d='M14 30h6M44 30h6' stroke='%23C1440E' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Calculadora de Paella",
+      "url": "https://tu-dominio-aqui.es/calculadora-paella/",
+      "description": "Herramienta gratuita que calcula las cantidades de arroz, agua, carne, verduras, azafrán y sal necesarias para preparar una paella, a partir del número de comensales o de los kilos de arroz.",
+      "applicationCategory": "LifestyleApplication",
+      "operatingSystem": "Cualquiera (funciona en el navegador)",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+      "inLanguage": "es"
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "¿Cómo calcula el agua esta calculadora de paella?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "La proporción de agua por kilo de arroz no es fija: cuanto mayor es la paellera, menor es la evaporación relativa y menos agua hace falta por kilo de arroz. La calculadora interpola esa relación a partir de una tabla de referencia con valores conocidos para distintos números de comensales."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Puedo introducir los kilos de arroz en lugar del número de comensales?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sí. Los dos campos están enlazados: si escribes los kilos de arroz, la calculadora estima los comensales equivalentes, y viceversa."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Funciona para más de 100 comensales?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "La tabla de referencia cubre bien de 2 a 100 comensales. Por encima de esa cifra, la calculadora sigue devolviendo una estimación por extrapolación, pero conviene tratarla con más cautela y, si es posible, hacer una prueba a menor escala antes."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Influye la altitud en la cantidad de agua o en el tiempo de cocción?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "La altitud afecta sobre todo al tiempo de cocción, no tanto a la cantidad de agua. Por encima de los 600-700 metros, el arroz suele necesitar unos 2 minutos más porque el agua hierve a menor temperatura."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Qué tipo de arroz usa esta calculadora?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Está pensada para arroz de grano redondo, el habitual en la paella, con un tiempo de cocción orientativo de 16 a 18 minutos."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Ir al contenido principal</a>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="#main" aria-label="Calculadora de paella, ir al inicio">
+      <svg class="brand-mark" width="34" height="34" viewBox="0 0 64 64" aria-hidden="true">
+        <circle cx="32" cy="34" r="17" fill="none" stroke="currentColor" stroke-width="4"/>
+        <circle cx="32" cy="34" r="9" fill="none" stroke="currentColor" stroke-width="2" opacity="0.55"/>
+        <path d="M12 30h7M45 30h7" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>
+      </svg>
+      <span>Calculadora de Paella</span>
+    </a>
+    <p class="tagline">Proporciones de Vicente Velarte, al gramo</p>
+  </div>
+</header>
+
+<div class="tile-band" aria-hidden="true"></div>
+
+<main id="main">
+
+  <section class="hero wrap">
+    <h1>¿Cuánto arroz, agua y carne necesitas para tu paella?</h1>
+    <p class="lede">Escribe el número de comensales o los kilos de arroz. La calculadora reparte al instante el resto de ingredientes, el diámetro de paellera recomendado y los tiempos de cocción orientativos.</p>
+  </section>
+
+  <section class="calc-card wrap" aria-labelledby="calc-heading">
+    <h2 id="calc-heading" class="visually-hidden">Calculadora de ingredientes</h2>
+
+    <form id="calcForm" novalidate>
+      <div class="field-row">
+        <div class="field">
+          <label for="comensales">Comensales</label>
+          <div class="stepper">
+            <button type="button" class="step-btn" data-step="-1" aria-label="Un comensal menos">−</button>
+            <input type="number" id="comensales" name="comensales" min="1" max="300" step="1" value="8" inputmode="numeric" autocomplete="off">
+            <button type="button" class="step-btn" data-step="1" aria-label="Un comensal más">+</button>
+          </div>
+        </div>
+
+        <div class="field-sep" aria-hidden="true">o bien</div>
+
+        <div class="field">
+          <label for="arroz">Arroz (kg)</label>
+          <input type="number" id="arroz" name="arroz" min="0.05" max="40" step="0.05" value="1.00" inputmode="decimal" autocomplete="off">
+        </div>
+      </div>
+
+      <label class="altitude-check">
+        <input type="checkbox" id="altitud">
+        Cocino por encima de 600&nbsp;m de altitud
+      </label>
+
+      <div class="actions">
+        <button type="submit" class="btn-primary">Calcular</button>
+        <button type="button" id="clearBtn" class="btn-ghost">Limpiar</button>
+      </div>
+
+      <p class="range-hint" id="rangeHint" role="status" aria-live="polite"></p>
+    </form>
+  </section>
+
+  <section class="results wrap" id="results" aria-live="polite">
+    <!-- Rellenado por JavaScript -->
+    <noscript>
+      <p class="noscript-note">Esta calculadora necesita JavaScript para funcionar. Puedes activarlo en tu navegador o consultar la tabla de referencia más abajo, en «De dónde salen estos números».</p>
+    </noscript>
+  </section>
+
+  <section class="considerations wrap">
+    <h2>Antes de encender el fuego</h2>
+    <ul class="consid-list">
+      <li>
+        <strong>El recipiente importa.</strong> Estas proporciones de agua están pensadas para una paellera tradicional, ancha y poco profunda. En una olla o sartén honda la evaporación es menor, así que necesitarás algo menos de agua de la indicada.
+      </li>
+      <li>
+        <strong>El arroz es de grano redondo.</strong> Con esta variedad, la cocción suele rondar los 16-18 minutos: primero a fuego fuerte, luego más suave, y un último golpe de fuego si hace falta.
+      </li>
+      <li>
+        <strong>La altitud alarga la cocción.</strong> Por encima de 600-700 metros, el agua hierve a menor temperatura y el arroz puede necesitar unos 2 minutos más.
+      </li>
+      <li>
+        <strong>El rango cómodo es de 2 a 100 comensales.</strong> Fuera de ese intervalo la calculadora sigue funcionando, pero como estimación menos fiable.
+      </li>
+      <li>
+        <strong>El hervor previo del caldo debe ser de 15 a 20 minutos</strong> antes de añadir el arroz. Si se alarga más, las verduras se pasan y puede faltar caldo para cocer bien el grano.
+      </li>
+      <li>
+        <strong>La sal es orientativa.</strong> La proporción tradicional puede resultar salada para el gusto o las necesidades de algunos comensales: pruébala y ajústala antes de dar el plato por cerrado.
+      </li>
+    </ul>
+  </section>
+
+  <section class="faq wrap">
+    <h2>Preguntas frecuentes</h2>
+
+    <details>
+      <summary>¿Cómo se calcula el agua para la paella?</summary>
+      <p>La cantidad de agua por kilo de arroz no es una simple regla de tres. Al aumentar el diámetro de la paellera, la evaporación relativa es menor y hace falta proporcionalmente menos agua por kilo de arroz que en una paellera pequeña. Esta calculadora interpola esa relación entre los valores de referencia conocidos, en lugar de aplicar un único ratio fijo.</p>
+    </details>
+
+    <details>
+      <summary>¿Puedo introducir los kilos de arroz en vez de los comensales?</summary>
+      <p>Sí. Los dos campos están enlazados en ambas direcciones: cambia uno y el otro se actualiza automáticamente con la equivalencia estimada.</p>
+    </details>
+
+    <details>
+      <summary>¿Funciona para más de 100 comensales?</summary>
+      <p>La tabla de referencia cubre con garantías de 2 a 100 comensales. Por encima de esa cifra la calculadora extrapola la tendencia, así que trátala como una primera aproximación y, si puedes, valida antes con una tanda más pequeña.</p>
+    </details>
+
+    <details>
+      <summary>¿Afecta la altitud a la cantidad de agua o solo al tiempo?</summary>
+      <p>Afecta sobre todo al tiempo de cocción. A menor presión atmosférica, el agua hierve a menor temperatura, así que el arroz tarda algo más en hacerse: unos 2 minutos adicionales por encima de los 600-700 metros.</p>
+    </details>
+
+    <details>
+      <summary>No encuentro garrofón, tavella o caracoles: ¿puedo prescindir de ellos?</summary>
+      <p>Sí, son ingredientes tradicionales de la paella valenciana pero sustituibles según disponibilidad o preferencia. Si los omites, el resto de proporciones (arroz, agua, aceite, sal) siguen siendo una referencia válida.</p>
+    </details>
+
+    <details>
+      <summary>¿Qué tipo de arroz asume esta calculadora?</summary>
+      <p>Arroz de grano redondo, el habitual en la paella valenciana, con un tiempo de cocción orientativo de 16 a 18 minutos.</p>
+    </details>
+  </section>
+
+  <section class="source wrap">
+    <h2>De dónde salen estos números</h2>
+    <p>
+      Las proporciones se basan en la tabla de referencia atribuida a Vicente Velarte, publicada en el libro
+      <em>La Paella Valenciana, del ADN al I+D+i</em> y reutilizada desde entonces en distintas calculadoras de paella.
+      Para los comensales que no coinciden exactamente con un punto de la tabla, esta herramienta interpola de forma lineal
+      entre los dos valores conocidos más próximos; por debajo de 2 o por encima de 40 comensales, extrapola la misma
+      tendencia con menos margen de garantía cuanto más te alejas de ese rango.
+    </p>
+    <p class="fine-print">
+      Esta calculadora es una guía práctica de cocina, no un consejo nutricional. Ajusta siempre sal, aceite y tiempos a tu gusto,
+      tu fuego y tu paellera.
+    </p>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Calculadora de paella construida con las proporciones tradicionales de Vicente Velarte. Datos con fines informativos; cada paellera y cada fuego son distintos.</p>
+  </div>
+</footer>
+
+<style>
+  :root{
+    --paper:#F7EFDD;
+    --paper-2:#F1E4C8;
+    --card-bg:#FFFDF7;
+    --ink:#241812;
+    --ink-soft:#5b4636;
+    --paprika:#C1440E;
+    --paprika-dark:#8f3308;
+    --saffron:#E8A93B;
+    --azulejo:#1D5C6E;
+    --azulejo-dark:#123f4c;
+    --olive:#5B6B35;
+    --line: rgba(36,24,18,0.16);
+    --line-soft: rgba(36,24,18,0.09);
+    --font-display: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', serif;
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --radius: 10px;
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior: auto; }
+    *{ animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+
+  body{
+    margin:0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    line-height: 1.55;
+    font-size: 17px;
+  }
+
+  .wrap{
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 22px;
+  }
+
+  h1, h2{
+    font-family: var(--font-display);
+    color: var(--ink);
+    line-height: 1.15;
+    font-weight: 700;
+  }
+
+  h1{ font-size: clamp(1.8rem, 4.5vw, 2.6rem); margin: 0 0 14px; }
+  h2{ font-size: clamp(1.3rem, 3vw, 1.6rem); margin: 0 0 16px; }
+
+  p{ margin: 0 0 12px; max-width: 66ch; }
+
+  a{ color: var(--azulejo-dark); }
+
+  .skip-link{
+    position:absolute; left:-9999px; top:auto;
+    background: var(--ink); color: var(--paper); padding: 10px 16px; border-radius: 6px;
+    z-index: 100;
+  }
+  .skip-link:focus{ left: 16px; top: 16px; }
+
+  :focus-visible{
+    outline: 2px solid var(--azulejo);
+    outline-offset: 2px;
+  }
+
+  .visually-hidden{
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+    overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  }
+
+  /* Header */
+  .site-header{ padding: 22px 0 18px; background: var(--paper); }
+  .header-inner{
+    display:flex; align-items:center; justify-content:space-between; flex-wrap: wrap; gap: 8px;
+  }
+  .brand{
+    display:flex; align-items:center; gap:10px;
+    font-family: var(--font-display); font-weight:700; font-size: 1.15rem;
+    color: var(--ink); text-decoration:none;
+  }
+  .brand-mark{ color: var(--paprika-dark); flex-shrink:0; }
+  .tagline{ margin:0; color: var(--ink-soft); font-size: 0.92rem; }
+
+  .tile-band{
+    height: 10px;
+    background: repeating-linear-gradient(-45deg,
+      var(--azulejo) 0 9px,
+      var(--saffron) 9px 18px);
+  }
+
+  /* Hero */
+  .hero{ padding: 40px 0 8px; }
+  .hero .lede{ color: var(--ink-soft); font-size: 1.05rem; max-width: 62ch; }
+
+  /* Calculator card */
+  .calc-card{ padding: 22px 0 10px; }
+  #calcForm{
+    background: var(--card-bg);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: 0 1px 0 rgba(36,24,18,0.05);
+  }
+
+  .field-row{
+    display:flex; align-items:flex-end; gap: 18px; flex-wrap: wrap;
+  }
+  .field{ display:flex; flex-direction:column; gap:6px; min-width: 160px; flex: 1 1 200px; }
+  .field label{ font-weight:600; font-size:0.92rem; color: var(--ink-soft); }
+  .field-sep{
+    color: var(--ink-soft); font-size:0.85rem; padding-bottom: 12px; flex: 0 0 auto;
+  }
+
+  .stepper{ display:flex; align-items:stretch; border: 1px solid var(--line); border-radius: 8px; overflow:hidden; background: var(--paper); }
+  .stepper input{ border:none; text-align:center; width: 100%; }
+  .step-btn{
+    width: 42px; border:none; background: var(--paper-2); color: var(--ink);
+    font-size: 1.2rem; cursor:pointer; line-height:1;
+  }
+  .step-btn:hover{ background: var(--saffron); }
+
+  input[type="number"]{
+    font-family: var(--font-body); font-size: 1.05rem; padding: 11px 10px;
+    background: transparent; color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .field > input[type="number"]{
+    border: 1px solid var(--line); border-radius: 8px; background: var(--paper);
+  }
+  input[type="number"]:focus{ background: #fff; }
+
+  .altitude-check{
+    display:flex; align-items:center; gap:8px; margin-top:18px; font-size:0.95rem; color: var(--ink-soft); cursor:pointer;
+  }
+  .altitude-check input{ width:16px; height:16px; }
+
+  .actions{ display:flex; gap:12px; margin-top: 20px; flex-wrap: wrap; }
+  .btn-primary, .btn-ghost, .btn-small{
+    font-family: var(--font-body); font-weight:600; font-size:0.98rem;
+    padding: 12px 22px; border-radius: 8px; cursor:pointer; border: 1px solid transparent;
+  }
+  .btn-primary{ background: var(--paprika-dark); color:#fff; }
+  .btn-primary:hover{ background: var(--paprika); }
+  .btn-ghost{ background: transparent; color: var(--ink); border-color: var(--line); }
+  .btn-ghost:hover{ background: var(--paper-2); }
+  .btn-small{ background: var(--paper-2); color: var(--ink); font-size:0.88rem; padding: 8px 14px; border-color: var(--line); }
+  .btn-small:hover{ background: var(--saffron); }
+
+  .range-hint{ margin: 14px 0 0; font-size:0.88rem; color: var(--paprika-dark); min-height: 1.2em; }
+
+  /* Results */
+  .results{ padding: 26px 0 6px; }
+  .result-card{
+    background: var(--card-bg); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 26px;
+  }
+  .result-top{
+    display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap: 10px 20px;
+    border-bottom: 1px solid var(--line-soft); padding-bottom: 16px; margin-bottom: 16px;
+  }
+  .result-top h2{ margin:0; font-size:1.25rem; }
+  .diameter-stat{ text-align:right; }
+  .diameter-stat .num{ font-family: var(--font-display); font-size:1.7rem; color: var(--paprika-dark); font-variant-numeric: tabular-nums; }
+  .diameter-stat .lbl{ display:block; font-size:0.8rem; color: var(--ink-soft); }
+
+  ul.ticket{ list-style:none; margin:0 0 18px; padding:0; }
+  ul.ticket li{
+    display:flex; align-items:baseline; gap: 8px;
+    padding: 7px 0;
+  }
+  ul.ticket .item{ flex: 0 0 auto; white-space: nowrap; }
+  ul.ticket .dots{
+    flex: 1 1 auto; border-bottom: 2px dotted var(--line);
+    margin-bottom: 5px;
+  }
+  ul.ticket .qty{
+    flex: 0 0 auto; font-variant-numeric: tabular-nums; font-weight:600; white-space:nowrap;
+  }
+  ul.ticket li.subtle .qty{ color: var(--ink-soft); font-weight:500; }
+
+  .time-note{
+    background: var(--paper-2); border-radius: 8px; padding: 14px 16px; font-size:0.94rem; color: var(--ink-soft);
+    margin-bottom: 16px;
+  }
+  .salt-note{ font-size:0.85rem; color: var(--ink-soft); margin-top:-8px; margin-bottom:16px; }
+  .range-warning{
+    background: #fbe9df; border: 1px solid var(--paprika); color: var(--paprika-dark);
+    border-radius: 8px; padding: 10px 14px; font-size: 0.9rem; margin-bottom:16px;
+  }
+
+  .result-actions{ display:flex; gap:10px; flex-wrap:wrap; }
+  .copy-feedback{ font-size:0.85rem; color: var(--olive); align-self:center; }
+
+  .noscript-note{ background: var(--paper-2); border-radius: 8px; padding:16px; }
+
+  /* Considerations */
+  .considerations{ padding: 34px 0; }
+  .consid-list{ list-style:none; margin:0; padding:0; display:grid; gap:14px; }
+  .consid-list li{
+    padding-left: 18px; border-left: 3px solid var(--saffron);
+  }
+  .consid-list strong{ color: var(--ink); }
+
+  /* FAQ */
+  .faq{ padding: 10px 0 34px; }
+  .faq details{
+    border-bottom: 1px solid var(--line); padding: 14px 0;
+  }
+  .faq summary{
+    cursor:pointer; font-weight:600; list-style:none; position:relative; padding-right: 26px;
+  }
+  .faq summary::-webkit-details-marker{ display:none; }
+  .faq summary::after{
+    content: "+"; position:absolute; right:0; top:0; font-size:1.2rem; color: var(--paprika-dark);
+  }
+  .faq details[open] summary::after{ content: "−"; }
+  .faq details p{ margin: 10px 0 0; color: var(--ink-soft); }
+
+  /* Source */
+  .source{ padding: 6px 0 40px; }
+  .fine-print{ font-size:0.85rem; color: var(--ink-soft); }
+
+  /* Footer */
+  .site-footer{ border-top: 1px solid var(--line); padding: 22px 0 40px; }
+  .site-footer p{ color: var(--ink-soft); font-size:0.85rem; margin:0; }
+
+  @media (max-width: 560px){
+    .field-row{ flex-direction:column; align-items:stretch; }
+    .field-sep{ padding-bottom:0; text-align:center; }
+    .diameter-stat{ text-align:left; }
+    .result-top{ flex-direction:column; }
+  }
+
+  @media print{
+    .site-header, .tile-band, .hero, #calcForm, .faq, .site-footer, .result-actions{ display:none !important; }
+    body{ background:#fff; }
+    .result-card{ border:none; padding:0; }
+  }
+</style>
+
+<script>
+(function(){
+  "use strict";
+
+  // Tabla de referencia (proporciones tradicionales, atribuidas a V. Velarte)
+  var TABLE = [
+    {n:2,  d:36,  oil:0.06, salt:13,  chicken:0.3, rabbit:0.2, tomato:0.06, snails:4,  paprika:1.3,  water:1.3,  greenbean:0.1, garrofon:0.05, tavella:0.1, saffron:0.05, rice:0.25},
+    {n:4,  d:50,  oil:0.13, salt:25,  chicken:0.6, rabbit:0.4, tomato:0.11, snails:8,  paprika:2.5,  water:2.6,  greenbean:0.3, garrofon:0.1,  tavella:0.2, saffron:0.06, rice:0.5},
+    {n:6,  d:55,  oil:0.19, salt:38,  chicken:0.9, rabbit:0.7, tomato:0.17, snails:12, paprika:3.8,  water:3.8,  greenbean:0.5, garrofon:0.15, tavella:0.4, saffron:0.09, rice:0.75},
+    {n:8,  d:60,  oil:0.25, salt:50,  chicken:1.3, rabbit:0.9, tomato:0.22, snails:16, paprika:5.0,  water:5.0,  greenbean:0.8, garrofon:0.2,  tavella:0.5, saffron:0.1,  rice:1.0},
+    {n:10, d:65,  oil:0.31, salt:63,  chicken:1.6, rabbit:1.1, tomato:0.28, snails:20, paprika:6.3,  water:6.3,  greenbean:1.1, garrofon:0.2,  tavella:0.6, saffron:0.2,  rice:1.25},
+    {n:12, d:70,  oil:0.38, salt:75,  chicken:1.9, rabbit:1.3, tomato:0.33, snails:24, paprika:7.5,  water:7.0,  greenbean:1.4, garrofon:0.3,  tavella:0.7, saffron:0.3,  rice:1.5},
+    {n:14, d:75,  oil:0.44, salt:88,  chicken:2.2, rabbit:1.4, tomato:0.39, snails:28, paprika:8.8,  water:8.8,  greenbean:1.7, garrofon:0.4,  tavella:0.8, saffron:0.4,  rice:1.75},
+    {n:16, d:80,  oil:0.5,  salt:100, chicken:2.5, rabbit:1.7, tomato:0.44, snails:32, paprika:10.0, water:9.0,  greenbean:2.0, garrofon:0.4,  tavella:0.9, saffron:0.5,  rice:2.0},
+    {n:18, d:85,  oil:0.56, salt:113, chicken:2.8, rabbit:1.9, tomato:0.5,  snails:36, paprika:11.3, water:10.0, greenbean:2.2, garrofon:0.5,  tavella:1.0, saffron:0.6,  rice:2.25},
+    {n:20, d:90,  oil:0.63, salt:125, chicken:3.2, rabbit:2.2, tomato:0.55, snails:40, paprika:12.5, water:10.5, greenbean:2.5, garrofon:0.6,  tavella:1.1, saffron:0.7,  rice:2.5},
+    {n:24, d:95,  oil:0.75, salt:150, chicken:3.8, rabbit:2.6, tomato:0.66, snails:48, paprika:15.0, water:12.0, greenbean:3.1, garrofon:0.8,  tavella:1.4, saffron:0.8,  rice:3.0},
+    {n:28, d:100, oil:0.88, salt:175, chicken:4.4, rabbit:3.1, tomato:0.77, snails:56, paprika:17.5, water:13.5, greenbean:3.7, garrofon:0.9,  tavella:1.7, saffron:0.9,  rice:3.5},
+    {n:30, d:105, oil:1.0,  salt:200, chicken:5.0, rabbit:3.5, tomato:0.88, snails:60, paprika:20.0, water:15.0, greenbean:4.4, garrofon:1.0,  tavella:1.9, saffron:1.0,  rice:4.0},
+    {n:36, d:110, oil:1.13, salt:225, chicken:5.7, rabbit:3.9, tomato:0.99, snails:72, paprika:22.5, water:16.0, greenbean:5.0, garrofon:1.1,  tavella:2.2, saffron:1.1,  rice:4.5},
+    {n:40, d:115, oil:1.25, salt:250, chicken:6.3, rabbit:4.5, tomato:1.1,  snails:80, paprika:25.0, water:17.0, greenbean:5.6, garrofon:1.3,  tavella:2.4, saffron:1.3,  rice:5.0}
+  ];
+  var KEYS = ["d","oil","salt","chicken","rabbit","tomato","snails","paprika","water","greenbean","garrofon","tavella","saffron","rice"];
+  var MIN_N = TABLE[0].n, MAX_N = TABLE[TABLE.length - 1].n;
+
+  function lerp(a, b, t){ return a + t * (b - a); }
+
+  function interp(n, key){
+    var pts = TABLE;
+    if (n <= pts[0].n){
+      var a0 = pts[0], b0 = pts[1];
+      var t0 = (n - a0.n) / (b0.n - a0.n);
+      return lerp(a0[key], b0[key], t0);
+    }
+    if (n >= pts[pts.length - 1].n){
+      var a1 = pts[pts.length - 2], b1 = pts[pts.length - 1];
+      var t1 = (n - a1.n) / (b1.n - a1.n);
+      return lerp(a1[key], b1[key], t1);
+    }
+    for (var i = 0; i < pts.length - 1; i++){
+      var a = pts[i], b = pts[i + 1];
+      if (n >= a.n && n <= b.n){
+        var t = (n - a.n) / (b.n - a.n);
+        return lerp(a[key], b[key], t);
+      }
+    }
+  }
+
+  function computeAll(n){
+    var out = { n: n };
+    for (var i = 0; i < KEYS.length; i++){
+      var v = interp(n, KEYS[i]);
+      out[KEYS[i]] = Math.max(0, v);
+    }
+    return out;
+  }
+
+  function dinersFromRice(kg){
+    var pts = TABLE;
+    if (kg <= pts[0].rice){
+      var a0 = pts[0], b0 = pts[1];
+      var t0 = (kg - a0.rice) / (b0.rice - a0.rice);
+      return lerp(a0.n, b0.n, t0);
+    }
+    if (kg >= pts[pts.length - 1].rice){
+      var a1 = pts[pts.length - 2], b1 = pts[pts.length - 1];
+      var t1 = (kg - a1.rice) / (b1.rice - a1.rice);
+      return lerp(a1.n, b1.n, t1);
+    }
+    for (var i = 0; i < pts.length - 1; i++){
+      var a = pts[i], b = pts[i + 1];
+      if (kg >= a.rice && kg <= b.rice){
+        var t = (kg - a.rice) / (b.rice - a.rice);
+        return lerp(a.n, b.n, t);
+      }
+    }
+  }
+
+  function fmt(v, decimals){
+    return v.toLocaleString("es-ES", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+  }
+
+  // --- DOM ---
+  var comensalesInput = document.getElementById("comensales");
+  var arrozInput = document.getElementById("arroz");
+  var altitudInput = document.getElementById("altitud");
+  var form = document.getElementById("calcForm");
+  var clearBtn = document.getElementById("clearBtn");
+  var resultsEl = document.getElementById("results");
+  var rangeHint = document.getElementById("rangeHint");
+
+  var syncing = false;
+
+  function onComensalesInput(){
+    if (syncing) return;
+    var n = parseFloat(comensalesInput.value);
+    if (!isFinite(n) || n <= 0) return;
+    syncing = true;
+    arrozInput.value = interp(n, "rice").toFixed(2);
+    syncing = false;
+    updateRangeHint(n);
+  }
+
+  function onArrozInput(){
+    if (syncing) return;
+    var kg = parseFloat(arrozInput.value);
+    if (!isFinite(kg) || kg <= 0) return;
+    syncing = true;
+    var n = Math.round(dinersFromRice(kg));
+    comensalesInput.value = Math.max(1, n);
+    syncing = false;
+    updateRangeHint(n);
+  }
+
+  function updateRangeHint(n){
+    if (n < MIN_N){
+      rangeHint.textContent = "Por debajo de " + MIN_N + " comensales, las cantidades son una estimación extrapolada.";
+    } else if (n > 100){
+      rangeHint.textContent = "Por encima de 100 comensales, trata el resultado como una aproximación.";
+    } else {
+      rangeHint.textContent = "";
+    }
+  }
+
+  comensalesInput.addEventListener("input", onComensalesInput);
+  arrozInput.addEventListener("input", onArrozInput);
+
+  document.querySelectorAll(".step-btn").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var step = parseInt(btn.getAttribute("data-step"), 10);
+      var current = parseInt(comensalesInput.value, 10) || 0;
+      comensalesInput.value = Math.max(1, current + step);
+      comensalesInput.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+  });
+
+  function renderResults(n){
+    var r = computeAll(n);
+    var warn = "";
+    if (n < MIN_N || n > 100){
+      warn = '<p class="range-warning">Estás fuera del rango de 2 a 100 comensales con el que mejor funciona esta tabla: toma las cantidades como una primera aproximación.</p>';
+    }
+
+    var altNote = altitudInput.checked
+      ? " Añade unos 2 minutos más a la cocción del arroz por la altitud."
+      : "";
+
+    var html =
+      '<div class="result-card">' +
+        '<div class="result-top">' +
+          '<h2>Para ' + Math.round(n) + ' comensal' + (Math.round(n) === 1 ? "" : "es") + '</h2>' +
+          '<div class="diameter-stat"><span class="num">' + Math.round(r.d) + ' cm</span><span class="lbl">paellera recomendada</span></div>' +
+        '</div>' +
+        warn +
+        '<ul class="ticket">' +
+          ticketRow("Arroz redondo", fmt(r.rice, 2) + " kg") +
+          ticketRow("Agua o caldo", fmt(r.water, 1) + " l") +
+          ticketRow("Aceite de oliva virgen extra", fmt(r.oil, 2) + " l") +
+          ticketRow("Pollo", fmt(r.chicken, 1) + " kg") +
+          ticketRow("Conejo", fmt(r.rabbit, 1) + " kg") +
+          ticketRow("Ferraura (judía verde plana)", fmt(r.greenbean, 1) + " kg") +
+          ticketRow("Garrofón (sin vaina)", fmt(r.garrofon, 1) + " kg") +
+          ticketRow("Tavella (sin vaina)", fmt(r.tavella, 1) + " kg") +
+          ticketRow("Tomate", fmt(r.tomato, 2) + " kg") +
+          ticketRow("Caracoles", Math.round(r.snails) + " unid.", true) +
+          ticketRow("Pimentón dulce", Math.round(r.paprika) + " g") +
+          ticketRow("Azafrán en hebra", fmt(r.saffron, 2) + " g") +
+          ticketRow("Sal", Math.round(r.salt) + " g") +
+        '</ul>' +
+        '<p class="salt-note">La sal es orientativa: pruébala y ajústala a tu gusto antes de servir.</p>' +
+        '<div class="time-note">Hervor del caldo antes de echar el arroz: 15-20 min. Cocción del arroz: 16-18 min (fuerte, luego suave, y un último golpe si hace falta).' + altNote + '</div>' +
+        '<div class="result-actions">' +
+          '<button type="button" class="btn-small" id="copyBtn">Copiar lista</button>' +
+          '<button type="button" class="btn-small" id="printBtn">Imprimir</button>' +
+          '<span class="copy-feedback" id="copyFeedback" role="status" aria-live="polite"></span>' +
+        '</div>' +
+      '</div>';
+
+    resultsEl.innerHTML = html;
+
+    document.getElementById("copyBtn").addEventListener("click", function(){
+      var text = buildPlainText(r, altNote);
+      var feedback = document.getElementById("copyFeedback");
+      navigator.clipboard.writeText(text).then(function(){
+        feedback.textContent = "Copiado";
+        setTimeout(function(){ feedback.textContent = ""; }, 2000);
+      }).catch(function(){
+        feedback.textContent = "No se pudo copiar";
+      });
+    });
+
+    document.getElementById("printBtn").addEventListener("click", function(){
+      window.print();
+    });
+  }
+
+  function ticketRow(label, value){
+    return '<li><span class="item">' + label + '</span><span class="dots"></span><span class="qty">' + value + '</span></li>';
+  }
+
+  function buildPlainText(r, altNote){
+    var lines = [
+      "Paella para " + Math.round(r.n) + " comensales (paellera de " + Math.round(r.d) + " cm)",
+      "- Arroz redondo: " + fmt(r.rice, 2) + " kg",
+      "- Agua o caldo: " + fmt(r.water, 1) + " l",
+      "- Aceite de oliva virgen extra: " + fmt(r.oil, 2) + " l",
+      "- Pollo: " + fmt(r.chicken, 1) + " kg",
+      "- Conejo: " + fmt(r.rabbit, 1) + " kg",
+      "- Ferraura (judía verde plana): " + fmt(r.greenbean, 1) + " kg",
+      "- Garrofón (sin vaina): " + fmt(r.garrofon, 1) + " kg",
+      "- Tavella (sin vaina): " + fmt(r.tavella, 1) + " kg",
+      "- Tomate: " + fmt(r.tomato, 2) + " kg",
+      "- Caracoles: " + Math.round(r.snails) + " unid.",
+      "- Pimentón dulce: " + Math.round(r.paprika) + " g",
+      "- Azafrán en hebra: " + fmt(r.saffron, 2) + " g",
+      "- Sal: " + Math.round(r.salt) + " g (ajusta a tu gusto)",
+      "",
+      "Hervor del caldo: 15-20 min. Cocción del arroz: 16-18 min." + altNote
+    ];
+    return lines.join("\n");
+  }
+
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    var n = parseFloat(comensalesInput.value);
+    if (!isFinite(n) || n <= 0){ n = 8; comensalesInput.value = 8; }
+    renderResults(n);
+    resultsEl.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  altitudInput.addEventListener("change", function(){
+    var n = parseFloat(comensalesInput.value) || 8;
+    if (resultsEl.querySelector(".result-card")) renderResults(n);
+  });
+
+  clearBtn.addEventListener("click", function(){
+    comensalesInput.value = 8;
+    arrozInput.value = "1.00";
+    altitudInput.checked = false;
+    rangeHint.textContent = "";
+    resultsEl.innerHTML = "";
+  });
+
+  // Cálculo inicial visible al cargar la página
+  renderResults(parseFloat(comensalesInput.value) || 8);
+})();
+</script>
+</body>
+</html>
