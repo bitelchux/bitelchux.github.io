@@ -25,10 +25,6 @@ const CONFIG = {
   
   // Rotación del banner en milisegundos (8 segundos)
   BANNER_ROTATION_INTERVAL_MS: 8000,
-  
-  // URLs de destino
-  WHATSAPP_CHANNEL_URL: 'https://whatsapp.com/channel/0029VaC... (pon_aqui_tu_enlace)',
-  ALL_DEALS_URL: 'https://promocionesycolecciones.com/ofertas-amazon/',
 
   // Dominios donde se activará la verificación de adultos (+18)
   ADULT_DOMAINS: [
@@ -240,7 +236,7 @@ function initAmazonStickyButton(affiliateTag) {
 
 /**
  * ============================================================================
- * MÓDULO 3: BANNER DE OFERTAS ROTATIVO Y RESPONSIVO
+ * MÓDULO 3: BANNER DE OFERTAS ROTATIVO (IMAGEN GRANDE, SIN CIERRE NI EXTRA LINKS)
  * ============================================================================
  */
 async function injectOfferBanner(type) {
@@ -284,13 +280,13 @@ async function injectOfferBanner(type) {
     #offer-int-cta { display: flex; align-items: center; justify-content: center; width: 100%; background: #ff9900; color: #000; font-weight: 700; font-size: 14px; padding: 12px; border-radius: 12px; text-decoration: none; box-sizing: border-box; }
     #offer-close-btn { position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 50%; width: 32px; height: 32px; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2; }
     
-    /* BANNER INFERIOR FLOTANTE */
+    /* BANNER INFERIOR FLOTANTE CON IMAGEN MÁS GRANDE */
     #offer-banner {
       position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%) translateY(140%);
       width: calc(100% - 24px); max-width: 860px; background: #18181b; color: #fff;
       z-index: 999999; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       display: flex; align-items: center; justify-content: space-between;
-      padding: 10px 14px; gap: 12px; cursor: pointer; opacity: 0;
+      padding: 10px 14px; gap: 14px; cursor: pointer; opacity: 0;
       border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.12);
       box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.6);
       transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
@@ -298,34 +294,23 @@ async function injectOfferBanner(type) {
     }
     #offer-banner.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
     
-    #offer-banner .offer-left { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
-    #offer-banner .offer-img { width: 52px; height: 52px; object-fit: cover; border-radius: 8px; flex-shrink: 0; background: #27272a; }
-    #offer-banner .offer-info { display: flex; flex-direction: column; min-width: 0; flex: 1; }
-    #offer-banner .offer-title { font-size: 13px; font-weight: 600; color: #f4f4f5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    #offer-banner .offer-sub { display: flex; align-items: center; gap: 8px; margin-top: 3px; flex-wrap: wrap; }
-    #offer-banner .offer-price { background: rgba(220, 38, 38, 0.25); color: #f87171; border: 1px solid rgba(220, 38, 38, 0.4); padding: 1px 7px; border-radius: 6px; font-size: 12px; font-weight: 700; }
-    
-    #offer-banner .offer-whatsapp { color: #25d366; text-decoration: none; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; gap: 3px; }
-    #offer-banner .offer-all { color: #a1a1aa; text-decoration: underline; font-size: 11px; font-weight: 500; }
+    #offer-banner .offer-left { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; }
+    /* Tamaño ampliado de la imagen */
+    #offer-banner .offer-img { width: 70px; height: 70px; object-fit: cover; border-radius: 10px; flex-shrink: 0; background: #27272a; border: 1px solid rgba(255,255,255,0.08); }
+    #offer-banner .offer-info { display: flex; flex-direction: column; min-width: 0; flex: 1; justify-content: center; }
+    #offer-banner .offer-title { font-size: 14px; font-weight: 600; color: #f4f4f5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #offer-banner .offer-sub { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+    #offer-banner .offer-price { background: rgba(220, 38, 38, 0.25); color: #f87171; border: 1px solid rgba(220, 38, 38, 0.4); padding: 2px 9px; border-radius: 6px; font-size: 13px; font-weight: 700; }
     
     #offer-banner .offer-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-    #offer-banner .offer-cta { background: #ff9900; padding: 8px 14px; border-radius: 8px; font-weight: 700; font-size: 12px; text-decoration: none; color: #000; white-space: nowrap; transition: background 0.2s; }
+    #offer-banner .offer-cta { background: #ff9900; padding: 10px 16px; border-radius: 10px; font-weight: 700; font-size: 13px; text-decoration: none; color: #000; white-space: nowrap; transition: background 0.2s; }
     #offer-banner .offer-cta:hover { background: #e68a00; }
-    
-    #offer-banner-close {
-      background: rgba(255, 255, 255, 0.1); border: none; color: #a1a1aa;
-      border-radius: 50%; width: 24px; height: 24px; font-size: 12px;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      transition: all 0.2s; flex-shrink: 0;
-    }
-    #offer-banner-close:hover { background: rgba(255, 255, 255, 0.25); color: #fff; }
 
     @media (max-width: 640px) {
-      #offer-banner { padding: 8px 10px; gap: 8px; }
-      #offer-banner .offer-img { width: 42px; height: 42px; }
+      #offer-banner { padding: 8px 10px; gap: 10px; }
+      #offer-banner .offer-img { width: 56px; height: 56px; }
       #offer-banner .offer-title { font-size: 12px; }
-      #offer-banner .offer-cta { padding: 6px 10px; font-size: 11px; }
-      #offer-banner .offer-all { display: none; }
+      #offer-banner .offer-cta { padding: 8px 12px; font-size: 12px; }
     }
   `;
   document.head.appendChild(style);
@@ -378,32 +363,17 @@ async function injectOfferBanner(type) {
           <div class="offer-title">${item.product_name}</div>
           <div class="offer-sub">
             <span class="offer-price">💰 ${price}</span>
-            <a class="offer-whatsapp" href="${CONFIG.WHATSAPP_CHANNEL_URL}" target="_blank" rel="noopener">
-              💚 WhatsApp
-            </a>
-            <a class="offer-all" href="${CONFIG.ALL_DEALS_URL}" target="_blank" rel="noopener">
-              Ver todos los chollos
-            </a>
           </div>
         </div>
       </div>
       <div class="offer-actions">
         <a class="offer-cta" target="_blank" href="${targetUrl}">Ver oferta →</a>
-        <button id="offer-banner-close" title="Cerrar banner">✕</button>
       </div>
     `;
 
     banner.onclick = (e) => {
-      if (e.target.closest(".offer-cta") || e.target.closest(".offer-whatsapp") || e.target.closest(".offer-all") || e.target.closest("#offer-banner-close")) return;
+      if (e.target.closest(".offer-cta")) return;
       window.open(targetUrl, "_blank");
-    };
-
-    document.getElementById("offer-banner-close").onclick = (e) => {
-      e.stopPropagation();
-      Logger.log("Banner de ofertas cerrado por el usuario.");
-      clearInterval(rotationTimer);
-      banner.classList.remove("visible");
-      setTimeout(() => banner.remove(), 400);
     };
   };
 
@@ -479,9 +449,9 @@ function inyectaTelegramFlotante() {
   loadScript(`https://directorycircle.com/telegram/telegramflotante.php?canal=${canal}`, { async: true });
 }
 
-function inyectaSmartLink() {
+function inyectaSmartLinkPopup() {
   if (window.location.hostname === "docentestic.es") return;
-  Logger.log('Iniciando SmartLink Popunder...');
+  Logger.log('Iniciando SmartLink Popunder Smartkink...');
 
   const popunders = [
     "https://compiledonatevanity.com/yt94dzqqz?key=8c687ab6a953d34b9bee3ccbd9d06a4e"
@@ -501,10 +471,16 @@ function inyectaSmartLink() {
   document.documentElement.addEventListener('click', triggerPop, { once: true });
 }
 
-function loadRandomAds() {
-  Logger.group('Cargando Redes de Publicidad Alternativas');
-  loadScript("https://compiledonatevanity.com/a4/e7/55/a4e7557f2067c4c0f922d9747a61a17f.js");
-  Logger.groupEnd();
+function loadRandomPopAds() {
+   Logger.log('Iniciando SmartLink Popunder Script...');
+  if (window.location.hostname === "docentestic.es") return;
+  const popunders = [
+    "https://compiledonatevanity.com/a4/e7/55/a4e7557f2067c4c0f922d9747a61a17f.js"
+  ];
+  const url = popunders[Math.floor(Math.random() * popunders.length)];
+  
+  loadScript(popunders);
+  
 }
 
 /**
@@ -544,8 +520,11 @@ function initAppManager() {
           }
         } else {
           inyectaTelegramFlotante();
-          inyectaSmartLink();
-          loadRandomAds();
+          if (Math.random() < 0.5) {
+            inyectaSmartLinkPopup();
+          }else{
+            loadRandomPopAds();
+          }
         }
       })
       .catch(err => {
@@ -563,7 +542,7 @@ function initAppManager() {
   }
 }
 
-// Control de carga según estado del DOM (cubre cargas asíncronas / tardías)
+// Control de carga según estado del DOM
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
   initAppManager();
 } else {
