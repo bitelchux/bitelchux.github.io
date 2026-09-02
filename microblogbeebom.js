@@ -519,12 +519,15 @@ function initAppManager() {
             initAmazonStickyButton();
           }
         } else {
-          inyectaTelegramFlotante();
-          if (Math.random() < 0.5) {
-            inyectaSmartLinkPopup();
-          }else{
-            loadRandomPopAds();
-          }
+          
+            inyectaTelegramFlotante();
+            if (window.location.hostname !== "www.infoenbolas.es") {
+              if (Math.random() < 0.5) {
+                inyectaSmartLinkPopup();
+              }else{
+                loadRandomPopAds();
+              }
+            }
         }
       })
       .catch(err => {
