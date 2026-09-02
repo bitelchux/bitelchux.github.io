@@ -28,6 +28,7 @@ const CONFIG = {
 
   // Dominios donde se activará la verificación de adultos (+18)
   ADULT_DOMAINS: [
+    'www.infoenbolas.com',
     'acelstorexxx.es',
     'dedronesxxx.es',
     'localhost'
