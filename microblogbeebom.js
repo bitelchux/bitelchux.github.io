@@ -495,7 +495,7 @@ function initAppManager() {
   setTimeout(updateAmazonAffiliateTags, 1000);
 
   // Exclusión si ya hay Google AdSense en la página
-  if (window.conadsense !== undefined || window.adsbygoogle !== undefined) {
+  if (window.conadsense !== undefined || window.adsbygoogle.requestNonPersonalizedAds !== 1) {
     Logger.warn('Google AdSense detectado. Se detiene la inyección publicitaria.');
     return;
   }
