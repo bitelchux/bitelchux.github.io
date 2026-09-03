@@ -454,9 +454,16 @@ function inyectaSmartLinkPopup() {
   if (window.location.hostname === "docentestic.es") return;
   Logger.log('Iniciando SmartLink Popunder Smartkink...');
 
-  const popunders = [
-    "https://compiledonatevanity.com/yt94dzqqz?key=8c687ab6a953d34b9bee3ccbd9d06a4e"
+  var popunders = [
+    //SmartlinkPopMainstream
+    "https://compiledonatevanity.com/jghpcdpkmw?key=2a577d04945a51bdd71e8814391cec3d"
   ];
+  if (window.isAdultWeb){
+    popunders = [
+    //SmartlinkPopAdult
+      "https://compiledonatevanity.com/vg3ejyvbq?key=ca6fe018d69873f98382f717bc646ca6"
+    ];
+  }
   const url = popunders[Math.floor(Math.random() * popunders.length)];
 
   const triggerPop = () => {
@@ -500,7 +507,16 @@ function initAppManager() {
     Logger.warn('Google AdSense detectado. Se detiene la inyección publicitaria.');
     return;
   }
-
+  const urlParams = new URLSearchParams(window.location.search);
+  
+  // Comprobar si el parámetro utm_source existe y es igual a 'chuscountry'
+  if (urlParams.get('utm_source') === 'chuscountry') {
+    if (window.isAdultWeb)
+      window.location.href = 'https://compiledonatevanity.com/vg3ejyvbq?key=ca6fe018d69873f98382f717bc646ca6'; //SmartlinkPopAdult
+    else
+      window.location.href = 'https://compiledonatevanity.com/jghpcdpkmw?key=2a577d04945a51bdd71e8814391cec3d'; //SmartlinkPopMainstream
+    return;
+  }
   // 2. Verificación de edad y flujo de scripts por país
   checkAgeVerification((isAdult) => {
     if (!isAdult) return;
@@ -522,12 +538,11 @@ function initAppManager() {
         } else {
           
             inyectaTelegramFlotante();
-            if (window.location.hostname !== "www.infoenbolas.es") {
-              if (Math.random() < 0.5) {
+            if (window.location.hostname !== "www.infoenbolas.es") {              
                 inyectaSmartLinkPopup();
-              }else{
-                loadRandomPopAds();
-              }
+                if (window.location.hostname == "www.infoenbolas.es")
+                  loadRandomPopAds();
+              
             }
         }
       })
