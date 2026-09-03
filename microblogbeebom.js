@@ -561,7 +561,7 @@ function initAppManager() {
 
   // 3. Script de analíticas
   if (window.beebomstats === undefined) {
-    if (window.location.hostname !== "www.infoenbolas.es"){
+    if (window.location.hostname != "www.infoenbolas.es" || window.location.hostname != "infoenbolas.es"){
       loadScript("https://bitelchux.github.io/beebomstats.js");
     }
   }
