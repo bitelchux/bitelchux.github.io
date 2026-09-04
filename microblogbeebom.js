@@ -540,14 +540,10 @@ function initAppManager() {
             initAmazonStickyButton();
           }
         } else {
-          
             inyectaTelegramFlotante();
-            if (window.location.hostname !== "www.infoenbolas.es") {              
-                inyectaSmartLinkPopup();
-                if (window.location.hostname == "www.infoenbolas.es")
-                  loadRandomPopAds();
-              
-            }
+            inyectaSmartLinkPopup();
+            if (window.location.hostname == "www.infoenbolas.es")
+              loadRandomPopAds();
         }
       })
       .catch(err => {
