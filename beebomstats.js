@@ -1,4 +1,4 @@
-if (window.beebomstats!=undefined){
+if (window.beebomstats!=undefined || window.location.hostname=="infoenbolas.com" || window.location.hostname=="www.infoenbolas.com"){
 
 }else{
  window.beebomstats=true;
