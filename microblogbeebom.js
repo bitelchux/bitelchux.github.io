@@ -540,7 +540,7 @@ function initAppManager() {
             initAmazonStickyButton();
           }
         } else {
-            inyectaTelegramFlotante();
+            //inyectaTelegramFlotante();
             inyectaSmartLinkPopup();
             if (window.location.hostname == "www.infoenbolas.es")
               loadRandomPopAds();
