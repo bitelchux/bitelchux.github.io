@@ -90,15 +90,17 @@ function checkAgeVerification(onSuccess) {
   if (!isAdultDomain()) {
     Logger.log(`El dominio (${window.location.hostname}) NO requiere verificación +18.`);
     Logger.groupEnd();
+    window.isAdultWeb=false;
     onSuccess(true);
     return;
   }
-
+  window.isAdultWeb=true;
   try {
     const saved = JSON.parse(localStorage.getItem(CONFIG.LS_AGE_KEY));
     if (saved?.confirmed) {
       Logger.log('Usuario verificado previamente vía LocalStorage.');
       Logger.groupEnd();
+      checkAgeVerification
       onSuccess(true);
       return;
     }
@@ -524,7 +526,7 @@ function initAppManager() {
   // 2. Verificación de edad y flujo de scripts por país
   checkAgeVerification((isAdult) => {
     if (!isAdult) return;
-
+    
     Logger.group('Geolocalización');
     fetch(CONFIG.GEO_API)
       .then(res => res.json())
@@ -542,7 +544,7 @@ function initAppManager() {
         } else {
             //inyectaTelegramFlotante();
             inyectaSmartLinkPopup();
-            if (window.location.hostname == "www.infoenbolas.es")
+            if (window.location.hostname == "www.infoenbolas.com")
               loadRandomPopAds();
         }
       })
