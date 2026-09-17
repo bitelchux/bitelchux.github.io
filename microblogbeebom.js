@@ -482,6 +482,7 @@ function inyectaSmartLinkPopup() {
 }
 
 function loadRandomPopAds() {
+  
    Logger.log('Iniciando SmartLink Popunder Script...');
   if (window.location.hostname === "docentestic.es") return;
   const popunders = [
@@ -494,6 +495,8 @@ function loadRandomPopAds() {
 
 
   loadScript(popunders);
+  //adsteraa social
+  loadScript("https://compiledonatevanity.com/e8/e9/23/e8e9237d7e6c9674010946d09842f465.js");
   
 }
 
