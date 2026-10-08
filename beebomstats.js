@@ -12,7 +12,7 @@
   // Configuración
   // ============================================================
   var REEMPLAZOS = {
-    '[NOMBRE DE LA EMPRESA]': 'Fafulisfa LLC',
+    '[NOMBRE DE LA EMPRESA]': 'Botijonline LLC',
     '[DIRECCIÓN DE LA EMPRESA]':'31 Spooner Street, Quahog, Rhode Island, 00093'
   };
 
