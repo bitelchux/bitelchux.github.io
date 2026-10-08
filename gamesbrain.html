@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Emoji Brain Academy</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
@@ -10,6 +10,10 @@
 :root{--pink:#FF6B9D;--purple:#9B5CFF;--sky:#4FB8FF;--green:#3CC36E;--orange:#FF9F43;--ink:#2D2A4A;--mid:#7B789A;--card:rgba(255,255,255,.94);--sh:0 8px 28px rgba(45,42,74,.14)}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{min-height:100%;font-family:'Nunito',system-ui,sans-serif;color:var(--ink);-webkit-tap-highlight-color:transparent}
+/*LOCK*/html,body{overscroll-behavior:none;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+*{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none;touch-action:pan-x pan-y}
+input,textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
+button{touch-action:manipulation}
 body{background:linear-gradient(150deg,#a8edea 0%,#fed6e3 50%,#d4e7ff 100%) fixed;overflow-x:hidden}
 button,input{font-family:inherit;color:inherit}
 button{cursor:pointer;border:none;background:none;touch-action:manipulation}
@@ -293,6 +297,10 @@ const FX={
 //  GAME KIT — shell, HUD, rounds/levels, hearts, timer, saving
 // ═════════════════════════════════════════════════════════════
 const KIT_CSS=`
+html,body{overscroll-behavior:none;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+*{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none;touch-action:pan-x pan-y}
+button{touch-action:manipulation}
+.arcade .k-stage,.arcade .k-stage *{touch-action:none}
 :root{--pink:#FF6B9D;--purple:#9B5CFF;--lilac:#C77DFF;--sky:#4FB8FF;--sun:#FFD93D;--green:#3CC36E;--orange:#FF9F43;--ink:#2D2A4A;--mid:#7B789A;--card:rgba(255,255,255,.94);--sh:0 8px 28px rgba(45,42,74,.14)}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{min-height:100%;font-family:'Nunito',system-ui,sans-serif;color:var(--ink);-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;overflow-x:clip;max-width:100%}
@@ -377,6 +385,7 @@ function startGame(win,def){
   const P=getProg(def.id);P.plays++;save();
   const arcade=def.mode==='arcade',ROUNDS=def.rounds||5,gid=U.strHash(def.id);
   doc.documentElement.lang=S.lang;
+  lockGestures(win);
   const css=doc.createElement('style');css.textContent=KIT_CSS+(def.css||'');doc.head.appendChild(css);
   if(!doc.querySelector('link[href*="fonts.googleapis"]')){const l=doc.createElement('link');l.rel='stylesheet';l.href='https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@600;800;900&display=swap';doc.head.appendChild(l);}
   if(arcade)doc.body.classList.add('arcade');
@@ -566,6 +575,23 @@ function closeGame(){const f=$('frame');f.classList.remove('show');f.src='about:
 
 // public API for the game files (they call parent.Hub)
 window.Hub={start:startGame,U,M,D,SFX,FX,speak,data:loadData,get lang(){return S.lang;},exit:()=>CUR?CUR.exit():closeGame()};
+
+// ─── gesture lock: no pinch/double-tap zoom, no ctrl+wheel/ctrl± zoom, no long-press menu, no drag, no pull-to-refresh ───
+function lockGestures(win){
+  if(!win||win.__locked)return;win.__locked=true;
+  const doc=win.document,stop=e=>{if(e.cancelable)e.preventDefault();},opt={passive:false,capture:true};
+  ['gesturestart','gesturechange','gestureend'].forEach(t=>doc.addEventListener(t,stop,opt));   // iOS pinch
+  doc.addEventListener('touchmove',e=>{if(e.touches&&e.touches.length>1)stop(e);},opt);            // two fingers
+  doc.addEventListener('touchstart',e=>{if(e.touches&&e.touches.length>1)stop(e);},opt);
+  // double-tap zoom is blocked by CSS touch-action (keeps every tap a normal click)
+  doc.addEventListener('dblclick',stop,opt);
+  doc.addEventListener('contextmenu',e=>{if(!e.target.closest||!e.target.closest('input,textarea'))stop(e);},opt);
+  doc.addEventListener('dragstart',stop,opt);
+  doc.addEventListener('selectstart',e=>{if(!e.target.closest||!e.target.closest('input,textarea'))stop(e);},opt);
+  win.addEventListener('wheel',e=>{if(e.ctrlKey)stop(e);},opt);                                   // trackpad pinch / ctrl+wheel
+  win.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&['+','-','=','0','_'].includes(e.key))stop(e);},opt);
+}
+lockGestures(window);
 
 // ─── boot ───
 loadData('games').then(d=>{
