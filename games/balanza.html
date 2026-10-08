@@ -25,6 +25,9 @@ function gen(r,D){
 }
 const TXT={en:u=>`⚖️ The scales are balanced. How many ${u} balance the last one?`,es:u=>`⚖️ Las balanzas están equilibradas. ¿Cuántos ${u} equilibran la última?`,fr:u=>`⚖️ Les balances sont équilibrées. Combien de ${u} pour la dernière ?`};
 const css=`
+.bals{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:2px 10px}
+@media (max-height:640px){.bal{padding:2px 0 12px}.pan{min-height:38px;padding:3px 6px 5px}.pan span{font-size:1.15rem}.mid .post{height:18px}.beam{bottom:12px}.k-choice{min-height:48px}}
+@media (orientation:landscape) and (max-height:540px){.bal{padding:2px 0 12px}.pan{min-height:38px;padding:3px 6px 5px}.pan span{font-size:1.15rem}.mid .post{height:18px}.beam{bottom:12px}}
 .bal{position:relative;display:flex;align-items:flex-end;justify-content:center;gap:0;padding:6px 0 18px;animation:kpop .4s backwards}
 .pan{min-width:96px;max-width:44%;min-height:54px;display:flex;flex-wrap:wrap;gap:1px;justify-content:center;align-content:flex-end;padding:6px 8px 8px;border-bottom:6px solid #a77c52;border-radius:0 0 30px 30px;background:linear-gradient(#fff0,#fff7e6)}
 .pan span{font-size:clamp(1.15rem,5vw,1.6rem);line-height:1.05}
@@ -33,15 +36,16 @@ const css=`
 .mid .post{width:8px;height:30px;background:#a77c52;border-radius:4px}
 .beam{position:absolute;bottom:18px;left:10%;right:10%;height:5px;background:#a77c52;border-radius:4px;z-index:-1}
 .bal.q .pan.right{border-bottom-color:var(--purple)}
-.qm{font-family:'Fredoka One';font-size:1.6rem;color:var(--purple)}
+.qm{font-family:'Fredoka One',ui-rounded,'Nunito',system-ui,sans-serif;font-size:1.6rem;color:var(--purple)}
 .k-choice{font-size:clamp(1.3rem,5.5vw,1.8rem)}
 `;
-H.start(window,{id:'balanza',mode:'rounds',css,
+H.start(window,{id:'balanza',mode:'rounds',css,noSplit:true,
   timer:D=>Math.max(15,Math.round(70*Math.pow(.9,D))),
   round(g){
     const P=gen(g.r,g.D),E=P.pool;g.prompt(g.t(TXT)(E[0]));
     const side=(arr,cls)=>{const p=g.el('div','pan '+cls);arr.forEach(([i,c])=>{for(let k=0;k<c;k++)g.el('span','',E[i],p);});return p;};
-    const bal=(L,R,q)=>{const b=g.el('div','bal'+(q?' q':''),null,g.stage);b.appendChild(side(L,'left'));g.el('div','mid','<b>=</b><div class="post"></div>',b);
+    const bals=g.el('div','bals',null,g.stage);
+    const bal=(L,R,q)=>{const b=g.el('div','bal'+(q?' q':''),null,bals);b.appendChild(side(L,'left'));g.el('div','mid','<b>=</b><div class="post"></div>',b);
       if(R)b.appendChild(side(R,'right'));else g.el('div','pan right',`<span class="qm">? × ${E[0]}</span>`,b);g.el('div','beam',null,b);return b;};
     P.clues.forEach(([L,R],i)=>{bal(L,R).style.animationDelay=(i*.12)+'s';});
     const qb=bal(P.q,null,true);

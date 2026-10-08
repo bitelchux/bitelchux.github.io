@@ -24,15 +24,16 @@ function gen(r,D){
   return{s,choices:shuf(r,[...out.values()])};
 }
 const css=`
-.sent{font-family:'Fredoka One';font-size:clamp(1.2rem,5.4vw,1.6rem);text-align:center;background:#fff;border-radius:18px;padding:12px 14px;box-shadow:0 4px 14px rgba(45,42,74,.08);line-height:1.35}
+.sent{font-family:'Fredoka One',ui-rounded,'Nunito',system-ui,sans-serif;font-size:clamp(1.2rem,5.4vw,1.6rem);text-align:center;background:#fff;border-radius:18px;padding:12px 14px;box-shadow:0 4px 14px rgba(45,42,74,.08);line-height:1.35}
 .k-choices{--cols:2}
-.k-choice{aspect-ratio:1.15;flex-direction:column;background:linear-gradient(#eaf7ff 0 62%,#e6f6dc 62%);font-family:'Nunito'}
+.k-choice{aspect-ratio:auto;height:clamp(84px,19vh,150px);flex-direction:column;background:linear-gradient(#eaf7ff 0 62%,#e6f6dc 62%);font-family:'Nunito'}
 .sc{display:flex;align-items:center;justify-content:center;gap:2px}
 .sc.col{flex-direction:column}
 .grp{display:flex;gap:1px;justify-content:center}
-.grp span{font-size:clamp(1.1rem,4.6vw,1.5rem);line-height:1}
-.grp.big span{font-size:clamp(1.7rem,7vw,2.3rem)}.grp.small span{font-size:clamp(.8rem,3.2vw,1rem)}
-.obj{font-size:clamp(2.3rem,10vw,3.2rem);line-height:1}
+.grp span{font-size:12cqw;line-height:1}
+.grp.big span{font-size:16cqw}.grp.small span{font-size:8cqw}
+.obj{font-size:24cqw;line-height:1}
+@media (orientation:landscape) and (max-height:540px){.k-choice{aspect-ratio:auto;height:clamp(60px,31vh,130px)}.sent{padding:6px 10px;font-size:1.1rem}}
 `;
 H.start(window,{id:'escena',mode:'rounds',css,
   timer:D=>D<2?null:Math.max(15,Math.round(60*Math.pow(.9,D))),

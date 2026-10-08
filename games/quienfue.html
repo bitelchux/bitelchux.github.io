@@ -35,7 +35,7 @@ function gen(r,D){
   return null;
 }
 const css=`
-.case{text-align:center;font-family:'Fredoka One';font-size:clamp(1.05rem,4.4vw,1.3rem)}
+.case{overflow:hidden;text-align:center;font-family:'Fredoka One',ui-rounded,'Nunito',system-ui,sans-serif;font-size:clamp(1.05rem,4.4vw,1.3rem)}
 .case span{font-size:2.4rem;display:block;animation:kwob 2s infinite}
 .rule{text-align:center;font-weight:900;background:#fff6d8;border:2px solid #ffd93d;border-radius:14px;padding:8px;color:#8a6200}
 .sus{display:grid;gap:10px}
@@ -43,9 +43,11 @@ const css=`
 .k-choice{justify-content:flex-start;gap:12px;font-family:'Nunito';font-size:clamp(1rem,4.2vw,1.2rem);font-weight:800;min-height:70px;padding:8px 14px;text-align:left}
 .k-choice .av{font-size:2.4rem;flex-shrink:0}
 .k-choice .bub{background:#f3efff;border-radius:16px 16px 16px 4px;padding:8px 12px;position:relative}
-.ask{text-align:center;font-family:'Fredoka One';color:var(--purple);font-size:1.15rem}
+@media (orientation:landscape) and (max-height:540px){.case span{display:inline;font-size:1.5rem;animation:none;margin-right:6px}.k-choices{--cols:2!important;max-width:100%}.k-choice{min-height:50px;padding:5px 8px;font-size:.92rem}.k-choice .av{font-size:1.7rem}.rule{padding:4px}}
+@media (max-height:640px){.case span{font-size:1.6rem}.k-choice{min-height:54px}.k-choice .av{font-size:1.8rem}}
+.ask{text-align:center;font-family:'Fredoka One',ui-rounded,'Nunito',system-ui,sans-serif;color:var(--purple);font-size:1.15rem}
 `;
-H.start(window,{id:'quienfue',mode:'rounds',css,
+H.start(window,{id:'quienfue',mode:'rounds',css,noSplit:true,
   timer:D=>Math.max(25,Math.round(90*Math.pow(.9,D))),
   round(g){
     const P=gen(g.r,g.D);const L=g.lang,say=SAY[g.lang]||SAY.en;

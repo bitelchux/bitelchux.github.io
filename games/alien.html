@@ -47,13 +47,15 @@ function gen(r,D){
 }
 const TXT={en:'👽 Learn the alien words from the examples. What does the last one mean?',es:'👽 Aprende las palabras alienígenas con los ejemplos. ¿Qué significa la última?',fr:'👽 Apprends les mots extraterrestres avec les exemples. Que veut dire le dernier ?'};
 const css=`
-.exs{display:grid;gap:8px}
-.ex{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#fff;border-radius:16px;padding:8px 12px;box-shadow:0 4px 12px rgba(45,42,74,.08);animation:kpop .4s backwards}
-.say{font-family:'Fredoka One';font-size:clamp(1.05rem,4.6vw,1.35rem);color:#2aa36b;background:#e9fff2;border-radius:14px;padding:6px 12px;letter-spacing:.5px}
+.exs{display:grid;gap:7px;grid-template-columns:repeat(auto-fill,minmax(135px,1fr))}
+.ex{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:0;background:#fff;border-radius:16px;padding:8px 12px;box-shadow:0 4px 12px rgba(45,42,74,.08);animation:kpop .4s backwards}
+.say{max-width:100%;overflow-wrap:anywhere;text-align:center;font-family:'Fredoka One',ui-rounded,'Nunito',system-ui,sans-serif;font-size:clamp(1rem,4.2vmin,1.3rem);color:#2aa36b;background:#e9fff2;border-radius:14px;padding:6px 12px;letter-spacing:.5px}
 .say:before{content:'👽 '}
 .pic{display:flex;gap:2px;align-items:flex-end;min-height:34px}
-.pic span{font-size:1.5rem;line-height:1}.pic.big span{font-size:2.3rem}.pic.small span{font-size:1.05rem}
-.q{background:linear-gradient(140deg,#f5eeff,#ffeef6);border:2.5px solid var(--lilac)}
+.pic span{font-size:1.35rem;line-height:1}.pic.big span{font-size:2rem}.pic.small span{font-size:.95rem}
+@media (orientation:landscape) and (max-height:540px){.exs{grid-template-columns:repeat(auto-fill,minmax(110px,1fr))}.ex{padding:4px 6px}}
+@media (max-height:640px){.ex{padding:4px 6px;gap:2px}.say{font-size:.95rem;padding:3px 8px}}
+.ex.q{grid-column:1/-1;flex-direction:row;justify-content:space-around}.q{background:linear-gradient(140deg,#f5eeff,#ffeef6);border:2.5px solid var(--lilac)}
 .k-choice .pic{justify-content:center}
 `;
 H.start(window,{id:'alien',mode:'rounds',css,

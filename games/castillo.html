@@ -8,19 +8,20 @@ const {ri,pick}=H.U;
 const MON=['👾','👹','👻','🧟','🐲','🦇','🕷️','🤖'];
 const INTRO={en:'Type the answer and press 🔥 to stop the monsters before they reach the castle!',es:'¡Escribe el resultado y pulsa 🔥 para parar a los monstruos antes de que lleguen al castillo!',fr:'Tape le résultat et appuie sur 🔥 pour arrêter les monstres avant le château !'};
 const css=`
-.field{position:relative;flex:1;min-height:250px;border-radius:16px;overflow:hidden;background:linear-gradient(#bfe6ff 0 55%,#9ad67c 55% 100%)}
+.field{position:relative;flex:1;min-height:110px;border-radius:16px;overflow:hidden;background:linear-gradient(#bfe6ff 0 55%,#9ad67c 55% 100%)}
 .castle{position:absolute;left:4px;bottom:8%;font-size:clamp(3rem,13vw,4.4rem);z-index:2;transition:transform .2s}
 .castle.hit{animation:kshake .4s}
 .mon{position:absolute;display:flex;flex-direction:column;align-items:center;transform:translateX(-50%);z-index:3}
 .mon .e{font-size:clamp(2rem,8vw,2.7rem);animation:walk .5s ease-in-out infinite alternate}
 @keyframes walk{to{transform:translateY(-4px) rotate(4deg)}}
-.mon .l{font-family:'Fredoka One';background:#fff;border-radius:10px;padding:2px 8px;font-size:clamp(.9rem,3.8vw,1.15rem);box-shadow:0 3px 8px rgba(0,0,0,.15);white-space:nowrap;color:#2d2a4a}
+.mon .l{font-family:'Fredoka One',ui-rounded,'Nunito',system-ui,sans-serif;background:#fff;border-radius:10px;padding:2px 8px;font-size:clamp(.9rem,3.8vw,1.15rem);box-shadow:0 3px 8px rgba(0,0,0,.15);white-space:nowrap;color:#2d2a4a}
 .mon .l.dots{letter-spacing:-1px;color:#e2457e}
 .pad{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:6px}
-.pad button{height:clamp(44px,11vw,54px);border-radius:12px;background:#fff;font-family:'Fredoka One';font-size:1.3rem;box-shadow:0 3px 8px rgba(45,42,74,.12)}
+.pad button{height:clamp(44px,11vw,54px);border-radius:12px;background:#fff;font-family:'Fredoka One',ui-rounded,'Nunito',system-ui,sans-serif;font-size:1.3rem;box-shadow:0 3px 8px rgba(45,42,74,.12)}
 .pad button:active{transform:scale(.92)}
 .pad .fire{background:linear-gradient(135deg,#ff9f43,#ff6b9d);color:#fff;grid-column:span 2}
-.disp{grid-column:span 2;display:flex;align-items:center;justify-content:center;font-family:'Fredoka One';font-size:1.6rem;background:#2d2a4a;color:#ffd93d;border-radius:12px;min-height:44px}
+.disp{grid-column:span 2;display:flex;align-items:center;justify-content:center;font-family:'Fredoka One',ui-rounded,'Nunito',system-ui,sans-serif;font-size:1.6rem;background:#2d2a4a;color:#ffd93d;border-radius:12px;min-height:44px}
+@media (orientation:landscape) and (max-height:540px){.k-stage{flex-direction:row!important;gap:8px!important}.pad{width:36%;margin:0;grid-template-columns:repeat(4,1fr);align-content:center;gap:5px}.pad button{height:clamp(34px,13vh,48px);font-size:1.1rem}.disp{grid-column:span 4;min-height:36px}.pad .fire{grid-column:span 4}}
 `;
 H.start(window,{id:'castillo',mode:'arcade',css,intro:g=>g.t(INTRO),
   wave(g){

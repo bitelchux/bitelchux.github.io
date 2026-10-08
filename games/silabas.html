@@ -10,12 +10,12 @@ const css=`
 .top{display:flex;align-items:center;justify-content:center;gap:10px}
 .pic{font-size:clamp(3.4rem,15vw,4.6rem);animation:kwob 2.4s ease-in-out infinite}
 .slots{display:flex;justify-content:center;gap:6px;flex-wrap:wrap}
-.slot{min-width:clamp(54px,15vw,74px);height:clamp(50px,13vw,62px);border-radius:14px;border:3px dashed var(--lilac);display:flex;align-items:center;justify-content:center;font-family:'Fredoka One';font-size:clamp(1.3rem,5.5vw,1.8rem);color:var(--purple);padding:0 8px;background:#faf6ff}
+.slot{min-width:clamp(54px,15vw,74px);height:clamp(50px,13vw,62px);border-radius:14px;border:3px dashed var(--lilac);display:flex;align-items:center;justify-content:center;font-family:'Fredoka One',ui-rounded,'Nunito',system-ui,sans-serif;font-size:clamp(1.3rem,5.5vw,1.8rem);color:var(--purple);padding:0 8px;background:#faf6ff}
 .slot.now{border-style:solid;border-color:var(--purple);animation:kbeat 1.3s infinite}
 .slot.full{border:3px solid var(--green);background:#ecfff3;color:#1e8a4a;animation:kpop .3s}
-.pond{position:relative;height:clamp(230px,46vh,330px);border-radius:20px;background:radial-gradient(circle at 30% 20%,#e8f7ff,#cdeaff);overflow:hidden}
+.pond{position:relative;height:clamp(170px,46vh,330px);border-radius:20px;background:radial-gradient(circle at 30% 20%,#e8f7ff,#cdeaff);overflow:hidden}
 .bub{position:absolute;width:clamp(64px,18vw,82px);height:clamp(64px,18vw,82px);border-radius:50%;display:flex;align-items:center;justify-content:center;
-  font-family:'Fredoka One';font-size:clamp(1.15rem,5vw,1.5rem);color:#2d2a4a;cursor:pointer;
+  font-family:'Fredoka One',ui-rounded,'Nunito',system-ui,sans-serif;font-size:clamp(1.15rem,5vw,1.5rem);color:#2d2a4a;cursor:pointer;
   background:radial-gradient(circle at 32% 28%,#fff 0 12%,rgba(255,255,255,.55) 13%,rgba(180,225,255,.75) 60%,rgba(140,200,255,.9));box-shadow:inset -4px -6px 12px rgba(79,184,255,.35),0 4px 12px rgba(45,42,74,.12);
   animation:bob var(--t) ease-in-out infinite alternate;border:2px solid rgba(255,255,255,.9)}
 .bub.k-wrong{background:#ffd6dc!important}
@@ -37,7 +37,7 @@ H.start(window,{id:'silabas',mode:'rounds',css,
     g.prompt(g.t(TXT));
     const top=g.el('div','top',null,g.stage);g.el('div','pic',W.e,top);g.sayBtn(W.w,top);
     const slots=g.el('div','slots',null,g.stage);const sl=need.map((_,i)=>g.el('div','slot'+(i?'':' now'),'',slots));
-    const pond=g.el('div','pond',null,g.stage);
+    const pond=g.el('div','pond k-ans',null,g.stage);
     const items=shuf(r,need.concat(others)),N=items.length,cols=N<=4?2:3,rows=Math.ceil(N/cols);
     let ptr=0;
     items.forEach((s,i)=>{

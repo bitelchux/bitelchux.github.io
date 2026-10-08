@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Emoji Brain Academy</title>
+<title>Emoji Brain Academy · ABN</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
 <style>
@@ -91,7 +91,7 @@ button{cursor:pointer;border:none;background:none;touch-action:manipulation}
 
 <!-- PROFILES -->
 <section class="scr show" id="sProf">
-  <div class="brand"><div class="lg">🧠</div><h1 id="appName">Emoji Brain Academy</h1><p data-t="tagline"></p></div>
+  <div class="brand"><div class="lg">🧮</div><h1 id="appName">Emoji Brain Academy · ABN</h1><p data-t="tagline"></p></div>
   <div class="toprow" id="langRow"></div>
   <div class="panel" id="profPanel">
     <div class="h2"><span data-t="who"></span><button class="mini" id="editBtn"></button></div>
@@ -133,9 +133,9 @@ button{cursor:pointer;border:none;background:none;touch-action:manipulation}
 //  SHARED UTILITIES  (used by every game through parent.Hub)
 // ═════════════════════════════════════════════════════════════
 // ── HUB CONFIG ── indexinnovabn.html is generated from this file changing only these three lines
-const APP_NAME='Emoji Brain Academy';
-const GAME_SET=null;          // null = every game · 'innovabn' = only the Innovamat/ABN-style subset
-const TAGLINE=null;           // null = default tagline
+const APP_NAME='Emoji Brain Academy · ABN';
+const GAME_SET='innovabn';         // null = every game · 'innovabn' = only the Innovamat/ABN-style subset
+const TAGLINE={en:'Maths with ABN and manipulatives',es:'Mates con ABN y material manipulativo',fr:'Maths avec ABN et matériel de manipulation'};          // null = default tagline
 const KEY='eba_v1';
 const U={
   mkRand(seed){let a=seed>>>0;return()=>{a=(a+0x6D2B79F5)|0;let t=Math.imul(a^(a>>>15),1|a);t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296;};},

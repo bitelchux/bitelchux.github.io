@@ -10,8 +10,8 @@ const BTN={en:['✅ Real','🚫 Made-up'],es:['✅ Real','🚫 Inventada'],fr:['
 const css=`
 .prog{display:flex;gap:6px;justify-content:center}
 .prog i{width:14px;height:14px;border-radius:50%;background:#e7e3f3}.prog i.ok{background:var(--green)}.prog i.no{background:var(--pink)}.prog i.now{background:var(--lilac);animation:kbeat 1.2s infinite}
-.card{min-height:clamp(120px,30vw,170px);border-radius:22px;background:#fff;box-shadow:0 6px 20px rgba(45,42,74,.1);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;padding:10px}
-.card b{font-family:'Fredoka One';font-weight:400;font-size:clamp(2.2rem,11vw,3.4rem);letter-spacing:1.5px;animation:kpop .35s}
+.card{min-height:min(170px,30vw,28vh);border-radius:22px;background:#fff;box-shadow:0 6px 20px rgba(45,42,74,.1);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;padding:10px}
+.card b{font-family:'Fredoka One',ui-rounded,'Nunito',system-ui,sans-serif;font-weight:400;font-size:clamp(2.2rem,11vw,3.4rem);letter-spacing:1.5px;animation:kpop .35s}
 .card small{font-size:1.6rem;min-height:1.8rem}
 .k-choices{--cols:2}
 .k-choice{font-size:clamp(1.1rem,5vw,1.4rem);min-height:76px}

@@ -11,11 +11,11 @@ const INTRO={
   es:(op,T)=>`Toca dos frutas que ${op==='+'?'sumen':'multiplicadas den'} ${T}. ¡Cuidado con las bombas 💣!`,
   fr:(op,T)=>`Touche deux fruits qui ${op==='+'?'font':'multipliés font'} ${T}. Attention aux bombes 💣 !`};
 const css=`
-.dojo{position:relative;flex:1;min-height:360px;border-radius:16px;overflow:hidden;background:linear-gradient(#ffe9c7,#ffc9a8 60%,#e8a27c)}
-.goal{position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:5;font-family:'Fredoka One';font-size:clamp(1.4rem,6.5vw,2rem);background:#2d2a4a;color:#ffd93d;padding:3px 18px;border-radius:16px;white-space:nowrap}
+.dojo{position:relative;flex:1;min-height:0;border-radius:16px;overflow:hidden;background:linear-gradient(#ffe9c7,#ffc9a8 60%,#e8a27c)}
+.goal{position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:5;font-family:'Fredoka One',ui-rounded,'Nunito',system-ui,sans-serif;font-size:clamp(1.4rem,6.5vw,2rem);background:#2d2a4a;color:#ffd93d;padding:3px 18px;border-radius:16px;white-space:nowrap}
 .fr{position:absolute;left:0;top:0;width:clamp(64px,17vw,80px);height:clamp(64px,17vw,80px);margin:calc(clamp(64px,17vw,80px)/-2) 0 0 calc(clamp(64px,17vw,80px)/-2);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:3;border-radius:50%}
 .fr .e{font-size:clamp(2.4rem,10vw,3.1rem)}
-.fr .n{position:absolute;font-family:'Fredoka One';font-size:clamp(1.1rem,5vw,1.45rem);color:#fff;-webkit-text-stroke:1.5px #2d2a4a;paint-order:stroke fill;text-shadow:0 2px 0 #2d2a4a}
+.fr .n{position:absolute;font-family:'Fredoka One',ui-rounded,'Nunito',system-ui,sans-serif;font-size:clamp(1.1rem,5vw,1.45rem);color:#fff;-webkit-text-stroke:1.5px #2d2a4a;paint-order:stroke fill;text-shadow:0 2px 0 #2d2a4a}
 .fr .n.dots{font-size:.9rem;letter-spacing:-1px;max-width:60px;text-align:center;line-height:.9}
 .fr.sel{box-shadow:0 0 0 4px #fff,0 0 0 8px var(--purple);background:rgba(155,92,255,.18)}
 .fr.cut{animation:cut .4s forwards;pointer-events:none}@keyframes cut{to{transform:scale(1.4) rotate(40deg);opacity:0}}
