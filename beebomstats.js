@@ -12,7 +12,8 @@
   // Configuración
   // ============================================================
   var REEMPLAZOS = {
-    '[NOMBRE DE LA EMPRESA]': 'Fafulisfa LLC'
+    '[NOMBRE DE LA EMPRESA]': 'Fafulisfa LLC',
+    '[DIRECCIÓN DE LA EMPRESA]':'31 Spooner Street, Quahog, Rhode Island, 00093'
   };
 
   var STATS_URL = 'https://pbnstats.promocionesycolecciones.com/add.php';
