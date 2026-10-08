@@ -2,6 +2,34 @@ if (window.beebomstats!=undefined || window.location.hostname=="infoenbolas.com"
 
 }else{
  window.beebomstats=true;
+ if (window.next!=undefined){
+      //para tucristalero tu alarma y demas
+      // Segunda pasada: placeholders partidos entre etiquetas inline
+      function reemplazarPartido(buscar, reemplazo, raiz = document.body) {
+        // Escapa caracteres especiales de regex ([ ] etc.)
+        const escapar = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        // Permite etiquetas HTML entre cada carácter del texto buscado
+        const patron = new RegExp(
+          [...buscar].map(escapar).join('(?:<[^>]+>)*'),
+          'g'
+        );
+      
+        // Solo elementos cuyo texto visible contiene el placeholder
+        // pero ningún hijo directo lo contiene entero (= está partido aquí)
+        raiz.querySelectorAll('li, p, td, th, h1, h2, h3, h4, h5, h6, span, a, div').forEach(el => {
+          if (!el.textContent.includes(buscar)) return;
+          const algunHijoLoTiene = [...el.children].some(h => h.textContent.includes(buscar));
+          if (algunHijoLoTiene) return;
+      
+          el.innerHTML = el.innerHTML.replace(patron, reemplazo);
+        });
+      }
+      
+      document.addEventListener('DOMContentLoaded', () => {
+        reemplazarTexto('[NOMBRE DE LA EMPRESA]', 'Fafulisfa LLC');   // casos normales
+        reemplazarPartido('[NOMBRE DE LA EMPRESA]', 'Fafulisfa LLC'); // casos partidos
+      });
+ }
  function decodeHex(x) {
  
      var j;
