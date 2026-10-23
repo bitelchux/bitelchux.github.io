@@ -7,7 +7,28 @@
   var HOST = location.hostname.replace(/^www\./, '');
   if (window.beebomstats !== undefined || HOST === 'infoenbolas.com') return;
   window.beebomstats = true;
+  //Gooogle Analitycs
+  var GA_ID = 'G-XNB4SZJ7GQ';
 
+  // Evitar cargarlo dos veces
+  if (window.__gaLoaded) return;
+  window.__gaLoaded = true;
+
+  // dataLayer y función gtag disponibles antes de que cargue el script
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = window.gtag || function () { dataLayer.push(arguments); };
+
+  gtag('js', new Date());
+  gtag('config', GA_ID);
+
+  // Inyectar el script de forma asíncrona
+  var s = document.createElement('script');
+  s.async = true;
+  s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+  (document.head || document.documentElement).appendChild(s);
+
+
+  
   // ============================================================
   // Configuración
   // ============================================================
