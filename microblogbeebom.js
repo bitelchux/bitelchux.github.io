@@ -92,8 +92,8 @@
       COOKIE: 'popunder',
       HOURS: 12,
       EXCLUDED_HOSTS: ['docentestic.es'],
-      ADSTERRA_POPUNDERS: ['https://compiledonatevanity.com/a4/e7/55/a4e7557f2067c4c0f922d9747a61a17f.js'],
-      ADSTERRA_SOCIAL: 'https://compiledonatevanity.com/e8/e9/23/e8e9237d7e6c9674010946d09842f465.js'
+      ADSTERRA_POPUNDERS: ['https://benchform.org/1/a4e7557f2067c4c0f922d9747a61a17f'],
+      ADSTERRA_SOCIAL: 'https://biomanos.org/14/e8e9237d7e6c9674010946d09842f465'
     },
 
     ANALYTICS: {
@@ -134,6 +134,7 @@
     Logger.log(`Cargando script externo: ${src}`);
     const script = document.createElement('script');
     script.src = src;
+    script.setAttribute('data-cfasync', 'false');
     Object.entries(attrs).forEach(([k, v]) => script.setAttribute(k, v));
     document.head.appendChild(script);
     return script;
