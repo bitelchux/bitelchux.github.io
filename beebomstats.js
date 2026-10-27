@@ -28,7 +28,7 @@
   (document.head || document.documentElement).appendChild(s);
 
 
-  
+
   // ============================================================
   // Configuración
   // ============================================================
@@ -38,6 +38,25 @@
   };
 
   var STATS_URL = 'https://pbnstats.promocionesycolecciones.com/add.php';
+
+  // Configuración del aviso (popup / barra fija)
+  var AVISO = {
+    activo: true,
+    titulo: 'Título del aviso',                 // solo se ve en el popup
+    texto: 'Texto del aviso. Cámbialo aquí.',   // se ve en popup y en barra
+    botonTexto: 'Ver más',                      // '' = sin botón
+    botonUrl: 'https://example.com/',
+    botonNuevaPestana: true,
+    colorBoton: '#0a7cff',
+    segundosAutoMinimizar: 8,  // popup -> barra tras N segundos (0 = solo al cerrar)
+    cerrableBarra: true,       // la barra tiene X para ocultarla en la sesión
+    geoCloudflare: true,       // intenta /cdn-cgi/trace (solo si el sitio va por Cloudflare)
+    geoTimeoutMs: 1500,        // máximo de espera de la geo antes de usar la zona horaria
+    // Al hacer clic en el botón se registra una visita virtual en pbnstats
+    // con la URL https://<discoverDominio>/<slug-del-dominio-actual>
+    discoverDominio: 'addedtodiscover.com',
+    discoverAux1: 'x1'         // valor de aux1 para estas visitas (cámbialo si quieres separarlas)
+  };
 
   var BOT_RE = new RegExp('(googlebot\/|bot|Googlebot-Mobile|Googlebot-Image|Google favicon|Mediapartners-Google|bingbot|slurp|java|wget|curl|Commons-HttpClient|Python-urllib|libwww|httpunit|nutch|phpcrawl|msnbot|jyxobot|FAST-WebCrawler|FAST Enterprise Crawler|biglotron|teoma|convera|seekbot|gigablast|exabot|ngbot|ia_archiver|GingerCrawler|webmon |httrack|webcrawler|grub.org|UsineNouvelleCrawler|antibot|netresearchserver|speedy|fluffy|bibnum.bnf|findlink|msrbot|panscient|yacybot|AISearchBot|IOI|ips-agent|tagoobot|MJ12bot|dotbot|woriobot|yanga|buzzbot|mlbot|yandexbot|purebot|Linguee Bot|Voyager|CyberPatrol|voilabot|baiduspider|citeseerxbot|spbot|twengabot|postrank|turnitinbot|scribdbot|page2rss|sitebot|linkdex|Adidxbot|blekkobot|ezooms|Mail.RU_Bot|discobot|heritrix|findthatfile|europarchive.org|NerdByNature.Bot|sistrix crawler|ahrefsbot|Aboundex|domaincrawler|wbsearchbot|summify|ccbot|edisterbot|seznambot|ec2linkfinder|gslfbot|aihitbot|intelium_bot|facebookexternalhit|yeti|RetrevoPageAnalyzer|lb-spider|sogou|lssbot|careerbot|wotbox|wocbot|ichiro|DuckDuckBot|lssrocketcrawler|drupact|webcompanycrawler|acoonbot|openindexspider|gnam gnam spider|web-archive-net.com.bot|backlinkcrawler|coccoc|integromedb|content crawler spider|toplistbot|seokicks-robot|it2media-domain-crawler|ip-web-crawler.com|siteexplorer.info|elisabot|proximic|changedetection|blexbot|arabot|WeSEE:Search|niki-bot|CrystalSemanticsBot|rogerbot|360Spider|psbot|InterfaxScanBot|Lipperhey SEO Service|CC Metadata Scaper|g00g1e.net|GrapeshotCrawler|urlappendbot|brainobot|fr-crawler|binlar|SimpleCrawler|Livelapbot|Twitterbot|cXensebot|smtbot|bnf.fr_bot|A6-Indexer|ADmantX|Facebot|OrangeBot|memorybot|AdvBot|MegaIndex|SemanticScholarBot|ltx71|nerdybot|xovibot|BUbiNG|Qwantify|archive.org_bot|Applebot|TweetmemeBot|crawler4j|findxbot|SemrushBot|yoozBot|lipperhey|y!j-asr|Domain Re-Animator Bot|AddThis)', 'i');
 
@@ -67,6 +86,14 @@
 
   function escaparRegex(s) {
     return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  // sessionStorage protegido (puede fallar en modo privado o con cookies bloqueadas)
+  function leerSesion(clave) {
+    try { return window.sessionStorage.getItem(clave); } catch (e) { return null; }
+  }
+  function guardarSesion(clave, valor) {
+    try { window.sessionStorage.setItem(clave, valor); } catch (e) { /* sin almacenamiento */ }
   }
 
   // ============================================================
@@ -149,6 +176,309 @@
   }
 
   // ============================================================
+  // Geolocalización: ¿el usuario está en España?
+  // ============================================================
+
+  // Heurística sin llamadas externas: zona horaria del sistema.
+  // Cubre península/Baleares, Canarias y Ceuta/Melilla.
+  function paisPorZonaHoraria() {
+    var zonasEs = ['Europe/Madrid', 'Atlantic/Canary', 'Africa/Ceuta'];
+    try {
+      var tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      if (tz) return zonasEs.indexOf(tz) !== -1 ? 'ES' : 'XX';
+    } catch (e) { /* navegador sin Intl */ }
+    // Último recurso: idioma del navegador (es-ES casi siempre es España)
+    var idioma = (navigator.language || '').toLowerCase();
+    return idioma === 'es-es' ? 'ES' : 'XX';
+  }
+
+  // Si el sitio va por Cloudflare, /cdn-cgi/trace devuelve "loc=XX" por IP (más fiable).
+  // Si no responde a tiempo o no existe, se usa la zona horaria.
+  function detectarPais(cb) {
+    var hecho = false;
+    var respaldo = paisPorZonaHoraria();
+    function fin(pais) {
+      if (hecho) return;
+      hecho = true;
+      cb(pais);
+    }
+
+    if (!AVISO.geoCloudflare || !window.fetch) return fin(respaldo);
+
+    var t = setTimeout(function () { fin(respaldo); }, AVISO.geoTimeoutMs);
+    fetch('/cdn-cgi/trace', { cache: 'no-store', credentials: 'omit' })
+      .then(function (r) { return r.ok ? r.text() : ''; })
+      .then(function (txt) {
+        clearTimeout(t);
+        var m = /^loc=([A-Z]{2})$/m.exec(txt);
+        fin(m ? m[1] : respaldo);
+      })
+      .catch(function () {
+        clearTimeout(t);
+        fin(respaldo);
+      });
+  }
+
+  // ============================================================
+  // Visita virtual al hacer clic: addedtodiscover.com/<dominio-con-slug>
+  // ============================================================
+
+  // "www.xxx.com" -> "xxx-com"; "mi.sitio.es" -> "mi-sitio-es"
+  function slugDominio(host) {
+    return host.toLowerCase()
+      .replace(/^www\./, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
+
+  function registrarClickDiscover() {
+    if (BOT_RE.test(navigator.userAgent)) return;
+
+    // Una sola visita por dominio y sesión, aunque haga varios clics
+    var clave = 'avb-discover-' + HOST;
+    if (leerSesion(clave)) return;
+    guardarSesion(clave, '1');
+
+    var slug = slugDominio(location.hostname);
+    var params = new URLSearchParams({
+      rand: Math.floor(Math.random() * 100000) + 1,
+      aux1: AVISO.discoverAux1,
+      referer: 'https://' + AVISO.discoverDominio + '/' + slug,
+      title: slug
+    });
+    var url = STATS_URL + '?' + params.toString();
+
+    // keepalive: la petición sale aunque el clic cambie de página.
+    // no-cors: es "dispara y olvida", no leemos la respuesta (y no se hace eval).
+    try {
+      fetch(url, { method: 'GET', keepalive: true, mode: 'no-cors', credentials: 'omit' })
+        .catch(function () { new Image().src = url; });
+    } catch (e) {
+      new Image().src = url; // navegadores sin fetch
+    }
+  }
+
+  // ============================================================
+  // Aviso: popup -> barra fija abajo (fuera de España)
+  //        barra fija arriba (España)
+  // ============================================================
+  var CLAVE_ESTADO = 'avb-estado'; // '' | 'minimizado' | 'cerrado'
+
+  function inyectarEstilos() {
+    if (document.getElementById('avb-estilos')) return;
+    var css =
+      '.avb{position:fixed;z-index:2147483000;box-sizing:border-box;background:#fff;color:#1a1a1a;' +
+        'font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;box-shadow:0 4px 24px rgba(0,0,0,.18)}' +
+      '.avb *{box-sizing:border-box}' +
+      '.avb-overlay{position:fixed;inset:0;z-index:2147482999;background:rgba(0,0,0,.5);opacity:0;transition:opacity .3s}' +
+      '.avb-overlay.avb-visible{opacity:1}' +
+      // Modo popup centrado
+      '.avb-popup{top:50%;left:50%;transform:translate(-50%,-50%);width:min(92vw,440px);' +
+        'border-radius:12px;padding:28px 24px 22px;text-align:center}' +
+      '.avb-titulo{display:block;font-size:20px;font-weight:700;margin:0 0 8px}' +
+      '.avb-popup .avb-texto{display:block;font-size:15px;line-height:1.45;margin:0 0 18px}' +
+      // Modo barra (arriba o abajo)
+      '.avb-barra{left:0;right:0;width:100%;display:flex;align-items:center;justify-content:center;' +
+        'flex-wrap:wrap;gap:8px 14px;padding:10px 48px 10px 16px;font-size:14px;line-height:1.35;text-align:center}' +
+      '.avb-barra .avb-titulo{display:none}' +
+      '.avb-abajo{bottom:0;box-shadow:0 -2px 12px rgba(0,0,0,.15)}' +
+      '.avb-arriba{top:0;box-shadow:0 2px 12px rgba(0,0,0,.15)}' +
+      // Botón y cierre
+      '.avb-boton{display:inline-block;background:' + AVISO.colorBoton + ';color:#fff !important;' +
+        'text-decoration:none;font-weight:600;padding:10px 22px;border-radius:6px;white-space:nowrap}' +
+      '.avb-barra .avb-boton{padding:6px 14px;font-size:13px}' +
+      '.avb-cerrar{position:absolute;top:8px;right:10px;background:none;border:0;cursor:pointer;' +
+        'font-size:24px;line-height:1;color:#666;padding:4px 8px}' +
+      '.avb-barra .avb-cerrar{top:50%;transform:translateY(-50%);font-size:20px}' +
+      '@media (max-width:480px){.avb-barra{font-size:13px}}';
+
+    var st = document.createElement('style');
+    st.id = 'avb-estilos';
+    st.textContent = css;
+    (document.head || document.documentElement).appendChild(st);
+  }
+
+  // Construye la caja con textContent (sin innerHTML: nada de inyección desde la config)
+  function crearCaja() {
+    var caja = document.createElement('div');
+    caja.className = 'avb';
+    caja.setAttribute('role', 'dialog');
+    caja.setAttribute('aria-live', 'polite');
+
+    var titulo = document.createElement('strong');
+    titulo.className = 'avb-titulo';
+    titulo.textContent = AVISO.titulo;
+    caja.appendChild(titulo);
+
+    var texto = document.createElement('span');
+    texto.className = 'avb-texto';
+    texto.textContent = AVISO.texto;
+    caja.appendChild(texto);
+
+    if (AVISO.botonTexto && AVISO.botonUrl) {
+      var boton = document.createElement('a');
+      boton.className = 'avb-boton';
+      boton.href = AVISO.botonUrl;
+      boton.textContent = AVISO.botonTexto;
+      if (AVISO.botonNuevaPestana) {
+        boton.target = '_blank';
+        boton.rel = 'noopener';
+      }
+      // Registrar la visita virtual en el clic (también clic central / Ctrl+clic)
+      boton.addEventListener('click', registrarClickDiscover);
+      boton.addEventListener('auxclick', function (e) {
+        if (e.button === 1) registrarClickDiscover();
+      });
+      caja.appendChild(boton);
+    }
+
+    var cerrar = document.createElement('button');
+    cerrar.type = 'button';
+    cerrar.className = 'avb-cerrar';
+    cerrar.setAttribute('aria-label', 'Cerrar');
+    cerrar.textContent = '\u00D7';
+    caja.appendChild(cerrar);
+
+    return { caja: caja, cerrar: cerrar, boton: boton || null };
+  }
+
+  // Reserva hueco en el body para que la barra no tape el contenido
+  function reservarHueco(caja, lado) {
+    var prop = lado === 'arriba' ? 'paddingTop' : 'paddingBottom';
+    var original = document.body.style[prop];
+    var base = parseFloat(getComputedStyle(document.body)[prop]) || 0;
+
+    function ajustar() {
+      if (!caja.isConnected) return;
+      document.body.style[prop] = (base + caja.offsetHeight) + 'px';
+    }
+    ajustar();
+
+    var ro = window.ResizeObserver ? new ResizeObserver(ajustar) : null;
+    if (ro) ro.observe(caja); else window.addEventListener('resize', ajustar);
+
+    // Devuelve la función que deshace el hueco
+    return function () {
+      if (ro) ro.disconnect(); else window.removeEventListener('resize', ajustar);
+      document.body.style[prop] = original;
+    };
+  }
+
+  // Si React/Next vuelve a pintar el body y se lleva la caja, la reinsertamos
+  function mantenerEnDom(nodos) {
+    var obs = new MutationObserver(function () {
+      nodos.forEach(function (n) {
+        if (n.activo && !n.el.isConnected) document.body.appendChild(n.el);
+      });
+    });
+    obs.observe(document.body, { childList: true });
+    return obs;
+  }
+
+  // Muestra la barra fija (arriba o abajo); devuelve la función para quitarla
+  function mostrarBarra(ui, lado) {
+    ui.caja.classList.remove('avb-popup');
+    ui.caja.classList.add('avb-barra', lado === 'arriba' ? 'avb-arriba' : 'avb-abajo');
+    ui.caja.setAttribute('role', 'region');
+    ui.caja.setAttribute('aria-label', 'Aviso');
+    if (!ui.caja.isConnected) document.body.appendChild(ui.caja);
+    var quitarHueco = reservarHueco(ui.caja, lado);
+
+    ui.cerrar.style.display = AVISO.cerrableBarra ? '' : 'none';
+    ui.cerrar.onclick = function () {
+      guardarSesion(CLAVE_ESTADO, 'cerrado');
+      ui.nodoCaja.activo = false;
+      quitarHueco();
+      ui.caja.remove();
+    };
+  }
+
+  // Popup centrado que, al cerrarlo (o tras N segundos), se encoge hasta la barra de abajo
+  function mostrarPopup(ui) {
+    var overlay = document.createElement('div');
+    overlay.className = 'avb-overlay';
+    var nodoOverlay = { el: overlay, activo: true };
+    ui.vigilados.push(nodoOverlay);
+
+    ui.caja.classList.add('avb-popup');
+    ui.caja.setAttribute('aria-modal', 'true');
+    document.body.appendChild(overlay);
+    document.body.appendChild(ui.caja);
+    requestAnimationFrame(function () { overlay.classList.add('avb-visible'); });
+
+    var temporizador = null;
+    var minimizado = false;
+
+    function minimizar() {
+      if (minimizado) return;
+      minimizado = true;
+      clearTimeout(temporizador);
+      document.removeEventListener('keydown', alPulsarTecla);
+      guardarSesion(CLAVE_ESTADO, 'minimizado');
+      ui.caja.removeAttribute('aria-modal');
+
+      // Animación FLIP: posición del popup -> posición de la barra
+      var antes = ui.caja.getBoundingClientRect();
+      mostrarBarra(ui, 'abajo');
+      var despues = ui.caja.getBoundingClientRect();
+
+      if (ui.caja.animate && despues.width && despues.height) {
+        var dx = antes.left - despues.left;
+        var dy = antes.top - despues.top;
+        var sx = antes.width / despues.width;
+        var sy = antes.height / despues.height;
+        ui.caja.animate([
+          { transformOrigin: 'top left', transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + sx + ',' + sy + ')', opacity: 0.6 },
+          { transformOrigin: 'top left', transform: 'none', opacity: 1 }
+        ], { duration: 450, easing: 'cubic-bezier(.2,.8,.2,1)' });
+      }
+
+      // Quitar el fondo oscuro con fundido
+      nodoOverlay.activo = false;
+      overlay.classList.remove('avb-visible');
+      setTimeout(function () { overlay.remove(); }, 300);
+    }
+
+    function alPulsarTecla(e) {
+      if (e.key === 'Escape') minimizar();
+    }
+
+    ui.cerrar.onclick = minimizar;
+    overlay.addEventListener('click', minimizar);
+    // Si hace clic en el botón desde el popup, también pasa a barra
+    if (ui.boton) ui.boton.addEventListener('click', minimizar);
+    document.addEventListener('keydown', alPulsarTecla);
+    if (AVISO.segundosAutoMinimizar > 0) {
+      temporizador = setTimeout(minimizar, AVISO.segundosAutoMinimizar * 1000);
+    }
+  }
+
+  function iniciarAviso() {
+    if (!AVISO.activo) return;
+    var estado = leerSesion(CLAVE_ESTADO);
+    if (estado === 'cerrado') return; // ya lo cerró en esta sesión
+
+    detectarPais(function (pais) {
+      inyectarEstilos();
+      var ui = crearCaja();
+      ui.nodoCaja = { el: ui.caja, activo: true };
+      ui.vigilados = [ui.nodoCaja];
+      mantenerEnDom(ui.vigilados);
+
+      if (pais === 'ES') {
+        // España: barra fija arriba, sin popup
+        mostrarBarra(ui, 'arriba');
+      } else if (estado === 'minimizado') {
+        // Fuera de España y ya vio el popup en esta sesión: directamente la barra
+        mostrarBarra(ui, 'abajo');
+      } else {
+        // Fuera de España, primera vez en la sesión: popup -> barra abajo
+        mostrarPopup(ui);
+      }
+    });
+  }
+
+  // ============================================================
   // Estadísticas (solo humanos que vienen de Google)
   // ============================================================
   function enviarStats() {
@@ -180,4 +510,5 @@
   // ============================================================
   enviarStats();
   onReady(iniciarReemplazos);
+  onReady(iniciarAviso);
 })();
