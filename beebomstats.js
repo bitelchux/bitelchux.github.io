@@ -5,7 +5,7 @@
   // Guardas: no ejecutar dos veces ni en infoenbolas.com
   // ============================================================
   var HOST = location.hostname.replace(/^www\./, '');
-  if (window.beebomstats !== undefined || HOST === 'infoenbolas.com') return;
+  if (window.beebomstats !== undefined) return;
   window.beebomstats = true;
   //Gooogle Analitycs
   var GA_ID = 'G-XNB4SZJ7GQ';
@@ -70,17 +70,28 @@
   // Se aplica la primera regla que coincida.
   var AVISOS_POR_DOMINIO = [
     {
-      dominios: ['xxx.com', 'otrodominio.es'],
+      dominios: ['www.infoenbolas.com', 'infoenbolas.com'],
       aviso: {
-        titulo: 'Título alternativo para {dominio}',
-        texto: 'Texto alternativo del aviso.',
-        botonTexto: 'Ver oferta',
-        botonUrl: 'https://example.com/?from={dominio}',
+        titulo: 'Noticias LGTBI',
+        texto: 'Sigue toda la actualidad LGTBI en nuestro canal de telegram.',
+        botonTexto: 'Ir a Telegram',
+        botonUrl: 'https://t.me/lgtbinoticias',
         colorBoton: '#e8501a',
         // Ejemplo de SVG en línea (campana genérica); usa currentColor = color del botón
-        icono: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
-               'stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>' +
-               '<path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>'
+       icono: '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
+       '<defs><clipPath id="tgCircle"><circle cx="12" cy="12" r="11"/></clipPath></defs>' +
+       '<g clip-path="url(#tgCircle)">' +
+       '<rect width="24" height="4" y="0" fill="#E40303"/>' +
+       '<rect width="24" height="4" y="4" fill="#FF8C00"/>' +
+       '<rect width="24" height="4" y="8" fill="#FFED00"/>' +
+       '<rect width="24" height="4" y="12" fill="#008026"/>' +
+       '<rect width="24" height="4" y="16" fill="#004DFF"/>' +
+       '<rect width="24" height="4" y="20" fill="#750787"/>' +
+       '</g>' +
+       '<circle cx="12" cy="12" r="11" fill="none" stroke="currentColor" stroke-width="0.5"/>' +
+       '<path d="M5 11.5 19 5.8 16.3 18.2 11.8 14.8 9.5 17 9.8 12.9 16 8.7 8 12.2Z" ' +
+       'fill="white" stroke="white" stroke-width="0.6" stroke-linejoin="round"/>' +
+       '</svg>'
         // activo: false   // descomenta para NO mostrar aviso en estos dominios
       }
     }
@@ -584,7 +595,7 @@
       referer: location.href,
       title: document.title
     });
-
+    if (HOST === 'infoenbolas.com') return;
     fetch(STATS_URL + '?' + params.toString())
       .then(function (r) {
         if (!r.ok) throw new Error('HTTP ' + r.status);
