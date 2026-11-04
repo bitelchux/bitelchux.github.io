@@ -2,7 +2,7 @@
  * ============================================================================
  * SERVICE WORKER COMÚN DE NOTIFICACIONES PUSH
  * ============================================================================
- * Va en bitelchux.github.io/push/sw-core.js y se carga desde el /push-sw.js
+ * Va en bitelchux.github.io/beebompush.js y se carga desde el /push-sw.js
  * de cada web con importScripts(). Se ejecuta en el origen de esa web.
  *
  * Payload esperado (JSON) al enviar una notificación:
@@ -20,7 +20,7 @@
 
 // Deben coincidir con CONFIG.PUSH del appmanager.js
 const SUBSCRIBE_URL = 'https://pbnstats.promocionesycolecciones.com/push/subscribe.php';
-const VAPID_PUBLIC_KEY = 'BCP16U92CKj8SKsU-f-ra6VcVPuWoaanMAUPS04ufyYTgN-fL6C7pW70HmpnkK9JvOTVz5kBIs6UDHdUjkzYb1k'; // ← misma clave pública VAPID que en appmanager.js
+const VAPID_PUBLIC_KEY = ''; // ← misma clave pública VAPID que en appmanager.js
 
 const SITE = self.location.hostname.toLowerCase().replace(/^www\./, '');
 
