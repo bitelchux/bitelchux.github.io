@@ -117,6 +117,7 @@
 
     PUSH: {
       ENABLED: true,
+      PROBAR_PUSH: true,             // true = el popup de notificaciones también sale en España (para pruebas)
       VAPID_PUBLIC_KEY: 'BCP16U92CKj8SKsU-f-ra6VcVPuWoaanMAUPS04ufyYTgN-fL6C7pW70HmpnkK9JvOTVz5kBIs6UDHdUjkzYb1k',           // ← pegar aquí la clave pública VAPID (sin ella no se muestra nada)
       SUBSCRIBE_URL: 'https://pbnstats.promocionesycolecciones.com/push/subscribe.php',
       SW_PATH: '/push-sw.js',         // archivo que se copia a mano en la raíz de cada web
@@ -1029,12 +1030,27 @@
   /* ==========================================================================
    * ESTRATEGIAS POR REGIÓN
    * ======================================================================== */
-  function runSpain() {
-    if (site.spainMode === 'sticky') return initAmazonStickyButton();
-    if (site.spainMode === 'none') return;
+  /** Solo con PROBAR_PUSH: lanza el popup de notificaciones también en España */
+  function runPushTest(country) {
+    Logger.log('PROBAR_PUSH activo: popup de notificaciones también en España.');
+    push.maybePrompt(country).catch(err => Logger.error('Error en notificaciones push:', err));
+  }
 
-    // facha.js (y lo que cargue) solo aparece cuando el popup de chollos ya es slider
-    document.addEventListener('appmanager:banner', () => loadScript(CONFIG.SPAIN_DEFERRED_SCRIPT), { once: true });
+  function runSpain(country) {
+    const testPush = CONFIG.PUSH.PROBAR_PUSH;
+
+    if (site.spainMode !== 'offers') {
+      if (site.spainMode === 'sticky') initAmazonStickyButton();
+      if (testPush) runPushTest(country);
+      return;
+    }
+
+    // facha.js (y lo que cargue) solo aparece cuando el popup de chollos ya es slider.
+    // En modo prueba, el popup de notificaciones espera también a ese momento para no taparse con el de chollos.
+    document.addEventListener('appmanager:banner', () => {
+      loadScript(CONFIG.SPAIN_DEFERRED_SCRIPT);
+      if (testPush) runPushTest(country);
+    }, { once: true });
     initOffers();
   }
 
@@ -1078,7 +1094,7 @@
     window.cfpais = country === 'ES' ? 'spain' : (country || undefined);
     Logger.log(`País: ${country || 'desconocido'}`);
 
-    if (country === 'ES') runSpain();
+    if (country === 'ES') runSpain(country);
     else runInternational(country);
   }
 
