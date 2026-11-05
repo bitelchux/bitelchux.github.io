@@ -76,7 +76,7 @@
 	'giantesscomic.com':    { adult: true, pushInSpain: true },
 	'bragasexy.es':    { adult: true, pushInSpain: true },
 	'300incestos.com':    { adult: true, pushInSpain: true },
-	'www.infoenbolas.com':    { adult: true, popAds: true, analytics: false, pushInSpain: true }
+	'www.infoenbolas.com':    { adult: true, popAds: true, analytics: false, pushInSpain: true },
 	'bumboobs.net':    { adult: true, pushInSpain: true },
 	'camporno.es':    { adult: true, pushInSpain: true },
     'infoenbolas.com':    { adult: true, popAds: true, analytics: false, pushInSpain: true }
