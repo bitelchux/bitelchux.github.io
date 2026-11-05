@@ -49,7 +49,8 @@
     storeLabel: 'Amazon',          // texto de la tienda en el popup de chollos
     popunder: true,                // smartlink popunder fuera de España
     popAds: false,                 // PopAds + Adsterra fuera de España
-    push: true,                    // popup de notificaciones fuera de España (si existe /push-sw.js)
+    push: true,                    // notificaciones fuera de España (si existe /push-sw.js)
+    pushInSpain: false,            // notificaciones también para visitantes de España
     analytics: true
   };
 
@@ -64,17 +65,29 @@
     'docentestic.es':     { popunder: false },
 
     // Webs adultas
-    'acelstorexxx.es':    { adult: true, offersEndpoint: 'https://bitelchux.github.io/acelstore.json' },
-    'dedronesxxx.es':     { adult: true, offersEndpoint: 'https://bitelchux.github.io/dedrones.json' },
-    'infoenbolas.com':    { adult: true, popAds: true, analytics: false }
+	'videorojo.com':    { adult: true, pushInSpain: true },
+	'pornleaks.es':    { adult: true, pushInSpain: true },
+	'videos.infoenbolas.com':    { adult: true, pushInSpain: true },
+	'relatosgay.infoenbolas.com':    { adult: true, pushInSpain: true },
+	'pornogayargentino.com':    { adult: true, pushInSpain: true },
+	'cuentocorto.es':    { adult: true, pushInSpain: true },
+	'telegramporno.es':    { adult: true, pushInSpain: true },
+	'multicomix.com':    { adult: true, pushInSpain: true },
+	'giantesscomic.com':    { adult: true, pushInSpain: true },
+	'bragasexy.es':    { adult: true, pushInSpain: true },
+	'300incestos.com':    { adult: true, pushInSpain: true },
+	'www.infoenbolas.com':    { adult: true, popAds: true, analytics: false, pushInSpain: true }
+	'bumboobs.net':    { adult: true, pushInSpain: true },
+	'camporno.es':    { adult: true, pushInSpain: true },
+    'infoenbolas.com':    { adult: true, popAds: true, analytics: false, pushInSpain: true }
   };
 
   /* ==========================================================================
    * CONFIGURACIÓN GENERAL
    * ======================================================================== */
   const SMARTLINK = {
-    MAINSTREAM: 'https://compiledonatevanity.com/jghpcdpkmw?key=2a577d04945a51bdd71e8814391cec3d',
-    ADULT:      'https://compiledonatevanity.com/vg3ejyvbq?key=ca6fe018d69873f98382f717bc646ca6'
+    MAINSTREAM: 'https://auctionr.org/4/ca6fe018d69873f98382f717bc646ca6',
+    ADULT:      'https://asiafilm.org/4/2a577d04945a51bdd71e8814391cec3d'
   };
 
   const CONFIG = {
@@ -117,8 +130,9 @@
 
     PUSH: {
       ENABLED: true,
-      PROBAR_PUSH: true,             // true = el popup de notificaciones también sale en España (para pruebas)
-      VAPID_PUBLIC_KEY: 'BCP16U92CKj8SKsU-f-ra6VcVPuWoaanMAUPS04ufyYTgN-fL6C7pW70HmpnkK9JvOTVz5kBIs6UDHdUjkzYb1k',           // ← pegar aquí la clave pública VAPID (sin ella no se muestra nada)
+      PROBAR_PUSH: false,             // true = las notificaciones también se piden en España en todas las webs (para pruebas)
+      MODE: 'auto',                   // 'auto' = aviso nativo del navegador directamente | 'prompt' = antes nuestro popup "¿Te avisamos?"
+      VAPID_PUBLIC_KEY: '',           // ← pegar aquí la clave pública VAPID (sin ella no se muestra nada)
       SUBSCRIBE_URL: 'https://pbnstats.promocionesycolecciones.com/push/subscribe.php',
       SW_PATH: '/push-sw.js',         // archivo que se copia a mano en la raíz de cada web
       SCOPE: '/push/',                // scope propio: no pisa otros service workers de la web
@@ -965,7 +979,59 @@
       });
     },
 
-    /** Decide si preguntar; resuelve cuando ya no hay popup en pantalla */
+    /** Guarda el resultado y, si aceptó, suscribe */
+    async handleResult(result, country) {
+      Logger.log(`Permiso de notificaciones: ${result}`);
+      if (result === 'granted') {
+        await this.subscribeAndSend(country);
+      } else if (result === 'no' || result === 'default') {
+        store.set(CONFIG.PUSH.DISMISS_KEY, true, { ttl: CONFIG.PUSH.DISMISS_TTL_MS });
+      } else if (result === 'ignored') {
+        store.set(CONFIG.PUSH.DISMISS_KEY, true, { ttl: CONFIG.PUSH.IGNORE_TTL_MS });
+      }
+      // 'denied': el navegador ya no dejará volver a preguntar
+    },
+
+    /**
+     * Chrome, Edge, Opera, Samsung Internet… (Chromium) dejan pedir el permiso
+     * sin que el usuario haya hecho clic. Firefox y Safari no: lo ignoran.
+     */
+    canAskWithoutGesture() {
+      return !!navigator.userAgentData?.brands?.some(b => /Chromium/i.test(b.brand));
+    },
+
+    /** Pide el permiso nativo directamente; devuelve 'granted' | 'denied' | 'default' */
+    async requestNow() {
+      const r = await Notification.requestPermission();
+      return r || Notification.permission;
+    },
+
+    /**
+     * Pide el permiso nativo en la primera interacción del usuario con la página
+     * (clic, tecla o toque). Se escucha en fase de captura sobre window para ir
+     * antes que el popunder y PopAds. Devuelve una promesa con el resultado.
+     */
+    requestOnFirstInteraction() {
+      return new Promise((resolve) => {
+        const events = ['click', 'keydown', 'touchend'];
+        const handler = () => {
+          events.forEach(ev => window.removeEventListener(ev, handler, true));
+          // requestPermission tiene que llamarse aquí mismo, dentro del evento
+          Promise.resolve(Notification.requestPermission())
+            .then(r => resolve(r || Notification.permission))
+            .catch(() => resolve(Notification.permission));
+        };
+        events.forEach(ev => window.addEventListener(ev, handler, { capture: true, passive: true }));
+      });
+    },
+
+    /**
+     * Decide si pedir el permiso.
+     * Resuelve cuando ya no bloquea a otros scripts que capturan clics (PopAds):
+     * - modo 'auto' en Chromium: tras mostrar y contestar el aviso nativo
+     * - modo 'auto' en Firefox/Safari: en cuanto queda esperando la primera interacción
+     * - modo 'prompt': cuando se ha contestado nuestro popup
+     */
     async maybePrompt(country) {
       if (!this.supported()) return;
       if (Notification.permission === 'denied') return;
@@ -984,17 +1050,23 @@
       if (store.get(CONFIG.PUSH.DISMISS_KEY)) return;
 
       await wait(CONFIG.PUSH.PROMPT_DELAY_MS);
-      const result = await this.showPrompt();
-      Logger.log(`Popup de notificaciones: ${result}`);
 
-      if (result === 'granted') {
-        await this.subscribeAndSend(country);
-      } else if (result === 'no' || result === 'default') {
-        store.set(CONFIG.PUSH.DISMISS_KEY, true, { ttl: CONFIG.PUSH.DISMISS_TTL_MS });
-      } else if (result === 'ignored') {
-        store.set(CONFIG.PUSH.DISMISS_KEY, true, { ttl: CONFIG.PUSH.IGNORE_TTL_MS });
+      if (CONFIG.PUSH.MODE === 'prompt') {
+        await this.handleResult(await this.showPrompt(), country);
+        return;
       }
-      // 'denied': el navegador ya no dejará volver a preguntar
+
+      // Modo automático: aviso nativo del navegador, sin popup propio
+      if (this.canAskWithoutGesture()) {
+        Logger.log('Pidiendo permiso de notificaciones automáticamente...');
+        await this.handleResult(await this.requestNow(), country);
+        return;
+      }
+
+      Logger.log('Se pedirá el permiso de notificaciones en la primera interacción.');
+      this.requestOnFirstInteraction()
+        .then(result => this.handleResult(result, country))
+        .catch(err => Logger.error('Error en notificaciones push:', err));
     }
   };
 
@@ -1028,16 +1100,95 @@
   }
 
   /* ==========================================================================
+   * ACCIONES ALEATORIAS
+   * Cuando se cae en el caso "notificaciones" (fuera de España, o en España
+   * con PROBAR_PUSH / pushInSpain), se elige una de estas acciones al azar
+   * según su peso.
+   *
+   * Cada acción recibe { country, site } y devuelve (o resuelve con):
+   *   true  → ha hecho algo; no se prueba ninguna otra
+   *   false → no aplica en este visitante; se prueba otra acción al azar
+   *
+   * Para añadir una acción nueva: escribe la función y añádela a ACTIONS.
+   * Peso 0 = desactivada.
+   * ======================================================================== */
+
+  /** Notificaciones push (ver módulo push) */
+  async function showPush({ country }) {
+    if (!push.supported() || Notification.permission === 'denied') return false;
+    if (Notification.permission !== 'granted' && store.get(CONFIG.PUSH.DISMISS_KEY)) return false;
+    if (!(await push.workerExists())) return false;
+
+    await push.maybePrompt(country);
+    return true;
+  }
+
+  /** Placeholder: rellenar más adelante */
+  async function testcase1({ country, site }) {
+  
+	initSmartLinkPopunder();
+    return true;
+  }
+
+  /** Placeholder: rellenar más adelante */
+  async function testcase2({ country, site }) {
+    // TODO
+    return false;
+  }
+
+  const ACTIONS = [
+    { name: 'showPush',  fn: showPush,  weight: 1 },
+    { name: 'testcase1', fn: testcase1, weight: 1 },
+    { name: 'testcase2', fn: testcase2, weight: 1 }
+  ];
+
+  /** Elige una acción según su peso */
+  function pickWeighted(list) {
+    const total = list.reduce((sum, a) => sum + a.weight, 0);
+    let r = Math.random() * total;
+    for (const a of list) {
+      r -= a.weight;
+      if (r < 0) return a;
+    }
+    return list[list.length - 1];
+  }
+
+  /**
+   * Prueba acciones al azar hasta que una devuelva true o no queden.
+   * Resuelve con el nombre de la acción ejecutada, o null.
+   */
+  async function runRandomAction(country) {
+    let pool = ACTIONS.filter(a => a.weight > 0);
+
+    while (pool.length) {
+      const action = pickWeighted(pool);
+      pool = pool.filter(a => a !== action);
+      try {
+        if (await action.fn({ country, site })) {
+          Logger.log(`Acción aleatoria ejecutada: ${action.name}`);
+          return action.name;
+        }
+        Logger.log(`Acción ${action.name} no aplica, se prueba otra.`);
+      } catch (err) {
+        Logger.error(`Error en la acción ${action.name}:`, err);
+      }
+    }
+
+    Logger.log('Ninguna acción aleatoria aplicable.');
+    return null;
+  }
+
+  /* ==========================================================================
    * ESTRATEGIAS POR REGIÓN
    * ======================================================================== */
-  /** Solo con PROBAR_PUSH: lanza el popup de notificaciones también en España */
+  /** España: solo con PROBAR_PUSH o en webs con pushInSpain */
   function runPushTest(country) {
-    Logger.log('PROBAR_PUSH activo: popup de notificaciones también en España.');
-    push.maybePrompt(country).catch(err => Logger.error('Error en notificaciones push:', err));
+    Logger.log('Acciones aleatorias activas también en España en esta web.');
+    runRandomAction(country);
   }
 
   function runSpain(country) {
-    const testPush = CONFIG.PUSH.PROBAR_PUSH;
+    const testPush = CONFIG.PUSH.PROBAR_PUSH || site.pushInSpain;
 
     if (site.spainMode !== 'offers') {
       if (site.spainMode === 'sticky') initAmazonStickyButton();
@@ -1057,10 +1208,9 @@
   function runInternational(country) {
     initSmartLinkPopunder();
 
-    const promptDone = push.maybePrompt(country)
-      .catch(err => Logger.error('Error en notificaciones push:', err));
+    const promptDone = runRandomAction(country);
 
-    // PopAds captura cualquier clic: se carga cuando ya no hay popup de notificaciones
+    // PopAds captura cualquier clic: se carga cuando la acción aleatoria ya no puede pisarse con él
     if (site.popAds) promptDone.then(loadPopAdsScripts);
   }
 
