@@ -1137,9 +1137,12 @@
   }
 
   const ACTIONS = [
-    { name: 'showPush',  fn: showPush,  weight: 1 },
+    /*
+	{ name: 'showPush',  fn: showPush,  weight: 1 },
+	{ name: 'testcase2', fn: testcase2, weight: 1 },
+	*/
     { name: 'testcase1', fn: testcase1, weight: 1 },
-    { name: 'testcase2', fn: testcase2, weight: 1 }
+   
   ];
 
   /** Elige una acción según su peso */
