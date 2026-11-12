@@ -1133,7 +1133,9 @@
   /** Placeholder: rellenar más adelante */
   async function testcase2({ country, site }) {
     // TODO
-    return false;
+	loadScript("https://juegosboom.com/bannergames/juegoaleatorio.js?lang=es");
+	  
+    return true;
   }
 
   const ACTIONS = [
@@ -1142,7 +1144,8 @@
 	{ name: 'testcase2', fn: testcase2, weight: 1 },
 	*/
     { name: 'testcase1', fn: testcase1, weight: 1 },
-   
+	{ name: 'testcase2', fn: testcase2, weight: 1 },
+    { name: 'showPush',  fn: showPush,  weight: 1 },
   ];
 
   /** Elige una acción según su peso */
