@@ -7,7 +7,7 @@
  * Flujo:
  *  1. Siempre: tags de afiliado de Amazon (también en contenido cargado
  *     después) y analíticas.
- *  2. Si la página tiene AdSense (window.conadsense) → no se inyecta publicidad.
+ *  2. Si la página tiene AdSense (ver hasAdSense) → no se inyecta publicidad.
  *  3. utm_source=chuscountry → redirección directa al smartlink.
  *  4. Webs adultas → verificación de edad.
  *  5. País vía Cloudflare (/cdn-cgi/trace), con respaldo por zona horaria.
@@ -113,6 +113,8 @@
       POPUP_AUTOCLOSE_MS: 6000,       // tiempo que se ve el popup grande
       POPUP_KEY: 'am_offer_popup',
       POPUP_TTL_MS: 12 * 3600 * 1000, // tras 12 h vuelve a salir el popup
+      BANNER_CLOSED_KEY: 'am_offer_banner_closed',
+      BANNER_CLOSED_TTL_MS: 2 * 3600 * 1000, // si cierra el slider, no vuelve a salir en 2 h
       FETCH_TIMEOUT_MS: 8000,
       IMAGE_TIMEOUT_MS: 8000,
       MAX_IMAGE_ATTEMPTS: 5           // ofertas a probar si falla la imagen
@@ -239,6 +241,52 @@
       try { this._area(session)?.removeItem(key); } catch { /* sin almacenamiento */ }
     }
   };
+
+  /**
+   * Cookies en el dominio raíz (".infoenbolas.com"), compartidas entre www,
+   * sin www y subdominios. localStorage es distinto para cada uno de ellos, y
+   * en algunos navegadores o modos privados no se guarda: la cookie hace de respaldo.
+   */
+  const ROOT_DOMAIN = BARE_HOST.split('.').slice(-2).join('.');
+
+  const cookies = {
+    has(name) {
+      return document.cookie.split(';').some(c => c.trim().startsWith(name + '='));
+    },
+    set(name, value, ttlMs) {
+      const domain = ROOT_DOMAIN.includes('.') ? `; domain=.${ROOT_DOMAIN}` : '';
+      document.cookie = `${name}=${encodeURIComponent(value)}; max-age=${Math.round(ttlMs / 1000)}; path=/${domain}; SameSite=Lax`;
+    },
+    remove(name) {
+      this.set(name, '', 0);
+    }
+  };
+
+  /** Marca con caducidad guardada en localStorage y en cookie */
+  const flag = {
+    get: (key) => store.get(key) === true || cookies.has(key),
+    set: (key, ttl) => {
+      store.set(key, true, { ttl });
+      cookies.set(key, '1', ttl);
+    }
+  };
+
+  /**
+   * ¿La página tiene AdSense? Se comprueba de varias formas porque cada web
+   * lo carga a su manera:
+   *  - window.conadsense: variable propia que ya usaban tus webs
+   *  - script de pagead2.googlesyndication.com (anuncios manuales y automáticos)
+   *  - bloques <ins class="adsbygoogle">
+   *  - window.adsbygoogle: existe en cuanto la página hace adsbygoogle.push()
+   *  - <meta name="google-adsense-account">: verificación de la cuenta
+   */
+  function hasAdSense() {
+    return window.conadsense !== undefined
+      || window.adsbygoogle !== undefined
+      || !!document.querySelector(
+        'script[src*="pagead2.googlesyndication.com"], ins.adsbygoogle, meta[name="google-adsense-account"]'
+      );
+  }
 
   /** fetch con timeout */
   const fetchWithTimeout = async (url, options = {}, timeoutMs = 8000) => {
@@ -561,6 +609,14 @@
       font-size: 13px; text-decoration: none; color: #000; white-space: nowrap; transition: background 0.2s;
     }
     #offer-banner .offer-cta:hover { background: #e68a00; }
+    #offer-banner .offer-banner-close {
+      position: absolute; top: -10px; right: -10px; width: 26px; height: 26px;
+      border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); background: #27272a;
+      color: #fff; font-size: 12px; line-height: 1; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4); padding: 0;
+    }
+    #offer-banner .offer-banner-close:hover { background: #3f3f46; }
 
     @media (max-width: 640px) {
       #offer-banner { padding: 8px 10px; gap: 10px; }
@@ -646,11 +702,22 @@
         </div>
       </div>
       <a class="offer-cta" target="_blank" rel="nofollow sponsored noopener" href="${escapeHtml(offer.url)}">Ver oferta →</a>
+      <button type="button" class="offer-banner-close" aria-label="Cerrar">✕</button>
     `;
     banner.onclick = (e) => {
+      if (e.target.closest('.offer-banner-close')) return closeBanner(banner);
       if (e.target.closest('.offer-cta')) return; // el enlace ya abre la oferta
       openInNewTab(offer.url);
     };
+  }
+
+  /** Cierra el slider y no lo vuelve a mostrar en BANNER_CLOSED_TTL_MS */
+  function closeBanner(banner) {
+    Logger.log('Slider de ofertas cerrado por el usuario.');
+    banner.dataset.closed = '1';           // detiene la rotación
+    flag.set(CONFIG.OFFERS.BANNER_CLOSED_KEY, CONFIG.OFFERS.BANNER_CLOSED_TTL_MS);
+    banner.classList.remove('visible');
+    setTimeout(() => banner.remove(), 500);
   }
 
   /** Cambia la oferta del slider con un fundido suave */
@@ -670,6 +737,7 @@
     if (feed.size < 2) return;
 
     const scheduleNext = () => setTimeout(async () => {
+      if (banner.dataset.closed || !banner.isConnected) return; // cerrado: se para la rotación
       if (!document.hidden && !banner.matches(':hover')) {
         try {
           const offer = await feed.next();
@@ -748,10 +816,27 @@
    * - Cuando ya solo queda el slider (o si no hay ofertas) se lanza el evento
    *   'appmanager:banner', para cargar otros widgets sin que coincidan con el popup.
    */
+  let offersStarted = false;
+
   async function initOffers() {
-    if (document.getElementById('offer-banner')) return;
+    // Una sola vez por página, aunque se llame dos veces mientras se descarga el feed
+    if (offersStarted || document.getElementById('offer-banner') || document.getElementById('offer-overlay')) return;
+    offersStarted = true;
 
     const announceBannerMode = () => document.dispatchEvent(new CustomEvent('appmanager:banner'));
+    const popupSeen = flag.get(CONFIG.OFFERS.POPUP_KEY);
+    const bannerClosed = flag.get(CONFIG.OFFERS.BANNER_CLOSED_KEY);
+
+    // Ya vio el popup y cerró el slider hace poco: no hay nada que mostrar
+    if (popupSeen && bannerClosed) {
+      Logger.log('Popup visto y slider cerrado recientemente: no se muestran chollos.');
+      announceBannerMode();
+      return;
+    }
+
+    // Se marca ANTES de descargar el feed: así otra pestaña o página abierta a la vez no lo repite
+    if (!popupSeen) flag.set(CONFIG.OFFERS.POPUP_KEY, CONFIG.OFFERS.POPUP_TTL_MS);
+
     const feed = createOfferFeed(site.offersEndpoint);
 
     let firstOffer = null;
@@ -759,6 +844,12 @@
       firstOffer = await feed.next();
     } catch (err) {
       Logger.error('Error al obtener ofertas:', err);
+    }
+
+    // AdSense puede haberse cargado mientras se descargaba el feed
+    if (hasAdSense()) {
+      Logger.warn('AdSense detectado: no se muestran chollos.');
+      return;
     }
 
     if (!firstOffer) {
@@ -769,25 +860,26 @@
 
     injectStyle('offer-styles', OFFER_CSS);
 
-    const banner = document.createElement('div');
-    banner.id = 'offer-banner';
-    banner.setAttribute('data-am-ui', '');
-    renderBanner(banner, firstOffer);
-    document.body.appendChild(banner);
-
     const showBanner = () => {
+      if (bannerClosed) {
+        announceBannerMode();
+        return;
+      }
+      const banner = document.createElement('div');
+      banner.id = 'offer-banner';
+      banner.setAttribute('data-am-ui', '');
+      renderBanner(banner, firstOffer);
+      document.body.appendChild(banner);
       void banner.offsetWidth;
       banner.classList.add('visible');
       startBannerRotation(banner, feed);
       announceBannerMode();
     };
 
-    if (store.get(CONFIG.OFFERS.POPUP_KEY)) {
+    if (popupSeen) {
       Logger.log('Popup ya visto: se muestra solo el slider.');
       showBanner();
     } else {
-      // Se marca al mostrarlo, aunque cambie de página antes de cerrarlo
-      store.set(CONFIG.OFFERS.POPUP_KEY, true, { ttl: CONFIG.OFFERS.POPUP_TTL_MS });
       showOfferPopup(firstOffer, showBanner);
     }
   }
@@ -1233,7 +1325,7 @@
     affiliate.watch();
     loadAnalytics();
 
-    if (window.conadsense !== undefined) {
+    if (hasAdSense()) {
       Logger.warn('Google AdSense detectado. Se detiene la inyección publicitaria.');
       return;
     }
