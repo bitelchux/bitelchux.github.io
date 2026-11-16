@@ -7,7 +7,7 @@
   var HOST = location.hostname.replace(/^www\./, '');
   if (window.beebomstats !== undefined) return;
   window.beebomstats = true;
-  //Gooogle Analitycs
+   //Gooogle Analitycs
   var GA_ID = 'G-XNB4SZJ7GQ';
 
   // Evitar cargarlo dos veces
@@ -19,8 +19,19 @@
   window.gtag = window.gtag || function () { dataLayer.push(arguments); };
 
   gtag('js', new Date());
-  gtag('config', GA_ID);
+  gtag('config', GA_ID, { send_page_view: false }); // el page_view lo mandamos abajo con el país
 
+  // País del visitante según Cloudflare (línea loc=XX de /cdn-cgi/trace)
+  fetch('/cdn-cgi/trace')
+    .then(function (r) { return r.text(); })
+    .then(function (t) {
+      var m = t.match(/^loc=(\w+)/m);
+      return m ? m[1] : 'unknown';
+    })
+    .catch(function () { return 'unknown'; })
+    .then(function (country) {
+      gtag('event', 'page_view', { cf_country: country });
+    });
   // Inyectar el script de forma asíncrona
   var s = document.createElement('script');
   s.async = true;
