@@ -1156,7 +1156,7 @@
         return result;
       };
 
-      if (this.started || document.getElementById('offer-overlay') || document.getElementById('offer-banner')) {
+      if (this.started || document.querySelector('#offer-overlay[data-am-ui], #offer-banner[data-am-ui]')) {
         log.warn('La campaña ya se había iniciado en esta página; se ignora la segunda llamada.');
         return 'duplicada';
       }
@@ -1333,6 +1333,47 @@
   }
 
   /* ==========================================================================
+   * WIDGETS DE VERSIONES ANTIGUAS
+   * Si una web sigue cargando una copia antigua del script (v1, facha.js…),
+   * sus popups no llevan data-am-ui: se retiran en cuanto aparecen, para que
+   * solo se vea lo que decide esta versión. Se avisa en consola para que
+   * puedas quitar el include duplicado de la web.
+   * ======================================================================== */
+  const LEGACY_SELECTORS = [
+    '#offer-overlay:not([data-am-ui])',   // popup de chollos de la v1/v2
+    '#offer-banner:not([data-am-ui])',    // slider de chollos de la v1/v2
+    '#ofertas-banner-widget',             // widget de arriba a la derecha (facha.js)
+    '#amz-sticky-bar:not([data-am-ui])'   // botón sticky de la v1
+  ].join(', ');
+
+  const legacy = {
+    log: createLog('legado'),
+    removed: 0,
+
+    sweep(root = document) {
+      const found = [];
+      if (root.nodeType === 1 && root.matches(LEGACY_SELECTORS)) found.push(root);
+      root.querySelectorAll?.(LEGACY_SELECTORS).forEach(el => found.push(el));
+      found.forEach(el => {
+        el.remove();
+        this.removed++;
+        this.log.warn(`Retirado #${el.id} de una versión antigua. Revisa si la web carga el script dos veces.`);
+      });
+    },
+
+    watch() {
+      this.sweep();
+      new MutationObserver((mutations) => {
+        for (const m of mutations) {
+          for (const node of m.addedNodes) {
+            if (node.nodeType === 1) this.sweep(node);
+          }
+        }
+      }).observe(document.body, { childList: true, subtree: true });
+    }
+  };
+
+  /* ==========================================================================
    * API PÚBLICA (consola)
    * ======================================================================== */
   function resetStoredFlags() {
@@ -1353,6 +1394,12 @@
       state,
       trace,
       get country() { return state.country; },
+      /** Scripts de publicidad cargados en la página (para ver duplicados) */
+      scripts() {
+        const list = [...document.scripts].map(sc => sc.src).filter(src => /bitelchux|appmanager|facha|juegosboom|chollo/i.test(src));
+        console.table(list.map(src => ({ src })));
+        return list;
+      },
       report() {
         console.table(trace.map(({ ms, level, area, msg }) => ({ ms, level, area, msg })));
         return state;
@@ -1395,6 +1442,7 @@
       return;
     }
     adsense.watchLate();
+    legacy.watch();
 
     // 3. Tráfico chuscountry
     if (QUERY.get('utm_source') === 'chuscountry') {
