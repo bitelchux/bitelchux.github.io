@@ -24,8 +24,9 @@
  *   AppManager.reset()    → borra las marcas guardadas (popup visto, popunder…)
  *
  * Parámetros de URL para pruebas (no hace falta tocar el código):
- *   ?mocklocation=US   simula el país
- *   ?mockadsense=1|0   simula que la página tiene / no tiene AdSense
+ *   ?mocklocation=US   simula el país (se mantiene en toda la sesión de la pestaña)
+ *   ?mockadsense=1|0   simula que la página tiene / no tiene AdSense (ídem)
+ *   ?mocklocation=off  quita la simulación (igual con mockadsense=off)
  *   ?am_debug=1        logs detallados
  *   ?am_reset=1        borra las marcas guardadas antes de empezar
  */
@@ -1411,13 +1412,33 @@
   /* ==========================================================================
    * INICIALIZACIÓN
    * ======================================================================== */
-  function readMocks() {
-    const qLoc = (QUERY.get('mocklocation') || '').trim().toUpperCase();
-    state.mock.location = qLoc || (MOCK_LOCATION ? String(MOCK_LOCATION).toUpperCase() : null);
+  /**
+   * Simulaciones. El parámetro de URL se guarda en la sesión de la pestaña,
+   * así sigue activo al navegar por otras páginas de la web.
+   * ?mocklocation=off / ?mockadsense=off lo quitan.
+   */
+  const MOCK_KEYS = { location: 'am_mock_location', adsense: 'am_mock_adsense' };
 
-    const qAds = QUERY.get('mockadsense');
-    state.mock.adsense = (qAds === '1' || qAds === 'true') ? true
-      : (qAds === '0' || qAds === 'false') ? false
+  function readMockParam(param, key) {
+    const raw = QUERY.get(param);
+    if (raw === null) return store.get(key, { session: true });
+    const value = raw.trim().toLowerCase();
+    if (value === '' || value === 'off') {
+      store.remove(key, { session: true });
+      return null;
+    }
+    store.set(key, value, { session: true });
+    return value;
+  }
+
+  function readMocks() {
+    const loc = readMockParam('mocklocation', MOCK_KEYS.location);
+    state.mock.location = loc ? loc.toUpperCase()
+      : (MOCK_LOCATION ? String(MOCK_LOCATION).toUpperCase() : null);
+
+    const ads = readMockParam('mockadsense', MOCK_KEYS.adsense);
+    state.mock.adsense = (ads === '1' || ads === 'true') ? true
+      : (ads === '0' || ads === 'false') ? false
       : MOCK_ADSENSE;
   }
 
@@ -1427,7 +1448,7 @@
     exposeApi();
 
     log.step(`AppManager v${VERSION} en ${BARE_HOST} (config: ${site.configKey || 'por defecto'})`);
-    if (state.mock.location) log.warn(`País SIMULADO: ${state.mock.location}`);
+    if (state.mock.location) log.warn(`País SIMULADO: ${state.mock.location} (quítalo con ?mocklocation=off)`);
     if (state.mock.adsense !== null) log.warn(`AdSense SIMULADO: ${state.mock.adsense ? 'sí' : 'no'}`);
     if (QUERY.has('am_reset')) resetStoredFlags();
 
