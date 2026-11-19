@@ -12,8 +12,9 @@
  *  4. Webs adultas → verificación de edad.
  *  5. País: MOCK_LOCATION / ?mocklocation=XX → caché de sesión → Cloudflare
  *     (/cdn-cgi/trace) → zona horaria.
- *  6. Campaña (popup + slider) según dominio y país: ver CAMPAIGNS.
- *     Por defecto, España = chollos de Amazon.
+ *  6. Campaña según dominio y país: ver CAMPAIGNS.
+ *     Por defecto: España = chollos de Amazon (popup + slider);
+ *     resto de países = banner de juegos de juegosboom.com.
  *  7. Después de la campaña: popunder / acciones aleatorias / PopAds,
  *     nunca a la vez que el popup.
  *
@@ -61,7 +62,7 @@
     campaigns: true,             // false = esta web nunca muestra campañas (popup/slider)
     popunder: true,              // smartlink popunder fuera de España
     popAds: false,               // PopAds + Adsterra fuera de España
-    actionsInSpain: false,       // acciones aleatorias (popunder, juegos…) también en España
+    actionsInSpain: false,       // acciones aleatorias (popunder) también en España
     analytics: true
   };
 
@@ -92,18 +93,27 @@
   };
 
   /* ==========================================================================
-   * 3. CAMPAÑAS (POPUP + SLIDER)
+   * 3. CAMPAÑAS
    * Se usa la PRIMERA campaña activa que encaje con la web y el país.
-   * Pon las específicas (por dominio) antes que las generales.
+   * Pon las específicas (por dominio o país) antes que las generales: la
+   * última, sin filtros, es la que se usa para todo lo demás.
    *
-   * Campos de una campaña (todos opcionales salvo id y feed):
+   * Hay dos tipos:
+   *   - con feed   → popup + slider propios a partir de un JSON
+   *   - con script → carga un script externo que pinta su propio banner
+   *                  (p. ej. el de juegosboom.com)
+   *
+   * Campos de una campaña (todos opcionales salvo id y feed o script):
    *   id            nombre único (también se usa para recordar si ya vio el popup)
    *   enabled       false = desactivada
    *   sites         ['midominio.es', …]   solo en estas webs (y subdominios)
    *   excludeSites  ['otro.es', …]         nunca en estas
    *   countries     ['ES', 'MX', …]        solo para visitantes de estos países
    *   excludeCountries
-   *   feed          URL del JSON
+   *   feed          URL del JSON (popup + slider)
+   *   script        URL de un script con su propio banner (en lugar de feed)
+   *   holdMs        solo con script: ms que se espera antes de seguir con el
+   *                 popunder/PopAds, para que no se pisen con su intersticial
    *   label         etiqueta del popup ("Amazon", "Recomendado"…); '' = sin etiqueta
    *   cta           texto del botón del slider
    *   popupCta      texto del botón del popup (por defecto = cta)
@@ -137,7 +147,8 @@
     rel: 'noopener',
     accent: '#2563eb',
     popup: true,
-    slider: true
+    slider: true,
+    holdMs: 8000
   };
 
   const CAMPAIGNS = [
@@ -162,7 +173,7 @@
     },
     */
 
-    // Por defecto: chollos de Amazon para todas las webs, visitantes de España
+    // España: chollos de Amazon en todas las webs
     {
       id: 'chollos-es',
       countries: ['ES'],
@@ -172,6 +183,13 @@
       popupCta: 'Ver oferta en Amazon',
       rel: 'nofollow sponsored noopener',
       accent: '#ff9900'
+    },
+
+    // Por defecto (todos los países y todas las webs): banner de juegos de juegosboom.com
+    {
+      id: 'juegosboom',
+      script: 'https://juegosboom.com/bannergames/juegoaleatorio.js?lang=es',
+      holdMs: 8000
     }
   ];
 
@@ -220,8 +238,6 @@
       ADSTERRA_SOCIAL: 'https://biomanos.org/14/e8e9237d7e6c9674010946d09842f465'
     },
 
-    BANNER_GAMES_URL: 'https://juegosboom.com/bannergames/juegoaleatorio.js?lang=es',
-
     ANALYTICS_URL: 'https://bitelchux.github.io/beebomstats.js'
   };
 
@@ -233,8 +249,8 @@
    * Las funciones están más abajo, en ACTION_FNS.
    * ======================================================================== */
   const ACTION_WEIGHTS = {
-    smartlink:   1,   // solo el popunder del smartlink (ningún widget más)
-    bannerGames: 1    // intersticial de juegos de juegosboom.com
+    smartlink: 1      // popunder del smartlink en el primer clic
+    // El banner de juegosboom ya no es una acción: es la campaña por defecto (CAMPAIGNS)
   };
 
   /* ==========================================================================
@@ -858,7 +874,7 @@
   function resolveCampaign(country) {
     for (const raw of CAMPAIGNS) {
       const c = { ...CAMPAIGN_DEFAULTS, ...raw };
-      if (!c.enabled || !c.id || !c.feed) continue;
+      if (!c.enabled || !c.id || !(c.feed || c.script)) continue;
       if (c.sites && !hostMatches(c.sites)) continue;
       if (c.excludeSites && hostMatches(c.excludeSites)) continue;
       if (c.countries && !c.countries.includes(country)) continue;
@@ -1118,6 +1134,19 @@
      * mostrar o error), para que lo siguiente no coincida con el popup.
      * Además lanza el evento 'appmanager:banner' por compatibilidad.
      */
+    /**
+     * Campaña con script externo: lo carga y espera holdMs para que su
+     * intersticial no coincida con el popunder ni con PopAds.
+     */
+    async runScript(campaign, finish) {
+      if (isStopped()) return finish('parada por AdSense');
+      this.log.step(`Campaña "${campaign.id}" → cargando script propio.`);
+      const script = loadScript(campaign.script);
+      script.onerror = () => this.log.error(`No se pudo cargar ${campaign.script}`);
+      if (campaign.holdMs > 0) await wait(campaign.holdMs);
+      return finish('script cargado');
+    },
+
     async run(campaign) {
       const log = this.log;
       const finish = (result) => {
@@ -1132,6 +1161,8 @@
         return 'duplicada';
       }
       this.started = true;
+
+      if (campaign.script) return this.runScript(campaign, finish);
 
       const keys = this.keys(campaign);
       const wantPopup = campaign.popup && !flag.get(keys.popup);
@@ -1214,13 +1245,7 @@
    * ======================================================================== */
   const ACTION_FNS = {
     /** Solo el popunder del smartlink */
-    smartlink: () => popunder.init() || 'popunder no disponible',
-
-    /** Intersticial de juegos de juegosboom.com */
-    bannerGames: () => {
-      loadScript(CONFIG.BANNER_GAMES_URL);
-      return true;
-    }
+    smartlink: () => popunder.init() || 'popunder no disponible'
   };
 
   function pickWeighted(list) {
