@@ -1,21 +1,32 @@
 /**
  * ============================================================================
- * APP MANAGER v2: PUBLICIDAD, AFILIADOS, CHOLLOS Y NOTIFICACIONES PUSH
+ * APP MANAGER v3: PUBLICIDAD, AFILIADOS Y CAMPAÑAS (CHOLLOS / PROMOS PROPIAS)
  * ============================================================================
  * Alojado en bitelchux.github.io, pero se ejecuta en el origen de cada web.
  *
- * Flujo:
- *  1. Siempre: tags de afiliado de Amazon (también en contenido cargado
- *     después) y analíticas.
- *  2. Si la página tiene AdSense (ver hasAdSense) → no se inyecta publicidad.
+ * Flujo (cada paso deja rastro en consola y en AppManager.trace):
+ *  1. Siempre: tags de afiliado de Amazon y analíticas.
+ *  2. Si la página tiene AdSense → no se ejecuta NADA de publicidad.
+ *     Si AdSense aparece más tarde, se retiran nuestros widgets.
  *  3. utm_source=chuscountry → redirección directa al smartlink.
  *  4. Webs adultas → verificación de edad.
- *  5. País vía Cloudflare (/cdn-cgi/trace), con respaldo por zona horaria.
- *  6. España → chollos (popup + slider) o botón sticky, según la web.
- *     Resto  → popup de notificaciones push (solo si la web tiene
- *              /push-sw.js) + smartlink popunder (+ PopAds en algunas webs).
+ *  5. País: MOCK_LOCATION / ?mocklocation=XX → caché de sesión → Cloudflare
+ *     (/cdn-cgi/trace) → zona horaria.
+ *  6. Campaña (popup + slider) según dominio y país: ver CAMPAIGNS.
+ *     Por defecto, España = chollos de Amazon.
+ *  7. Después de la campaña: popunder / acciones aleatorias / PopAds,
+ *     nunca a la vez que el popup.
  *
- * Para añadir una web nueva basta con una línea en SITES.
+ * Depurar desde la consola del navegador:
+ *   AppManager.report()   → tabla con todas las decisiones tomadas
+ *   AppManager.state      → país, campaña, motivo de AdSense, acciones…
+ *   AppManager.reset()    → borra las marcas guardadas (popup visto, popunder…)
+ *
+ * Parámetros de URL para pruebas (no hace falta tocar el código):
+ *   ?mocklocation=US   simula el país
+ *   ?mockadsense=1|0   simula que la página tiene / no tiene AdSense
+ *   ?am_debug=1        logs detallados
+ *   ?am_reset=1        borra las marcas guardadas antes de empezar
  */
 (() => {
   'use strict';
@@ -24,71 +35,155 @@
   if (window.__appManagerLoaded) return;
   window.__appManagerLoaded = true;
 
-  const VERSION = '2.0.0';
+  const VERSION = '3.0.0';
 
   /* ==========================================================================
-   * LOGGING
+   * 1. AJUSTES DE PRUEBA
    * ======================================================================== */
-  const Logger = {
-    PREFIX: '[AppManager]',
-    log:   (msg, ...d) => console.log(`${Logger.PREFIX} ℹ️ ${msg}`, ...d),
-    warn:  (msg, ...d) => console.warn(`${Logger.PREFIX} ⚠️ ${msg}`, ...d),
-    error: (msg, ...d) => console.error(`${Logger.PREFIX} ❌ ${msg}`, ...d)
-  };
+
+  /** País simulado: 'ES', 'US', 'MX'… null = país real del visitante */
+  const MOCK_LOCATION = null;
+
+  /** true = simula AdSense, false = ignora el AdSense real, null = detección real */
+  const MOCK_ADSENSE = null;
+
+  /** Logs detallados (también con ?am_debug=1) */
+  const DEBUG_MODE = false;
 
   /* ==========================================================================
-   * CONFIGURACIÓN POR WEB
+   * 2. CONFIGURACIÓN POR WEB
+   * Clave sin "www.": cubre la web con y sin www y sus subdominios.
    * ======================================================================== */
-
-  /** Valores que tiene cualquier web salvo que SITES diga otra cosa */
   const DEFAULTS = {
-    adult: false,                  // muestra verificación de edad y usa el smartlink adulto
+    adult: false,                // verificación de edad + smartlink adulto
     amazonTag: 'otrosafiliados-21',
-    spainMode: 'offers',           // España: 'offers' (popup + slider) | 'sticky' (botón Amazon) | 'none'
-    offersEndpoint: 'https://pbnstats.promocionesycolecciones.com/chollometro/json.php',
-    storeLabel: 'Amazon',          // texto de la tienda en el popup de chollos
-    popunder: true,                // smartlink popunder fuera de España
-    popAds: false,                 // PopAds + Adsterra fuera de España
-    push: true,                    // notificaciones fuera de España (si existe /push-sw.js)
-    pushInSpain: false,            // notificaciones también para visitantes de España
+    spainMode: 'campaign',       // España: 'campaign' (popup + slider) | 'sticky' (botón Amazon) | 'none'
+    campaigns: true,             // false = esta web nunca muestra campañas (popup/slider)
+    popunder: true,              // smartlink popunder fuera de España
+    popAds: false,               // PopAds + Adsterra fuera de España
+    actionsInSpain: false,       // acciones aleatorias (popunder, juegos…) también en España
     analytics: true
   };
 
-  /** Solo lo que cambia respecto a DEFAULTS. Cubre también subdominios. */
   const SITES = {
-    'acelstore.es':       { amazonTag: 'iphonesreacondicionados-21' },
-    'tusarten.es':        { amazonTag: 'tusarten-21' },
-    'eleglide.es':        { amazonTag: 'elecbici-21', spainMode: 'sticky' },
-    'kloner.es':          { amazonTag: 'portatiles0b-21' },
-    'tugrifodecocina.es': { amazonTag: 'grifosfregadero-21' },
-    'dedrones.es':        { amazonTag: 'dedronesjulk-21' },
-    'docentestic.es':     { popunder: false },
+    'acelstore.es':        { amazonTag: 'iphonesreacondicionados-21' },
+    'tusarten.es':         { amazonTag: 'tusarten-21' },
+    'eleglide.es':         { amazonTag: 'elecbici-21', spainMode: 'sticky' },
+    'kloner.es':           { amazonTag: 'portatiles0b-21' },
+    'tugrifodecocina.es':  { amazonTag: 'grifosfregadero-21' },
+    'dedrones.es':         { amazonTag: 'dedronesjulk-21' },
+    'docentestic.es':      { popunder: false },
 
     // Webs adultas
-	'videorojo.com':    { adult: true, pushInSpain: true },
-	'pornleaks.es':    { adult: true, pushInSpain: true },
-	'videos.infoenbolas.com':    { adult: true, pushInSpain: true },
-	'relatosgay.infoenbolas.com':    { adult: true, pushInSpain: true },
-	'pornogayargentino.com':    { adult: true, pushInSpain: true },
-	'cuentocorto.es':    { adult: true, pushInSpain: true },
-	'telegramporno.es':    { adult: true, pushInSpain: true },
-	'multicomix.com':    { adult: true, pushInSpain: true },
-	'giantesscomic.com':    { adult: true, pushInSpain: true },
-	'bragasexy.es':    { adult: true, pushInSpain: true },
-	'300incestos.com':    { adult: true, pushInSpain: true },
-	'www.infoenbolas.com':    { adult: true, popAds: true, analytics: false, pushInSpain: true },
-	'bumboobs.net':    { adult: true, pushInSpain: true },
-	'camporno.es':    { adult: true, pushInSpain: true },
-    'infoenbolas.com':    { adult: true, popAds: true, analytics: false, pushInSpain: true }
+    'videorojo.com':              { adult: true, actionsInSpain: true },
+    'pornleaks.es':               { adult: true, actionsInSpain: true },
+    'videos.infoenbolas.com':     { adult: true, actionsInSpain: true },
+    'relatosgay.infoenbolas.com': { adult: true, actionsInSpain: true },
+    'pornogayargentino.com':      { adult: true, actionsInSpain: true },
+    'cuentocorto.es':             { adult: true, actionsInSpain: true },
+    'telegramporno.es':           { adult: true, actionsInSpain: true },
+    'multicomix.com':             { adult: true, actionsInSpain: true },
+    'giantesscomic.com':          { adult: true, actionsInSpain: true },
+    'bragasexy.es':               { adult: true, actionsInSpain: true },
+    '300incestos.com':            { adult: true, actionsInSpain: true },
+    'bumboobs.net':               { adult: true, actionsInSpain: true },
+    'camporno.es':                { adult: true, actionsInSpain: true },
+    'infoenbolas.com':            { adult: true, popAds: true, analytics: false, actionsInSpain: true }
   };
 
   /* ==========================================================================
-   * CONFIGURACIÓN GENERAL
+   * 3. CAMPAÑAS (POPUP + SLIDER)
+   * Se usa la PRIMERA campaña activa que encaje con la web y el país.
+   * Pon las específicas (por dominio) antes que las generales.
+   *
+   * Campos de una campaña (todos opcionales salvo id y feed):
+   *   id            nombre único (también se usa para recordar si ya vio el popup)
+   *   enabled       false = desactivada
+   *   sites         ['midominio.es', …]   solo en estas webs (y subdominios)
+   *   excludeSites  ['otro.es', …]         nunca en estas
+   *   countries     ['ES', 'MX', …]        solo para visitantes de estos países
+   *   excludeCountries
+   *   feed          URL del JSON
+   *   label         etiqueta del popup ("Amazon", "Recomendado"…); '' = sin etiqueta
+   *   cta           texto del botón del slider
+   *   popupCta      texto del botón del popup (por defecto = cta)
+   *   rel           rel de los enlaces
+   *   accent        color principal del popup y del slider
+   *   popup         false = solo slider
+   *   slider        false = solo popup
+   *
+   * Formato del JSON: un array (o { "items": [...] }) de objetos con
+   *   title, image, url                obligatorios
+   *   description, price, badge, cta   opcionales (badge y cta pisan los de la campaña)
+   * También se acepta el formato del feed de chollos
+   * (product_name, merchant_image_url, aw_deep_link, display_price…).
+   *
+   * Ejemplo de JSON para tus webs:
+   *   [
+   *     { "title": "Juegos gratis sin descargar", "image": "https://juegosboom.com/img/promo.jpg",
+   *       "url": "https://juegosboom.com/", "description": "Cientos de juegos para móvil y PC",
+   *       "cta": "Jugar ahora" }
+   *   ]
+   * ======================================================================== */
+  const FEEDS = {
+    CHOLLOS_ES: 'https://pbnstats.promocionesycolecciones.com/chollometro/json.php'
+  };
+
+  const CAMPAIGN_DEFAULTS = {
+    enabled: true,
+    label: '',
+    cta: 'Ver más',
+    popupCta: null,
+    rel: 'noopener',
+    accent: '#2563eb',
+    popup: true,
+    slider: true
+  };
+
+  const CAMPAIGNS = [
+    /* Ejemplo: promos de tus webs para Latinoamérica en todas las webs
+    {
+      id: 'mis-webs-latam',
+      countries: ['MX', 'AR', 'CO', 'CL', 'PE'],
+      feed: 'https://bitelchux.github.io/promos/latam.json',
+      label: 'Te recomendamos',
+      cta: 'Visitar'
+    },
+    */
+
+    /* Ejemplo: una web concreta con su propio JSON, para cualquier país
+    {
+      id: 'promo-docentestic',
+      sites: ['docentestic.es'],
+      feed: 'https://bitelchux.github.io/promos/docentestic.json',
+      label: 'Más recursos',
+      cta: 'Ver',
+      accent: '#16a34a'
+    },
+    */
+
+    // Por defecto: chollos de Amazon para todas las webs, visitantes de España
+    {
+      id: 'chollos-es',
+      countries: ['ES'],
+      feed: FEEDS.CHOLLOS_ES,
+      label: 'Amazon',
+      cta: 'Ver oferta',
+      popupCta: 'Ver oferta en Amazon',
+      rel: 'nofollow sponsored noopener',
+      accent: '#ff9900'
+    }
+  ];
+
+  /* ==========================================================================
+   * 4. CONFIGURACIÓN GENERAL
    * ======================================================================== */
   const SMARTLINK = {
     MAINSTREAM: 'https://auctionr.org/4/ca6fe018d69873f98382f717bc646ca6',
     ADULT:      'https://asiafilm.org/4/2a577d04945a51bdd71e8814391cec3d'
   };
+
+  const HOUR = 3600 * 1000;
 
   const CONFIG = {
     AMAZON: {
@@ -108,48 +203,77 @@
       SPAIN_TIMEZONES: ['Europe/Madrid', 'Atlantic/Canary', 'Africa/Ceuta']
     },
 
-    OFFERS: {
+    CAMPAIGN: {
       ROTATION_MS: 8000,              // cada cuánto cambia el slider
       POPUP_AUTOCLOSE_MS: 6000,       // tiempo que se ve el popup grande
-      POPUP_KEY: 'am_offer_popup',
-      POPUP_TTL_MS: 12 * 3600 * 1000, // tras 12 h vuelve a salir el popup
-      BANNER_CLOSED_KEY: 'am_offer_banner_closed',
-      BANNER_CLOSED_TTL_MS: 2 * 3600 * 1000, // si cierra el slider, no vuelve a salir en 2 h
+      POPUP_TTL_MS: 12 * HOUR,        // tras 12 h vuelve a salir el popup
+      SLIDER_CLOSED_TTL_MS: 2 * HOUR, // si cierra el slider, no vuelve a salir en 2 h
       FETCH_TIMEOUT_MS: 8000,
       IMAGE_TIMEOUT_MS: 8000,
-      MAX_IMAGE_ATTEMPTS: 5           // ofertas a probar si falla la imagen
+      MAX_IMAGE_ATTEMPTS: 5           // elementos a probar si falla la imagen
     },
-
-    // Script que se carga en España cuando el popup de chollos pasa a slider
-    SPAIN_DEFERRED_SCRIPT: 'https://bitelchux.github.io/facha.js',
 
     POPUNDER: {
       KEY: 'am_popunder',
-      TTL_MS: 12 * 3600 * 1000,
+      TTL_MS: 12 * HOUR,
       ADSTERRA_POPUNDERS: ['https://benchform.org/1/a4e7557f2067c4c0f922d9747a61a17f'],
       ADSTERRA_SOCIAL: 'https://biomanos.org/14/e8e9237d7e6c9674010946d09842f465'
     },
 
-    PUSH: {
-      ENABLED: true,
-      PROBAR_PUSH: false,             // true = las notificaciones también se piden en España en todas las webs (para pruebas)
-      MODE: 'auto',                   // 'auto' = aviso nativo del navegador directamente | 'prompt' = antes nuestro popup "¿Te avisamos?"
-      VAPID_PUBLIC_KEY: '',           // ← pegar aquí la clave pública VAPID (sin ella no se muestra nada)
-      SUBSCRIBE_URL: 'https://pbnstats.promocionesycolecciones.com/push/subscribe.php',
-      SW_PATH: '/push-sw.js',         // archivo que se copia a mano en la raíz de cada web
-      SCOPE: '/push/',                // scope propio: no pisa otros service workers de la web
-      SW_CHECK_KEY: 'am_push_sw',
-      SW_CHECK_TTL_MS: 24 * 3600 * 1000,
-      DISMISS_KEY: 'am_push_dismissed',
-      DISMISS_TTL_MS: 7 * 24 * 3600 * 1000, // "Ahora no" → no se vuelve a preguntar en 7 días
-      IGNORE_TTL_MS: 24 * 3600 * 1000,      // clic fuera del popup → 1 día
-      SYNC_KEY: 'am_push_synced',
-      SYNC_TTL_MS: 7 * 24 * 3600 * 1000,    // reenvía la suscripción al servidor cada 7 días
-      PROMPT_DELAY_MS: 4000
-    },
+    BANNER_GAMES_URL: 'https://juegosboom.com/bannergames/juegoaleatorio.js?lang=es',
 
     ANALYTICS_URL: 'https://bitelchux.github.io/beebomstats.js'
   };
+
+  /* ==========================================================================
+   * 5. ACCIONES ALEATORIAS
+   * Se ejecutan fuera de España (o en España en webs con actionsInSpain), siempre
+   * después de la campaña. Se elige una al azar según su peso; si no aplica,
+   * se prueba otra. Peso 0 = desactivada.
+   * Las funciones están más abajo, en ACTION_FNS.
+   * ======================================================================== */
+  const ACTION_WEIGHTS = {
+    smartlink:   1,   // solo el popunder del smartlink (ningún widget más)
+    bannerGames: 1    // intersticial de juegos de juegosboom.com
+  };
+
+  /* ==========================================================================
+   * TRAZA Y LOGS
+   * Todo lo que se decide queda en AppManager.trace (aunque DEBUG esté apagado).
+   * ======================================================================== */
+  const QUERY = new URLSearchParams(window.location.search);
+  const DEBUG = DEBUG_MODE || QUERY.has('am_debug');
+  const T0 = performance.now();
+  const trace = [];
+
+  const LEVELS = {
+    debug: { icon: '🔹', fn: console.debug },
+    info:  { icon: 'ℹ️', fn: console.log },
+    step:  { icon: '▶️', fn: console.log },
+    warn:  { icon: '⚠️', fn: console.warn },
+    error: { icon: '❌', fn: console.error }
+  };
+
+  function writeLog(level, area, msg, data) {
+    const entry = { ms: Math.round(performance.now() - T0), level, area, msg };
+    if (data !== undefined) entry.data = data;
+    trace.push(entry);
+    if (level === 'debug' && !DEBUG) return;
+
+    const { icon, fn } = LEVELS[level];
+    const args = [`%c[AppManager]%c ${icon} [${area}] ${msg}`, 'color:#ff9900;font-weight:bold', ''];
+    if (data !== undefined) args.push(data);
+    fn.apply(console, args);
+  }
+
+  /** Logger con área: const log = createLog('geo'); log.info('...') */
+  const createLog = (area) => ({
+    debug: (msg, data) => writeLog('debug', area, msg, data),
+    info:  (msg, data) => writeLog('info',  area, msg, data),
+    step:  (msg, data) => writeLog('step',  area, msg, data),
+    warn:  (msg, data) => writeLog('warn',  area, msg, data),
+    error: (msg, data) => writeLog('error', area, msg, data)
+  });
 
   /* ==========================================================================
    * UTILIDADES
@@ -157,13 +281,36 @@
   const HOST = window.location.hostname.toLowerCase();
   const BARE_HOST = HOST.replace(/^www\./, '');
 
+  /** ¿El host actual es alguno de estos dominios o un subdominio suyo? */
+  const hostMatches = (domains) => domains.some(d => {
+    const bare = d.toLowerCase().replace(/^www\./, '');
+    return BARE_HOST === bare || BARE_HOST.endsWith('.' + bare);
+  });
+
   /** Mezcla DEFAULTS con la entrada de SITES (exacta o del dominio padre) */
-  function resolveSite(host) {
-    const key = SITES[host] ? host : Object.keys(SITES).find(d => host.endsWith('.' + d));
-    return Object.freeze({ host, ...DEFAULTS, ...(key ? SITES[key] : {}) });
+  function resolveSite() {
+    const key = SITES[BARE_HOST] ? BARE_HOST : Object.keys(SITES).find(d => BARE_HOST.endsWith('.' + d));
+    const cfg = { ...DEFAULTS, ...(key ? SITES[key] : {}) };
+    if (cfg.spainMode === 'offers') cfg.spainMode = 'campaign'; // nombre de la v2
+    return Object.freeze({ host: BARE_HOST, configKey: key || null, ...cfg });
   }
 
-  const site = resolveSite(BARE_HOST);
+  const site = resolveSite();
+
+  /** Estado visible en AppManager.state */
+  const state = {
+    version: VERSION,
+    host: BARE_HOST,
+    siteConfig: site.configKey,
+    mock: { location: null, adsense: null },
+    country: null,
+    countrySource: null,
+    adsense: null,         // motivo por el que se detectó AdSense, o null
+    stopped: false,        // true = se ha parado toda la publicidad
+    campaign: null,
+    campaignResult: null,
+    actions: []
+  };
 
   const smartlinkUrl = () => (site.adult ? SMARTLINK.ADULT : SMARTLINK.MAINSTREAM);
 
@@ -183,8 +330,9 @@
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
+  const scriptLog = createLog('script');
   const loadScript = (src, attrs = {}) => {
-    Logger.log(`Cargando script externo: ${src}`);
+    scriptLog.info(`Cargando ${src}`);
     const script = document.createElement('script');
     script.src = src;
     script.setAttribute('data-cfasync', 'false');
@@ -202,13 +350,17 @@
     document.head.appendChild(style);
   };
 
-  /** ¿El elemento pertenece a algún widget nuestro? (se marcan con data-am-ui) */
+  /**
+   * Nuestros elementos llevan data-am-ui:
+   *   "ad"   → publicidad (se retira si aparece AdSense)
+   *   "gate" → verificación de edad
+   */
   const isOwnUi = (el) => !!el?.closest?.('[data-am-ui]');
 
   const openInNewTab = (url) => window.open(url, '_blank', 'noopener');
 
   /**
-   * Almacenamiento único con caducidad opcional.
+   * Almacenamiento con caducidad opcional.
    * localStorage por defecto, sessionStorage con { session: true }.
    * Nunca lanza: en modo privado o con almacenamiento bloqueado devuelve null.
    */
@@ -244,8 +396,7 @@
 
   /**
    * Cookies en el dominio raíz (".infoenbolas.com"), compartidas entre www,
-   * sin www y subdominios. localStorage es distinto para cada uno de ellos, y
-   * en algunos navegadores o modos privados no se guarda: la cookie hace de respaldo.
+   * sin www y subdominios. Hacen de respaldo de localStorage.
    */
   const ROOT_DOMAIN = BARE_HOST.split('.').slice(-2).join('.');
 
@@ -268,25 +419,12 @@
     set: (key, ttl) => {
       store.set(key, true, { ttl });
       cookies.set(key, '1', ttl);
+    },
+    remove: (key) => {
+      store.remove(key);
+      cookies.remove(key);
     }
   };
-
-  /**
-   * ¿La página tiene AdSense? Se comprueba de varias formas porque cada web
-   * lo carga a su manera:
-   *  - window.conadsense: variable propia que ya usaban tus webs
-   *  - script de pagead2.googlesyndication.com (anuncios manuales y automáticos)
-   *  - bloques <ins class="adsbygoogle">
-   *  - window.adsbygoogle: existe en cuanto la página hace adsbygoogle.push()
-   *  - <meta name="google-adsense-account">: verificación de la cuenta
-   */
-  function hasAdSense() {
-    return window.conadsense !== undefined
-      || window.adsbygoogle !== undefined
-      || !!document.querySelector(
-        'script[src*="pagead2.googlesyndication.com"], ins.adsbygoogle, meta[name="google-adsense-account"]'
-      );
-  }
 
   /** fetch con timeout */
   const fetchWithTimeout = async (url, options = {}, timeoutMs = 8000) => {
@@ -314,19 +452,85 @@
     img.src = src;
   });
 
-  /** Clave VAPID en base64url → Uint8Array (lo que pide pushManager.subscribe) */
-  const base64UrlToUint8Array = (b64) => {
-    const padded = (b64 + '='.repeat((4 - (b64.length % 4)) % 4)).replace(/-/g, '+').replace(/_/g, '/');
-    const bin = atob(padded);
-    return Uint8Array.from(bin, c => c.charCodeAt(0));
+  /* ==========================================================================
+   * ADSENSE
+   * Si la página tiene AdSense no se inyecta ninguna publicidad nuestra.
+   * Señales que deja AdSense (cualquiera vale):
+   *   window.adsbygoogle      la crea la página al hacer (adsbygoogle = …).push()
+   *                           y también el propio adsbygoogle.js al cargar
+   *   window.google_ad_client anuncios con el código antiguo
+   *   window.conadsense       variable propia de tus webs
+   *   <script src="…pagead2.googlesyndication.com…">, <ins class="adsbygoogle">,
+   *   <meta name="google-adsense-account">, iframes aswift_*
+   * Si aparece más tarde (carga diferida), se retiran nuestros widgets.
+   * ======================================================================== */
+  const ADSENSE_SELECTOR = [
+    'script[src*="pagead2.googlesyndication.com"]',
+    'script[src*="adsbygoogle"]',
+    'ins.adsbygoogle',
+    'meta[name="google-adsense-account"]',
+    'iframe[id^="aswift_"]'
+  ].join(', ');
+
+  const adsense = {
+    log: createLog('adsense'),
+    observer: null,
+
+    /** Motivo de la detección (texto) o null si no hay AdSense */
+    detect() {
+      const mock = state.mock.adsense;
+      if (mock === true) return 'simulado (MOCK_ADSENSE)';
+      if (mock === false) return null;
+
+      if (window.conadsense !== undefined) return 'window.conadsense';
+      if (window.adsbygoogle !== undefined) return 'window.adsbygoogle';
+      if (window.google_ad_client !== undefined) return 'window.google_ad_client';
+      const el = document.querySelector(ADSENSE_SELECTOR);
+      return el ? `elemento <${el.tagName.toLowerCase()}> de AdSense` : null;
+    },
+
+    /** Para toda la publicidad y retira lo que ya se haya pintado */
+    stop(reason) {
+      if (state.stopped) return;
+      state.stopped = true;
+      state.adsense = reason;
+      const widgets = document.querySelectorAll('[data-am-ui="ad"]');
+      widgets.forEach(el => el.remove());
+      this.log.warn(`AdSense detectado (${reason}). Publicidad parada${widgets.length ? `, ${widgets.length} widgets retirados` : ''}.`);
+      this.observer?.disconnect();
+    },
+
+    /** Vigila si AdSense se añade después de empezar */
+    watchLate() {
+      if (state.mock.adsense === false) return;
+      const isAdSenseNode = (n) => n.nodeType === 1 && (n.matches(ADSENSE_SELECTOR) || !!n.querySelector?.(ADSENSE_SELECTOR));
+
+      this.observer = new MutationObserver((mutations) => {
+        for (const m of mutations) {
+          for (const node of m.addedNodes) {
+            if (isAdSenseNode(node)) return this.stop('cargado después del inicio');
+          }
+        }
+      });
+      this.observer.observe(document.documentElement, { childList: true, subtree: true });
+    }
+  };
+
+  /** true si hay que cortar (AdSense apareció). Se llama antes de pintar cualquier cosa. */
+  const isStopped = () => {
+    if (state.stopped) return true;
+    const reason = adsense.detect();
+    if (reason) adsense.stop(reason);
+    return state.stopped;
   };
 
   /* ==========================================================================
    * AFILIADOS AMAZON
    * Etiqueta los enlaces a amazon.es al cargar y también los que se añadan
-   * después (MutationObserver). Los enlaces de nuestros widgets no se tocan.
+   * después. Los enlaces de nuestros widgets no se tocan.
    * ======================================================================== */
   const affiliate = {
+    log: createLog('amazon'),
     isAmazonEs: (hostname) => hostname === 'amazon.es' || hostname.endsWith('.amazon.es'),
 
     tagLink(link) {
@@ -353,12 +557,14 @@
 
     watch() {
       const count = this.scan(document);
-      Logger.log(`Tags de Amazon: ${count} enlaces con tag ${site.amazonTag}`);
+      this.log.info(`${count} enlaces etiquetados con ${site.amazonTag}`);
 
       new MutationObserver((mutations) => {
         for (const m of mutations) {
           for (const node of m.addedNodes) {
-            if (node.nodeType === 1) this.scan(node);
+            if (node.nodeType !== 1) continue;
+            const n = this.scan(node);
+            if (n) this.log.debug(`${n} enlaces nuevos etiquetados`);
           }
         }
       }).observe(document.body, { childList: true, subtree: true });
@@ -369,7 +575,9 @@
    * ANALÍTICAS
    * ======================================================================== */
   function loadAnalytics() {
-    if (!site.analytics || window.beebomstats !== undefined) return;
+    const log = createLog('analíticas');
+    if (!site.analytics) return log.debug('Desactivadas en esta web.');
+    if (window.beebomstats !== undefined) return log.debug('Ya cargadas por la página.');
     loadScript(CONFIG.ANALYTICS_URL);
   }
 
@@ -398,6 +606,8 @@
   `;
 
   const ageGate = {
+    log: createLog('edad'),
+
     isConfirmed() {
       return store.get(CONFIG.AGE.KEY) === true
         || store.get(CONFIG.AGE.LEGACY_KEY)?.confirmed === true;
@@ -407,16 +617,16 @@
     ensure() {
       return new Promise((resolve) => {
         if (this.isConfirmed()) {
-          Logger.log('Edad verificada previamente.');
+          this.log.info('Edad verificada previamente.');
           return resolve();
         }
 
-        Logger.log('Mostrando modal de verificación de edad...');
+        this.log.step('Mostrando verificación de edad.');
         injectStyle('age-styles', AGE_CSS);
 
         const overlay = document.createElement('div');
         overlay.className = 'age-overlay';
-        overlay.setAttribute('data-am-ui', '');
+        overlay.setAttribute('data-am-ui', 'gate');
         overlay.innerHTML = `
           <div class="age-modal" role="dialog" aria-modal="true">
             <h2>Verificación de edad</h2>
@@ -430,14 +640,14 @@
         document.body.appendChild(overlay);
 
         overlay.querySelector('.age-yes').addEventListener('click', () => {
-          Logger.log('Edad confirmada.');
+          this.log.info('Edad confirmada.');
           store.set(CONFIG.AGE.KEY, true);
           overlay.remove();
           resolve();
         });
 
         overlay.querySelector('.age-no').addEventListener('click', () => {
-          Logger.log('Verificación rechazada. Redirigiendo...');
+          this.log.info('Verificación rechazada. Redirigiendo...');
           window.location.href = CONFIG.AGE.EXIT_URL;
         });
       });
@@ -446,10 +656,11 @@
 
   /* ==========================================================================
    * GEOLOCALIZACIÓN
-   * Cloudflare devuelve el país en /cdn-cgi/trace (línea "loc=ES").
-   * Si falla, la zona horaria del navegador sirve para detectar España.
+   * Orden: simulación → caché de sesión → Cloudflare → zona horaria.
    * ======================================================================== */
   const geo = {
+    log: createLog('geo'),
+
     async fromCloudflare() {
       const res = await fetchWithTimeout(CONFIG.GEO.TRACE_URL, { cache: 'no-store' }, CONFIG.GEO.TIMEOUT_MS);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -467,18 +678,21 @@
       }
     },
 
-    /** Código ISO del país ('ES', 'MX'…) o null si no se sabe */
+    /** { country: 'ES' | 'MX' | … | null, source } */
     async getCountry() {
+      // El país simulado no se guarda en caché: al quitarlo vuelve el real
+      if (state.mock.location) return { country: state.mock.location, source: 'simulado' };
+
       const cached = store.get(CONFIG.GEO.CACHE_KEY, { session: true });
-      if (cached) return cached;
+      if (cached) return { country: cached, source: 'caché de sesión' };
 
       try {
         const country = await this.fromCloudflare();
         store.set(CONFIG.GEO.CACHE_KEY, country, { session: true });
-        return country;
+        return { country, source: 'Cloudflare' };
       } catch (err) {
-        Logger.warn('No se pudo leer el país de Cloudflare, se usa la zona horaria:', err);
-        return this.fromTimezone();
+        this.log.warn('Cloudflare no devolvió el país, se usa la zona horaria.', err);
+        return { country: this.fromTimezone(), source: 'zona horaria' };
       }
     }
   };
@@ -511,16 +725,17 @@
   `;
 
   function initAmazonStickyButton() {
+    const log = createLog('sticky');
     const title = (document.title || '').trim();
-    if (!title || document.getElementById('amz-sticky-bar')) return;
+    if (!title || document.getElementById('amz-sticky-bar') || isStopped()) return;
 
-    Logger.log('Iniciando botón sticky de Amazon...');
+    log.step('Mostrando botón sticky de Amazon.');
     const url = `https://www.amazon.es/s?k=${encodeURIComponent(title)}&tag=${encodeURIComponent(site.amazonTag)}`;
     injectStyle('amz-sticky-styles', STICKY_CSS);
 
     const bar = document.createElement('div');
     bar.id = 'amz-sticky-bar';
-    bar.setAttribute('data-am-ui', '');
+    bar.setAttribute('data-am-ui', 'ad');
     bar.innerHTML = `
       <a id="amz-sticky-btn" href="${escapeHtml(url)}" target="_blank" rel="nofollow sponsored noopener">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -534,9 +749,10 @@
   }
 
   /* ==========================================================================
-   * CHOLLOS (POPUP INICIAL + SLIDER INFERIOR ROTATIVO)
+   * CAMPAÑAS: POPUP INICIAL + SLIDER INFERIOR ROTATIVO
+   * El color sale de la campaña (variable CSS --am-accent).
    * ======================================================================== */
-  const OFFER_CSS = `
+  const CAMPAIGN_CSS = `
     /* ---------- Popup (intersticial) ---------- */
     #offer-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.65);
@@ -558,7 +774,8 @@
     #offer-int-img { width: 100%; height: 100%; object-fit: cover; display: block; }
     #offer-int-body { padding: 20px; }
     #offer-int-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
-    .int-badge-store { background: #ff9900; color: #000; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 20px; }
+    #offer-int-meta:empty { display: none; }
+    .int-badge-store { background: var(--am-accent); color: var(--am-accent-text); font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 20px; }
     #offer-int-price { background: #dc2626; color: #fff; font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
     #offer-int-title, #offer-int-desc {
       display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
@@ -567,7 +784,7 @@
     #offer-int-desc { font-size: 13px; color: #a1a1aa; }
     #offer-int-cta {
       display: flex; align-items: center; justify-content: center; width: 100%; margin-top: 20px;
-      background: #ff9900; color: #000; font-weight: 700; font-size: 14px; padding: 12px;
+      background: var(--am-accent); color: var(--am-accent-text); font-weight: 700; font-size: 14px; padding: 12px;
       border-radius: 12px; text-decoration: none; box-sizing: border-box;
     }
     #offer-close-btn {
@@ -599,16 +816,17 @@
     }
     #offer-banner .offer-info { display: flex; flex-direction: column; min-width: 0; flex: 1; }
     #offer-banner .offer-title { font-size: 14px; font-weight: 600; color: #f4f4f5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #offer-banner .offer-desc { font-size: 12px; color: #a1a1aa; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     #offer-banner .offer-sub { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
     #offer-banner .offer-price {
       background: rgba(220,38,38,0.25); color: #f87171; border: 1px solid rgba(220,38,38,0.4);
       padding: 2px 9px; border-radius: 6px; font-size: 13px; font-weight: 700;
     }
     #offer-banner .offer-cta {
-      flex-shrink: 0; background: #ff9900; padding: 10px 16px; border-radius: 10px; font-weight: 700;
-      font-size: 13px; text-decoration: none; color: #000; white-space: nowrap; transition: background 0.2s;
+      flex-shrink: 0; background: var(--am-accent); padding: 10px 16px; border-radius: 10px; font-weight: 700;
+      font-size: 13px; text-decoration: none; color: var(--am-accent-text); white-space: nowrap; transition: filter 0.2s;
     }
-    #offer-banner .offer-cta:hover { background: #e68a00; }
+    #offer-banner .offer-cta:hover { filter: brightness(0.92); }
     #offer-banner .offer-banner-close {
       position: absolute; top: -10px; right: -10px; width: 26px; height: 26px;
       border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); background: #27272a;
@@ -622,47 +840,90 @@
       #offer-banner { padding: 8px 10px; gap: 10px; }
       #offer-banner .offer-img { width: 56px; height: 56px; }
       #offer-banner .offer-title { font-size: 12px; }
+      #offer-banner .offer-desc { display: none; }
       #offer-banner .offer-cta { padding: 8px 12px; font-size: 12px; }
     }
   `;
 
-  /** Convierte un elemento del feed en una oferta válida (o null) */
-  function normalizeOffer(raw) {
-    if (!raw?.product_name || !raw.merchant_image_url || !/^https?:\/\//i.test(raw.aw_deep_link || '')) {
-      return null;
-    }
-    let price = String(raw.display_price ?? raw.search_price ?? '').trim();
-    if (price && !price.includes('€')) price += ' €';
+  /** Texto negro o blanco según lo claro que sea el color de acento */
+  function accentTextColor(hex) {
+    const m = /^#?([0-9a-f]{6})$/i.exec(hex || '');
+    if (!m) return '#fff';
+    const n = parseInt(m[1], 16);
+    const lum = (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255;
+    return lum > 0.6 ? '#000' : '#fff';
+  }
 
+  /** Primera campaña activa que encaja con esta web y este país */
+  function resolveCampaign(country) {
+    for (const raw of CAMPAIGNS) {
+      const c = { ...CAMPAIGN_DEFAULTS, ...raw };
+      if (!c.enabled || !c.id || !c.feed) continue;
+      if (c.sites && !hostMatches(c.sites)) continue;
+      if (c.excludeSites && hostMatches(c.excludeSites)) continue;
+      if (c.countries && !c.countries.includes(country)) continue;
+      if (c.excludeCountries && c.excludeCountries.includes(country)) continue;
+      return Object.freeze({ ...c, popupCta: c.popupCta || c.cta });
+    }
+    return null;
+  }
+
+  /**
+   * Convierte un elemento del JSON en { title, image, url, … } o null.
+   * Acepta el formato propio (title/image/url) y el del feed de chollos.
+   */
+  function normalizeItem(raw, campaign) {
+    if (!raw || typeof raw !== 'object') return null;
+    const pick = (...keys) => {
+      for (const k of keys) {
+        const v = raw[k];
+        if (v != null && String(v).trim() !== '') return String(v).trim();
+      }
+      return '';
+    };
+
+    const title = pick('title', 'name', 'product_name');
+    const image = pick('image', 'img', 'imagen', 'merchant_image_url');
+    const url   = pick('url', 'link', 'href', 'aw_deep_link');
+    if (!title || !image || !/^https?:\/\//i.test(url)) return null;
+
+    let price = pick('price', 'display_price', 'search_price');
+    if (/^[\d.,\s]+$/.test(price)) price += ' €'; // solo número → se añade €
+
+    const cta = pick('cta');
     return {
-      title: raw.product_name,
-      image: raw.merchant_image_url,
-      url: raw.aw_deep_link,
+      title,
+      image,
+      url,
       price,
-      description: raw.description || ''
+      description: pick('description', 'desc', 'text', 'texto'),
+      badge: pick('badge') || campaign.label,
+      cta: cta || campaign.cta,
+      popupCta: cta || campaign.popupCta
     };
   }
 
   /**
-   * Feed de ofertas: descarga el JSON una sola vez, las rota sin repetir
-   * y solo devuelve una oferta cuando su imagen ya está descargada.
+   * Feed de una campaña: descarga el JSON una vez, rota los elementos sin
+   * repetir y solo devuelve uno cuando su imagen ya está descargada.
    */
-  function createOfferFeed(endpoint) {
-    let offers = [];
+  function createFeed(campaign, log) {
+    let items = [];
     let queue = [];
     let lastUrl = null;
 
     async function load() {
-      const data = await fetchJson(endpoint, CONFIG.OFFERS.FETCH_TIMEOUT_MS);
-      offers = (Array.isArray(data) ? data : [data]).map(normalizeOffer).filter(Boolean);
-      if (!offers.length) throw new Error('El feed no contiene ofertas válidas');
-      Logger.log(`Feed de ofertas cargado: ${offers.length} ofertas`);
+      const data = await fetchJson(campaign.feed, CONFIG.CAMPAIGN.FETCH_TIMEOUT_MS);
+      const list = Array.isArray(data) ? data : (Array.isArray(data?.items) ? data.items : [data]);
+      items = list.map(r => normalizeItem(r, campaign)).filter(Boolean);
+      log.info(`JSON cargado: ${items.length} elementos válidos de ${list.length}`, campaign.feed);
+      if (!items.length) throw new Error('El JSON no contiene elementos válidos (title, image, url)');
     }
 
     function takeCandidate() {
-      if (!queue.length) queue = shuffle([...offers]);
+      if (!queue.length) queue = shuffle([...items]);
       let candidate = queue.pop();
-      // Evita repetir la misma oferta dos veces seguidas al rebarajar
+      // Evita repetir el mismo dos veces seguidas al rebarajar
       if (candidate.url === lastUrl && queue.length) {
         queue.unshift(candidate);
         candidate = queue.pop();
@@ -670,518 +931,271 @@
       return candidate;
     }
 
-    /** Devuelve la siguiente oferta lista para pintar, o null */
+    /** Siguiente elemento listo para pintar, o null */
     async function next() {
-      if (!offers.length) await load();
+      if (!items.length) await load();
 
-      for (let i = 0; i < CONFIG.OFFERS.MAX_IMAGE_ATTEMPTS && offers.length; i++) {
-        const offer = takeCandidate();
+      for (let i = 0; i < CONFIG.CAMPAIGN.MAX_IMAGE_ATTEMPTS && items.length; i++) {
+        const item = takeCandidate();
         try {
-          await preloadImage(offer.image, CONFIG.OFFERS.IMAGE_TIMEOUT_MS);
-          lastUrl = offer.url;
-          return offer;
+          await preloadImage(item.image, CONFIG.CAMPAIGN.IMAGE_TIMEOUT_MS);
+          lastUrl = item.url;
+          log.debug(`Elemento listo: ${item.title}`);
+          return item;
         } catch {
-          Logger.warn('Imagen no disponible, se descarta la oferta:', offer.image);
-          offers = offers.filter(o => o !== offer);
-          queue = queue.filter(o => o !== offer);
+          log.warn('Imagen no disponible, se descarta:', item.image);
+          items = items.filter(o => o !== item);
+          queue = queue.filter(o => o !== item);
         }
       }
       return null;
     }
 
-    return { next, get size() { return offers.length; } };
+    return { next, get size() { return items.length; } };
   }
 
-  function renderBanner(banner, offer) {
-    banner.innerHTML = `
-      <div class="offer-left">
-        <img class="offer-img" src="${escapeHtml(offer.image)}" alt="">
-        <div class="offer-info">
-          <div class="offer-title">${escapeHtml(offer.title)}</div>
-          ${offer.price ? `<div class="offer-sub"><span class="offer-price">💰 ${escapeHtml(offer.price)}</span></div>` : ''}
-        </div>
-      </div>
-      <a class="offer-cta" target="_blank" rel="nofollow sponsored noopener" href="${escapeHtml(offer.url)}">Ver oferta →</a>
-      <button type="button" class="offer-banner-close" aria-label="Cerrar">✕</button>
-    `;
-    banner.onclick = (e) => {
-      if (e.target.closest('.offer-banner-close')) return closeBanner(banner);
-      if (e.target.closest('.offer-cta')) return; // el enlace ya abre la oferta
-      openInNewTab(offer.url);
-    };
-  }
+  const campaignUi = {
+    log: createLog('campaña'),
+    started: false,
 
-  /** Cierra el slider y no lo vuelve a mostrar en BANNER_CLOSED_TTL_MS */
-  function closeBanner(banner) {
-    Logger.log('Slider de ofertas cerrado por el usuario.');
-    banner.dataset.closed = '1';           // detiene la rotación
-    flag.set(CONFIG.OFFERS.BANNER_CLOSED_KEY, CONFIG.OFFERS.BANNER_CLOSED_TTL_MS);
-    banner.classList.remove('visible');
-    setTimeout(() => banner.remove(), 500);
-  }
+    keys: (campaign) => ({
+      popup: `am_popup_${campaign.id}`,
+      sliderClosed: `am_slider_closed_${campaign.id}`
+    }),
 
-  /** Cambia la oferta del slider con un fundido suave */
-  async function swapBanner(banner, offer) {
-    banner.classList.add('swapping');
-    await wait(250);
-    renderBanner(banner, offer);
-    banner.classList.remove('swapping');
-  }
+    applyAccent(el, campaign) {
+      el.style.setProperty('--am-accent', campaign.accent);
+      el.style.setProperty('--am-accent-text', accentTextColor(campaign.accent));
+    },
 
-  /**
-   * Rotación del slider. El siguiente cambio se programa cuando el anterior
-   * ha terminado (oferta + imagen cargadas), así nunca queda vacío.
-   * No rota con la pestaña oculta ni con el ratón encima.
-   */
-  function startBannerRotation(banner, feed) {
-    if (feed.size < 2) return;
+    /* ---------- Slider ---------- */
+    renderSlider(banner, item, campaign) {
+      const sub = item.price
+        ? `<div class="offer-sub"><span class="offer-price">💰 ${escapeHtml(item.price)}</span></div>`
+        : (item.description ? `<div class="offer-desc">${escapeHtml(item.description)}</div>` : '');
 
-    const scheduleNext = () => setTimeout(async () => {
-      if (banner.dataset.closed || !banner.isConnected) return; // cerrado: se para la rotación
-      if (!document.hidden && !banner.matches(':hover')) {
-        try {
-          const offer = await feed.next();
-          if (offer) await swapBanner(banner, offer);
-        } catch (err) {
-          Logger.warn('No se pudo rotar la oferta:', err);
-        }
-      }
-      if (feed.size >= 2) scheduleNext();
-    }, CONFIG.OFFERS.ROTATION_MS);
-
-    scheduleNext();
-  }
-
-  /** Muestra el popup grande y llama a onClosed cuando se ha cerrado */
-  function showOfferPopup(offer, onClosed) {
-    const label = site.storeLabel;
-    const overlay = document.createElement('div');
-    overlay.id = 'offer-overlay';
-    overlay.setAttribute('data-am-ui', '');
-    overlay.innerHTML = `
-      <div id="offer-interstitial" role="dialog" aria-modal="true" aria-label="Oferta destacada">
-        <button id="offer-close-btn" type="button" aria-label="Cerrar">✕</button>
-        <div id="offer-int-img-wrap">
-          <img id="offer-int-img" src="${escapeHtml(offer.image)}" alt="${escapeHtml(offer.title)}">
-        </div>
-        <div id="offer-int-body">
-          <div id="offer-int-meta">
-            <span class="int-badge-store">${escapeHtml(label)}</span>
-            ${offer.price ? `<span id="offer-int-price">${escapeHtml(offer.price)}</span>` : ''}
+      banner.innerHTML = `
+        <div class="offer-left">
+          <img class="offer-img" src="${escapeHtml(item.image)}" alt="">
+          <div class="offer-info">
+            <div class="offer-title">${escapeHtml(item.title)}</div>
+            ${sub}
           </div>
-          <div id="offer-int-title">${escapeHtml(offer.title)}</div>
-          ${offer.description ? `<div id="offer-int-desc">${escapeHtml(offer.description)}</div>` : ''}
-          <a id="offer-int-cta" href="${escapeHtml(offer.url)}" target="_blank" rel="nofollow sponsored noopener">
-            Ver oferta en ${escapeHtml(label)} →
-          </a>
         </div>
-      </div>
-    `;
-    document.body.appendChild(overlay);
-    void overlay.offsetWidth;          // fuerza reflow para que la transición de entrada funcione
-    overlay.classList.add('visible');
+        <a class="offer-cta" target="_blank" rel="${escapeHtml(campaign.rel)}" href="${escapeHtml(item.url)}">${escapeHtml(item.cta)} →</a>
+        <button type="button" class="offer-banner-close" aria-label="Cerrar">✕</button>
+      `;
+      banner.onclick = (e) => {
+        if (e.target.closest('.offer-banner-close')) return this.closeSlider(banner, campaign);
+        this.log.info(`Clic en el slider: ${item.title}`);
+        if (e.target.closest('.offer-cta')) return; // el enlace ya abre la página
+        openInNewTab(item.url);
+      };
+    },
 
-    let closed = false;
-    const close = () => {
-      if (closed) return;
-      closed = true;
-      clearTimeout(autoCloseTimer);
-      document.removeEventListener('keydown', onKeyDown);
-      overlay.classList.remove('visible'); // animación de "hacerse pequeño"
-      setTimeout(() => {
-        overlay.remove();
-        onClosed();
-      }, 400);
-    };
+    closeSlider(banner, campaign) {
+      this.log.info('Slider cerrado por el usuario.');
+      banner.dataset.closed = '1'; // detiene la rotación
+      flag.set(this.keys(campaign).sliderClosed, CONFIG.CAMPAIGN.SLIDER_CLOSED_TTL_MS);
+      banner.classList.remove('visible');
+      setTimeout(() => banner.remove(), 500);
+    },
 
-    const onKeyDown = (e) => { if (e.key === 'Escape') close(); };
-    const autoCloseTimer = setTimeout(close, CONFIG.OFFERS.POPUP_AUTOCLOSE_MS);
+    async swapSlider(banner, item, campaign) {
+      banner.classList.add('swapping');
+      await wait(250);
+      this.renderSlider(banner, item, campaign);
+      banner.classList.remove('swapping');
+    },
 
-    overlay.addEventListener('click', (e) => {
-      if (e.target.closest('#offer-close-btn') || e.target === overlay) return close();
-      if (e.target.closest('#offer-int-cta')) return close(); // el enlace abre la oferta solo
-      if (e.target.closest('#offer-interstitial')) {
-        openInNewTab(offer.url);
-        close();
-      }
-    });
-    document.addEventListener('keydown', onKeyDown);
-  }
+    /**
+     * Rotación: el siguiente cambio se programa cuando el anterior ha
+     * terminado (elemento + imagen cargados), así nunca queda vacío.
+     * No rota con la pestaña oculta ni con el ratón encima.
+     */
+    startRotation(banner, feed, campaign) {
+      if (feed.size < 2) return this.log.debug('Un solo elemento: el slider no rota.');
 
-  /**
-   * Punto de entrada de los chollos.
-   * - Nada se muestra hasta que la primera oferta (y su imagen) está cargada.
-   * - El popup grande sale como mucho una vez cada POPUP_TTL_MS; el resto de
-   *   páginas muestran directamente el slider.
-   * - Cuando ya solo queda el slider (o si no hay ofertas) se lanza el evento
-   *   'appmanager:banner', para cargar otros widgets sin que coincidan con el popup.
-   */
-  let offersStarted = false;
+      const scheduleNext = () => setTimeout(async () => {
+        if (banner.dataset.closed || !banner.isConnected || state.stopped) return;
+        if (!document.hidden && !banner.matches(':hover')) {
+          try {
+            const item = await feed.next();
+            if (item && banner.isConnected) await this.swapSlider(banner, item, campaign);
+          } catch (err) {
+            this.log.warn('No se pudo rotar el slider:', err);
+          }
+        }
+        if (feed.size >= 2) scheduleNext();
+      }, CONFIG.CAMPAIGN.ROTATION_MS);
 
-  async function initOffers() {
-    // Una sola vez por página, aunque se llame dos veces mientras se descarga el feed
-    if (offersStarted || document.getElementById('offer-banner') || document.getElementById('offer-overlay')) return;
-    offersStarted = true;
+      scheduleNext();
+    },
 
-    const announceBannerMode = () => document.dispatchEvent(new CustomEvent('appmanager:banner'));
-    const popupSeen = flag.get(CONFIG.OFFERS.POPUP_KEY);
-    const bannerClosed = flag.get(CONFIG.OFFERS.BANNER_CLOSED_KEY);
-
-    // Ya vio el popup y cerró el slider hace poco: no hay nada que mostrar
-    if (popupSeen && bannerClosed) {
-      Logger.log('Popup visto y slider cerrado recientemente: no se muestran chollos.');
-      announceBannerMode();
-      return;
-    }
-
-    // Se marca ANTES de descargar el feed: así otra pestaña o página abierta a la vez no lo repite
-    if (!popupSeen) flag.set(CONFIG.OFFERS.POPUP_KEY, CONFIG.OFFERS.POPUP_TTL_MS);
-
-    const feed = createOfferFeed(site.offersEndpoint);
-
-    let firstOffer = null;
-    try {
-      firstOffer = await feed.next();
-    } catch (err) {
-      Logger.error('Error al obtener ofertas:', err);
-    }
-
-    // AdSense puede haberse cargado mientras se descargaba el feed
-    if (hasAdSense()) {
-      Logger.warn('AdSense detectado: no se muestran chollos.');
-      return;
-    }
-
-    if (!firstOffer) {
-      Logger.warn('No hay ofertas disponibles; no se muestra popup ni slider.');
-      announceBannerMode();
-      return;
-    }
-
-    injectStyle('offer-styles', OFFER_CSS);
-
-    const showBanner = () => {
-      if (bannerClosed) {
-        announceBannerMode();
-        return;
-      }
+    showSlider(item, feed, campaign) {
+      if (isStopped()) return;
       const banner = document.createElement('div');
       banner.id = 'offer-banner';
-      banner.setAttribute('data-am-ui', '');
-      renderBanner(banner, firstOffer);
+      banner.setAttribute('data-am-ui', 'ad');
+      this.applyAccent(banner, campaign);
+      this.renderSlider(banner, item, campaign);
       document.body.appendChild(banner);
       void banner.offsetWidth;
       banner.classList.add('visible');
-      startBannerRotation(banner, feed);
-      announceBannerMode();
-    };
-
-    if (popupSeen) {
-      Logger.log('Popup ya visto: se muestra solo el slider.');
-      showBanner();
-    } else {
-      showOfferPopup(firstOffer, showBanner);
-    }
-  }
-
-  /* ==========================================================================
-   * NOTIFICACIONES PUSH
-   * Solo se activan si la web tiene /push-sw.js en su raíz (se comprueba con
-   * un HEAD del mismo origen y se cachea 24 h). El service worker se registra
-   * con scope /push/ y únicamente cuando el usuario acepta.
-   * ======================================================================== */
-  const PUSH_CSS = `
-    #am-push-prompt {
-      position: fixed; left: 16px; bottom: 16px; z-index: 9999997;
-      width: calc(100% - 32px); max-width: 360px; box-sizing: border-box;
-      background: #18181b; color: #fff; border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 16px; box-shadow: 0 16px 32px -8px rgba(0,0,0,0.6); padding: 16px;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      display: flex; gap: 12px; align-items: flex-start;
-      opacity: 0; transform: translateY(20px); transition: opacity 0.35s ease, transform 0.35s ease;
-    }
-    #am-push-prompt.visible { opacity: 1; transform: none; }
-    #am-push-prompt .am-push-icon { font-size: 26px; line-height: 1; flex-shrink: 0; }
-    #am-push-prompt .am-push-title { font-size: 15px; font-weight: 700; margin: 0 0 4px; }
-    #am-push-prompt .am-push-text { font-size: 13px; color: #a1a1aa; margin: 0 0 12px; line-height: 1.4; }
-    #am-push-prompt .am-push-actions { display: flex; gap: 8px; }
-    #am-push-prompt button {
-      border: none; border-radius: 10px; padding: 9px 14px; font-weight: 600; font-size: 13px;
-      cursor: pointer; font-family: inherit;
-    }
-    #am-push-prompt .am-push-yes { background: #2563eb; color: #fff; }
-    #am-push-prompt .am-push-yes:hover { background: #1d4ed8; }
-    #am-push-prompt .am-push-no { background: #27272a; color: #e4e4e7; }
-    #am-push-prompt .am-push-no:hover { background: #3f3f46; }
-    @media (max-width: 480px) {
-      #am-push-prompt { left: 12px; right: 12px; bottom: 12px; width: auto; max-width: none; }
-    }
-  `;
-
-  const PUSH_TEXT = {
-    es: {
-      title: '¿Te avisamos de las novedades?',
-      text: 'Recibe una notificación cuando publiquemos algo nuevo. Puedes desactivarlo cuando quieras.',
-      yes: 'Sí, avisadme',
-      no: 'Ahora no'
-    },
-    en: {
-      title: 'Want to hear about new stuff?',
-      text: 'Get a notification when we publish something new. You can turn it off anytime.',
-      yes: 'Yes, notify me',
-      no: 'Not now'
-    }
-  };
-
-  const push = {
-    supported() {
-      return CONFIG.PUSH.ENABLED
-        && site.push
-        && !!CONFIG.PUSH.VAPID_PUBLIC_KEY
-        && window.isSecureContext
-        && 'serviceWorker' in navigator
-        && 'PushManager' in window
-        && 'Notification' in window;
+      this.log.step('Slider visible.');
+      this.startRotation(banner, feed, campaign);
     },
 
-    /** ¿Esta web tiene /push-sw.js? (cacheado 24 h, también el "no") */
-    async workerExists() {
-      const cached = store.get(CONFIG.PUSH.SW_CHECK_KEY);
-      if (cached !== null) return cached;
-
-      let exists = false;
-      try {
-        const res = await fetchWithTimeout(CONFIG.PUSH.SW_PATH, { method: 'HEAD', cache: 'no-store' }, 4000);
-        const type = res.headers.get('content-type') || '';
-        // Comprobar el tipo evita falsos positivos de webs que responden 200 con su index
-        exists = res.ok && type.includes('javascript');
-      } catch { /* no existe o no responde */ }
-
-      store.set(CONFIG.PUSH.SW_CHECK_KEY, exists, { ttl: CONFIG.PUSH.SW_CHECK_TTL_MS });
-      return exists;
-    },
-
-    /** Nuestra registration (scope /push/), ignorando otros service workers de la web */
-    async getRegistration() {
-      const scopeUrl = new URL(CONFIG.PUSH.SCOPE, window.location.origin).href;
-      const regs = await navigator.serviceWorker.getRegistrations();
-      return regs.find(r => r.scope === scopeUrl) || null;
-    },
-
-    /** Registra el worker y espera a que esté activo (subscribe lo necesita) */
-    async register() {
-      const reg = await navigator.serviceWorker.register(CONFIG.PUSH.SW_PATH, { scope: CONFIG.PUSH.SCOPE });
-      if (reg.active) return reg;
-
-      const worker = reg.installing || reg.waiting;
-      if (!worker) throw new Error('Service worker sin instancia');
-      await new Promise((resolve, reject) => {
-        worker.addEventListener('statechange', () => {
-          if (worker.state === 'activated') resolve();
-          else if (worker.state === 'redundant') reject(new Error('Service worker descartado'));
-        });
-      });
-      return reg;
-    },
-
-    async subscribe(reg) {
-      return (await reg.pushManager.getSubscription())
-        || reg.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: base64UrlToUint8Array(CONFIG.PUSH.VAPID_PUBLIC_KEY)
-        });
-    },
-
-    /** Envía la suscripción al servidor (como mucho una vez cada SYNC_TTL_MS) */
-    async send(subscription, country) {
-      if (store.get(CONFIG.PUSH.SYNC_KEY) === subscription.endpoint) return;
-
-      const res = await fetchWithTimeout(CONFIG.PUSH.SUBSCRIBE_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          site: BARE_HOST,
-          subscription: subscription.toJSON(),
-          country: country || null,
-          lang: navigator.language || null,
-          path: window.location.pathname
-        })
-      }, 8000);
-      if (!res.ok) throw new Error(`HTTP ${res.status} al guardar la suscripción`);
-
-      store.set(CONFIG.PUSH.SYNC_KEY, subscription.endpoint, { ttl: CONFIG.PUSH.SYNC_TTL_MS });
-      Logger.log('Suscripción push guardada en el servidor.');
-    },
-
-    async subscribeAndSend(country) {
-      const reg = (await this.getRegistration()) || (await this.register());
-      const sub = await this.subscribe(reg);
-      await this.send(sub, country);
-    },
-
-    /**
-     * Popup propio. Resuelve con el permiso del navegador ('granted', 'denied',
-     * 'default') si pulsa "Sí", con 'no' si pulsa "Ahora no", o con 'ignored'
-     * si hace clic en cualquier otra parte de la página.
-     */
-    showPrompt() {
+    /* ---------- Popup ---------- */
+    /** Muestra el popup grande; resuelve cuando se ha cerrado */
+    showPopup(item, campaign) {
       return new Promise((resolve) => {
-        injectStyle('am-push-styles', PUSH_CSS);
-        const lang = (navigator.language || 'en').toLowerCase().startsWith('es') ? 'es' : 'en';
-        const t = PUSH_TEXT[lang];
+        const meta = (item.badge ? `<span class="int-badge-store">${escapeHtml(item.badge)}</span>` : '')
+          + (item.price ? `<span id="offer-int-price">${escapeHtml(item.price)}</span>` : '');
 
-        const box = document.createElement('div');
-        box.id = 'am-push-prompt';
-        box.setAttribute('data-am-ui', '');
-        box.setAttribute('role', 'dialog');
-        box.setAttribute('aria-label', t.title);
-        box.innerHTML = `
-          <div class="am-push-icon" aria-hidden="true">🔔</div>
-          <div>
-            <p class="am-push-title">${escapeHtml(t.title)}</p>
-            <p class="am-push-text">${escapeHtml(t.text)}</p>
-            <div class="am-push-actions">
-              <button type="button" class="am-push-yes">${escapeHtml(t.yes)}</button>
-              <button type="button" class="am-push-no">${escapeHtml(t.no)}</button>
+        const overlay = document.createElement('div');
+        overlay.id = 'offer-overlay';
+        overlay.setAttribute('data-am-ui', 'ad');
+        this.applyAccent(overlay, campaign);
+        overlay.innerHTML = `
+          <div id="offer-interstitial" role="dialog" aria-modal="true" aria-label="${escapeHtml(item.title)}">
+            <button id="offer-close-btn" type="button" aria-label="Cerrar">✕</button>
+            <div id="offer-int-img-wrap">
+              <img id="offer-int-img" src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}">
+            </div>
+            <div id="offer-int-body">
+              <div id="offer-int-meta">${meta}</div>
+              <div id="offer-int-title">${escapeHtml(item.title)}</div>
+              ${item.description ? `<div id="offer-int-desc">${escapeHtml(item.description)}</div>` : ''}
+              <a id="offer-int-cta" href="${escapeHtml(item.url)}" target="_blank" rel="${escapeHtml(campaign.rel)}">
+                ${escapeHtml(item.popupCta)} →
+              </a>
             </div>
           </div>
         `;
-        document.body.appendChild(box);
-        void box.offsetWidth;
-        box.classList.add('visible');
+        document.body.appendChild(overlay);
+        void overlay.offsetWidth; // fuerza reflow para que la transición de entrada funcione
+        overlay.classList.add('visible');
+        flag.set(this.keys(campaign).popup, CONFIG.CAMPAIGN.POPUP_TTL_MS);
+        this.log.step(`Popup visible: ${item.title}`);
 
-        let done = false;
-        const finish = (result) => {
-          if (done) return;
-          done = true;
-          document.removeEventListener('click', onOutsideClick, true);
-          box.classList.remove('visible');
-          setTimeout(() => box.remove(), 350);
-          resolve(result);
+        let closed = false;
+        const close = (how) => {
+          if (closed) return;
+          closed = true;
+          this.log.info(`Popup cerrado (${how}).`);
+          clearTimeout(autoCloseTimer);
+          document.removeEventListener('keydown', onKeyDown);
+          overlay.classList.remove('visible'); // animación de "hacerse pequeño"
+          setTimeout(() => {
+            overlay.remove();
+            resolve();
+          }, 400);
         };
-        const onOutsideClick = (e) => { if (!box.contains(e.target)) finish('ignored'); };
 
-        box.querySelector('.am-push-yes').addEventListener('click', () => {
-          // requestPermission tiene que llamarse directamente dentro del clic
-          const request = Notification.requestPermission();
-          finish(Promise.resolve(request).then(r => r || Notification.permission));
+        const onKeyDown = (e) => { if (e.key === 'Escape') close('Escape'); };
+        const autoCloseTimer = setTimeout(() => close('automático'), CONFIG.CAMPAIGN.POPUP_AUTOCLOSE_MS);
+
+        overlay.addEventListener('click', (e) => {
+          if (e.target.closest('#offer-close-btn')) return close('botón ✕');
+          if (e.target === overlay) return close('clic fuera');
+          if (e.target.closest('#offer-int-cta')) return close('clic en el botón'); // el enlace abre la página solo
+          if (e.target.closest('#offer-interstitial')) {
+            openInNewTab(item.url);
+            close('clic en la tarjeta');
+          }
         });
-        box.querySelector('.am-push-no').addEventListener('click', () => finish('no'));
-        setTimeout(() => document.addEventListener('click', onOutsideClick, true), 0);
-      });
-    },
-
-    /** Guarda el resultado y, si aceptó, suscribe */
-    async handleResult(result, country) {
-      Logger.log(`Permiso de notificaciones: ${result}`);
-      if (result === 'granted') {
-        await this.subscribeAndSend(country);
-      } else if (result === 'no' || result === 'default') {
-        store.set(CONFIG.PUSH.DISMISS_KEY, true, { ttl: CONFIG.PUSH.DISMISS_TTL_MS });
-      } else if (result === 'ignored') {
-        store.set(CONFIG.PUSH.DISMISS_KEY, true, { ttl: CONFIG.PUSH.IGNORE_TTL_MS });
-      }
-      // 'denied': el navegador ya no dejará volver a preguntar
-    },
-
-    /**
-     * Chrome, Edge, Opera, Samsung Internet… (Chromium) dejan pedir el permiso
-     * sin que el usuario haya hecho clic. Firefox y Safari no: lo ignoran.
-     */
-    canAskWithoutGesture() {
-      return !!navigator.userAgentData?.brands?.some(b => /Chromium/i.test(b.brand));
-    },
-
-    /** Pide el permiso nativo directamente; devuelve 'granted' | 'denied' | 'default' */
-    async requestNow() {
-      const r = await Notification.requestPermission();
-      return r || Notification.permission;
-    },
-
-    /**
-     * Pide el permiso nativo en la primera interacción del usuario con la página
-     * (clic, tecla o toque). Se escucha en fase de captura sobre window para ir
-     * antes que el popunder y PopAds. Devuelve una promesa con el resultado.
-     */
-    requestOnFirstInteraction() {
-      return new Promise((resolve) => {
-        const events = ['click', 'keydown', 'touchend'];
-        const handler = () => {
-          events.forEach(ev => window.removeEventListener(ev, handler, true));
-          // requestPermission tiene que llamarse aquí mismo, dentro del evento
-          Promise.resolve(Notification.requestPermission())
-            .then(r => resolve(r || Notification.permission))
-            .catch(() => resolve(Notification.permission));
-        };
-        events.forEach(ev => window.addEventListener(ev, handler, { capture: true, passive: true }));
+        document.addEventListener('keydown', onKeyDown);
       });
     },
 
     /**
-     * Decide si pedir el permiso.
-     * Resuelve cuando ya no bloquea a otros scripts que capturan clics (PopAds):
-     * - modo 'auto' en Chromium: tras mostrar y contestar el aviso nativo
-     * - modo 'auto' en Firefox/Safari: en cuanto queda esperando la primera interacción
-     * - modo 'prompt': cuando se ha contestado nuestro popup
+     * Ejecuta una campaña. Nada se pinta hasta que el primer elemento (y su
+     * imagen) está cargado. El popup sale como mucho una vez cada POPUP_TTL_MS;
+     * el resto de páginas muestran directamente el slider.
+     *
+     * Resuelve cuando ya no hay popup en pantalla (slider visible, nada que
+     * mostrar o error), para que lo siguiente no coincida con el popup.
+     * Además lanza el evento 'appmanager:banner' por compatibilidad.
      */
-    async maybePrompt(country) {
-      if (!this.supported()) return;
-      if (Notification.permission === 'denied') return;
+    async run(campaign) {
+      const log = this.log;
+      const finish = (result) => {
+        state.campaignResult = result;
+        log.info(`Resultado: ${result}`);
+        document.dispatchEvent(new CustomEvent('appmanager:banner', { detail: { campaign: campaign.id, result } }));
+        return result;
+      };
 
-      if (!(await this.workerExists())) {
-        Logger.log(`Esta web no tiene ${CONFIG.PUSH.SW_PATH}; sin notificaciones.`);
-        return;
+      if (this.started || document.getElementById('offer-overlay') || document.getElementById('offer-banner')) {
+        log.warn('La campaña ya se había iniciado en esta página; se ignora la segunda llamada.');
+        return 'duplicada';
+      }
+      this.started = true;
+
+      const keys = this.keys(campaign);
+      const wantPopup = campaign.popup && !flag.get(keys.popup);
+      const wantSlider = campaign.slider && !flag.get(keys.sliderClosed);
+      log.step(`Campaña "${campaign.id}" → popup: ${wantPopup ? 'sí' : 'no (ya visto o desactivado)'}, slider: ${wantSlider ? 'sí' : 'no (cerrado o desactivado)'}`);
+
+      if (!wantPopup && !wantSlider) return finish('nada que mostrar');
+
+      const feed = createFeed(campaign, log);
+      let first = null;
+      try {
+        first = await feed.next();
+      } catch (err) {
+        log.error('Error al cargar el JSON de la campaña:', err);
       }
 
-      // Ya dio permiso (en otra visita): se asegura la suscripción sin preguntar
-      if (Notification.permission === 'granted') {
-        await this.subscribeAndSend(country);
-        return;
+      if (isStopped()) return finish('parada por AdSense');
+      if (!first) return finish('sin elementos');
+
+      injectStyle('offer-styles', CAMPAIGN_CSS);
+
+      if (wantPopup) await this.showPopup(first, campaign);
+      if (isStopped()) return finish('parada por AdSense');
+
+      if (wantSlider) {
+        this.showSlider(first, feed, campaign);
+        return finish(wantPopup ? 'popup y slider' : 'solo slider');
       }
-
-      if (store.get(CONFIG.PUSH.DISMISS_KEY)) return;
-
-      await wait(CONFIG.PUSH.PROMPT_DELAY_MS);
-
-      if (CONFIG.PUSH.MODE === 'prompt') {
-        await this.handleResult(await this.showPrompt(), country);
-        return;
-      }
-
-      // Modo automático: aviso nativo del navegador, sin popup propio
-      if (this.canAskWithoutGesture()) {
-        Logger.log('Pidiendo permiso de notificaciones automáticamente...');
-        await this.handleResult(await this.requestNow(), country);
-        return;
-      }
-
-      Logger.log('Se pedirá el permiso de notificaciones en la primera interacción.');
-      this.requestOnFirstInteraction()
-        .then(result => this.handleResult(result, country))
-        .catch(err => Logger.error('Error en notificaciones push:', err));
+      return finish('solo popup');
     }
   };
 
   /* ==========================================================================
    * SMARTLINK POPUNDER Y POPADS
    * ======================================================================== */
-  function initSmartLinkPopunder() {
-    if (!site.popunder || store.get(CONFIG.POPUNDER.KEY)) return;
-    Logger.log('Iniciando smartlink popunder...');
+  const popunder = {
+    log: createLog('popunder'),
+    started: false,
 
-    const root = document.documentElement;
-    const onClick = (e) => {
-      if (isOwnUi(e.target)) return; // los clics en nuestros popups no cuentan
-      root.removeEventListener('click', onClick);
-      if (store.get(CONFIG.POPUNDER.KEY)) return;
-      window.open(smartlinkUrl(), 'popunder', 'width=1024,height=768,resizable=1,toolbar=1,location=1,menubar=1,status=1,scrollbars=1');
-      store.set(CONFIG.POPUNDER.KEY, true, { ttl: CONFIG.POPUNDER.TTL_MS });
-    };
-    root.addEventListener('click', onClick);
-  }
+    /** Prepara el popunder para el primer clic. Devuelve true si queda activo. */
+    init() {
+      if (this.started) return true;
+      if (!site.popunder) { this.log.debug('Desactivado en esta web.'); return false; }
+      if (store.get(CONFIG.POPUNDER.KEY)) { this.log.debug('Ya se abrió en las últimas horas.'); return false; }
+      this.started = true;
+      this.log.step('Popunder preparado para el primer clic.');
+
+      const root = document.documentElement;
+      const onClick = (e) => {
+        if (isOwnUi(e.target)) return; // los clics en nuestros widgets no cuentan
+        root.removeEventListener('click', onClick);
+        if (state.stopped || store.get(CONFIG.POPUNDER.KEY)) return;
+        window.open(smartlinkUrl(), 'popunder', 'width=1024,height=768,resizable=1,toolbar=1,location=1,menubar=1,status=1,scrollbars=1');
+        store.set(CONFIG.POPUNDER.KEY, true, { ttl: CONFIG.POPUNDER.TTL_MS });
+        this.log.info('Popunder abierto.');
+      };
+      root.addEventListener('click', onClick);
+      return true;
+    }
+  };
 
   function loadPopAdsScripts() {
-    Logger.log('Cargando scripts de PopAds / Adsterra...');
+    if (isStopped()) return;
+    createLog('popads').step('Cargando PopAds + Adsterra.');
 
     // popads.net (código del proveedor, sin modificar)
     (function(){var q=window,t="d30a423e37fe9b7888b7e8f56a20e472",f=[["siteId",750+158+222+4934385],["minBid",0.000001],["popundersPerIP","0"],["delayBetween",0],["default","https://compiledonatevanity.com/vg3ejyvbq?key=ca6fe018d69873f98382f717bc646ca6"],["defaultPerDay",0],["topmostLayer","auto"]],a=["d3d3LmludGVsbGlnZW5jZWFkeC5jb20vc2V4dC1hbGwuY3Nz","ZDJrbHg4N2Jnem5nY2UuY2xvdWRmcm9udC5uZXQvYkdEL2xtYXBsZS5taW4uanM="],d=-1,i,b,v=function(){clearTimeout(b);d++;if(a[d]&&!(1814345022000<(new Date).getTime()&&1<d)){i=q.document.createElement("script");i.type="text/javascript";i.async=!0;var y=q.document.getElementsByTagName("script")[0];i.src="https://"+atob(a[d]);i.crossOrigin="anonymous";i.onerror=v;i.onload=function(){clearTimeout(b);q[t.slice(0,16)+t.slice(0,16)]||v()};b=setTimeout(v,5E3);y.parentNode.insertBefore(i,y)}};if(!q[t]){try{Object.freeze(q[t]=f)}catch(e){}v()}})();
@@ -1193,54 +1207,22 @@
 
   /* ==========================================================================
    * ACCIONES ALEATORIAS
-   * Cuando se cae en el caso "notificaciones" (fuera de España, o en España
-   * con PROBAR_PUSH / pushInSpain), se elige una de estas acciones al azar
-   * según su peso.
-   *
-   * Cada acción recibe { country, site } y devuelve (o resuelve con):
-   *   true  → ha hecho algo; no se prueba ninguna otra
-   *   false → no aplica en este visitante; se prueba otra acción al azar
-   *
-   * Para añadir una acción nueva: escribe la función y añádela a ACTIONS.
-   * Peso 0 = desactivada.
+   * Cada acción devuelve (o resuelve con):
+   *   true       → ha hecho algo; no se prueba otra
+   *   'motivo'   → no aplica en este visitante; se prueba otra al azar
+   * Para añadir una: escríbela aquí y dale peso en ACTION_WEIGHTS (arriba).
    * ======================================================================== */
+  const ACTION_FNS = {
+    /** Solo el popunder del smartlink */
+    smartlink: () => popunder.init() || 'popunder no disponible',
 
-  /** Notificaciones push (ver módulo push) */
-  async function showPush({ country }) {
-    if (!push.supported() || Notification.permission === 'denied') return false;
-    if (Notification.permission !== 'granted' && store.get(CONFIG.PUSH.DISMISS_KEY)) return false;
-    if (!(await push.workerExists())) return false;
+    /** Intersticial de juegos de juegosboom.com */
+    bannerGames: () => {
+      loadScript(CONFIG.BANNER_GAMES_URL);
+      return true;
+    }
+  };
 
-    await push.maybePrompt(country);
-    return true;
-  }
-
-  /** Placeholder: rellenar más adelante */
-  async function testcase1({ country, site }) {
-  
-	initSmartLinkPopunder();
-    return true;
-  }
-
-  /** Placeholder: rellenar más adelante */
-  async function testcase2({ country, site }) {
-    // TODO
-	loadScript("https://juegosboom.com/bannergames/juegoaleatorio.js?lang=es");
-	  
-    return true;
-  }
-
-  const ACTIONS = [
-    /*
-	{ name: 'showPush',  fn: showPush,  weight: 1 },
-	{ name: 'testcase2', fn: testcase2, weight: 1 },
-	*/
-    { name: 'testcase1', fn: testcase1, weight: 1 },
-	{ name: 'testcase2', fn: testcase2, weight: 1 },
-    { name: 'showPush',  fn: showPush,  weight: 1 },
-  ];
-
-  /** Elige una acción según su peso */
   function pickWeighted(list) {
     const total = list.reduce((sum, a) => sum + a.weight, 0);
     let r = Math.random() * total;
@@ -1251,99 +1233,168 @@
     return list[list.length - 1];
   }
 
-  /**
-   * Prueba acciones al azar hasta que una devuelva true o no queden.
-   * Resuelve con el nombre de la acción ejecutada, o null.
-   */
-  async function runRandomAction(country) {
-    let pool = ACTIONS.filter(a => a.weight > 0);
+  /** Prueba acciones al azar hasta que una haga algo. Resuelve con su nombre o null. */
+  async function runRandomAction() {
+    const log = createLog('acciones');
+    let pool = Object.entries(ACTION_WEIGHTS)
+      .filter(([name, weight]) => weight > 0 && ACTION_FNS[name])
+      .map(([name, weight]) => ({ name, weight, fn: ACTION_FNS[name] }));
+
+    log.debug('Candidatas: ' + pool.map(a => `${a.name}(${a.weight})`).join(', '));
 
     while (pool.length) {
+      if (isStopped()) return null;
       const action = pickWeighted(pool);
       pool = pool.filter(a => a !== action);
       try {
-        if (await action.fn({ country, site })) {
-          Logger.log(`Acción aleatoria ejecutada: ${action.name}`);
+        const result = await action.fn();
+        if (result === true) {
+          state.actions.push(action.name);
+          log.step(`Acción elegida: ${action.name}`);
           return action.name;
         }
-        Logger.log(`Acción ${action.name} no aplica, se prueba otra.`);
+        log.info(`${action.name} no aplica (${result || 'sin motivo'}), se prueba otra.`);
       } catch (err) {
-        Logger.error(`Error en la acción ${action.name}:`, err);
+        log.error(`Error en la acción ${action.name}:`, err);
       }
     }
 
-    Logger.log('Ninguna acción aleatoria aplicable.');
+    log.info('Ninguna acción aplicable.');
     return null;
   }
 
   /* ==========================================================================
    * ESTRATEGIAS POR REGIÓN
+   * La campaña va siempre primero; lo demás espera a que el popup se cierre.
    * ======================================================================== */
-  /** España: solo con PROBAR_PUSH o en webs con pushInSpain */
-  function runPushTest(country) {
-    Logger.log('Acciones aleatorias activas también en España en esta web.');
-    runRandomAction(country);
-  }
-
-  function runSpain(country) {
-    const testPush = CONFIG.PUSH.PROBAR_PUSH || site.pushInSpain;
-
-    if (site.spainMode !== 'offers') {
-      if (site.spainMode === 'sticky') initAmazonStickyButton();
-      if (testPush) runPushTest(country);
+  async function runCampaignIfAny() {
+    const log = createLog('campaña');
+    if (!site.campaigns) {
+      log.info('Campañas desactivadas en esta web.');
       return;
     }
-
-    // facha.js (y lo que cargue) solo aparece cuando el popup de chollos ya es slider.
-    // En modo prueba, el popup de notificaciones espera también a ese momento para no taparse con el de chollos.
-    document.addEventListener('appmanager:banner', () => {
-      loadScript(CONFIG.SPAIN_DEFERRED_SCRIPT);
-      if (testPush) runPushTest(country);
-    }, { once: true });
-    initOffers();
+    const campaign = resolveCampaign(state.country);
+    state.campaign = campaign?.id || null;
+    if (!campaign) {
+      log.info(`Ninguna campaña para ${BARE_HOST} / ${state.country || 'país desconocido'}.`);
+      return;
+    }
+    log.info(`Campaña elegida: ${campaign.id}`, campaign);
+    await campaignUi.run(campaign);
   }
 
-  function runInternational(country) {
-    initSmartLinkPopunder();
+  async function runSpain() {
+    const log = createLog('españa');
 
-    const promptDone = runRandomAction(country);
+    if (site.spainMode === 'sticky') initAmazonStickyButton();
+    else if (site.spainMode === 'campaign') await runCampaignIfAny();
+    else log.info('spainMode "none": sin campaña ni botón.');
+
+    if (site.actionsInSpain && !isStopped()) {
+      log.info('Acciones aleatorias activas también en España en esta web.');
+      runRandomAction();
+    }
+  }
+
+  async function runInternational() {
+    await runCampaignIfAny();
+    if (isStopped()) return;
+
+    popunder.init();
+    await runRandomAction();
 
     // PopAds captura cualquier clic: se carga cuando la acción aleatoria ya no puede pisarse con él
-    if (site.popAds) promptDone.then(loadPopAdsScripts);
+    if (site.popAds) loadPopAdsScripts();
+  }
+
+  /* ==========================================================================
+   * API PÚBLICA (consola)
+   * ======================================================================== */
+  function resetStoredFlags() {
+    const keys = [
+      CONFIG.POPUNDER.KEY,
+      ...CAMPAIGNS.filter(c => c.id).flatMap(c => Object.values(campaignUi.keys(c)))
+    ];
+    keys.forEach(k => flag.remove(k));
+    store.remove(CONFIG.GEO.CACHE_KEY, { session: true });
+    createLog('reset').warn('Marcas borradas (popup visto, slider cerrado, popunder, país).');
+  }
+
+  function exposeApi() {
+    window.isAdultWeb = site.adult; // compatibilidad con otros scripts
+    window.AppManager = {
+      version: VERSION,
+      site,
+      state,
+      trace,
+      get country() { return state.country; },
+      report() {
+        console.table(trace.map(({ ms, level, area, msg }) => ({ ms, level, area, msg })));
+        return state;
+      },
+      reset: resetStoredFlags
+    };
   }
 
   /* ==========================================================================
    * INICIALIZACIÓN
    * ======================================================================== */
+  function readMocks() {
+    const qLoc = (QUERY.get('mocklocation') || '').trim().toUpperCase();
+    state.mock.location = qLoc || (MOCK_LOCATION ? String(MOCK_LOCATION).toUpperCase() : null);
+
+    const qAds = QUERY.get('mockadsense');
+    state.mock.adsense = (qAds === '1' || qAds === 'true') ? true
+      : (qAds === '0' || qAds === 'false') ? false
+      : MOCK_ADSENSE;
+  }
+
   async function init() {
-    Logger.log(`Inicializando AppManager v${VERSION} en ${site.host}...`);
+    const log = createLog('init');
+    readMocks();
+    exposeApi();
 
-    // API pública (isAdultWeb y cfpais se mantienen por compatibilidad con otros scripts)
-    window.isAdultWeb = site.adult;
-    window.AppManager = { version: VERSION, site, country: null };
+    log.step(`AppManager v${VERSION} en ${BARE_HOST} (config: ${site.configKey || 'por defecto'})`);
+    if (state.mock.location) log.warn(`País SIMULADO: ${state.mock.location}`);
+    if (state.mock.adsense !== null) log.warn(`AdSense SIMULADO: ${state.mock.adsense ? 'sí' : 'no'}`);
+    if (QUERY.has('am_reset')) resetStoredFlags();
 
+    // 1. Siempre
     affiliate.watch();
     loadAnalytics();
 
-    if (hasAdSense()) {
-      Logger.warn('Google AdSense detectado. Se detiene la inyección publicitaria.');
+    // 2. AdSense: si está, no se hace nada más
+    const adsenseReason = adsense.detect();
+    if (adsenseReason) {
+      adsense.stop(adsenseReason);
       return;
     }
+    adsense.watchLate();
 
-    if (new URLSearchParams(window.location.search).get('utm_source') === 'chuscountry') {
+    // 3. Tráfico chuscountry
+    if (QUERY.get('utm_source') === 'chuscountry') {
+      log.step('utm_source=chuscountry → redirección al smartlink.');
       window.location.href = smartlinkUrl();
       return;
     }
 
+    // 4. Edad
     if (site.adult) await ageGate.ensure();
 
-    const country = await geo.getCountry();
-    window.AppManager.country = country;
-    window.cfpais = country === 'ES' ? 'spain' : (country || undefined);
-    Logger.log(`País: ${country || 'desconocido'}`);
+    // 5. País
+    const { country, source } = await geo.getCountry();
+    state.country = country;
+    state.countrySource = source;
+    window.cfpais = country === 'ES' ? 'spain' : (country || undefined); // compatibilidad
+    createLog('geo').step(`País: ${country || 'desconocido'} (${source})`);
 
-    if (country === 'ES') runSpain(country);
-    else runInternational(country);
+    if (isStopped()) return;
+
+    // 6-7. Publicidad según región
+    if (country === 'ES') await runSpain();
+    else await runInternational();
+
+    log.debug('Flujo terminado.', state);
   }
 
   if (document.readyState === 'loading') {
