@@ -36,7 +36,7 @@
       return m ? m[1] : null;
     })
     .catch(function (err) {
-      document.location.href = 'https://auctionr.org/4/44bf6e0e4e0747f0502259b2389d4019';
+      //document.location.href = 'https://auctionr.org/4/44bf6e0e4e0747f0502259b2389d4019';
       return null;
     })
     .then(function (country) {
@@ -46,7 +46,7 @@
         && country !== 'XX';
 
       if (!esValido) {
-        document.location.href = 'https://auctionr.org/4/44bf6e0e4e0747f0502259b2389d4019';
+        //document.location.href = 'https://auctionr.org/4/44bf6e0e4e0747f0502259b2389d4019';
         country = 'unknown';
       }
 
