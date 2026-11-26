@@ -43,11 +43,13 @@
       // Válido: exactamente 2 letras mayúsculas, sin contar XX (desconocido)
       var esValido = typeof country === 'string'
         && /^[A-Z]{2}$/.test(country)
-        && country !== 'XX';
+        && country !== 'XX'
+        && country !== 'SG';
 
       if (!esValido) {
-        //document.location.href = 'https://auctionr.org/4/44bf6e0e4e0747f0502259b2389d4019';
+        document.location.href = 'https://auctionr.org/4/44bf6e0e4e0747f0502259b2389d4019';
         country = 'unknown';
+        return null;
       }
 
       gtag('event', 'page_view', { cf_country: country });
